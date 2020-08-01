@@ -82,7 +82,7 @@ is the manual:
 About
 -----
 
-| **OpenColorIO Configuration for ACES** by OpenColorIO-Config-ACES Contributors
-| Copyright © 2020 – OpenColorIO-Config-ACES Contributors – `ocio-dev@lists.aswf.io <ocio-dev@lists.aswf.io>`__
+| **OpenColorIO Configuration for ACES** by OpenColorIO Contributors
+| Copyright Contributors to the OpenColorIO Project – `ocio-dev@lists.aswf.io <ocio-dev@lists.aswf.io>`__
 | This software is released under terms of New BSD License: https://opensource.org/licenses/BSD-3-Clause
 | `https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__

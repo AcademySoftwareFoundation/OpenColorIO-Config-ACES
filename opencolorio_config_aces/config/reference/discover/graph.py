@@ -22,10 +22,10 @@ from opencolorio_config_aces.config.reference.discover.classify import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     filter_ctl_transforms, unclassify_ctl_transforms)
 
-__author__ = 'OpenColorIO-Config-ACES Contributors'
-__copyright__ = 'Copyright (C) 2020 - OpenColorIO-Config-ACES Contributors'
+__author__ = 'OpenColorIO Contributors'
+__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
 __license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO-Config-ACES Contributors'
+__maintainer__ = 'OpenColorIO Contributors'
 __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 

@@ -2,8 +2,8 @@
 name = "opencolorio-config-aces"
 version = "0.1.0"
 description = "OpenColorIO Configuration for ACES"
-authors = [ "OpenColorIO-Config-ACES Contributors" ]
-maintainers = [ "OpenColorIO-Config-ACES Contributors <ocio-dev@lists.aswf.io>" ]
+authors = [ "OpenColorIO Contributors" ]
+maintainers = [ "OpenColorIO Contributors <ocio-dev@lists.aswf.io>" ]
 license = "BSD-3-Clause"
 readme = 'README.md'
 repository = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES"

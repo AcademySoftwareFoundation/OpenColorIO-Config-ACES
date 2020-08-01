@@ -33,10 +33,10 @@ from collections import Mapping, defaultdict
 from opencolorio_config_aces.utilities import (
     message_box, paths_common_ancestor, vivified_to_dict)
 
-__author__ = 'OpenColorIO-Config-ACES Contributors'
-__copyright__ = 'Copyright (C) 2020 - OpenColorIO-Config-ACES Contributors'
+__author__ = 'OpenColorIO Contributors'
+__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
 __license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO-Config-ACES Contributors'
+__maintainer__ = 'OpenColorIO Contributors'
 __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 

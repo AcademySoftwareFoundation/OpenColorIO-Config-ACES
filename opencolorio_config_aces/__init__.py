@@ -24,10 +24,10 @@ from .config import (
     build_aces_conversion_graph, node_to_ctl_transform, ctl_transform_to_node,
     filter_nodes, plot_aces_conversion_graph)
 
-__author__ = 'OpenColorIO-Config-ACES Contributors'
-__copyright__ = 'Copyright (C) 2020 - OpenColorIO-Config-ACES Contributors'
+__author__ = 'OpenColorIO Contributors'
+__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
 __license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO-Config-ACES Contributors'
+__maintainer__ = 'OpenColorIO Contributors'
 __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
