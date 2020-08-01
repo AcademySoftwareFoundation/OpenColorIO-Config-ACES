@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright Contributors to the OpenColorIO Project.
+
 #
 # ocio-config-aces documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug  5 14:31:53 2014.

@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright Contributors to the OpenColorIO Project.
 
 from .classify import (discover_aces_ctl_transforms,
                        classify_aces_ctl_transforms, unclassify_ctl_transforms,

@@ -1,3 +1,6 @@
+REM SPDX-License-Identifier: BSD-3-Clause
+REM Copyright Contributors to the OpenColorIO Project.
+
 @ECHO OFF
 
 REM Command file for Sphinx documentation
