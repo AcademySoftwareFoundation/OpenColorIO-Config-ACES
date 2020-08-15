@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright Contributors to the OpenColorIO Project.
+
+[tool.poetry]
+name = "opencolorio-config-aces"
+version = "0.1.0"
+description = "OpenColorIO Configuration for ACES"
+authors = [ "OpenColorIO Contributors" ]
+maintainers = [ "OpenColorIO Contributors <ocio-dev@lists.aswf.io>" ]
+license = "BSD-3-Clause"
+readme = 'README.md'
+repository = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES"
+homepage = "https://www.colour-science.org/"
+keywords = [
+    "ACES",
+    "OpenColorIO",
+    "OCIO"
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+networkx = { version = "*" }
+
+coverage = { version = "*", optional = true }  # Development dependency.
+coveralls = { version = "*", optional = true }  # Development dependency.
+flake8 = { version = "*", optional = true }  # Development dependency.
+invoke = { version = "*", optional = true }  # Development dependency.
+nose = { version = "*", optional = true }  # Development dependency.
+pre-commit = { version = "*", optional = true }  # Development dependency.
+pygraphviz = { version = "*", optional = true }
+pytest = { version = "*", optional = true }  # Development dependency.
+restructuredtext-lint = { version = "*", optional = true }  # Development dependency.
+sphinx = { version = "*", optional = true }  # Development dependency.
+sphinx_rtd_theme = { version = "*", optional = true }  # Development dependency.
+twine = { version = "*", optional = true }  # Development dependency.
+yapf = { version = "0.23", optional = true }  # Development dependency.
+
+[tool.poetry.dev-dependencies]
+coverage = "*"
+coveralls = "*"
+flake8 = "*"
+invoke = "*"
+nose = "*"
+pre-commit = "*"
+pytest = "*"
+restructuredtext-lint = "*"
+sphinx = "*"
+sphinx_rtd_theme = "*"
+twine = "*"
+yapf = "0.23"
+
+[tool.poetry.extras]
+development = [
+    "coverage",
+    "coveralls",
+    "flake8",
+    "invoke",
+    "nose",
+    "pre-commit",
+    "pytest",
+    "restructuredtext-lint",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "twine",
+    "yapf"
+]
+graphviz = [ "pygraphviz" ]
+
+[build-system]
+requires = [ "poetry>=0.12" ]
+build-backend = "poetry.masonry.api"
