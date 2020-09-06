@@ -71,12 +71,31 @@ def build_aces_conversion_graph(ctl_transforms):
     for ctl_transform in ctl_transforms:
         source = ctl_transform.source
         target = ctl_transform.target
+        family = ctl_transform.family
 
         if source is None or target is None:
-            logging.warning(f'{ctl_transform} has either a missing source or '
-                            f'target colourspace and won\'t be included in '
+            logging.warning(f'"{ctl_transform}" has either a missing source '
+                            f'or target colourspace and won\'t be included in '
                             f'the "aces-dev" conversion graph!')
             continue
+
+        # Without enforcing a preferred source and target colourspaces, the
+        # nodes do not necessarily have predictable source and target
+        # colourspaces which might be confusing, e.g. a node for an
+        # "Output Transform" might have an "RGBmonitor_100nits_dim" source and
+        # a "OCES" target.
+        if family in ('csc', 'input_transform', 'lmt'):
+            if source == 'ACES2065-1':
+                logging.info(f'"{ctl_transform}" ctl transform from the '
+                             f'"{family}" family uses "{source}" as source, '
+                             f'skipping!')
+                continue
+        elif family == 'output_transform':
+            if target in ('ACES2065-1', 'OCES'):
+                logging.info(f'"{ctl_transform}" ctl transform from the '
+                             f'"{family}" family uses "{target}" as target, '
+                             f'skipping!')
+                continue
 
         # Serializing the data for "Graphviz AGraph".
         serialized = codecs.encode(pickle.dumps(ctl_transform, 4),
@@ -86,10 +105,10 @@ def build_aces_conversion_graph(ctl_transforms):
             if node not in graph.nodes():
                 graph.add_node(node, data=ctl_transform, serialized=serialized)
             else:
-                logging.debug(f'{node} node was already added to '
-                              f'the "aces-dev" conversion graph '
-                              f'by the {node_to_ctl_transform(graph, node)} '
-                              f'"CTL" transform, skipping!')
+                logging.info(f'"{node}" node was already added to '
+                             f'the "aces-dev" conversion graph '
+                             f'by the "{node_to_ctl_transform(graph, node)}" '
+                             f'"CTL" transform, skipping!')
 
         graph.add_edge(source, target)
 
@@ -118,7 +137,7 @@ def node_to_ctl_transform(graph, node):
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
     >>> node_to_ctl_transform(graph, 'P3D60_48nits')  # doctest: +ELLIPSIS
-    CTLTransform('odt...p3...InvODT.Academy.P3D60_48nits.ctl')
+    CTLTransform('odt...p3...ODT.Academy.P3D60_48nits.ctl')
     """
 
     return graph.nodes[node]['data']
