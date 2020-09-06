@@ -56,3 +56,16 @@ Reference Configuration
     ctl_transform_to_node
     filter_nodes
     plot_aces_conversion_graph
+
+*aces-dev* Reference Config Generator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/
+
+    classify_aces_ctl_transforms
+    generate_config_aces
