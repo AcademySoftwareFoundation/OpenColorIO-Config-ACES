@@ -7,6 +7,7 @@ Common Utilities
 Defines common utilities objects that don't fall in any specific category.
 """
 
+import functools
 import os
 from collections import defaultdict
 from itertools import chain
@@ -20,9 +21,20 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'first_item', 'common_ancestor', 'paths_common_ancestor', 'vivification',
-    'vivified_to_dict', 'message_box'
+    'DocstringDict', 'first_item', 'common_ancestor', 'paths_common_ancestor',
+    'vivification', 'vivified_to_dict', 'message_box',
+    'is_opencolorio_installed', 'REQUIREMENTS_TO_CALLABLE', 'required',
+    'is_string', 'is_iterable'
 ]
+
+
+class DocstringDict(dict):
+    """
+    A :class:`dict` sub-class that allows settings a docstring to :class:`dict`
+    instances.
+    """
+
+    pass
 
 
 def first_item(iterable, default=None):
@@ -238,3 +250,130 @@ def message_box(message, width=79, padding=3, print_callable=print):
     print_callable('=' * width)
 
     return True
+
+
+def is_opencolorio_installed(raise_exception=False):
+    """
+    Returns if *OpenColorIO* is installed and available.
+
+    Parameters
+    ----------
+    raise_exception : bool
+        Raise exception if *OpenColorIO* is unavailable.
+
+    Returns
+    -------
+    bool
+        Is *OpenColorIO* installed.
+
+    Raises
+    ------
+    ImportError
+        If *OpenColorIO* is not installed.
+    """
+
+    try:  # pragma: no cover
+        import PyOpenColorIO  # noqa
+
+        return True
+    except ImportError as error:  # pragma: no cover
+        if raise_exception:
+            raise ImportError(('"OpenColorIO" related API features '
+                               'are not available: "{0}".').format(error))
+        return False
+
+
+REQUIREMENTS_TO_CALLABLE = DocstringDict({
+    'OpenColorIO':
+    is_opencolorio_installed
+})
+REQUIREMENTS_TO_CALLABLE.__doc__ = """
+Mapping of requirements to their respective callables.
+
+REQUIREMENTS_TO_CALLABLE : dict
+"""
+
+
+def required(*requirements):
+    """
+    A decorator checking if various requirements are satisfied.
+
+    Other Parameters
+    ----------------
+    \\*requirements : list, optional
+        Requirements to check whether they are satisfied.
+
+    Returns
+    -------
+    object
+    """
+
+    def wrapper(function):
+        """
+        Wrapper for given function.
+        """
+
+        @functools.wraps(function)
+        def wrapped(*args, **kwargs):
+            """
+            Wrapped function.
+            """
+
+            for requirement in requirements:
+                REQUIREMENTS_TO_CALLABLE[requirement](raise_exception=True)
+
+            return function(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
+
+
+def is_string(a):
+    """
+    Returns if given :math:`a` variable is a *string* like variable.
+
+    Parameters
+    ----------
+    a : object
+        Data to test.
+
+    Returns
+    -------
+    bool
+        Is :math:`a` variable a *string* like variable.
+
+    Examples
+    --------
+    >>> is_string("I'm a string!")
+    True
+    >>> is_string(["I'm a string!"])
+    False
+    """
+
+    return True if isinstance(a, str) else False
+
+
+def is_iterable(a):
+    """
+    Returns if given :math:`a` variable is iterable.
+
+    Parameters
+    ----------
+    a : object
+        Variable to check the iterability.
+
+    Returns
+    -------
+    bool
+        :math:`a` variable iterability.
+
+    Examples
+    --------
+    >>> is_iterable([1, 2, 3])
+    True
+    >>> is_iterable(1)
+    False
+    """
+
+    return is_string(a) or (True if getattr(a, '__iter__', False) else False)

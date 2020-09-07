@@ -10,4 +10,6 @@ dist
 docs/_build
 docs/generated
 opencolorio_config_aces/config/reference/discover/aces_conversion_graph.png
+opencolorio_config_aces/config/generation/config-v1.ocio
+opencolorio_config_aces/config/generation/config-v2.ocio
 poetry.lock

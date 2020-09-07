@@ -7,6 +7,21 @@ Generation
 
 .. contents:: :local:
 
+Config Generation Common Objects
+--------------------------------
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/
+
+    colorspace_factory
+    ConfigData
+    validate_config
+    generate_config
+
 Reference Configuration
 -----------------------
 

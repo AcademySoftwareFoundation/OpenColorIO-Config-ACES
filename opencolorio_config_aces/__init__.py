@@ -20,10 +20,11 @@ Sub-packages
 """
 
 from .config import (
-    discover_aces_ctl_transforms, classify_aces_ctl_transforms,
-    unclassify_ctl_transforms, filter_ctl_transforms, print_aces_taxonomy,
-    build_aces_conversion_graph, node_to_ctl_transform, ctl_transform_to_node,
-    filter_nodes, plot_aces_conversion_graph)
+    ConfigData, build_aces_conversion_graph, classify_aces_ctl_transforms,
+    colorspace_factory, ctl_transform_to_node, discover_aces_ctl_transforms,
+    filter_ctl_transforms, filter_nodes, generate_config,
+    node_to_ctl_transform, plot_aces_conversion_graph, print_aces_taxonomy,
+    unclassify_ctl_transforms, validate_config)
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -33,11 +34,12 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'discover_aces_ctl_transforms', 'classify_aces_ctl_transforms',
-    'unclassify_ctl_transforms', 'filter_ctl_transforms',
-    'print_aces_taxonomy', 'build_aces_conversion_graph',
-    'node_to_ctl_transform', 'ctl_transform_to_node', 'filter_nodes',
-    'plot_aces_conversion_graph'
+    'ConfigData', 'build_aces_conversion_graph',
+    'classify_aces_ctl_transforms', 'colorspace_factory',
+    'ctl_transform_to_node', 'discover_aces_ctl_transforms',
+    'filter_ctl_transforms', 'filter_nodes', 'generate_config',
+    'node_to_ctl_transform', 'plot_aces_conversion_graph',
+    'print_aces_taxonomy', 'unclassify_ctl_transforms', 'validate_config'
 ]
 
 __application_name__ = 'OpenColorIO Configuration for ACES'
