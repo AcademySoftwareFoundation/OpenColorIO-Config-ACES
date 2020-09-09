@@ -57,6 +57,9 @@ ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR : unicode
 """
 
 COLORSPACE_NAME_SUBSTITUTION_PATTERNS = {
+    'ACES_0_1_1': 'ACES 0.1.1',
+    'ACES_0_2_2': 'ACES 0.2.2',
+    'ACES_0_7_1': 'ACES 0.7.1',
     '_7nits': '',
     '_15nits': '',
     '_': ' ',
