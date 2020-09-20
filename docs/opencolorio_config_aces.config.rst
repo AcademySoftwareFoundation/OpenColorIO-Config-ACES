@@ -55,6 +55,7 @@ Reference Configuration
     node_to_ctl_transform
     ctl_transform_to_node
     filter_nodes
+    conversion_path
     plot_aces_conversion_graph
 
 *aces-dev* Reference Config Generator

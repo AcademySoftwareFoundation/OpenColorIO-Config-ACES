@@ -4,7 +4,7 @@
 from .generation import (ConfigData, colorspace_factory, generate_config,
                          validate_config)
 from .reference import (
-    build_aces_conversion_graph, classify_aces_ctl_transforms,
+    build_aces_conversion_graph, classify_aces_ctl_transforms, conversion_path,
     ctl_transform_to_colorspace, ctl_transform_to_node,
     discover_aces_ctl_transforms, filter_ctl_transforms, filter_nodes,
     generate_config_aces, node_to_ctl_transform, plot_aces_conversion_graph,
@@ -15,7 +15,7 @@ __all__ = [
 ]
 __all__ += [
     'build_aces_conversion_graph', 'classify_aces_ctl_transforms',
-    'ctl_transform_to_colorspace', 'ctl_transform_to_node',
+    'conversion_path', 'ctl_transform_to_colorspace', 'ctl_transform_to_node',
     'discover_aces_ctl_transforms', 'filter_ctl_transforms', 'filter_nodes',
     'generate_config_aces', 'node_to_ctl_transform',
     'plot_aces_conversion_graph', 'print_aces_taxonomy',

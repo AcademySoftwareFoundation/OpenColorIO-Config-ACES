@@ -11,6 +11,7 @@ conversion graph:
 -   :func:`opencolorio_config_aces.node_to_ctl_transform`
 -   :func:`opencolorio_config_aces.ctl_transform_to_node`
 -   :func:`opencolorio_config_aces.filter_nodes`
+-   :func:`opencolorio_config_aces.conversion_path`
 -   :func:`opencolorio_config_aces.plot_aces_conversion_graph`
 """
 
@@ -32,7 +33,8 @@ __status__ = 'Production'
 
 __all__ = [
     'build_aces_conversion_graph', 'node_to_ctl_transform',
-    'ctl_transform_to_node', 'filter_nodes', 'plot_aces_conversion_graph'
+    'ctl_transform_to_node', 'filter_nodes', 'conversion_path',
+    'plot_aces_conversion_graph'
 ]
 
 
@@ -214,6 +216,40 @@ def filter_nodes(graph, filterers=None):
             filtered_nodes.append(node)
 
     return filtered_nodes
+
+
+def conversion_path(graph, source, target):
+    """
+    Returns the conversion path from the source node to the target node in the
+    *aces-dev* conversion graph.
+
+    Parameters
+    ----------
+    graph : DiGraph
+        *aces-dev* conversion graph.
+    source : unicode
+        Source node.
+    target : unicode
+        Target node.
+
+    Returns
+    -------
+    list
+        Conversion path from the source node to the target node.
+
+    Examples
+    --------
+    >>> ctl_transforms = classify_aces_ctl_transforms(
+    ...     discover_aces_ctl_transforms())
+    >>> graph = build_aces_conversion_graph(ctl_transforms)
+    >>> conversion_path(graph, 'Venice_SLog3_SGamut3', 'P3D60_48nits')
+    [('Venice_SLog3_SGamut3', 'ACES2065-1'), ('ACES2065-1', 'OCES'), \
+('OCES', 'P3D60_48nits')]
+    """
+
+    path = nx.shortest_path(graph, source, target)
+
+    return [(a, b) for a, b in zip(path[:-1], path[1:])]
 
 
 def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):

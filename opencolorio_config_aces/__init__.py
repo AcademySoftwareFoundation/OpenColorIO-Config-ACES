@@ -21,9 +21,9 @@ Sub-packages
 
 from .config import (
     ConfigData, build_aces_conversion_graph, classify_aces_ctl_transforms,
-    ctl_transform_to_colorspace, colorspace_factory, ctl_transform_to_node,
-    discover_aces_ctl_transforms, filter_ctl_transforms, filter_nodes,
-    generate_config, generate_config_aces, node_to_ctl_transform,
+    ctl_transform_to_colorspace, colorspace_factory, conversion_path,
+    ctl_transform_to_node, discover_aces_ctl_transforms, filter_ctl_transforms,
+    filter_nodes, generate_config, generate_config_aces, node_to_ctl_transform,
     plot_aces_conversion_graph, print_aces_taxonomy, unclassify_ctl_transforms,
     validate_config)
 
@@ -36,7 +36,7 @@ __status__ = 'Production'
 
 __all__ = [
     'ConfigData', 'build_aces_conversion_graph',
-    'classify_aces_ctl_transforms', 'colorspace_factory',
+    'classify_aces_ctl_transforms', 'colorspace_factory', 'conversion_path',
     'ctl_transform_to_colorspace', 'ctl_transform_to_node',
     'discover_aces_ctl_transforms', 'filter_ctl_transforms', 'filter_nodes',
     'generate_config', 'generate_config_aces', 'node_to_ctl_transform',
