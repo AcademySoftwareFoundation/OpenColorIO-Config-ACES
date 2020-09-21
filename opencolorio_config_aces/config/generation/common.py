@@ -6,7 +6,7 @@ OpenColorIO Config Generation Common Objects
 
 Defines various objects related to *OpenColorIO* config generation:
 
--   :class:`opencolorio_config_aces.colorspace_factory`
+-   :func:`opencolorio_config_aces.colorspace_factory`
 -   :class:`opencolorio_config_aces.ConfigData`
 -   :func:`opencolorio_config_aces.validate_config`
 -   :func:`opencolorio_config_aces.generate_config`
