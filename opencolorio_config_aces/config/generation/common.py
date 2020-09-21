@@ -46,8 +46,8 @@ def colorspace_factory(name,
                        bit_depth=None,
                        allocation=None,
                        allocation_vars=None,
-                       to_reference_transformation=None,
-                       from_reference_transformation=None,
+                       to_reference_transform=None,
+                       from_reference_transform=None,
                        is_data=None,
                        base_colorspace=None):
     """
@@ -73,15 +73,15 @@ def colorspace_factory(name,
         *OpenColorIO* colorspace allocation type.
     allocation_vars : tuple, optional
         *OpenColorIO* colorspace allocation variables.
-    to_reference_transformation : object, optional
-        *To Reference* *OpenColorIO* colorspace transformation.
-    from_reference_transformation : object, optional
-        *From Reference* *OpenColorIO* colorspace transformation.
+    to_reference_transform : object, optional
+        *To Reference* *OpenColorIO* colorspace transform.
+    from_reference_transform : object, optional
+        *From Reference* *OpenColorIO* colorspace transform.
     is_data : bool, optional
         Whether the colorspace represents data.
     base_colorspace : ColorSpace, optional
         *OpenColorIO* base colorspace inherited for bit depth, allocation,
-        allocation variables, and to/from reference transformations.
+        allocation variables, and to/from reference transforms.
 
     Returns
     -------
@@ -110,12 +110,12 @@ def colorspace_factory(name,
         if allocation_vars is not None:
             colorspace.setAllocationVars(allocation_vars)
 
-        if to_reference_transformation is not None:
-            colorspace.setTransform(to_reference_transformation,
+        if to_reference_transform is not None:
+            colorspace.setTransform(to_reference_transform,
                                     ocio.COLORSPACE_DIR_TO_REFERENCE)
 
-        if from_reference_transformation is not None:
-            colorspace.setTransform(from_reference_transformation,
+        if from_reference_transform is not None:
+            colorspace.setTransform(from_reference_transform,
                                     ocio.COLORSPACE_DIR_FROM_REFERENCE)
 
     colorspace.setName(name)
@@ -626,12 +626,12 @@ if __name__ == '__main__':
         'CCTF',
         description=('WARNING: The sRGB "EOTF" is purposely incorrect and '
                      'only a placeholder!'),
-        to_reference_transformation=ocio.ExponentTransform([2.2, 2.2, 2.2, 1]))
+        to_reference_transform=ocio.ExponentTransform([2.2, 2.2, 2.2, 1]))
 
     colorspace_3 = colorspace_factory(
         'Colorspace - sRGB',
         'Colorspace',
-        to_reference_transformation=ocio.ColorSpaceTransform(
+        to_reference_transform=ocio.ColorSpaceTransform(
             'CCTF - sRGB', 'Gamut - sRGB'))
 
     colorspace_4 = colorspace_factory(
