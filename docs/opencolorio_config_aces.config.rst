@@ -52,6 +52,7 @@ Reference Configuration
     :toctree: generated/
 
     build_aces_conversion_graph
+    node_to_builtin_transform
     node_to_ctl_transform
     ctl_transform_to_node
     filter_nodes

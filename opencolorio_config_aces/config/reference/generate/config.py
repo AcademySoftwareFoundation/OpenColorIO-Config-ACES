@@ -8,16 +8,20 @@ Defines various objects related to the generation of the *aces-dev* reference
 *OpenColorIO* Config:
 
 -   :func:`opencolorio_config_aces.ctl_transform_to_colorspace`
+-   :func:`opencolorio_config_aces.node_to_builtin_transform`
+-   :func:`opencolorio_config_aces.node_to_colorspace`
 -   :func:`opencolorio_config_aces.generate_config_aces`
 """
 
+import itertools
 import logging
 import re
+from networkx.exception import NetworkXNoPath
 
 from opencolorio_config_aces.config.generation import (
     ConfigData, colorspace_factory, generate_config)
 from opencolorio_config_aces.config.reference import (
-    build_aces_conversion_graph, classify_aces_ctl_transforms,
+    build_aces_conversion_graph, classify_aces_ctl_transforms, conversion_path,
     discover_aces_ctl_transforms, filter_nodes, filter_ctl_transforms,
     node_to_ctl_transform)
 from opencolorio_config_aces.utilities import required
@@ -30,8 +34,11 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
+    'ACES_CONFIG_REFERENCE_COLORSPACE',
+    'ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE',
     'ACES_CONFIG_COLORSPACE_NAME_SEPARATOR',
     'ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR',
+    'ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR',
     'COLORSPACE_NAME_SUBSTITUTION_PATTERNS',
     'COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS',
     'VIEW_NAME_SUBSTITUTION_PATTERNS', 'DISPLAY_NAME_SUBSTITUTION_PATTERNS',
@@ -39,21 +46,42 @@ __all__ = [
     'beautify_colorspace_family', 'beautify_view_name',
     'beautify_display_name', 'ctl_transform_to_colorspace_name',
     'ctl_transform_to_colorspace_family', 'ctl_transform_to_colorspace',
-    'generate_config_aces'
+    'node_to_builtin_transform', 'node_to_colorspace', 'generate_config_aces'
 ]
+
+ACES_CONFIG_REFERENCE_COLORSPACE = 'ACES2065-1'
+"""
+*OpenColorIO* config reference colorspace.
+
+ACES_CONFIG_REFERENCE_COLORSPACE : unicode
+"""
+
+ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE = 'OCES'
+"""
+*OpenColorIO* config output encoding colorspace.
+
+ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE : unicode
+"""
 
 ACES_CONFIG_COLORSPACE_NAME_SEPARATOR = ' - '
 """
-*OpenColorIO* colorspace name separator.
+*OpenColorIO* config colorspace name separator.
 
 ACES_CONFIG_COLORSPACE_NAME_SEPARATOR : unicode
 """
 
 ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR = '/'
 """
-*OpenColorIO* colorspace family separator.
+*OpenColorIO* config colorspace family separator.
 
 ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR : unicode
+"""
+
+ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR = '_to_'
+"""
+*OpenColorIO* config *BuiltinTransform* name separator.
+
+ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR : unicode
 """
 
 COLORSPACE_NAME_SUBSTITUTION_PATTERNS = {
@@ -291,7 +319,8 @@ def ctl_transform_to_colorspace_name(ctl_transform):
         *OpenColorIO* colorspace name.
     """
 
-    if ctl_transform.source in ('ACES2065-1', 'OCES'):
+    if ctl_transform.source in (ACES_CONFIG_REFERENCE_COLORSPACE,
+                                ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
         name = ctl_transform.target
     else:
         name = ctl_transform.source
@@ -329,7 +358,9 @@ def ctl_transform_to_colorspace_family(ctl_transform):
     return beautify_colorspace_family(family)
 
 
-def ctl_transform_to_colorspace(ctl_transform, complete_description=True):
+def ctl_transform_to_colorspace(ctl_transform,
+                                complete_description=True,
+                                **kwargs):
     """
     Generates the *OpenColorIO* colorspace for given *ACES* *CTL* transform.
 
@@ -341,6 +372,12 @@ def ctl_transform_to_colorspace(ctl_transform, complete_description=True):
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
 
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.colorspace_factory` definition.
+
     Returns
     -------
     ColorSpace
@@ -350,14 +387,135 @@ def ctl_transform_to_colorspace(ctl_transform, complete_description=True):
     name = ctl_transform_to_colorspace_name(ctl_transform)
     family = ctl_transform_to_colorspace_family(ctl_transform)
 
-    colorspace = colorspace_factory(
-        f'{beautify_colorspace_name(family)}'
-        f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}{name}',
+    settings = {
+        'name': (f'{beautify_colorspace_name(family)}'
+                 f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
+                 f'{name}'),
+        'family':
         family,
-        description=ctl_transform.description
-        if complete_description else ctl_transform.description.split('\n')[0])
+        'description': (ctl_transform.description if complete_description else
+                        ctl_transform.description.split('\n')[0]),
+    }
+    settings.update(kwargs)
+
+    colorspace = colorspace_factory(**settings)
 
     COLORSPACE_TO_CTL_TRANSFORM[colorspace.getName()] = ctl_transform
+
+    return colorspace
+
+
+@required('OpenColorIO')
+def node_to_builtin_transform(graph, node, direction='Forward'):
+    """
+    Generates the *OpenColorIO* builtin transform for given *aces-dev*
+    conversion graph node.
+
+    Parameters
+    ----------
+    graph : DiGraph
+        *aces-dev* conversion graph.
+    node : unicode
+        Node name to generate the *OpenColorIO* builtin transform for.
+    direction : unicode, optional
+        {'Forward', 'Reverse'},
+
+    Returns
+    -------
+    BuiltinTransform
+        *OpenColorIO* builtin transform.
+    """
+
+    import PyOpenColorIO as ocio
+
+    def create_builtin_transform(style):
+        """
+        Creates an *OpenColorIO* builtin transform for given style.
+
+        If the style does not exist, a placeholder transform is used in place
+        of the builtin transform.
+        """
+
+        builtin_transform = ocio.BuiltinTransform()
+
+        try:
+            builtin_transform.setStyle(style)
+        except ocio.Exception:
+            logging.warning(f'{style} style is not defined, '
+                            f'using a placeholder "FileTransform" instead!')
+            builtin_transform = ocio.FileTransform()
+            builtin_transform.setSrc(style)
+
+        return builtin_transform
+
+    try:
+        transform_styles = []
+
+        path = (node, ACES_CONFIG_REFERENCE_COLORSPACE)
+        path = path if direction.lower() == 'forward' else reversed(path)
+        path = conversion_path(graph, *path)
+
+        if not path:
+            return
+
+        verbose_path = " --> ".join(
+            dict.fromkeys(itertools.chain.from_iterable(path)))
+        logging.info(f'Creating "BuiltinTransform" with {verbose_path} path.')
+
+        for edge in path:
+            source, target = edge
+            transform_styles.append(
+                f'{source}'
+                f'{ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR}'
+                f'{target}')
+
+        if len(transform_styles) == 1:
+            builtin_transform = create_builtin_transform(transform_styles[0])
+
+            return builtin_transform
+        else:
+            group_transform = ocio.GroupTransform()
+
+            for transform_style in transform_styles:
+                builtin_transform = create_builtin_transform(transform_style)
+                group_transform.appendTransform(builtin_transform)
+
+            return group_transform
+
+    except NetworkXNoPath:
+        logging.debug(
+            f'No path to {ACES_CONFIG_REFERENCE_COLORSPACE} for {node}!')
+
+
+def node_to_colorspace(graph, node, complete_description=True):
+    """
+    Generates the *OpenColorIO* colorspace for given *aces-dev* conversion
+    graph node.
+
+    Parameters
+    ----------
+    graph : DiGraph
+        *aces-dev* conversion graph.
+    node : unicode
+        Node name to generate the *OpenColorIO* colorspace for.
+    complete_description : bool, optional
+        Whether to use the full *ACES* *CTL* transform description or just the
+        first line.
+
+    Returns
+    -------
+    ColorSpace
+        *OpenColorIO* colorspace.
+    """
+
+    ctl_transform = node_to_ctl_transform(graph, node)
+
+    colorspace = ctl_transform_to_colorspace(
+        ctl_transform,
+        complete_description,
+        to_reference_transform=node_to_builtin_transform(graph, node),
+        from_reference_transform=node_to_builtin_transform(
+            graph, node, 'Reverse'))
 
     return colorspace
 
@@ -397,39 +555,38 @@ def generate_config_aces(config_name=None,
 
     colorspaces += [
         colorspace_factory(
-            'ACES - ACES2065-1',
+            f'ACES - {ACES_CONFIG_REFERENCE_COLORSPACE}',
             'ACES',
             description=(
                 'The "Academy Color Encoding System" reference colorspace.')),
         colorspace_factory(
-            'ACES - OCES',
+            f'ACES - {ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE}',
             'ACES',
             description=(
-                'The "Output Color Encoding Specification" colorspace.')),
+                'The "Output Color Encoding Specification" colorspace.'),
+            to_reference_transform=node_to_builtin_transform(
+                graph, ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE),
+            from_reference_transform=node_to_builtin_transform(
+                graph, ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE, 'Reverse')),
     ]
 
     # "CSC"
     csc = []
     for node in filter_nodes(graph, [lambda x: x.family == 'csc']):
-        csc.append(
-            ctl_transform_to_colorspace(
-                node_to_ctl_transform(graph, node), complete_description))
+        csc.append(node_to_colorspace(graph, node, complete_description))
     colorspaces += csc
 
     # "Input Transforms"
     input_transforms = []
     for node in filter_nodes(graph, [lambda x: x.family == 'input_transform']):
         input_transforms.append(
-            ctl_transform_to_colorspace(
-                node_to_ctl_transform(graph, node), complete_description))
+            node_to_colorspace(graph, node, complete_description))
     colorspaces += input_transforms
 
     # "LMTs"
     lmts = []
     for node in filter_nodes(graph, [lambda x: x.family == 'lmt']):
-        lmts.append(
-            ctl_transform_to_colorspace(
-                node_to_ctl_transform(graph, node), complete_description))
+        lmts.append(node_to_colorspace(graph, node, complete_description))
     colorspaces += lmts
 
     # "Output Transforms"
@@ -438,11 +595,10 @@ def generate_config_aces(config_name=None,
     views = []
     for node in filter_nodes(graph,
                              [lambda x: x.family == 'output_transform']):
-        ctl_transform = node_to_ctl_transform(graph, node)
-        colorspace = ctl_transform_to_colorspace(ctl_transform,
-                                                 complete_description)
+        colorspace = node_to_colorspace(graph, node, complete_description)
         output_transforms.append(colorspace)
-        display = beautify_display_name(ctl_transform.genus)
+        display = beautify_display_name(
+            node_to_ctl_transform(graph, node).genus)
         displays.add(display)
         view = beautify_view_name(colorspace.getName())
         views.append({
