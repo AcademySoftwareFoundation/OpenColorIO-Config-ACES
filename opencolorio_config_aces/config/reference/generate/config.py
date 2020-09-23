@@ -564,8 +564,6 @@ def generate_config_aces(config_name=None,
             'ACES',
             description=(
                 'The "Output Color Encoding Specification" colorspace.'),
-            to_reference_transform=node_to_builtin_transform(
-                graph, ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE),
             from_reference_transform=node_to_builtin_transform(
                 graph, ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE, 'Reverse')),
     ]
@@ -573,12 +571,20 @@ def generate_config_aces(config_name=None,
     # "CSC"
     csc = []
     for node in filter_nodes(graph, [lambda x: x.family == 'csc']):
+        if node in (ACES_CONFIG_REFERENCE_COLORSPACE,
+                    ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+            continue
+
         csc.append(node_to_colorspace(graph, node, complete_description))
     colorspaces += csc
 
     # "Input Transforms"
     input_transforms = []
     for node in filter_nodes(graph, [lambda x: x.family == 'input_transform']):
+        if node in (ACES_CONFIG_REFERENCE_COLORSPACE,
+                    ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+            continue
+
         input_transforms.append(
             node_to_colorspace(graph, node, complete_description))
     colorspaces += input_transforms
@@ -586,6 +592,10 @@ def generate_config_aces(config_name=None,
     # "LMTs"
     lmts = []
     for node in filter_nodes(graph, [lambda x: x.family == 'lmt']):
+        if node in (ACES_CONFIG_REFERENCE_COLORSPACE,
+                    ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+            continue
+
         lmts.append(node_to_colorspace(graph, node, complete_description))
     colorspaces += lmts
 
@@ -595,6 +605,10 @@ def generate_config_aces(config_name=None,
     views = []
     for node in filter_nodes(graph,
                              [lambda x: x.family == 'output_transform']):
+        if node in (ACES_CONFIG_REFERENCE_COLORSPACE,
+                    ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+            continue
+
         colorspace = node_to_colorspace(graph, node, complete_description)
         output_transforms.append(colorspace)
         display = beautify_display_name(
