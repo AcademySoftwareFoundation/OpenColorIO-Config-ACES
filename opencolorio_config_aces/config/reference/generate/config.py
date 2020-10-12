@@ -5,7 +5,7 @@
 =====================================
 
 Defines various objects related to the generation of the *aces-dev* reference
-*OpenColorIO* Config:
+*OpenColorIO* config:
 
 -   :func:`opencolorio_config_aces.ctl_transform_to_colorspace`
 -   :func:`opencolorio_config_aces.node_to_builtin_transform`
