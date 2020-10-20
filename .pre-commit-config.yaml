@@ -8,4 +8,4 @@ repos:
     rev: v0.23.0
     hooks:
     -   id: yapf
-        exclude: aces/config/reference/aces-dev
+        exclude: opencolorio_config_aces/config/reference/aces-dev

@@ -17,9 +17,15 @@ Common
 .. autosummary::
     :toctree: generated/
 
+    DocstringDict
     first_item
     common_ancestor
     paths_common_ancestor
     vivification
     vivified_to_dict
     message_box
+    is_opencolorio_installed
+    REQUIREMENTS_TO_CALLABLE
+    required
+    is_string
+    is_iterable

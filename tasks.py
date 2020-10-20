@@ -84,9 +84,11 @@ def formatting(ctx, yapf=True):
 
     if yapf:
         message_box('Formatting codebase with "Yapf"...')
-        ctx.run('yapf -p -i -r '
-                '--exclude \'.git\' '
-                '--exclude \'aces/config/reference/aces-dev\' .')
+        ctx.run(
+            'yapf -p -i -r '
+            '--exclude \'.git\' '
+            '--exclude \'opencolorio_config_aces/config/reference/aces-dev\' .'
+        )
 
 
 @task
@@ -138,7 +140,7 @@ def quality(ctx, flake8=True):
 
     if flake8:
         message_box('Checking codebase with "Flake8"...')
-        ctx.run('flake8 aces --exclude=aces-dev')
+        ctx.run('flake8 opencolorio_config_aces --exclude=aces-dev')
 
 
 @task(formatting, tests, quality)
