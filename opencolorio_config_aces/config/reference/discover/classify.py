@@ -45,11 +45,11 @@ __all__ = [
     'ACES_URN', 'ACES_URN_SEPARATOR', 'ACES_ID_SEPARATOR', 'ACES_NAMESPACE',
     'ACES_TYPES', 'ACES_CTL_TRANSFORMS_ROOT', 'ACES_CTL_TRANSFORM_FAMILIES',
     'DEFAULT_ACES_CTL_TRANSFORM_GENUS', 'DEFAULT_ACES_CTL_TRANSFORM_FILTERERS',
-    'patch_invalid_aces_transform_id', 'ctl_transform_relative_path',
-    'ACESTransformID', 'CTLTransform', 'CTLTransformPair',
-    'find_ctl_transform_pairs', 'discover_aces_ctl_transforms',
-    'classify_aces_ctl_transforms', 'unclassify_ctl_transforms',
-    'filter_ctl_transforms', 'print_aces_taxonomy'
+    'DESCRIPTION_SUBSTITUTION_PATTERNS', 'patch_invalid_aces_transform_id',
+    'ctl_transform_relative_path', 'ACESTransformID', 'CTLTransform',
+    'CTLTransformPair', 'find_ctl_transform_pairs',
+    'discover_aces_ctl_transforms', 'classify_aces_ctl_transforms',
+    'unclassify_ctl_transforms', 'filter_ctl_transforms', 'print_aces_taxonomy'
 ]
 
 ACES_URN = 'urn:ampas:aces:transformId:v1.5'
@@ -143,6 +143,16 @@ DEFAULT_ACES_CTL_TRANSFORM_GENUS = 'undefined'
 DEFAULT_ACES_CTL_TRANSFORM_GENUS : unicode
 """
 
+DESCRIPTION_SUBSTITUTION_PATTERNS = {
+    '============ CONSTANTS ============ //': '',
+    'Written by .*_IDT_maker\\.py v.* on .*': ''
+}
+"""
+*ACES* *CTL* transform description substitution patterns.
+
+DESCRIPTION_SUBSTITUTION_PATTERNS : dict
+"""
+
 
 def _exclusion_filterer_ARRIIDT(ctl_transform):
     """
@@ -215,6 +225,16 @@ def patch_invalid_aces_transform_id(aces_transform_id):
         logging.warning(f'{invalid_id} has an invalid separator in "7.2nits"!')
 
         aces_transform_id = aces_transform_id.replace('7.2', '7')
+    elif 'P3D65_709limit_48nits' in aces_transform_id:
+        logging.warning(f'{invalid_id} is inconsistently named!')
+
+        aces_transform_id = aces_transform_id.replace(
+            'P3D65_709limit_48nits', 'P3D65_Rec709limited_48nits')
+    elif 'Rec2020_100nits' in aces_transform_id:
+        logging.warning(f'{invalid_id} is incorrectly named!')
+
+        aces_transform_id = aces_transform_id.replace(
+            'Rec2020_100nits', 'Rec2020_P3D65limited_100nits')
     elif 'ACEScsc' in aces_transform_id:
         if 'ACEScsc.Academy' not in aces_transform_id:
             logging.warning(f'{invalid_id} is missing "Academy" namespace!')
@@ -928,30 +948,36 @@ CTLTransform` class are tried on the underlying
         with open(self._path) as ctl_file:
             self._code = ctl_file.read()
 
-            lines = filter(None,
-                           (line.strip() for line in self._code.split('\n')))
+        lines = filter(None, (line.strip() for line in self._code.split('\n')))
 
-            in_header = True
-            for line in lines:
-                search = re.search('<ACEStransformID>(.*)</ACEStransformID>',
-                                   line)
-                if search:
-                    self._aces_transform_id = ACESTransformID(search.group(1))
-                    continue
+        in_header = True
+        for line in lines:
+            search = re.search('<ACEStransformID>(.*)</ACEStransformID>', line)
+            if search:
+                self._aces_transform_id = ACESTransformID(search.group(1))
+                continue
 
-                search = re.search('<ACESuserName>(.*)</ACESuserName>', line)
-                if search:
-                    self._user_name = search.group(1)
-                    continue
+            search = re.search('<ACESuserName>(.*)</ACESuserName>', line)
+            if search:
+                self._user_name = search.group(1)
+                continue
 
-                if line.startswith('//'):
-                    self._description += line[2:].strip()
-                    self._description += '\n'
-                else:
-                    in_header = False
+            if line.startswith('//'):
+                line = line[2:].strip()
 
-                if not in_header:
-                    break
+                for pattern, substitution in (
+                        DESCRIPTION_SUBSTITUTION_PATTERNS.items()):
+                    line = re.sub(pattern, substitution, line)
+
+                self._description += line
+                self._description += '\n'
+            else:
+                in_header = False
+
+            if not in_header:
+                break
+
+        self._description = self._description.strip()
 
 
 class CTLTransformPair:
