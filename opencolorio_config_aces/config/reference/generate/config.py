@@ -20,6 +20,8 @@ from networkx.exception import NetworkXNoPath
 
 from opencolorio_config_aces.config.generation import (
     ConfigData, colorspace_factory, generate_config)
+from opencolorio_config_aces.config.reference.discover.graph import (
+    NODE_NAME_SEPARATOR)
 from opencolorio_config_aces.config.reference import (
     build_aces_conversion_graph, classify_aces_ctl_transforms, conversion_path,
     discover_aces_ctl_transforms, filter_nodes, filter_ctl_transforms,
@@ -465,9 +467,9 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
         for edge in path:
             source, target = edge
             transform_styles.append(
-                f'{source}'
+                f'{source.split(NODE_NAME_SEPARATOR)[-1]}'
                 f'{ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR}'
-                f'{target}')
+                f'{target.split(NODE_NAME_SEPARATOR)[-1]}')
 
         if len(transform_styles) == 1:
             builtin_transform = create_builtin_transform(transform_styles[0])
