@@ -5,7 +5,7 @@
 =====================================
 
 Defines various objects related to the generation of the *aces-dev* reference
-*OpenColorIO* Config:
+*OpenColorIO* config:
 
 -   :func:`opencolorio_config_aces.ctl_transform_to_colorspace`
 -   :func:`opencolorio_config_aces.node_to_builtin_transform`
@@ -660,11 +660,20 @@ def generate_config_aces(config_name=None,
 
 
 if __name__ == '__main__':
+    import os
+    import opencolorio_config_aces
     from pprint import pprint
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    generate_config_aces('config-aces-v2.ocio')
+    build_directory = os.path.join(opencolorio_config_aces.__path__[0], '..',
+                                   'build')
+
+    if not os.path.exists(build_directory):
+        os.makedirs(build_directory)
+
+    generate_config_aces(
+        os.path.join(build_directory, 'config-aces-reference.ocio'))
 
     pprint(COLORSPACE_TO_CTL_TRANSFORM)

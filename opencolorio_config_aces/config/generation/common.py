@@ -613,7 +613,15 @@ def generate_config(data, config_name=None, validate=True):
 if __name__ == '__main__':
     required('OpenColorIO')(lambda: None)()
 
+    import os
+    import opencolorio_config_aces
     import PyOpenColorIO as ocio
+
+    build_directory = os.path.join(opencolorio_config_aces.__path__[0], '..',
+                                   'build')
+
+    if not os.path.exists(build_directory):
+        os.makedirs(build_directory)
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
@@ -661,7 +669,7 @@ if __name__ == '__main__':
         active_views=['sRGB - sRGB'],
     )
 
-    generate_config(data, 'config-v1.ocio')
+    generate_config(data, os.path.join(build_directory, 'config-v1.ocio'))
 
     # "OpenColorIO 2" configuration.
     data.profile_version = 2
@@ -703,4 +711,4 @@ if __name__ == '__main__':
     ]
     data.viewing_rules = []
 
-    generate_config(data, 'config-v2.ocio')
+    generate_config(data, os.path.join(build_directory, 'config-v2.ocio'))

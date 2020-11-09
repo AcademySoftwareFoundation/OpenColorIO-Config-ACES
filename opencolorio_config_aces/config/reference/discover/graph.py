@@ -349,13 +349,20 @@ def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
 if __name__ == '__main__':
     import os
     import subprocess
+    import opencolorio_config_aces
     from pprint import pprint
     from opencolorio_config_aces.utilities import message_box
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    filename = 'aces_conversion_graph.png'
+    build_directory = os.path.join(opencolorio_config_aces.__path__[0], '..',
+                                   'build')
+
+    if not os.path.exists(build_directory):
+        os.makedirs(build_directory)
+
+    filename = os.path.join(build_directory, 'aces_conversion_graph.png')
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
