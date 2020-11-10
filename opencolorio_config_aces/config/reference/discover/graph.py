@@ -32,10 +32,17 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'build_aces_conversion_graph', 'node_to_ctl_transform',
-    'ctl_transform_to_node', 'filter_nodes', 'conversion_path',
-    'plot_aces_conversion_graph'
+    'NODE_NAME_SEPARATOR', 'build_aces_conversion_graph',
+    'node_to_ctl_transform', 'ctl_transform_to_node', 'filter_nodes',
+    'conversion_path', 'plot_aces_conversion_graph'
 ]
+
+NODE_NAME_SEPARATOR = '/'
+"""
+*aces-dev* conversion graph node name separator.
+
+NODE_NAME_SEPARATOR : unicode
+"""
 
 
 def build_aces_conversion_graph(ctl_transforms):
@@ -74,6 +81,7 @@ def build_aces_conversion_graph(ctl_transforms):
         source = ctl_transform.source
         target = ctl_transform.target
         family = ctl_transform.family
+        type_ = ctl_transform.type
 
         if source is None or target is None:
             logging.warning(f'"{ctl_transform}" has either a missing source '
@@ -98,6 +106,11 @@ def build_aces_conversion_graph(ctl_transforms):
                              f'"{family}" family uses "{target}" as target, '
                              f'skipping!')
                 continue
+
+        source = (source if source in ('ACES2065-1', 'OCES') else
+                  f'{type_}{NODE_NAME_SEPARATOR}{source}')
+        target = (target if target in ('ACES2065-1', 'OCES') else
+                  f'{type_}{NODE_NAME_SEPARATOR}{target}')
 
         # Serializing the data for "Graphviz AGraph".
         serialized = codecs.encode(pickle.dumps(ctl_transform, 4),
@@ -138,7 +151,7 @@ def node_to_ctl_transform(graph, node):
     >>> ctl_transforms = classify_aces_ctl_transforms(
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
-    >>> node_to_ctl_transform(graph, 'P3D60_48nits')  # doctest: +ELLIPSIS
+    >>> node_to_ctl_transform(graph, 'ODT/P3D60_48nits')  # doctest: +ELLIPSIS
     CTLTransform('odt...p3...ODT.Academy.P3D60_48nits.ctl')
     """
 
@@ -166,9 +179,9 @@ def ctl_transform_to_node(graph, ctl_transform):
     >>> ctl_transforms = classify_aces_ctl_transforms(
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
-    >>> ctl_transform = node_to_ctl_transform(graph, 'P3D60_48nits')
+    >>> ctl_transform = node_to_ctl_transform(graph, 'ODT/P3D60_48nits')
     >>> ctl_transform_to_node(graph, ctl_transform)
-    'P3D60_48nits'
+    'ODT/P3D60_48nits'
     """
 
     for node in graph.nodes:
@@ -200,7 +213,7 @@ def filter_nodes(graph, filterers=None):
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
     >>> sorted(filter_nodes(graph, [lambda x: x.genus == 'p3']))[0]
-    'P3D60_48nits'
+    'ODT/P3D60_48nits'
     """
 
     if filterers is None:
@@ -242,9 +255,9 @@ def conversion_path(graph, source, target):
     >>> ctl_transforms = classify_aces_ctl_transforms(
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
-    >>> conversion_path(graph, 'Venice_SLog3_SGamut3', 'P3D60_48nits')
-    [('Venice_SLog3_SGamut3', 'ACES2065-1'), ('ACES2065-1', 'OCES'), \
-('OCES', 'P3D60_48nits')]
+    >>> conversion_path(graph, 'IDT/Venice_SLog3_SGamut3', 'ODT/P3D60_48nits')
+    [('IDT/Venice_SLog3_SGamut3', 'ACES2065-1'), ('ACES2065-1', 'OCES'), \
+('OCES', 'ODT/P3D60_48nits')]
     """
 
     path = nx.shortest_path(graph, source, target)
@@ -273,7 +286,7 @@ def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
     Returns
     -------
     AGraph
-        *Pyraphviz* graph.
+        *PyGraphviz* graph.
     """
 
     agraph = nx.nx_agraph.to_agraph(graph)
@@ -356,14 +369,16 @@ if __name__ == '__main__':
     filtered_ctl_transforms = filter_ctl_transforms(classified_ctl_transforms)
 
     graph = build_aces_conversion_graph(filtered_ctl_transforms)
+    print(graph.nodes)
 
     message_box('Retrieving a "CTL" Transform from a Node')
-    print(node_to_ctl_transform(graph, 'P3D60_48nits'))
+    print(node_to_ctl_transform(graph, 'ODT/P3D60_48nits'))
 
     message_box('Retrieving a Node from a "CTL" Transform')
     print(
         ctl_transform_to_node(graph,
-                              node_to_ctl_transform(graph, 'P3D60_48nits')))
+                              node_to_ctl_transform(graph,
+                                                    'ODT/P3D60_48nits')))
 
     message_box('Filtering "output_transform" Family')
     pprint(
