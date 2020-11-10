@@ -127,10 +127,7 @@ API
 The main reference for `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__
 is the `manual <https://opencolorio-config-aces.readthedocs.io/>`__.
 
-.. toctree::
-    :maxdepth: 3
-
-    manual
+.. {MANUAL-URL}
 
 About
 -----

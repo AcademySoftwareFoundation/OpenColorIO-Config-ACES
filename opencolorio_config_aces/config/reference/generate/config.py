@@ -5,7 +5,7 @@
 =====================================
 
 Defines various objects related to the generation of the *aces-dev* reference
-*OpenColorIO* Config:
+*OpenColorIO* config:
 
 -   :func:`opencolorio_config_aces.ctl_transform_to_colorspace`
 -   :func:`opencolorio_config_aces.node_to_builtin_transform`
@@ -20,6 +20,8 @@ from networkx.exception import NetworkXNoPath
 
 from opencolorio_config_aces.config.generation import (
     ConfigData, colorspace_factory, generate_config)
+from opencolorio_config_aces.config.reference.discover.graph import (
+    NODE_NAME_SEPARATOR)
 from opencolorio_config_aces.config.reference import (
     build_aces_conversion_graph, classify_aces_ctl_transforms, conversion_path,
     discover_aces_ctl_transforms, filter_nodes, filter_ctl_transforms,
@@ -465,9 +467,9 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
         for edge in path:
             source, target = edge
             transform_styles.append(
-                f'{source}'
+                f'{source.split(NODE_NAME_SEPARATOR)[-1]}'
                 f'{ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR}'
-                f'{target}')
+                f'{target.split(NODE_NAME_SEPARATOR)[-1]}')
 
         if len(transform_styles) == 1:
             builtin_transform = create_builtin_transform(transform_styles[0])
@@ -658,11 +660,20 @@ def generate_config_aces(config_name=None,
 
 
 if __name__ == '__main__':
+    import os
+    import opencolorio_config_aces
     from pprint import pprint
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    generate_config_aces('config-aces-v2.ocio')
+    build_directory = os.path.join(opencolorio_config_aces.__path__[0], '..',
+                                   'build')
+
+    if not os.path.exists(build_directory):
+        os.makedirs(build_directory)
+
+    generate_config_aces(
+        os.path.join(build_directory, 'config-aces-reference.ocio'))
 
     pprint(COLORSPACE_TO_CTL_TRANSFORM)
