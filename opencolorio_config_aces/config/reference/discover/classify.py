@@ -1217,8 +1217,8 @@ def discover_aces_ctl_transforms(root_directory=ACES_CTL_TRANSFORMS_ROOT):
 
             ctl_transform = os.path.join(directory, filename)
 
-            logging.info(f'"{ctl_transform_relative_path(ctl_transform)}" '
-                         f'CTL transform was found!')
+            logging.debug(f'"{ctl_transform_relative_path(ctl_transform)}" '
+                          f'CTL transform was found!')
 
             ctl_transforms[directory].append(ctl_transform)
 
@@ -1292,7 +1292,8 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')'))]
                 ctl_transform = CTLTransform(
                     list(pairs.values())[0], family, genus)
 
-                logging.info(f'Classifying "{ctl_transform}" under "{genus}".')
+                logging.debug(
+                    f'Classifying "{ctl_transform}" under "{genus}".')
 
                 classified_ctl_transforms[family][genus][basename] = (
                     ctl_transform)
@@ -1306,7 +1307,8 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')'))]
                 ctl_transform = CTLTransformPair(forward_ctl_transform,
                                                  inverse_ctl_transform)
 
-                logging.info(f'Classifying "{ctl_transform}" under "{genus}".')
+                logging.debug(
+                    f'Classifying "{ctl_transform}" under "{genus}".')
 
                 classified_ctl_transforms[family][genus][basename] = (
                     ctl_transform)

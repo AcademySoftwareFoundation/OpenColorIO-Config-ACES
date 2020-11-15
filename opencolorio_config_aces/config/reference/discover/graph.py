@@ -96,15 +96,15 @@ def build_aces_conversion_graph(ctl_transforms):
         # a "OCES" target.
         if family in ('csc', 'input_transform', 'lmt'):
             if source == 'ACES2065-1':
-                logging.info(f'"{ctl_transform}" ctl transform from the '
-                             f'"{family}" family uses "{source}" as source, '
-                             f'skipping!')
+                logging.debug(f'"{ctl_transform}" ctl transform from the '
+                              f'"{family}" family uses "{source}" as source, '
+                              f'skipping!')
                 continue
         elif family == 'output_transform':
             if target in ('ACES2065-1', 'OCES'):
-                logging.info(f'"{ctl_transform}" ctl transform from the '
-                             f'"{family}" family uses "{target}" as target, '
-                             f'skipping!')
+                logging.debug(f'"{ctl_transform}" ctl transform from the '
+                              f'"{family}" family uses "{target}" as target, '
+                              f'skipping!')
                 continue
 
         source = (source if source in ('ACES2065-1', 'OCES') else
@@ -120,10 +120,10 @@ def build_aces_conversion_graph(ctl_transforms):
             if node not in graph.nodes():
                 graph.add_node(node, data=ctl_transform, serialized=serialized)
             else:
-                logging.info(f'"{node}" node was already added to '
-                             f'the "aces-dev" conversion graph '
-                             f'by the "{node_to_ctl_transform(graph, node)}" '
-                             f'"CTL" transform, skipping!')
+                logging.debug(f'"{node}" node was already added to '
+                              f'the "aces-dev" conversion graph '
+                              f'by the "{node_to_ctl_transform(graph, node)}" '
+                              f'"CTL" transform, skipping!')
 
         graph.add_edge(source, target)
 

@@ -536,11 +536,11 @@ def generate_config(data, config_name=None, validate=True):
         config.setDescription(data.description)
 
     for colorspace, role in data.roles.items():
-        logging.info(f'Adding "{colorspace}" colorspace as "{role}" role.')
+        logging.debug(f'Adding "{colorspace}" colorspace as "{role}" role.')
         config.setRole(role, colorspace)
 
     for colorspace in data.colorspaces:
-        logging.info(f'Adding colorspace "{colorspace.getName()}".')
+        logging.debug(f'Adding colorspace "{colorspace.getName()}".')
         config.addColorSpace(colorspace)
 
     for view in data.views:
@@ -552,14 +552,14 @@ def generate_config(data, config_name=None, validate=True):
         rule = view.get('rule')
         description = view.get('rule')
         if colorspace:
-            logging.info(f'Adding "{view_name}" view to "{display}" display '
-                         f'using "{colorspace}" colorspace.')
+            logging.debug(f'Adding "{view_name}" view to "{display}" display '
+                          f'using "{colorspace}" colorspace.')
 
             config.addDisplayView(display, view_name, colorspace, looks)
         else:
-            logging.info(f'Adding "{view_name}" view to "{display}" display '
-                         f'using "{view_transform}" view_transform, '
-                         f'"{rule}" rule and "{description}" description.')
+            logging.debug(f'Adding "{view_name}" view to "{display}" display '
+                          f'using "{view_transform}" view_transform, '
+                          f'"{rule}" rule and "{description}" description.')
 
             config.addDisplayView(display, view_name, view_transform, looks,
                                   rule, description)
@@ -576,19 +576,19 @@ def generate_config(data, config_name=None, validate=True):
         pattern = file_rule.get('pattern')
         extension = file_rule.get('extension')
         if name == 'Default':
-            logging.info(f'Setting "{name}" file rule with '
-                         f'"{colorspace}" colorspace.')
+            logging.debug(f'Setting "{name}" file rule with '
+                          f'"{colorspace}" colorspace.')
             file_rules.setDefaultRuleColorSpace(colorspace)
         elif regex:
-            logging.info(f'Adding "{name}" file rule with '
-                         f'"{regex}" regex pattern for '
-                         f'"{colorspace}" colorspace.')
+            logging.debug(f'Adding "{name}" file rule with '
+                          f'"{regex}" regex pattern for '
+                          f'"{colorspace}" colorspace.')
             file_rules.insertRule(rule_index, name, colorspace, regex)
             rule_index += 1
         else:
-            logging.info(f'Adding "{name}" file rule with '
-                         f'"{pattern}" pattern and "{extension}" extension '
-                         f'for "{colorspace}" colorspace.')
+            logging.debug(f'Adding "{name}" file rule with '
+                          f'"{pattern}" pattern and "{extension}" extension '
+                          f'for "{colorspace}" colorspace.')
             file_rules.insertRule(rule_index, name, colorspace, pattern,
                                   extension)
             rule_index += 1

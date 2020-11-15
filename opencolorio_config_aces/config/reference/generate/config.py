@@ -450,7 +450,7 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
 
         verbose_path = " --> ".join(
             dict.fromkeys(itertools.chain.from_iterable(path)))
-        logging.info(f'Creating "BuiltinTransform" with {verbose_path} path.')
+        logging.debug(f'Creating "BuiltinTransform" with {verbose_path} path.')
 
         for edge in path:
             source, target = edge
