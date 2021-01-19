@@ -19,12 +19,12 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-networkx = { version = "*" }
 
 coverage = { version = "*", optional = true }  # Development dependency.
 coveralls = { version = "*", optional = true }  # Development dependency.
 flake8 = { version = "*", optional = true }  # Development dependency.
 invoke = { version = "*", optional = true }  # Development dependency.
+networkx = { version = "*", optional = true }
 nose = { version = "*", optional = true }  # Development dependency.
 pre-commit = { version = "*", optional = true }  # Development dependency.
 pygraphviz = { version = "*", optional = true }
@@ -64,6 +64,7 @@ development = [
     "twine",
     "yapf"
 ]
+graph = [ "networkx" ]
 graphviz = [ "pygraphviz" ]
 
 [build-system]

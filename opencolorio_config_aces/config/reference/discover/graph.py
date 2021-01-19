@@ -18,11 +18,11 @@ conversion graph:
 import codecs
 import logging
 import pickle
-import networkx as nx
 
 from opencolorio_config_aces.config.reference.discover.classify import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     filter_ctl_transforms, unclassify_ctl_transforms)
+from opencolorio_config_aces.utilities import required
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -45,6 +45,7 @@ NODE_NAME_SEPARATOR : unicode
 """
 
 
+@required('NetworkX')
 def build_aces_conversion_graph(ctl_transforms):
     """
     Builds the *aces-dev* conversion graph from given *ACES* *CTL* transforms.
@@ -69,6 +70,8 @@ def build_aces_conversion_graph(ctl_transforms):
     >>> build_aces_conversion_graph(ctl_transforms)  # doctest: +ELLIPSIS
     <networkx.classes.digraph.DiGraph object at 0x...>
     """
+
+    import networkx as nx
 
     if isinstance(ctl_transforms, dict):
         ctl_transforms = unclassify_ctl_transforms(ctl_transforms)
@@ -231,6 +234,7 @@ def filter_nodes(graph, filterers=None):
     return filtered_nodes
 
 
+@required('NetworkX')
 def conversion_path(graph, source, target):
     """
     Returns the conversion path from the source node to the target node in the
@@ -260,11 +264,14 @@ def conversion_path(graph, source, target):
 ('OCES', 'ODT/P3D60_48nits')]
     """
 
+    import networkx as nx
+
     path = nx.shortest_path(graph, source, target)
 
     return [(a, b) for a, b in zip(path[:-1], path[1:])]
 
 
+@required('NetworkX')
 def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
     """
     Plots given *aces-dev* conversion graph using
@@ -288,6 +295,8 @@ def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
     AGraph
         *PyGraphviz* graph.
     """
+
+    import networkx as nx
 
     agraph = nx.nx_agraph.to_agraph(graph)
 

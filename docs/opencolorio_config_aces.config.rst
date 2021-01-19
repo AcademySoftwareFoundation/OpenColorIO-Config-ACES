@@ -18,6 +18,7 @@ Config Generation Common Objects
     :toctree: generated/
 
     colorspace_factory
+    view_transform_factory
     ConfigData
     validate_config
     generate_config
@@ -69,5 +70,4 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
-    classify_aces_ctl_transforms
     generate_config_aces

@@ -7,14 +7,18 @@ OpenColorIO Config Generation Common Objects
 Defines various objects related to *OpenColorIO* config generation:
 
 -   :func:`opencolorio_config_aces.colorspace_factory`
+-   :func:`opencolorio_config_aces.view_transform_factory`
 -   :class:`opencolorio_config_aces.ConfigData`
 -   :func:`opencolorio_config_aces.validate_config`
 -   :func:`opencolorio_config_aces.generate_config`
 """
 
 import logging
+from collections import OrderedDict
+from dataclasses import dataclass, field
+from typing import Union
 
-from opencolorio_config_aces.utilities import required, is_iterable
+from opencolorio_config_aces.utilities import required
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -24,8 +28,8 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'LOG_ALLOCATION_VARS', 'colorspace_factory', 'ConfigData',
-    'validate_config', 'generate_config'
+    'LOG_ALLOCATION_VARS', 'colorspace_factory', 'view_transform_factory',
+    'ConfigData', 'validate_config', 'generate_config'
 ]
 
 LOG_ALLOCATION_VARS = (-8, 5, 2**-8)
@@ -46,9 +50,10 @@ def colorspace_factory(name,
                        bit_depth=None,
                        allocation=None,
                        allocation_vars=None,
-                       to_reference_transform=None,
-                       from_reference_transform=None,
+                       to_reference=None,
+                       from_reference=None,
                        is_data=None,
+                       reference_space=None,
                        base_colorspace=None):
     """
     *OpenColorIO* colorspace factory.
@@ -73,10 +78,12 @@ def colorspace_factory(name,
         *OpenColorIO* colorspace allocation type.
     allocation_vars : tuple, optional
         *OpenColorIO* colorspace allocation variables.
-    to_reference_transform : object, optional
+    to_reference : object, optional
         *To Reference* *OpenColorIO* colorspace transform.
-    from_reference_transform : object, optional
+    from_reference : object, optional
         *From Reference* *OpenColorIO* colorspace transform.
+    reference_space : ReferenceSpaceType, optional
+        *OpenColorIO* colorspace reference space.
     is_data : bool, optional
         Whether the colorspace represents data.
     base_colorspace : ColorSpace, optional
@@ -97,10 +104,13 @@ def colorspace_factory(name,
     if bit_depth is None:
         bit_depth = ocio.BIT_DEPTH_F32
 
+    if reference_space is None:
+        reference_space = ocio.REFERENCE_SPACE_SCENE
+
     if base_colorspace is not None:
         colorspace = base_colorspace
     else:
-        colorspace = ocio.ColorSpace()
+        colorspace = ocio.ColorSpace(reference_space)
 
         colorspace.setBitDepth(bit_depth)
 
@@ -110,12 +120,12 @@ def colorspace_factory(name,
         if allocation_vars is not None:
             colorspace.setAllocationVars(allocation_vars)
 
-        if to_reference_transform is not None:
-            colorspace.setTransform(to_reference_transform,
+        if to_reference is not None:
+            colorspace.setTransform(to_reference,
                                     ocio.COLORSPACE_DIR_TO_REFERENCE)
 
-        if from_reference_transform is not None:
-            colorspace.setTransform(from_reference_transform,
+        if from_reference is not None:
+            colorspace.setTransform(from_reference,
                                     ocio.COLORSPACE_DIR_FROM_REFERENCE)
 
     colorspace.setName(name)
@@ -141,21 +151,107 @@ def colorspace_factory(name,
     return colorspace
 
 
+@required('OpenColorIO')
+def view_transform_factory(name,
+                           family=None,
+                           categories=None,
+                           description=None,
+                           to_reference=None,
+                           from_reference=None,
+                           reference_space=None,
+                           base_view_transform=None):
+    """
+    *OpenColorIO* view transform factory.
+
+    Parameters
+    ----------
+    name : unicode
+        *OpenColorIO* view transform name.
+    family : unicode, optional
+        *OpenColorIO* view transform family.
+    categories : array_like, optional
+        *OpenColorIO* view transform categories.
+    description : unicode, optional
+        *OpenColorIO* view transform description.
+    to_reference : object, optional
+        *To Reference* *OpenColorIO* view transform transform.
+    from_reference : object, optional
+        *From Reference* *OpenColorIO* view transform transform.
+    reference_space : ReferenceSpaceType, optional
+        *OpenColorIO* view transform reference space.
+    base_view_transform : ViewTransform, optional
+        *OpenColorIO* base view transform inherited for bit depth, allocation,
+        allocation variables, and to/from reference transforms.
+
+    Returns
+    -------
+    ViewTransform
+        *OpenColorIO* view transform.
+    """
+
+    import PyOpenColorIO as ocio
+
+    if categories is None:
+        categories = []
+
+    if reference_space is None:
+        reference_space = ocio.REFERENCE_SPACE_SCENE
+
+    if base_view_transform is not None:
+        view_transform = base_view_transform
+    else:
+        view_transform = ocio.ViewTransform(reference_space)
+
+        if to_reference is not None:
+            view_transform.setTransform(to_reference,
+                                        ocio.VIEWTRANSFORM_DIR_TO_REFERENCE)
+
+        if from_reference is not None:
+            view_transform.setTransform(from_reference,
+                                        ocio.VIEWTRANSFORM_DIR_FROM_REFERENCE)
+
+    view_transform.setName(name)
+
+    if family is not None:
+        view_transform.setFamily(family)
+
+    for category in categories:
+        view_transform.addCategory(category)
+
+    if description is not None:
+        view_transform.setDescription(description)
+
+    return view_transform
+
+
+@dataclass
 class ConfigData:
     """
     Defines the data container for an *OpenColorIO* config.
 
     Parameters
     ----------
+    profile_version : int, optional
+        Config major version, i.e. 1 or 2.
+    description : unicode, optional
+        Config description.
     roles : dict
         Config roles, a dict of role and colorspace name.
     colorspaces : array_like
         Config colorspaces, an iterable of
         :attr:`PyOpenColorIO.ColorSpace` class instances.
-    views : array_like
+    view_transforms : array_like, optional
+        Config view transforms, an iterable of
+        :attr:`PyOpenColorIO.ViewTransform` class instances.
+    inactive_colorspaces : array_like, optional
+        Config inactive colorspaces an iterable of colorspace names.
+    shared_views : array_like, optional
+        Config shared views, an iterable of dicts of view, view transform,
+        colorspace and rule names, iterable of looks and description.
+    views : array_like, optional
         Config views, an iterable of dicts of display, view
         and colorspace names.
-    active_displays : array_like
+    active_displays : array_like, optional
         Config active displays, an iterable of display names.
     active_views : array_like, optional
         Config active displays, an iterable of view names.
@@ -163,324 +259,36 @@ class ConfigData:
         Config file rules, a dict of file rules.
     viewing_rules : array_like, optional
         Config viewing rules, a dict of viewing rules.
-    description : unicode, optional
-        Config description.
-    profile_version : int, optional
-        Config major version, i.e. 1 or 2.
 
     Attributes
     ----------
+    profile_version
+    description
     roles
     colorspaces
+    view_transforms
+    inactive_colorspaces
+    shared_views
     views
     active_displays
     active_views
     file_rules
     viewing_rules
-    description
-    profile_version
     """
 
-    def __init__(self,
-                 roles,
-                 colorspaces,
-                 views,
-                 active_displays,
-                 active_views=None,
-                 file_rules=None,
-                 viewing_rules=None,
-                 description=None,
-                 profile_version=None):
-        self._roles = {}
-        self.roles = roles
-        self._colorspaces = []
-        self.colorspaces = colorspaces
-        self._views = []
-        self.views = views
-        self._active_displays = []
-        self.active_displays = active_displays
-        self._active_views = []
-        self.active_views = active_views
-        self._file_rules = []
-        self.file_rules = file_rules
-        self._viewing_rules = []
-        self.viewing_rules = viewing_rules
-        self._description = None
-        self.description = description
-        self._profile_version = 1
-        self.profile_version = profile_version
-
-    @property
-    def roles(self):
-        """
-        Getter and setter property for the *OpenColorIO* config roles.
-
-        Parameters
-        ----------
-        value : dict
-            Attribute value.
-
-        Returns
-        -------
-        dict
-            *OpenColorIO* config roles.
-        """
-
-        return self._roles
-
-    @roles.setter
-    def roles(self, value):
-        """
-        Setter for **self.roles** property.
-        """
-
-        if value is not None:
-            assert isinstance(value, dict), ((
-                '"{0}" attribute: "{1}" is not a "dict" like object!').format(
-                    'roles', value))
-            self._roles = dict(value)
-
-    @property
-    def colorspaces(self):
-        """
-        Getter and setter property for the *OpenColorIO* config colorspaces.
-
-        Parameters
-        ----------
-        value : array_like
-            Attribute value.
-
-        Returns
-        -------
-        list
-            *OpenColorIO* config colorspaces.
-        """
-
-        return self._colorspaces
-
-    @colorspaces.setter
-    def colorspaces(self, value):
-        """
-        Setter for **self.colorspaces** property.
-        """
-
-        if value is not None:
-            assert is_iterable(value), (
-                ('"{0}" attribute: "{1}" is not an "array_like" like object!'
-                 ).format('colorspaces', value))
-            self._colorspaces = list(value)
-
-    @property
-    def views(self):
-        """
-        Getter and setter property for the *OpenColorIO* config views.
-
-        Parameters
-        ----------
-        value : array_like
-            Attribute value.
-
-        Returns
-        -------
-        list
-            *OpenColorIO* config views.
-        """
-
-        return self._views
-
-    @views.setter
-    def views(self, value):
-        """
-        Setter for **self.views** property.
-        """
-
-        if value is not None:
-            assert is_iterable(value), (
-                ('"{0}" attribute: "{1}" is not an "array_like" like object!'
-                 ).format('views', value))
-            self._views = list(value)
-
-    @property
-    def active_displays(self):
-        """
-        Getter and setter property for the *OpenColorIO* config active
-        displays.
-
-        Parameters
-        ----------
-        value : array_like
-            Attribute value.
-
-        Returns
-        -------
-        list
-            *OpenColorIO* config active displays.
-        """
-
-        return self._active_displays
-
-    @active_displays.setter
-    def active_displays(self, value):
-        """
-        Setter for **self.active_displays** property.
-        """
-
-        if value is not None:
-            assert is_iterable(value), (
-                ('"{0}" attribute: "{1}" is not an "array_like" like object!'
-                 ).format('active_displays', value))
-            self._active_displays = list(value)
-
-    @property
-    def active_views(self):
-        """
-        Getter and setter property for the *OpenColorIO* config active views.
-
-        Parameters
-        ----------
-        value : array_like
-            Attribute value.
-
-        Returns
-        -------
-        list
-            *OpenColorIO* config active views.
-        """
-
-        return self._active_views
-
-    @active_views.setter
-    def active_views(self, value):
-        """
-        Setter for **self.active_views** property.
-        """
-
-        if value is not None:
-            assert is_iterable(value), (
-                ('"{0}" attribute: "{1}" is not an "array_like" like object!'
-                 ).format('active_views', value))
-            self._active_views = list(value)
-
-    @property
-    def file_rules(self):
-        """
-        Getter and setter property for the *OpenColorIO* config file rules.
-
-        Parameters
-        ----------
-        value : array_like
-            Attribute value.
-
-        Returns
-        -------
-        list
-            *OpenColorIO* config file rules.
-        """
-
-        return self._file_rules
-
-    @file_rules.setter
-    def file_rules(self, value):
-        """
-        Setter for **self.file_rules** property.
-        """
-
-        if value is not None:
-            assert is_iterable(value), (
-                ('"{0}" attribute: "{1}" is not an "array_like" like object!'
-                 ).format('file_rules', value))
-            self._file_rules = list(value)
-
-    @property
-    def viewing_rules(self):
-        """
-        Getter and setter property for the *OpenColorIO* config viewing rules.
-
-        Parameters
-        ----------
-        value : array_like
-            Attribute value.
-
-        Returns
-        -------
-        list
-            *OpenColorIO* config viewing rules.
-        """
-
-        return self._viewing_rules
-
-    @viewing_rules.setter
-    def viewing_rules(self, value):
-        """
-        Setter for **self.viewing_rules** property.
-        """
-
-        if value is not None:
-            assert is_iterable(value), (
-                ('"{0}" attribute: "{1}" is not an "array_like" like object!'
-                 ).format('viewing_rules', value))
-            self._viewing_rules = list(value)
-
-    @property
-    def description(self):
-        """
-        Getter and setter property for the *OpenColorIO* config description.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
-
-        Returns
-        -------
-        unicode
-            *OpenColorIO* config description.
-        """
-
-        return self._description
-
-    @description.setter
-    def description(self, value):
-        """
-        Setter for **self.description** property.
-        """
-
-        if value is not None:
-            assert isinstance(value, str), ((
-                '"{0}" attribute: "{1}" is not a "str" like object!').format(
-                    'description', value))
-            self._description = value
-
-    @property
-    def profile_version(self):
-        """
-        Getter and setter property for the *OpenColorIO* config profile
-        version.
-
-        Parameters
-        ----------
-        value : int
-            Attribute value.
-
-        Returns
-        -------
-        int
-            *OpenColorIO* config profile version.
-        """
-
-        return self._profile_version
-
-    @profile_version.setter
-    def profile_version(self, value):
-        """
-        Setter for **self.profile_version** property.
-        """
-
-        if value is not None:
-            assert isinstance(value, int), ((
-                '"{0}" attribute: "{1}" is not an "int" like object!').format(
-                    'profile_version', value))
-            self._profile_version = int(value)
+    profile_version: int = 1
+    description: str = (
+        'An "OpenColorIO" config generated by "OpenColorIO-Config-ACES".')
+    roles: Union[dict, OrderedDict] = field(default_factory=dict)
+    colorspaces: Union[list, tuple] = field(default_factory=list)
+    view_transforms: Union[list, tuple] = field(default_factory=list)
+    inactive_colorspaces: Union[list, tuple] = field(default_factory=list)
+    shared_views: Union[list, tuple] = field(default_factory=list)
+    views: Union[list, tuple] = field(default_factory=list)
+    active_displays: Union[list, tuple] = field(default_factory=list)
+    active_views: Union[list, tuple] = field(default_factory=list)
+    file_rules: Union[list, tuple] = field(default_factory=list)
+    viewing_rules: Union[list, tuple] = field(default_factory=list)
 
 
 def validate_config(config):
@@ -535,36 +343,68 @@ def generate_config(data, config_name=None, validate=True):
     if data.description is not None:
         config.setDescription(data.description)
 
-    for colorspace, role in data.roles.items():
+    for role, colorspace in data.roles.items():
         logging.debug(f'Adding "{colorspace}" colorspace as "{role}" role.')
         config.setRole(role, colorspace)
 
     for colorspace in data.colorspaces:
-        logging.debug(f'Adding colorspace "{colorspace.getName()}".')
+        logging.debug(f'Adding "{colorspace.getName()}" colorspace.')
         config.addColorSpace(colorspace)
+
+    for view_transform in data.view_transforms:
+        logging.debug(f'Adding "{view_transform.getName()}" view transform.')
+        config.addViewTransform(view_transform)
+
+    if data.profile_version >= 2:
+        logging.debug(f'Disabling "{data.inactive_colorspaces}" colorspaces.')
+        config.setInactiveColorSpaces(','.join(data.inactive_colorspaces))
+
+    for shared_view in data.shared_views:
+        display_colorspace = shared_view.get('display_colorspace',
+                                             '<USE_DISPLAY_NAME>')
+        looks = shared_view.get('looks')
+        view_transform = shared_view.get('view_transform')
+        rule = shared_view.get('rule')
+        description = shared_view.get('description')
+        view = shared_view['view']
+        logging.debug(
+            f'Adding "{view}" shared view using "{view_transform}" '
+            f'view_transform, "{display_colorspace}" display colorspace, '
+            f'"{rule}" rule and "{description}" description.')
+
+        config.addSharedView(view, view_transform, display_colorspace, looks,
+                             rule, description)
 
     for view in data.views:
         display = view['display']
-        view_name = view['view']
         colorspace = view.get('colorspace')
         looks = view.get('looks')
         view_transform = view.get('view_transform')
+        display_colorspace = view.get('display_colorspace')
         rule = view.get('rule')
-        description = view.get('rule')
-        if colorspace:
-            logging.debug(f'Adding "{view_name}" view to "{display}" display '
+        description = view.get('description')
+        view = view['view']
+        if colorspace is not None:
+            logging.debug(f'Adding "{view}" view to "{display}" display '
                           f'using "{colorspace}" colorspace.')
 
-            config.addDisplayView(display, view_name, colorspace, looks)
-        else:
-            logging.debug(f'Adding "{view_name}" view to "{display}" display '
-                          f'using "{view_transform}" view_transform, '
+            config.addDisplayView(display, view, colorspace, looks)
+        elif view_transform is not None and display_colorspace is not None:
+            logging.debug(f'Adding "{view}" view to "{display}" display '
+                          f'using "{view_transform}" view transform, '
+                          f'"{display_colorspace}" display colorspace, '
                           f'"{rule}" rule and "{description}" description.')
 
-            config.addDisplayView(display, view_name, view_transform, looks,
-                                  rule, description)
+            config.addDisplayView(display, view, view_transform,
+                                  display_colorspace, looks, rule, description)
+        else:
+            logging.debug(f'Adding "{view}" view to "{display}" display.')
+            config.addDisplaySharedView(display, view)
 
+    logging.debug(f'Activating "{data.active_displays}" displays.')
     config.setActiveDisplays(','.join(data.active_displays))
+
+    logging.debug(f'Activating "{data.active_views}" views.')
     config.setActiveViews(','.join(data.active_views))
 
     file_rules = ocio.FileRules()
@@ -628,41 +468,35 @@ if __name__ == '__main__':
 
     # "OpenColorIO 1" configuration.
     colorspace_1 = colorspace_factory('Gamut - sRGB', 'Gamut')
-
     colorspace_2 = colorspace_factory(
         'CCTF - sRGB',
         'CCTF',
         description=('WARNING: The sRGB "EOTF" is purposely incorrect and '
                      'only a placeholder!'),
-        to_reference_transform=ocio.ExponentTransform([2.2, 2.2, 2.2, 1]))
-
+        to_reference=ocio.ExponentTransform([2.2, 2.2, 2.2, 1]))
     colorspace_3 = colorspace_factory(
         'Colorspace - sRGB',
         'Colorspace',
-        to_reference_transform=ocio.ColorSpaceTransform(
-            'CCTF - sRGB', 'Gamut - sRGB'))
-
-    colorspace_4 = colorspace_factory(
+        to_reference=ocio.ColorSpaceTransform('CCTF - sRGB', 'Gamut - sRGB'))
+    colorspace_4 = colorspace_factory('Utility - Raw', 'Utility', is_data=True)
+    display_1 = colorspace_factory(
         'View - sRGB Monitor - sRGB', 'View', base_colorspace=colorspace_3)
 
-    colorspace_5 = colorspace_factory('Utility - Raw', 'Utility', is_data=True)
-
     data = ConfigData(
-        roles={'Gamut - sRGB': ocio.ROLE_SCENE_LINEAR},
+        roles={ocio.ROLE_SCENE_LINEAR: 'Gamut - sRGB'},
         colorspaces=[
-            colorspace_1, colorspace_2, colorspace_3, colorspace_4,
-            colorspace_5
+            colorspace_1, colorspace_2, colorspace_3, colorspace_4, display_1
         ],
         views=[
             {
                 'display': 'sRGB Monitor',
                 'view': 'sRGB - sRGB',
-                'colorspace': 'View - sRGB Monitor - sRGB'
+                'colorspace': display_1.getName()
             },
             {
                 'display': 'sRGB Monitor',
                 'view': 'Raw',
-                'colorspace': 'Utility - Raw'
+                'colorspace': colorspace_4.getName()
             },
         ],
         active_displays=['sRGB Monitor'],
@@ -672,43 +506,96 @@ if __name__ == '__main__':
     generate_config(data, os.path.join(build_directory, 'config-v1.ocio'))
 
     # "OpenColorIO 2" configuration.
-    data.profile_version = 2
+    colorspace_1 = colorspace_factory('ACES - ACES2065-1', 'ACES')
+    colorspace_2 = colorspace_factory(
+        'ACES - ACEScg',
+        'ACES',
+        to_reference=ocio.BuiltinTransform('ACEScg_to_ACES2065-1'))
+    colorspace_3 = colorspace_factory(
+        'Gamut - sRGB',
+        'Gamut',
+        to_reference=ocio.MatrixTransform([
+            0.4387956642, 0.3825367756, 0.1787151431, 0.0000000000,
+            0.0890560064, 0.8126211313, 0.0982957371, 0.0000000000,
+            0.0173063724, 0.1083658908, 0.8742745984, 0.0000000000,
+            0.0000000000, 0.0000000000, 0.0000000000, 1.0000000000,
+        ]))  # yapf: disable
     transform = ocio.ExponentWithLinearTransform()
     transform.setGamma([2.4, 2.4, 2.4, 1])
     transform.setOffset([0.055, 0.055, 0.055, 0])
-    data.colorspaces[1].setTransform(transform,
-                                     ocio.COLORSPACE_DIR_TO_REFERENCE)
-    data.colorspaces[1].setDescription('')
+    colorspace_4 = colorspace_factory(
+        'CCTF - sRGB', 'CCTF', to_reference=transform)
+    colorspace_5 = colorspace_factory('Utility - Raw', 'Utility', is_data=True)
+    interchange = colorspace_factory('CIE-XYZ D65')
+    display_1 = colorspace_factory(
+        'sRGB Monitor',
+        from_reference=ocio.BuiltinTransform('DISPLAY - CIE-XYZ-D65_to_sRGB'),
+        reference_space=ocio.REFERENCE_SPACE_DISPLAY)
+    display_2 = colorspace_factory(
+        'ITU-R BT.1886 Monitor',
+        from_reference=ocio.BuiltinTransform(
+            'DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709'),
+        reference_space=ocio.REFERENCE_SPACE_DISPLAY)
 
-    # TODO: Use new display colorspace system.
-    data.views = [
-        {
-            'display': 'sRGB Monitor',
-            'view': 'sRGB - sRGB',
-            'colorspace': 'View - sRGB Monitor - sRGB'
+    view_transform_1 = view_transform_factory(
+        'ACES Output - SDR Video - 1.0',
+        from_reference=ocio.BuiltinTransform(
+            'ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0'),
+    )
+    view_transform_2 = view_transform_factory(
+        'Output - No Tonescale',
+        from_reference=ocio.BuiltinTransform(
+            'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'),
+    )
+
+    displays = (display_1, display_2)
+    view_transforms = (view_transform_1, view_transform_2)
+    shared_views = [{
+        'display': display.getName(),
+        'view': view_transform.getName(),
+        'view_transform': view_transform.getName(),
+    } for display in displays for view_transform in view_transforms]
+
+    data = ConfigData(
+        profile_version=2,
+        roles={
+            'aces_interchange': 'ACES - ACES2065-1',
+            'cie_xyz_d65_interchange': 'CIE-XYZ D65',
+            ocio.ROLE_SCENE_LINEAR: colorspace_2.getName(),
         },
-        {
-            'display': 'sRGB Monitor',
+        colorspaces=[
+            colorspace_1, colorspace_2, colorspace_3, colorspace_4,
+            colorspace_5, interchange, display_1, display_2
+        ],
+        view_transforms=[view_transform_1, view_transform_2],
+        inactive_colorspaces=['CIE-XYZ D65'],
+        shared_views=shared_views,
+        views=shared_views + [{
+            'display': display.getName(),
             'view': 'Raw',
             'colorspace': 'Utility - Raw'
-        },
-    ]
-    data.file_rules = [
-        {
-            'name': 'Default',
-            'colorspace': 'Gamut - sRGB'
-        },
-        {
-            'name': 'Linear - sRGB',
-            'colorspace': 'Gamut - sRGB',
-            'regex': '_[sS][rR][gG][bB]\\.([eE][xX][rR]|[hH][dD][rR])$'
-        },
-        {
-            'name': 'EOTF - sRGB',
-            'colorspace': 'CCTF - sRGB',
-            'regex': '_[sS][rR][gG][bB]\\.([pP][nN][gG]|[tT][iI][fF])$'
-        },
-    ]
-    data.viewing_rules = []
+        } for display in displays],
+        active_displays=[display_1.getName(),
+                         display_2.getName()],
+        active_views=[
+            view_transform.getName() for view_transform in view_transforms
+        ] + ['Raw'],
+        file_rules=[
+            {
+                'name': 'Default',
+                'colorspace': 'ACES - ACES2065-1'
+            },
+            {
+                'name': 'Linear - sRGB',
+                'colorspace': 'Gamut - sRGB',
+                'regex': '_[sS][rR][gG][bB]\\.([eE][xX][rR]|[hH][dD][rR])$'
+            },
+            {
+                'name': 'EOTF - sRGB',
+                'colorspace': 'CCTF - sRGB',
+                'regex': '_[sS][rR][gG][bB]\\.([pP][nN][gG]|[tT][iI][fF])$'
+            },
+        ],
+        viewing_rules=[])
 
     generate_config(data, os.path.join(build_directory, 'config-v2.ocio'))

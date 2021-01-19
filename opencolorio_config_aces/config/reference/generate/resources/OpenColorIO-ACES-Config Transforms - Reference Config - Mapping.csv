@@ -1,0 +1,37 @@
+ACEStransformID,BuiltinTransform Style,Linked DisplayColorSpace Style,Interface
+ACEScsc.CLog2_CGamut_to_ACES.a1.v1,CANON_CLOG2-CGAMUT_to_ACES2065-1,,ColorSpace
+ACEScsc.CLog3_CGamut_to_ACES.a1.v1,CANON_CLOG3-CGAMUT_to_ACES2065-1,,ColorSpace
+ACEScsc.Log3G10_RWG_to_ACES.a1.v1,RED_LOG3G10-RWG_to_ACES2065-1,,ColorSpace
+ACEScsc.LogC_EI800_AWG_to_ACES.a1.v1,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace
+ACEScsc.SLog3_SGamut3_to_ACES.a1.v1,SONY_SLOG3-SGAMUT3_to_ACES2065-1,,ColorSpace
+ACEScsc.SLog3_SGamut3Cine_to_ACES.a1.v1,SONY_SLOG3-SGAMUT3.CINE_to_ACES2065-1,,ColorSpace
+ACEScsc.VLog_VGamut_to_ACES.a1.v1,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScc_to_ACES.a1.0.3,ACEScc_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScct_to_ACES.a1.0.3,ACEScct_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,ACEScg_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX10_to_ACES.a1.0.3,ADX10_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX16_to_ACES.a1.0.3,ADX16_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1,SONY_SLOG3-SGAMUT3-VENICE_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace
+urn:ampas:aces:transformId:v1.5:LMT.Academy.BlueLightArtifactFix.a1.1.0,ACES-LMT - BLUE_LIGHT_ARTIFACT_FIX,,Look
+urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D60_48nits.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA_1.0,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-D60-BFD,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_48nits.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA_1.0,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_709limit_48nits.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA-REC709lim_1.1,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_D60sim_48nits.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA-D60sim-D65_1.1,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.P3DCI_48nits.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA-D60sim-DCI_1.0,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-DCI-BFD,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.P3DCI_D65sim_48nits.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA-D65sim-DCI_1.1,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-DCI-BFD,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec2020_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.2020,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec2020_100nits.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-P3lim_1.1,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.2020,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec2020_Rec709limited_100nits.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-REC709lim_1.1,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.2020,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_D60sim_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform
+urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_D60sim_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_1000nits_15nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-1000nit-15nit-P3lim_1.1,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_108nits_7.2nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-CINEMA-108nit-7.2nit-P3lim_1.1,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_2000nits_15nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-2000nit-15nit-P3lim_1.1,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_4000nits_15nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-4000nit-15nit-P3lim_1.1,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_HLG.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-1000nit-15nit-REC2020lim_1.1,DISPLAY - CIE-XYZ-D65_to_REC.2100-HLG-1000nit,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-1000nit-15nit-REC2020lim_1.1,DISPLAY - CIE-XYZ-D65_to_REC.2100-PQ,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_2000nits_15nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-2000nit-15nit-REC2020lim_1.1,DISPLAY - CIE-XYZ-D65_to_REC.2100-PQ,ViewTransform
+urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_4000nits_15nits_ST2084.a1.1.0,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-VIDEO-4000nit-15nit-REC2020lim_1.1,DISPLAY - CIE-XYZ-D65_to_REC.2100-PQ,ViewTransform
