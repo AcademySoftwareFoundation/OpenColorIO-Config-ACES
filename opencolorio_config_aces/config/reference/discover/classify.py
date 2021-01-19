@@ -230,11 +230,11 @@ def patch_invalid_aces_transform_id(aces_transform_id):
 
         aces_transform_id = aces_transform_id.replace(
             'P3D65_709limit_48nits', 'P3D65_Rec709limited_48nits')
-    elif 'Rec2020_100nits' in aces_transform_id:
+    elif 'Rec2020_100nits.a1.1.0' in aces_transform_id:
         logging.warning(f'{invalid_id} is incorrectly named!')
 
         aces_transform_id = aces_transform_id.replace(
-            'Rec2020_100nits', 'Rec2020_P3D65limited_100nits')
+            'Rec2020_100nits', 'Rec2020_P3D65limited_100nits_dim')
     elif 'ACEScsc' in aces_transform_id:
         if 'ACEScsc.Academy' not in aces_transform_id:
             logging.warning(f'{invalid_id} is missing "Academy" namespace!')
