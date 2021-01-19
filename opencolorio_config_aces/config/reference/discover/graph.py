@@ -84,9 +84,9 @@ def build_aces_conversion_graph(ctl_transforms):
         type_ = ctl_transform.type
 
         if source is None or target is None:
-            logging.warning(f'"{ctl_transform}" has either a missing source '
-                            f'or target colourspace and won\'t be included in '
-                            f'the "aces-dev" conversion graph!')
+            logging.debug(f'"{ctl_transform}" has either a missing source '
+                          f'or target colourspace and won\'t be included in '
+                          f'the "aces-dev" conversion graph!')
             continue
 
         # Without enforcing a preferred source and target colourspaces, the
