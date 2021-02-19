@@ -211,41 +211,49 @@ def patch_invalid_aces_transform_id(aces_transform_id):
 
     Notes
     -----
-    - https://github.com/ampas/aces-dev/issues/118
-    - https://github.com/ampas/aces-dev/pull/119
+    -   Fixed by https://github.com/scottdyer/aces-dev/\
+commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
+        - https://github.com/ampas/aces-dev/issues/118
+        - https://github.com/ampas/aces-dev/pull/119
     """
 
-    invalid_id = aces_transform_id
-    if not aces_transform_id.startswith(ACES_URN):
-        logging.warning(f'{invalid_id} is missing "ACES" URN!')
+    # Addressed with https://github.com/scottdyer/aces-dev/
+    # commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
+    if False:
+        invalid_id = aces_transform_id
+        if not aces_transform_id.startswith(ACES_URN):
+            logging.warning(f'{invalid_id} is missing "ACES" URN!')
 
-        aces_transform_id = f'{ACES_URN}:{aces_transform_id}'
+            aces_transform_id = f'{ACES_URN}:{aces_transform_id}'
 
-    if 'Academy.P3D65_108nits_7.2nits_ST2084' in aces_transform_id:
-        logging.warning(f'{invalid_id} has an invalid separator in "7.2nits"!')
+        if 'Academy.P3D65_108nits_7.2nits_ST2084' in aces_transform_id:
+            logging.warning(
+                f'{invalid_id} has an invalid separator in "7.2nits"!')
 
-        aces_transform_id = aces_transform_id.replace('7.2', '7')
-    elif 'P3D65_709limit_48nits' in aces_transform_id:
-        logging.warning(f'{invalid_id} is inconsistently named!')
-
-        aces_transform_id = aces_transform_id.replace(
-            'P3D65_709limit_48nits', 'P3D65_Rec709limited_48nits')
-    elif 'Rec2020_100nits.a1.1.0' in aces_transform_id:
-        logging.warning(f'{invalid_id} is incorrectly named!')
-
-        aces_transform_id = aces_transform_id.replace(
-            'Rec2020_100nits', 'Rec2020_P3D65limited_100nits_dim')
-    elif 'ACEScsc' in aces_transform_id:
-        if 'ACEScsc.Academy' not in aces_transform_id:
-            logging.warning(f'{invalid_id} is missing "Academy" namespace!')
+            aces_transform_id = aces_transform_id.replace('7.2', '7')
+        elif 'P3D65_709limit_48nits' in aces_transform_id:
+            logging.warning(f'{invalid_id} is inconsistently named!')
 
             aces_transform_id = aces_transform_id.replace(
-                'ACEScsc', 'ACEScsc.Academy')
+                'P3D65_709limit_48nits', 'P3D65_Rec709limited_48nits')
+        elif 'Rec2020_100nits.a1.1.0' in aces_transform_id:
+            logging.warning(f'{invalid_id} is incorrectly named!')
 
-        if aces_transform_id.endswith('a1.v1'):
-            logging.warning(f'{invalid_id} version scheme is invalid!')
+            aces_transform_id = aces_transform_id.replace(
+                'Rec2020_100nits', 'Rec2020_P3D65limited_100nits_dim')
+        elif 'ACEScsc' in aces_transform_id:
+            if 'ACEScsc.Academy' not in aces_transform_id:
+                logging.warning(
+                    f'{invalid_id} is missing "Academy" namespace!')
 
-            aces_transform_id = aces_transform_id.replace('a1.v1', 'a1.1.0')
+                aces_transform_id = aces_transform_id.replace(
+                    'ACEScsc', 'ACEScsc.Academy')
+
+            if aces_transform_id.endswith('a1.v1'):
+                logging.warning(f'{invalid_id} version scheme is invalid!')
+
+                aces_transform_id = aces_transform_id.replace(
+                    'a1.v1', 'a1.1.0')
 
     return aces_transform_id
 
