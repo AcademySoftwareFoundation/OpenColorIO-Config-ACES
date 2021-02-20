@@ -16,7 +16,8 @@ from opencolorio_config_aces.config.generation import (
 from opencolorio_config_aces.config.reference.discover.graph import (
     NODE_NAME_SEPARATOR)
 from opencolorio_config_aces.config.reference import (
-    build_aces_conversion_graph, classify_aces_ctl_transforms, conversion_path,
+    ColorspaceDescriptionStyle, build_aces_conversion_graph,
+    classify_aces_ctl_transforms, conversion_path,
     discover_aces_ctl_transforms, filter_nodes, filter_ctl_transforms,
     node_to_ctl_transform)
 from opencolorio_config_aces.config.reference.generate.config import (
@@ -174,7 +175,9 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
             f'No path to {ACES_CONFIG_REFERENCE_COLORSPACE} for {node}!')
 
 
-def node_to_colorspace(graph, node, complete_description=True):
+def node_to_colorspace(graph,
+                       node,
+                       describe=ColorspaceDescriptionStyle.LONG_UNION):
     """
     Generates the *OpenColorIO* colorspace for given *aces-dev* conversion
     graph node.
@@ -185,9 +188,9 @@ def node_to_colorspace(graph, node, complete_description=True):
         *aces-dev* conversion graph.
     node : unicode
         Node name to generate the *OpenColorIO* colorspace for.
-    complete_description : bool, optional
-        Whether to use the full *ACES* *CTL* transform description or just the
-        first line.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
 
     Returns
     -------
@@ -199,7 +202,7 @@ def node_to_colorspace(graph, node, complete_description=True):
 
     colorspace = ctl_transform_to_colorspace(
         ctl_transform,
-        complete_description,
+        describe=describe,
         to_reference=node_to_builtin_transform(graph, node),
         from_reference=node_to_builtin_transform(graph, node, 'Reverse'))
 
@@ -209,7 +212,7 @@ def node_to_colorspace(graph, node, complete_description=True):
 @required('OpenColorIO')
 def generate_config_aces(config_name=None,
                          validate=True,
-                         complete_description=True,
+                         describe=ColorspaceDescriptionStyle.LONG_UNION,
                          filterers=None,
                          additional_data=False):
     """
@@ -229,8 +232,9 @@ def generate_config_aces(config_name=None,
         disk.
     validate : bool, optional
         Whether to validate the config.
-    complete_description : bool, optional
-        Whether to output the full *ACES* *CTL* transform descriptions.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
     filterers : array_like, optional
         List of callables used to filter the *ACES* *CTL* transforms, each
         callable takes an *ACES* *CTL* transform as argument and returns
@@ -294,7 +298,7 @@ def generate_config_aces(config_name=None,
                         ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
                 continue
 
-            colorspace = node_to_colorspace(graph, node, complete_description)
+            colorspace = node_to_colorspace(graph, node, describe)
 
             family_colourspaces.append(colorspace)
 

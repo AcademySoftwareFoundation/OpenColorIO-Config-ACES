@@ -14,6 +14,7 @@ import csv
 import logging
 import re
 from collections import defaultdict
+from enum import Flag, auto
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
@@ -40,8 +41,8 @@ __all__ = [
     'COLORSPACE_NAME_SUBSTITUTION_PATTERNS',
     'COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS',
     'VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS',
-    'DISPLAY_NAME_SUBSTITUTION_PATTERNS', 'beautify_name',
-    'beautify_colorspace_name', 'beautify_colorspace_family',
+    'DISPLAY_NAME_SUBSTITUTION_PATTERNS', 'ColorspaceDescriptionStyle',
+    'beautify_name', 'beautify_colorspace_name', 'beautify_colorspace_family',
     'beautify_view_transform_name', 'beautify_display_name',
     'ctl_transform_to_colorspace_name', 'ctl_transform_to_colorspace_family',
     'ctl_transform_to_colorspace', 'create_builtin_transform',
@@ -188,6 +189,20 @@ Notes
 
 DISPLAY_NAME_SUBSTITUTION_PATTERNS : dict
 """
+
+
+class ColorspaceDescriptionStyle(Flag):
+    """
+    Enum storing the various *OpenColorIO* colorspace description styles.
+    """
+
+    NONE = auto()
+    ACES = auto()
+    OPENCOLORIO = auto()
+    SHORT = auto()
+    LONG = auto()
+    SHORT_UNION = ACES | OPENCOLORIO | SHORT
+    LONG_UNION = ACES | OPENCOLORIO | LONG
 
 
 def beautify_name(name, patterns):
@@ -391,8 +406,9 @@ def ctl_transform_to_colorspace_family(ctl_transform):
     return beautify_colorspace_family(family)
 
 
+@required('OpenColorIO')
 def ctl_transform_to_colorspace(ctl_transform,
-                                complete_description=True,
+                                describe=ColorspaceDescriptionStyle.LONG_UNION,
                                 **kwargs):
     """
     Generates the *OpenColorIO* colorspace for given *ACES* *CTL* transform.
@@ -401,7 +417,7 @@ def ctl_transform_to_colorspace(ctl_transform,
     ----------
     ctl_transform : CTLTransform
         *ACES* *CTL* transform to generate the *OpenColorIO* colorspace for.
-    complete_description : bool, optional
+    describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
 
@@ -417,8 +433,51 @@ def ctl_transform_to_colorspace(ctl_transform,
         *OpenColorIO* colorspace.
     """
 
+    import PyOpenColorIO as ocio
+
     name = ctl_transform_to_colorspace_name(ctl_transform)
     family = ctl_transform_to_colorspace_family(ctl_transform)
+
+    description = None
+    if describe != ColorspaceDescriptionStyle.NONE:
+        description = []
+
+        if describe in (ColorspaceDescriptionStyle.OPENCOLORIO,
+                        ColorspaceDescriptionStyle.SHORT_UNION,
+                        ColorspaceDescriptionStyle.LONG_UNION):
+            transforms = [
+                transform for transform in (kwargs.get('to_reference'),
+                                            kwargs.get('from_reference'))
+                if transform is not None
+            ]
+            transform = next(iter(transforms), None)
+            if isinstance(transform, ocio.BuiltinTransform):
+                description.append(transform.getDescription())
+
+        if describe in (ColorspaceDescriptionStyle.ACES,
+                        ColorspaceDescriptionStyle.ACES
+                        | ColorspaceDescriptionStyle.SHORT,
+                        ColorspaceDescriptionStyle.SHORT_UNION,
+                        ColorspaceDescriptionStyle.LONG_UNION):
+            if len(description) > 0:
+                description.append('')
+
+            aces_transform_id = (
+                ctl_transform.aces_transform_id.aces_transform_id)
+
+            if describe in (ColorspaceDescriptionStyle.ACES,
+                            ColorspaceDescriptionStyle.ACES
+                            | ColorspaceDescriptionStyle.SHORT,
+                            ColorspaceDescriptionStyle.SHORT_UNION):
+                description.append(f'ACEStransformID: {aces_transform_id}')
+            else:
+                description.append('CTL Transform')
+                description.append(f'{"=" * len(description[-1])}\n')
+
+                description.append(f'{ctl_transform.description}\n')
+                description.append(f'ACEStransformID: {aces_transform_id}')
+
+        description = '\n'.join(description)
 
     settings = {
         'name': (f'{beautify_colorspace_name(family)}'
@@ -426,8 +485,8 @@ def ctl_transform_to_colorspace(ctl_transform,
                  f'{name}'),
         'family':
         family,
-        'description': (ctl_transform.description if complete_description else
-                        ctl_transform.description.split('\n')[0]),
+        'description':
+        description,
     }
     settings.update(kwargs)
 
@@ -471,7 +530,9 @@ def create_builtin_transform(style):
 
 
 @required('OpenColorIO')
-def style_to_view_transform(style):
+def style_to_view_transform(style,
+                            ctl_transforms,
+                            describe=ColorspaceDescriptionStyle.LONG_UNION):
     """
     Creates an *OpenColorIO* view transform for given style.
 
@@ -479,6 +540,12 @@ def style_to_view_transform(style):
     ----------
     style : unicode
         *OpenColorIO* builtin transform style
+    ctl_transforms : array_like
+        Array of :class:`opencolorio_config_aces.config.reference.CTLTransform`
+        class instances corresponding to the given style.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
 
     Returns
     -------
@@ -491,14 +558,56 @@ def style_to_view_transform(style):
     name = beautify_view_transform_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
 
+    description = None
+    if describe != ColorspaceDescriptionStyle.NONE:
+        description = []
+
+        if describe in (ColorspaceDescriptionStyle.OPENCOLORIO,
+                        ColorspaceDescriptionStyle.SHORT_UNION,
+                        ColorspaceDescriptionStyle.LONG_UNION):
+            description.append(builtin_transform.getDescription())
+
+        if describe in (ColorspaceDescriptionStyle.ACES,
+                        ColorspaceDescriptionStyle.ACES
+                        | ColorspaceDescriptionStyle.SHORT,
+                        ColorspaceDescriptionStyle.SHORT_UNION,
+                        ColorspaceDescriptionStyle.LONG_UNION):
+            aces_transform_ids, aces_descriptions = zip(
+                *[(ctl_transform.aces_transform_id.aces_transform_id,
+                   ctl_transform.description)
+                  for ctl_transform in ctl_transforms])
+
+            if len(description) > 0:
+                description.append('')
+
+            if describe in (ColorspaceDescriptionStyle.ACES
+                            | ColorspaceDescriptionStyle.SHORT,
+                            ColorspaceDescriptionStyle.SHORT_UNION):
+                description.extend([
+                    f'ACEStransformID: {aces_transform_id}'
+                    for aces_transform_id in aces_transform_ids
+                ])
+            else:
+                description.append(
+                    f'CTL Transform'
+                    f'{"s" if len(aces_transform_ids) >= 2 else ""}')
+                description.append(f'{"=" * len(description[-1])}\n')
+
+                description.append(f'\n{"-" * 80}\n\n'.join([
+                    (f'{aces_descriptions[i]}\n\n'
+                     f'ACEStransformID: {aces_transform_id}\n')
+                    for i, aces_transform_id in enumerate(aces_transform_ids)
+                ]))
+
+        description = '\n'.join(description)
+
     return view_transform_factory(
-        name,
-        from_reference=builtin_transform,
-        description=builtin_transform.getDescription())
+        name, from_reference=builtin_transform, description=description)
 
 
 @required('OpenColorIO')
-def style_to_display_colorspace(style):
+def style_to_display_colorspace(
+        style, describe=ColorspaceDescriptionStyle.OPENCOLORIO):
     """
     Creates an *OpenColorIO* display colorspace for given style.
 
@@ -506,6 +615,9 @@ def style_to_display_colorspace(style):
     ----------
     style : unicode
         *OpenColorIO* builtin transform style
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
 
     Returns
     -------
@@ -518,18 +630,29 @@ def style_to_display_colorspace(style):
     name = beautify_display_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
 
+    description = None
+    if describe != ColorspaceDescriptionStyle.NONE:
+        description = []
+
+        if describe in (ColorspaceDescriptionStyle.OPENCOLORIO,
+                        ColorspaceDescriptionStyle.SHORT_UNION,
+                        ColorspaceDescriptionStyle.LONG_UNION):
+            description.append(builtin_transform.getDescription())
+
+        description = '\n'.join(description)
+
     return colorspace_factory(
         name,
         from_reference=builtin_transform,
         reference_space=ocio.REFERENCE_SPACE_DISPLAY,
-        description=builtin_transform.getDescription())
+        description=description)
 
 
 @required('OpenColorIO')
 def generate_config_aces(
         config_name=None,
         validate=True,
-        complete_description=True,
+        describe=ColorspaceDescriptionStyle.SHORT_UNION,
         config_mapping_file_path=ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH,
         additional_data=False):
     """
@@ -553,8 +676,9 @@ def generate_config_aces(
         disk.
     validate : bool, optional
         Whether to validate the config.
-    complete_description : bool, optional
-        Whether to output the full *ACES* *CTL* transform descriptions.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
     config_mapping_file_path : unicode, optional
         Path to the *CSV* mapping file used by the *Mapping* method.
     additional_data : bool, optional
@@ -662,7 +786,10 @@ def generate_config_aces(
 
     for style, transforms_data in config_mapping.items():
         if transforms_data[0]['interface'] == 'ViewTransform':
-            view_transform = style_to_view_transform(style)
+            view_transform = style_to_view_transform(style, [
+                transform_data['ctl_transform']
+                for transform_data in transforms_data
+            ], describe)
             view_transforms.append(view_transform)
             view_transform_name = view_transform.getName()
             view_transform_names.append(view_transform_name)
@@ -688,7 +815,7 @@ def generate_config_aces(
                 ctl_transform = transform_data['ctl_transform']
                 colorspace = ctl_transform_to_colorspace(
                     ctl_transform,
-                    complete_description,
+                    describe,
                     to_reference=create_builtin_transform(style))
 
                 colorspaces.append(colorspace)

@@ -70,4 +70,5 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
+    ColorspaceDescriptionStyle
     generate_config_aces
