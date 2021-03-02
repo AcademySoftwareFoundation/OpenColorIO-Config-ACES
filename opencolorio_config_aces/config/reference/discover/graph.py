@@ -216,7 +216,7 @@ def filter_nodes(graph, filterers=None):
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
     >>> sorted(filter_nodes(graph, [lambda x: x.genus == 'p3']))[0]
-    'ODT/P3D60_48nits'
+    'InvRRTODT/P3D65_1000nits_15nits_ST2084'
     """
 
     if filterers is None:
