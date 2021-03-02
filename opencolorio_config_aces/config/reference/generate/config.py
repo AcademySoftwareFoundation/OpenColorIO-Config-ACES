@@ -770,7 +770,8 @@ def generate_config_aces(
 
     display_reference_colorspace = colorspace_factory(
         'CIE-XYZ-D65',
-        description='The "CIE XYZ (D65)" display connection colorspace.')
+        description='The "CIE XYZ (D65)" display connection colorspace.',
+        reference_space=ocio.REFERENCE_SPACE_DISPLAY)
 
     raw_colorspace = colorspace_factory(
         'Utility - Raw',
@@ -820,17 +821,17 @@ def generate_config_aces(
 
                 colorspaces.append(colorspace)
 
-    no_tonescale_view_transform = view_transform_factory(
-        'Output - No Tonescale',
+    untonemapped_view_transform = view_transform_factory(
+        'Un-tone-mapped',
         from_reference=ocio.BuiltinTransform(
             'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'),
     )
-    no_tonescale_view_transform_name = no_tonescale_view_transform.getName()
+    untonemapped_view_transform_name = untonemapped_view_transform.getName()
     for display in display_names:
         shared_views.append({
             'display': display,
-            'view': no_tonescale_view_transform_name,
-            'view_transform': no_tonescale_view_transform_name,
+            'view': untonemapped_view_transform_name,
+            'view_transform': untonemapped_view_transform_name,
         })
 
     data = ConfigData(
@@ -840,10 +841,15 @@ def generate_config_aces(
             ocio.ROLE_COMPOSITING_LOG: 'ACES - ACEScct',
             ocio.ROLE_DATA: 'Utility - Raw',
             ocio.ROLE_DEFAULT: scene_reference_colorspace.getName(),
+            ocio.ROLE_INTERCHANGE_DISPLAY:
+            display_reference_colorspace.getName(),
+            ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace.getName(),
+            ocio.ROLE_REFERENCE: scene_reference_colorspace.getName(),
+            ocio.ROLE_RENDERING: 'ACES - ACEScg',
             ocio.ROLE_SCENE_LINEAR: 'ACES - ACEScg',
         },
         colorspaces=colorspaces + displays,
-        view_transforms=view_transforms + [no_tonescale_view_transform],
+        view_transforms=view_transforms + [untonemapped_view_transform],
         shared_views=shared_views,
         views=shared_views + [{
             'display': display,
@@ -856,6 +862,7 @@ def generate_config_aces(
             'name': 'Default',
             'colorspace': scene_reference_colorspace.getName()
         }],
+        inactive_colorspaces=['CIE-XYZ-D65'],
         profile_version=2)
 
     config = generate_config(data, config_name, validate)

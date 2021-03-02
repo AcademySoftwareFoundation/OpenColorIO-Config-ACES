@@ -369,8 +369,9 @@ def generate_config(data, config_name=None, validate=True):
         view = shared_view['view']
         logging.debug(
             f'Adding "{view}" shared view using "{view_transform}" '
-            f'view_transform, "{display_colorspace}" display colorspace, '
-            f'"{rule}" rule and "{description}" description.')
+            f'view transform, "{display_colorspace}" display colorspace, '
+            f'"{looks}" looks, "{rule}" rule and "{description}"'
+            f'description.')
 
         config.addSharedView(view, view_transform, display_colorspace, looks,
                              rule, description)
