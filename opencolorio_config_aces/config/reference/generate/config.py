@@ -340,14 +340,16 @@ def beautify_display_name(name):
     Examples
     --------
     >>> beautify_display_name('DISPLAY - CIE-XYZ-D65_to_sRGB')
-    'sRGB'
+    'Display - sRGB'
     >>> beautify_display_name('rec709')
-    'Rec. 709'
+    'Display - Rec. 709'
     """
 
     basename = name.split(ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR)[-1]
 
-    return beautify_name(basename, DISPLAY_NAME_SUBSTITUTION_PATTERNS)
+    name = beautify_name(basename, DISPLAY_NAME_SUBSTITUTION_PATTERNS)
+
+    return f'Display - {name}'
 
 
 def ctl_transform_to_colorspace_name(ctl_transform):
@@ -394,7 +396,7 @@ def ctl_transform_to_colorspace_family(ctl_transform):
     """
 
     if ctl_transform.family == 'csc' and ctl_transform.namespace == 'Academy':
-        family = 'ACES'
+        family = 'CSC'
     elif ctl_transform.family == 'input_transform':
         family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
                   f'{ctl_transform.genus}')
@@ -709,6 +711,7 @@ def generate_config_aces(
             csv_file,
             delimiter=',',
             fieldnames=[
+                'ordering',
                 'aces_transform_id',
                 'builtin_transform_style',
                 'linked_display_colorspace_style',
@@ -763,7 +766,7 @@ def generate_config_aces(
     shared_views = []
 
     scene_reference_colorspace = colorspace_factory(
-        f'ACES - {ACES_CONFIG_REFERENCE_COLORSPACE}',
+        f'CSC - {ACES_CONFIG_REFERENCE_COLORSPACE}',
         'ACES',
         description=(
             'The "Academy Color Encoding System" reference colorspace.'))
@@ -837,16 +840,16 @@ def generate_config_aces(
     data = ConfigData(
         description='The "Academy Color Encoding System" reference config.',
         roles={
-            ocio.ROLE_COLOR_TIMING: 'ACES - ACEScct',
-            ocio.ROLE_COMPOSITING_LOG: 'ACES - ACEScct',
+            ocio.ROLE_COLOR_TIMING: 'CSC - ACEScct',
+            ocio.ROLE_COMPOSITING_LOG: 'CSC - ACEScct',
             ocio.ROLE_DATA: 'Utility - Raw',
             ocio.ROLE_DEFAULT: scene_reference_colorspace.getName(),
             ocio.ROLE_INTERCHANGE_DISPLAY:
             display_reference_colorspace.getName(),
             ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace.getName(),
             ocio.ROLE_REFERENCE: scene_reference_colorspace.getName(),
-            ocio.ROLE_RENDERING: 'ACES - ACEScg',
-            ocio.ROLE_SCENE_LINEAR: 'ACES - ACEScg',
+            ocio.ROLE_RENDERING: 'CSC - ACEScg',
+            ocio.ROLE_SCENE_LINEAR: 'CSC - ACEScg',
         },
         colorspaces=colorspaces + displays,
         view_transforms=view_transforms + [untonemapped_view_transform],
