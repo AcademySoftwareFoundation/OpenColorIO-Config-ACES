@@ -18,7 +18,8 @@ from enum import Flag, auto
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
-    ConfigData, colorspace_factory, generate_config, view_transform_factory)
+    ConfigData, colorspace_factory, generate_config, look_factory,
+    view_transform_factory)
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     unclassify_ctl_transforms)
@@ -38,14 +39,16 @@ __all__ = [
     'ACES_CONFIG_COLORSPACE_NAME_SEPARATOR',
     'ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR',
     'ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR',
-    'COLORSPACE_NAME_SUBSTITUTION_PATTERNS',
-    'COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS',
+    'COLORSPACE_NAME_SUBSTITUTION_PATTERNS', 'LOOK_NAME_SUBSTITUTION_PATTERNS',
+    'TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS',
     'VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS',
     'DISPLAY_NAME_SUBSTITUTION_PATTERNS', 'ColorspaceDescriptionStyle',
-    'beautify_name', 'beautify_colorspace_name', 'beautify_colorspace_family',
-    'beautify_view_transform_name', 'beautify_display_name',
-    'ctl_transform_to_colorspace_name', 'ctl_transform_to_colorspace_family',
-    'ctl_transform_to_colorspace', 'create_builtin_transform',
+    'beautify_name', 'beautify_colorspace_name', 'beautify_look_name',
+    'beautify_transform_family', 'beautify_view_transform_name',
+    'beautify_display_name', 'ctl_transform_to_colorspace_name',
+    'ctl_transform_to_look_name', 'ctl_transform_to_transform_family',
+    'ctl_transform_to_description', 'ctl_transform_to_colorspace',
+    'ctl_transform_to_look', 'create_builtin_transform',
     'style_to_view_transform', 'style_to_display_colorspace',
     'generate_config_aces'
 ]
@@ -129,7 +132,20 @@ COLORSPACE_NAME_SUBSTITUTION_PATTERNS.update({
     ACES_CONFIG_COLORSPACE_NAME_SEPARATOR,
 })
 
-COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS = {
+LOOK_NAME_SUBSTITUTION_PATTERNS = {
+    'BlueLightArtifactFix': 'Blue Light Artifact Fix'
+}
+"""
+*OpenColorIO* look name substitution patterns.
+
+Notes
+-----
+- The substitutions are evaluated in order.
+
+LOOK_NAME_SUBSTITUTION_PATTERNS : dict
+"""
+
+TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS = {
     '\\\\': ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR,
     'vendorSupplied[/\\\\]': '',
     'arri': 'ARRI',
@@ -137,13 +153,13 @@ COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS = {
     'sony': 'Sony',
 }
 """
-*OpenColorIO* colorspace family substitution patterns.
+*OpenColorIO* transform family substitution patterns.
 
 Notes
 -----
 - The substitutions are evaluated in order.
 
-COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS : dict
+TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS : dict
 """
 
 VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS = {
@@ -260,7 +276,31 @@ def beautify_colorspace_name(name):
     return beautify_name(name, COLORSPACE_NAME_SUBSTITUTION_PATTERNS)
 
 
-def beautify_colorspace_family(name):
+def beautify_look_name(name):
+    """
+    Beautifies given *OpenColorIO* look name by applying in succession the
+    relevant patterns.
+
+    Parameters
+    ----------
+    name : unicode
+        *OpenColorIO* look name to beautify.
+
+    Returns
+    -------
+    unicode
+        Beautified *OpenColorIO* look name.
+
+    Examples
+    --------
+    >>> beautify_look_name('BlueLightArtifactFix')
+    'Blue Light Artifact Fix'
+    """
+
+    return beautify_name(name, LOOK_NAME_SUBSTITUTION_PATTERNS)
+
+
+def beautify_transform_family(name):
     """
     Beautifies given *OpenColorIO* colorspace family by applying in succession
     the relevant patterns.
@@ -277,11 +317,11 @@ def beautify_colorspace_family(name):
 
     Examples
     --------
-    >>> beautify_colorspace_family('vendorSupplied/arri/alexa/v3/EI800')
+    >>> beautify_transform_family('vendorSupplied/arri/alexa/v3/EI800')
     'ARRI/Alexa/v3/EI800'
     """
 
-    return beautify_name(name, COLORSPACE_FAMILY_SUBSTITUTION_PATTERNS)
+    return beautify_name(name, TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS)
 
 
 def beautify_view_transform_name(name):
@@ -378,21 +418,46 @@ def ctl_transform_to_colorspace_name(ctl_transform):
     return beautify_colorspace_name(name)
 
 
-def ctl_transform_to_colorspace_family(ctl_transform):
+def ctl_transform_to_look_name(ctl_transform):
     """
-    Generates the *OpenColorIO* colorspace family for given *ACES* *CTL*
+    Generates the *OpenColorIO* look name for given *ACES* *CTL*
     transform.
 
     Parameters
     ----------
     ctl_transform : CTLTransform
-        *ACES* *CTL* transform to generate the *OpenColorIO* colorspace family
+        *ACES* *CTL* transform to generate the *OpenColorIO* look name for.
+
+    Returns
+    -------
+    unicode
+        *OpenColorIO* look name.
+    """
+
+    if ctl_transform.source in (ACES_CONFIG_REFERENCE_COLORSPACE,
+                                ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+        name = ctl_transform.target
+    else:
+        name = ctl_transform.source
+
+    return beautify_look_name(name)
+
+
+def ctl_transform_to_transform_family(ctl_transform):
+    """
+    Generates the *OpenColorIO* transform family for given *ACES* *CTL*
+    transform.
+
+    Parameters
+    ----------
+    ctl_transform : CTLTransform
+        *ACES* *CTL* transform to generate the *OpenColorIO* transform family
         for.
 
     Returns
     -------
     unicode
-        *OpenColorIO* colorspace family.
+        *OpenColorIO* transform family.
     """
 
     if ctl_transform.family == 'csc' and ctl_transform.namespace == 'Academy':
@@ -405,15 +470,18 @@ def ctl_transform_to_colorspace_family(ctl_transform):
     elif ctl_transform.family == 'lmt':
         family = 'LMT'
 
-    return beautify_colorspace_family(family)
+    return beautify_transform_family(family)
 
 
 @required('OpenColorIO')
-def ctl_transform_to_colorspace(ctl_transform,
-                                describe=ColorspaceDescriptionStyle.LONG_UNION,
-                                **kwargs):
+def ctl_transform_to_description(
+        ctl_transform,
+        describe=ColorspaceDescriptionStyle.LONG_UNION,
+        factory=colorspace_factory,
+        **kwargs):
     """
-    Generates the *OpenColorIO* colorspace for given *ACES* *CTL* transform.
+    Generates the *OpenColorIO* colorspace or look description for given
+    *ACES* *CTL* transform.
 
     Parameters
     ----------
@@ -422,6 +490,9 @@ def ctl_transform_to_colorspace(ctl_transform,
     describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
+    factory : callable, optional
+        Factory used to adjust the code paths because of slight difference
+        of signature between the *OpenColorIO* colorspace and look.
 
     Other Parameters
     ----------------
@@ -431,14 +502,11 @@ def ctl_transform_to_colorspace(ctl_transform,
 
     Returns
     -------
-    ColorSpace
-        *OpenColorIO* colorspace.
+    unicode
+        *OpenColorIO* colorspace or look description.
     """
 
     import PyOpenColorIO as ocio
-
-    name = ctl_transform_to_colorspace_name(ctl_transform)
-    family = ctl_transform_to_colorspace_family(ctl_transform)
 
     description = None
     if describe != ColorspaceDescriptionStyle.NONE:
@@ -447,9 +515,17 @@ def ctl_transform_to_colorspace(ctl_transform,
         if describe in (ColorspaceDescriptionStyle.OPENCOLORIO,
                         ColorspaceDescriptionStyle.SHORT_UNION,
                         ColorspaceDescriptionStyle.LONG_UNION):
+
+            forward, inverse = ([
+                'to_reference',
+                'from_reference',
+            ] if factory is colorspace_factory else [
+                'forward_transform',
+                'inverse_transform',
+            ])
             transforms = [
-                transform for transform in (kwargs.get('to_reference'),
-                                            kwargs.get('from_reference'))
+                transform for transform in (kwargs.get(forward),
+                                            kwargs.get(inverse))
                 if transform is not None
             ]
             transform = next(iter(transforms), None)
@@ -481,6 +557,41 @@ def ctl_transform_to_colorspace(ctl_transform,
 
         description = '\n'.join(description)
 
+    return description
+
+
+def ctl_transform_to_colorspace(ctl_transform,
+                                describe=ColorspaceDescriptionStyle.LONG_UNION,
+                                **kwargs):
+    """
+    Generates the *OpenColorIO* colorspace for given *ACES* *CTL* transform.
+
+    Parameters
+    ----------
+    ctl_transform : CTLTransform
+        *ACES* *CTL* transform to generate the *OpenColorIO* colorspace for.
+    describe : bool, optional
+        Whether to use the full *ACES* *CTL* transform description or just the
+        first line.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.colorspace_factory` definition.
+
+    Returns
+    -------
+    ColorSpace
+        *OpenColorIO* colorspace.
+    """
+
+    name = ctl_transform_to_colorspace_name(ctl_transform)
+    family = ctl_transform_to_transform_family(ctl_transform)
+
+    description = ctl_transform_to_description(ctl_transform, describe,
+                                               colorspace_factory, **kwargs)
+
     settings = {
         'name': (f'{beautify_colorspace_name(family)}'
                  f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
@@ -495,6 +606,52 @@ def ctl_transform_to_colorspace(ctl_transform,
     colorspace = colorspace_factory(**settings)
 
     return colorspace
+
+
+def ctl_transform_to_look(ctl_transform,
+                          describe=ColorspaceDescriptionStyle.LONG_UNION,
+                          **kwargs):
+    """
+    Generates the *OpenColorIO* look for given *ACES* *CTL* transform.
+
+    Parameters
+    ----------
+    ctl_transform : CTLTransform
+        *ACES* *CTL* transform to generate the *OpenColorIO* look for.
+    describe : bool, optional
+        Whether to use the full *ACES* *CTL* transform description or just the
+        first line.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.look_factory` definition.
+
+    Returns
+    -------
+    ColorSpace
+        *OpenColorIO* look.
+    """
+
+    name = ctl_transform_to_look_name(ctl_transform)
+    family = ctl_transform_to_transform_family(ctl_transform)
+
+    description = ctl_transform_to_description(ctl_transform, describe,
+                                               look_factory, **kwargs)
+
+    settings = {
+        'name': (f'{beautify_colorspace_name(family)}'
+                 f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
+                 f'{name}'),
+        'description':
+        description,
+    }
+    settings.update(kwargs)
+
+    look = look_factory(**settings)
+
+    return look
 
 
 @required('OpenColorIO')
@@ -761,6 +918,7 @@ def generate_config_aces(
                 transform_data)
 
     colorspaces = []
+    looks = []
     displays, display_names = [], []
     view_transforms, view_transform_names = [], []
     shared_views = []
@@ -817,12 +975,21 @@ def generate_config_aces(
         else:
             for transform_data in transforms_data:
                 ctl_transform = transform_data['ctl_transform']
-                colorspace = ctl_transform_to_colorspace(
-                    ctl_transform,
-                    describe,
-                    to_reference=create_builtin_transform(style))
 
-                colorspaces.append(colorspace)
+                if transform_data['interface'] == 'Look':
+                    look = ctl_transform_to_look(
+                        ctl_transform,
+                        describe,
+                        forward_transform=create_builtin_transform(style))
+
+                    looks.append(look)
+                else:
+                    colorspace = ctl_transform_to_colorspace(
+                        ctl_transform,
+                        describe,
+                        to_reference=create_builtin_transform(style))
+
+                    colorspaces.append(colorspace)
 
     untonemapped_view_transform = view_transform_factory(
         'Un-tone-mapped',
@@ -852,6 +1019,7 @@ def generate_config_aces(
             ocio.ROLE_SCENE_LINEAR: 'CSC - ACEScg',
         },
         colorspaces=colorspaces + displays,
+        looks=looks,
         view_transforms=view_transforms + [untonemapped_view_transform],
         shared_views=shared_views,
         views=shared_views + [{

@@ -19,6 +19,7 @@ Config Generation Common Objects
 
     colorspace_factory
     view_transform_factory
+    look_factory
     ConfigData
     validate_config
     generate_config

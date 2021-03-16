@@ -2,7 +2,7 @@
 # Copyright Contributors to the OpenColorIO Project.
 
 from .generation import (ConfigData, colorspace_factory,
-                         view_transform_factory, generate_config,
+                         view_transform_factory, look_factory, generate_config,
                          validate_config)
 from .reference import (
     ColorspaceDescriptionStyle, build_aces_conversion_graph,
@@ -13,7 +13,7 @@ from .reference import (
 
 __all__ = [
     'ConfigData', 'colorspace_factory', 'view_transform_factory',
-    'generate_config', 'validate_config'
+    'look_factory', 'generate_config', 'validate_config'
 ]
 __all__ += [
     'ColorspaceDescriptionStyle', 'build_aces_conversion_graph',
