@@ -180,8 +180,7 @@ def view_transform_factory(name,
     reference_space : ReferenceSpaceType, optional
         *OpenColorIO* view transform reference space.
     base_view_transform : ViewTransform, optional
-        *OpenColorIO* base view transform inherited for bit depth, allocation,
-        allocation variables, and to/from reference transforms.
+        Inherited *OpenColorIO* base view transform.
 
     Returns
     -------
