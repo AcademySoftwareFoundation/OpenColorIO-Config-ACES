@@ -133,6 +133,8 @@ COLORSPACE_NAME_SUBSTITUTION_PATTERNS.update({
 })
 
 LOOK_NAME_SUBSTITUTION_PATTERNS = {
+    # TODO: Implement support for callable patterns.
+    # The following one should be a dedicated definition/callable.
     'BlueLightArtifactFix': 'Blue Light Artifact Fix'
 }
 """
@@ -150,6 +152,9 @@ TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS = {
     'vendorSupplied[/\\\\]': '',
     'arri': 'ARRI',
     'alexa': 'Alexa',
+    'canon': 'Canon',
+    'panasonic': 'Panasonic',
+    'red': 'RED',
     'sony': 'Sony',
 }
 """
@@ -443,7 +448,7 @@ def ctl_transform_to_look_name(ctl_transform):
     return beautify_look_name(name)
 
 
-def ctl_transform_to_transform_family(ctl_transform):
+def ctl_transform_to_transform_family(ctl_transform, analytical=True):
     """
     Generates the *OpenColorIO* transform family for given *ACES* *CTL*
     transform.
@@ -453,6 +458,10 @@ def ctl_transform_to_transform_family(ctl_transform):
     ctl_transform : CTLTransform
         *ACES* *CTL* transform to generate the *OpenColorIO* transform family
         for.
+    analytical : bool, optional
+        Whether to generate the *OpenColorIO* transform family that
+        analytically matches the given *ACES* *CTL* transform, i.e. true to
+        the *aces-dev* reference but not necessarily user friendly.
 
     Returns
     -------
@@ -460,15 +469,32 @@ def ctl_transform_to_transform_family(ctl_transform):
         *OpenColorIO* transform family.
     """
 
-    if ctl_transform.family == 'csc' and ctl_transform.namespace == 'Academy':
-        family = 'CSC'
-    elif ctl_transform.family == 'input_transform':
-        family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
-                  f'{ctl_transform.genus}')
-    elif ctl_transform.family == 'output_transform':
-        family = 'Output'
-    elif ctl_transform.family == 'lmt':
-        family = 'LMT'
+    if analytical:
+        if (ctl_transform.family == 'csc'
+                and ctl_transform.namespace == 'Academy'):
+            family = 'CSC'
+        elif ctl_transform.family == 'input_transform':
+            family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
+                      f'{ctl_transform.genus}')
+        elif ctl_transform.family == 'output_transform':
+            family = 'Output'
+        elif ctl_transform.family == 'lmt':
+            family = 'LMT'
+    else:
+        if (ctl_transform.family == 'csc'
+                and ctl_transform.namespace == 'Academy'):
+            if re.match('ACES|ADX', ctl_transform.name):
+                family = 'ACES'
+            else:
+                family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
+                          f'{ctl_transform.genus}')
+        elif ctl_transform.family == 'input_transform':
+            family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
+                      f'{ctl_transform.genus}')
+        elif ctl_transform.family == 'output_transform':
+            family = 'Output'
+        elif ctl_transform.family == 'lmt':
+            family = 'LMT'
 
     return beautify_transform_family(family)
 
@@ -562,6 +588,7 @@ def ctl_transform_to_description(
 
 def ctl_transform_to_colorspace(ctl_transform,
                                 describe=ColorspaceDescriptionStyle.LONG_UNION,
+                                analytical=True,
                                 **kwargs):
     """
     Generates the *OpenColorIO* colorspace for given *ACES* *CTL* transform.
@@ -573,6 +600,10 @@ def ctl_transform_to_colorspace(ctl_transform,
     describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
+    analytical : bool, optional
+        Whether to generate the *OpenColorIO* transform family that
+        analytically matches the given *ACES* *CTL* transform, i.e. true to
+        the *aces-dev* reference but not necessarily user friendly.
 
     Other Parameters
     ----------------
@@ -587,7 +618,7 @@ def ctl_transform_to_colorspace(ctl_transform,
     """
 
     name = ctl_transform_to_colorspace_name(ctl_transform)
-    family = ctl_transform_to_transform_family(ctl_transform)
+    family = ctl_transform_to_transform_family(ctl_transform, analytical)
 
     description = ctl_transform_to_description(ctl_transform, describe,
                                                colorspace_factory, **kwargs)
@@ -610,6 +641,7 @@ def ctl_transform_to_colorspace(ctl_transform,
 
 def ctl_transform_to_look(ctl_transform,
                           describe=ColorspaceDescriptionStyle.LONG_UNION,
+                          analytical=True,
                           **kwargs):
     """
     Generates the *OpenColorIO* look for given *ACES* *CTL* transform.
@@ -621,6 +653,10 @@ def ctl_transform_to_look(ctl_transform,
     describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
+    analytical : bool, optional
+        Whether to generate the *OpenColorIO* transform family that
+        analytically matches the given *ACES* *CTL* transform, i.e. true to
+        the *aces-dev* reference but not necessarily user friendly.
 
     Other Parameters
     ----------------
@@ -635,7 +671,7 @@ def ctl_transform_to_look(ctl_transform,
     """
 
     name = ctl_transform_to_look_name(ctl_transform)
-    family = ctl_transform_to_transform_family(ctl_transform)
+    family = ctl_transform_to_transform_family(ctl_transform, analytical)
 
     description = ctl_transform_to_description(ctl_transform, describe,
                                                look_factory, **kwargs)
@@ -813,6 +849,7 @@ def generate_config_aces(
         validate=True,
         describe=ColorspaceDescriptionStyle.SHORT_UNION,
         config_mapping_file_path=ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH,
+        analytical=True,
         additional_data=False):
     """
     Generates the *aces-dev* reference implementation *OpenColorIO* Config
@@ -840,6 +877,10 @@ def generate_config_aces(
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
     config_mapping_file_path : unicode, optional
         Path to the *CSV* mapping file used by the *Mapping* method.
+    analytical : bool, optional
+        Whether to generate *OpenColorIO* transform families that analytically
+        match the given *ACES* *CTL* transform, i.e. true to the *aces-dev*
+        reference but not necessarily user friendly.
     additional_data : bool, optional
         Whether to return additional data.
 
@@ -923,8 +964,10 @@ def generate_config_aces(
     view_transforms, view_transform_names = [], []
     shared_views = []
 
+    aces_family_prefix = 'CSC' if analytical else 'ACES'
+
     scene_reference_colorspace = colorspace_factory(
-        f'CSC - {ACES_CONFIG_REFERENCE_COLORSPACE}',
+        f'{aces_family_prefix} - {ACES_CONFIG_REFERENCE_COLORSPACE}',
         'ACES',
         description=(
             'The "Academy Color Encoding System" reference colorspace.'))
@@ -980,6 +1023,7 @@ def generate_config_aces(
                     look = ctl_transform_to_look(
                         ctl_transform,
                         describe,
+                        analytical=analytical,
                         forward_transform=create_builtin_transform(style))
 
                     looks.append(look)
@@ -987,6 +1031,7 @@ def generate_config_aces(
                     colorspace = ctl_transform_to_colorspace(
                         ctl_transform,
                         describe,
+                        analytical=analytical,
                         to_reference=create_builtin_transform(style))
 
                     colorspaces.append(colorspace)
@@ -1007,16 +1052,16 @@ def generate_config_aces(
     data = ConfigData(
         description='The "Academy Color Encoding System" reference config.',
         roles={
-            ocio.ROLE_COLOR_TIMING: 'CSC - ACEScct',
-            ocio.ROLE_COMPOSITING_LOG: 'CSC - ACEScct',
+            ocio.ROLE_COLOR_TIMING: f'{aces_family_prefix} - ACEScct',
+            ocio.ROLE_COMPOSITING_LOG: f'{aces_family_prefix} - ACEScct',
             ocio.ROLE_DATA: 'Utility - Raw',
             ocio.ROLE_DEFAULT: scene_reference_colorspace.getName(),
             ocio.ROLE_INTERCHANGE_DISPLAY:
             display_reference_colorspace.getName(),
             ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace.getName(),
             ocio.ROLE_REFERENCE: scene_reference_colorspace.getName(),
-            ocio.ROLE_RENDERING: 'CSC - ACEScg',
-            ocio.ROLE_SCENE_LINEAR: 'CSC - ACEScg',
+            ocio.ROLE_RENDERING: f'{aces_family_prefix} - ACEScg',
+            ocio.ROLE_SCENE_LINEAR: f'{aces_family_prefix} - ACEScg',
         },
         colorspaces=colorspaces + displays,
         looks=looks,
@@ -1060,4 +1105,5 @@ if __name__ == '__main__':
     config, data = generate_config_aces(
         config_name=os.path.join(build_directory,
                                  'config-aces-reference.ocio'),
+        analytical=False,
         additional_data=True)
