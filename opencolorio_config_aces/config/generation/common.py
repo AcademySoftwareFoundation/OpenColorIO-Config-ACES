@@ -14,6 +14,7 @@ Defines various objects related to *OpenColorIO* config generation:
 """
 
 import logging
+import re
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Union
@@ -66,7 +67,7 @@ def colorspace_factory(name,
         *OpenColorIO* colorspace family.
     encoding : unicode, optional
         *OpenColorIO* colorspace encoding.
-    categories : array_like, optional
+    categories : unicode or array_like, optional
         *OpenColorIO* colorspace categories.
     description : unicode, optional
         *OpenColorIO* colorspace description.
@@ -136,8 +137,12 @@ def colorspace_factory(name,
     if encoding is not None:
         colorspace.setEncoding(encoding)
 
-    for category in categories:
-        colorspace.addCategory(category)
+    if categories is not None:
+        if isinstance(categories, str):
+            categories = re.split('[,;\\s]+', categories)
+
+        for category in categories:
+            colorspace.addCategory(category)
 
     if description is not None:
         colorspace.setDescription(description)

@@ -802,7 +802,7 @@ def style_to_view_transform(style,
 
 @required('OpenColorIO')
 def style_to_display_colorspace(
-        style, describe=ColorspaceDescriptionStyle.OPENCOLORIO):
+        style, describe=ColorspaceDescriptionStyle.OPENCOLORIO, **kwargs):
     """
     Creates an *OpenColorIO* display colorspace for given style.
 
@@ -813,6 +813,11 @@ def style_to_display_colorspace(
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.colorspace_factory` definition.
 
     Returns
     -------
@@ -840,7 +845,8 @@ def style_to_display_colorspace(
         name,
         from_reference=builtin_transform,
         reference_space=ocio.REFERENCE_SPACE_DISPLAY,
-        description=description)
+        description=description,
+        **kwargs)
 
 
 @required('OpenColorIO')
@@ -914,6 +920,8 @@ def generate_config_aces(
                 'builtin_transform_style',
                 'linked_display_colorspace_style',
                 'interface',
+                'encoding',
+                'categories',
             ])
 
         # Skipping the first header line.
@@ -970,7 +978,8 @@ def generate_config_aces(
         f'{aces_family_prefix} - {ACES_CONFIG_REFERENCE_COLORSPACE}',
         'ACES',
         description=(
-            'The "Academy Color Encoding System" reference colorspace.'))
+            'The "Academy Color Encoding System" reference colorspace.'),
+        encoding='scene-linear')
 
     display_reference_colorspace = colorspace_factory(
         'CIE-XYZ-D65',
@@ -1003,7 +1012,10 @@ def generate_config_aces(
                 display_style = transform_data[
                     'linked_display_colorspace_style']
 
-                display = style_to_display_colorspace(display_style)
+                display = style_to_display_colorspace(
+                    display_style,
+                    encoding=transform_data.get('encoding'),
+                    categories=transform_data.get('categories'))
                 display_name = display.getName()
 
                 if display_name not in display_names:
@@ -1032,7 +1044,9 @@ def generate_config_aces(
                         ctl_transform,
                         describe,
                         analytical=analytical,
-                        to_reference=create_builtin_transform(style))
+                        to_reference=create_builtin_transform(style),
+                        encoding=transform_data.get('encoding'),
+                        categories=transform_data.get('categories'))
 
                     colorspaces.append(colorspace)
 
