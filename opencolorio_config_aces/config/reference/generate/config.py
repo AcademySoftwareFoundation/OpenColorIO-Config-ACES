@@ -1093,6 +1093,7 @@ def generate_config_aces(
             'colorspace': scene_reference_colorspace.getName()
         }],
         inactive_colorspaces=['CIE-XYZ-D65'],
+        default_view_transform=untonemapped_view_transform.getName(),
         profile_version=2)
 
     config = generate_config(data, config_name, validate)

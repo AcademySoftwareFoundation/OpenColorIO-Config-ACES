@@ -308,8 +308,6 @@ class ConfigData:
     view_transforms : array_like, optional
         Config view transforms, an iterable of
         :attr:`PyOpenColorIO.ViewTransform` class instances.
-    inactive_colorspaces : array_like, optional
-        Config inactive colorspaces an iterable of colorspace names.
     shared_views : array_like, optional
         Config shared views, an iterable of dicts of view, view transform,
         colorspace and rule names, iterable of looks and description.
@@ -324,6 +322,10 @@ class ConfigData:
         Config file rules, a dict of file rules.
     viewing_rules : array_like, optional
         Config viewing rules, a dict of viewing rules.
+    inactive_colorspaces : array_like, optional
+        Config inactive colorspaces an iterable of colorspace names.
+    default_view_transform : unicode, optional
+        Name of the default view transform.
 
     Attributes
     ----------
@@ -333,13 +335,14 @@ class ConfigData:
     colorspaces
     looks
     view_transforms
-    inactive_colorspaces
     shared_views
     views
     active_displays
     active_views
     file_rules
     viewing_rules
+    inactive_colorspaces
+    default_view_transform
     """
 
     profile_version: int = 1
@@ -349,13 +352,14 @@ class ConfigData:
     colorspaces: Union[list, tuple] = field(default_factory=list)
     looks: Union[list, tuple] = field(default_factory=list)
     view_transforms: Union[list, tuple] = field(default_factory=list)
-    inactive_colorspaces: Union[list, tuple] = field(default_factory=list)
     shared_views: Union[list, tuple] = field(default_factory=list)
     views: Union[list, tuple] = field(default_factory=list)
     active_displays: Union[list, tuple] = field(default_factory=list)
     active_views: Union[list, tuple] = field(default_factory=list)
     file_rules: Union[list, tuple] = field(default_factory=list)
     viewing_rules: Union[list, tuple] = field(default_factory=list)
+    inactive_colorspaces: Union[list, tuple] = field(default_factory=list)
+    default_view_transform: str = field(default_factory=None)
 
 
 def validate_config(config):
@@ -511,6 +515,9 @@ def generate_config(data, config_name=None, validate=True):
         logging.warning('Inserting a viewing rule is not supported yet!')
         # viewing_rules.insertRule()
     config.setViewingRules(viewing_rules)
+
+    if data.default_view_transform is not None:
+        config.setDefaultViewTransformName(data.default_view_transform)
 
     if validate:
         validate_config(config)
