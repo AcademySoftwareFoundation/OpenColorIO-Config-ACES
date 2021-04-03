@@ -1036,7 +1036,9 @@ def generate_config_aces(
                         ctl_transform,
                         describe,
                         analytical=analytical,
-                        forward_transform=create_builtin_transform(style))
+                        forward_transform=create_builtin_transform(style),
+                        process_space=scene_reference_colorspace.getName(),
+                    )
 
                     looks.append(look)
                 else:
