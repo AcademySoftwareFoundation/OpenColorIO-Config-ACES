@@ -40,7 +40,7 @@ pygraphviz==1.6
 pyparsing==2.4.7
 pytest==6.0.1
 pytz==2020.1
-PyYAML==5.3.1
+PyYAML==5.4
 readme-renderer==26.0
 requests==2.24.0
 requests-toolbelt==0.9.1
