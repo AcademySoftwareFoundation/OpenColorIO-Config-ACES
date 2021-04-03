@@ -14,6 +14,7 @@ import csv
 import logging
 import re
 from collections import defaultdict
+from datetime import datetime
 from enum import Flag, auto
 from pathlib import Path
 
@@ -23,7 +24,7 @@ from opencolorio_config_aces.config.generation import (
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     unclassify_ctl_transforms)
-from opencolorio_config_aces.utilities import required
+from opencolorio_config_aces.utilities import git_describe, required
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -1066,7 +1067,16 @@ def generate_config_aces(
         })
 
     data = ConfigData(
-        description='The "Academy Color Encoding System" reference config.',
+        description=(
+            f'The "Academy Color Encoding System" (ACES) "Reference Config".'
+            f'\n\n'
+            f'This "OpenColorIO" config is a strict and quasi-analytical '
+            f'implementation of "aces-dev" and is designed as a reference for '
+            f'software developers. It is not a replacement for the previous '
+            f'"ACES" configs nor the "ACES Studio Config".'
+            f'\n\n'
+            f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
+            f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'),
         roles={
             ocio.ROLE_COLOR_TIMING: f'{aces_family_prefix} - ACEScct',
             ocio.ROLE_COMPOSITING_LOG: f'{aces_family_prefix} - ACEScct',

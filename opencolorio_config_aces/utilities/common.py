@@ -9,6 +9,7 @@ Defines common utilities objects that don't fall in any specific category.
 
 import functools
 import os
+import subprocess
 from collections import defaultdict
 from itertools import chain
 from textwrap import TextWrapper
@@ -24,7 +25,7 @@ __all__ = [
     'DocstringDict', 'first_item', 'common_ancestor', 'paths_common_ancestor',
     'vivification', 'vivified_to_dict', 'message_box', 'is_networkx_installed',
     'is_opencolorio_installed', 'REQUIREMENTS_TO_CALLABLE', 'required',
-    'is_string', 'is_iterable'
+    'is_string', 'is_iterable', 'git_describe'
 ]
 
 
@@ -412,3 +413,27 @@ def is_iterable(a):
     """
 
     return is_string(a) or (True if getattr(a, '__iter__', False) else False)
+
+
+def git_describe():
+    """
+    Describes the current *OpenColorIO Configuration for ACES* *git* version.
+
+    Returns
+    -------
+    >>> git_describe()  # doctest: +SKIP
+    '0.1.0'
+    """
+
+    import opencolorio_config_aces
+
+    try:  # pragma: no cover
+        version = subprocess.check_output(
+            ['git', 'describe'],
+            cwd=opencolorio_config_aces.__path__[0],
+            stderr=subprocess.STDOUT).strip()
+        version = version.decode('utf-8')
+    except Exception:  # pragma: no cover
+        version = opencolorio_config_aces.__version__
+
+    return version
