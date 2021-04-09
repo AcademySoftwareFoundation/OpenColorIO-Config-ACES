@@ -7,7 +7,7 @@ jobs:
     name: ${{ matrix.os }} - Python ${{ matrix.python-version }}
     strategy:
       matrix:
-        os: [macOS-latest, ubuntu-18.04, windows-latest]
+        os: [macOS-latest, ubuntu-18.04, ubuntu-latest, windows-latest]
         python-version: [3.7, 3.8]
       fail-fast: false
     runs-on: ${{ matrix.os }}
