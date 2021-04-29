@@ -10,9 +10,9 @@ Ordering,ACEStransformID,BuiltinTransform Style,Linked DisplayColorSpace Style,I
 130,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.LogC_EI800_AWG_to_ACES.a1.1.0,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace,log,file-io
 140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3_to_ACES.a1.1.0,SONY_SLOG3-SGAMUT3_to_ACES2065-1,,ColorSpace,log,file-io
 140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3Cine_to_ACES.a1.1.0,SONY_SLOG3-SGAMUT3.CINE_to_ACES2065-1,,ColorSpace,log,file-io
+140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3_to_ACES.a1.1.0,SONY_SLOG3-SGAMUT3-VENICE_to_ACES2065-1,,ColorSpace,log,file-io
+140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3Cine_to_ACES.a1.1.0,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace,log,file-io
 150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace,log,file-io
-240,urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1,SONY_SLOG3-SGAMUT3-VENICE_to_ACES2065-1,,ColorSpace,log,file-io
-240,urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace,log,file-io
 310,urn:ampas:aces:transformId:v1.5:LMT.Academy.BlueLightArtifactFix.a1.1.0,ACES-LMT - BLUE_LIGHT_ARTIFACT_FIX,,Look,,
 400,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform,sdr-video,file-io
 400,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_D60sim_100nits_dim.a1.0.3,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform,sdr-video,file-io
