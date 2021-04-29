@@ -261,7 +261,9 @@ def requirements(ctx):
     """
 
     message_box('Exporting "requirements.txt" file...')
-    ctx.run('poetry run pip freeze > requirements.txt')
+    ctx.run('poetry run pip list --format=freeze | '
+            'egrep -v "opencolorio-config-aces" '
+            '> requirements.txt')
 
 
 @task(requirements)

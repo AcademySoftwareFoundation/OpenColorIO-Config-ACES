@@ -29,3 +29,4 @@ Common
     required
     is_string
     is_iterable
+    git_describe
