@@ -40,7 +40,8 @@ __all__ = [
     'ACES_CONFIG_COLORSPACE_NAME_SEPARATOR',
     'ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR',
     'ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR',
-    'COLORSPACE_NAME_SUBSTITUTION_PATTERNS', 'LOOK_NAME_SUBSTITUTION_PATTERNS',
+    'ACES_CONFIG_DISPLAY_FAMILY', 'COLORSPACE_NAME_SUBSTITUTION_PATTERNS',
+    'LOOK_NAME_SUBSTITUTION_PATTERNS',
     'TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS',
     'VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS',
     'DISPLAY_NAME_SUBSTITUTION_PATTERNS', 'ColorspaceDescriptionStyle',
@@ -96,6 +97,13 @@ ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR = '_to_'
 *OpenColorIO* config *BuiltinTransform* name separator.
 
 ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR : unicode
+"""
+
+ACES_CONFIG_DISPLAY_FAMILY = 'Display'
+"""
+*OpenColorIO* config display family.
+
+ACES_CONFIG_DISPLAY_FAMILY : unicode
 """
 
 COLORSPACE_NAME_SUBSTITUTION_PATTERNS = {
@@ -797,8 +805,10 @@ def style_to_view_transform(style,
 
         description = '\n'.join(description)
 
-    return view_transform_factory(
+    view_transform = view_transform_factory(
         name, from_reference=builtin_transform, description=description)
+
+    return view_transform
 
 
 @required('OpenColorIO')
@@ -828,6 +838,8 @@ def style_to_display_colorspace(
 
     import PyOpenColorIO as ocio
 
+    kwargs.setdefault('family', ACES_CONFIG_DISPLAY_FAMILY)
+
     name = beautify_display_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
 
@@ -842,12 +854,18 @@ def style_to_display_colorspace(
 
         description = '\n'.join(description)
 
-    return colorspace_factory(
-        name,
-        from_reference=builtin_transform,
-        reference_space=ocio.REFERENCE_SPACE_DISPLAY,
-        description=description,
-        **kwargs)
+    settings = {
+        'name': name,
+        'family': ACES_CONFIG_DISPLAY_FAMILY,
+        'description': description,
+        'from_reference': builtin_transform,
+        'reference_space': ocio.REFERENCE_SPACE_DISPLAY,
+    }
+    settings.update(kwargs)
+
+    colorspace = colorspace_factory(**settings)
+
+    return colorspace
 
 
 @required('OpenColorIO')
