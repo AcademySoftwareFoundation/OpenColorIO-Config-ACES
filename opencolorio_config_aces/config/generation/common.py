@@ -359,7 +359,7 @@ class ConfigData:
     file_rules: Union[list, tuple] = field(default_factory=list)
     viewing_rules: Union[list, tuple] = field(default_factory=list)
     inactive_colorspaces: Union[list, tuple] = field(default_factory=list)
-    default_view_transform: str = field(default_factory=None)
+    default_view_transform: str = field(default_factory=str)
 
 
 def validate_config(config):

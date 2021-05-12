@@ -267,13 +267,13 @@ def generate_config_aces(config_name=None,
     views = []
 
     scene_reference_colorspace = colorspace_factory(
-        f'ACES - {ACES_CONFIG_REFERENCE_COLORSPACE}',
+        f'CSC - {ACES_CONFIG_REFERENCE_COLORSPACE}',
         'ACES',
         description='The "Academy Color Encoding System" reference colorspace.'
     )
 
     display_reference_colorspace = colorspace_factory(
-        f'ACES - {ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE}',
+        f'CSC - {ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE}',
         'ACES',
         description='The "Output Color Encoding Specification" colorspace.',
         from_reference=node_to_builtin_transform(
@@ -335,7 +335,7 @@ def generate_config_aces(config_name=None,
     data = ConfigData(
         description='The "Academy Color Encoding System" reference config.',
         roles={
-            ocio.ROLE_SCENE_LINEAR: 'ACES - ACEScg',
+            ocio.ROLE_SCENE_LINEAR: 'CSC - ACEScg',
         },
         colorspaces=colorspaces,
         views=views,
@@ -343,7 +343,7 @@ def generate_config_aces(config_name=None,
         active_views=list(dict.fromkeys([view['view'] for view in views])),
         file_rules=[{
             'name': 'Default',
-            'colorspace': 'ACES - ACEScg'
+            'colorspace': 'CSC - ACEScg'
         }],
         profile_version=2)
 
