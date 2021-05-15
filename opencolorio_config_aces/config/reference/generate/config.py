@@ -143,8 +143,9 @@ COLORSPACE_NAME_SUBSTITUTION_PATTERNS.update({
 
 LOOK_NAME_SUBSTITUTION_PATTERNS = {
     # TODO: Implement support for callable patterns.
-    # The following one should be a dedicated definition/callable.
-    'BlueLightArtifactFix': 'Blue Light Artifact Fix'
+    # The following ones should be a dedicated definition/callable.
+    'BlueLightArtifactFix': 'Blue Light Artifact Fix',
+    'GamutCompress': 'Gamut Compress',
 }
 """
 *OpenColorIO* look name substitution patterns.
