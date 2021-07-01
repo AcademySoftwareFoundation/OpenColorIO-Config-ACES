@@ -20,6 +20,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = "^3.7"
 
+colour-science = { version = "^0.3.16", optional = true }
 coverage = { version = "*", optional = true }  # Development dependency.
 coveralls = { version = "*", optional = true }  # Development dependency.
 flake8 = { version = "*", optional = true }  # Development dependency.
@@ -64,6 +65,7 @@ development = [
     "twine",
     "yapf"
 ]
+colour = [ "colour-science" ]
 graph = [ "networkx" ]
 graphviz = [ "pygraphviz" ]
 
