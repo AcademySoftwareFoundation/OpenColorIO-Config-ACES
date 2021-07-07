@@ -57,7 +57,8 @@ __all__ = [
 
 ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH = (
     Path(__file__).parents[0] / 'resources' /
-    'OpenColorIO-ACES-Config Transforms - Reference Config - Mapping.csv')
+    'OpenColorIO-Config-ACES _Reference_ Transforms - '
+    'Reference Config - Mapping.csv')
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 
