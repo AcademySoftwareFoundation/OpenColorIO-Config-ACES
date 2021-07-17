@@ -146,7 +146,7 @@ LOOK_NAME_SUBSTITUTION_PATTERNS = {
     # TODO: Implement support for callable patterns.
     # The following ones should be a dedicated definition/callable.
     'BlueLightArtifactFix': 'Blue Light Artifact Fix',
-    'GamutCompress': 'Gamut Compress',
+    'GamutCompress': 'ACES 1.3 Reference Gamut Compression',
 }
 """
 *OpenColorIO* look name substitution patterns.
