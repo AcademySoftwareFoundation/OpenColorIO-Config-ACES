@@ -686,8 +686,6 @@ class CTLTransform:
         self._aces_transform_id = None
         self._user_name = None
         self._description = ''
-        self._source = None
-        self._target = None
 
         self._family = family
         self._genus = genus
