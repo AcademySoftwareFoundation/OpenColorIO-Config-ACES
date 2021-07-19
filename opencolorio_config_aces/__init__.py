@@ -15,6 +15,7 @@ It is freely available under the
 
 Sub-packages
 ------------
+-   clf: Objects implementing support for *CLF* transforms generation.
 -   config: Objects implementing support for the *OCIO* config generation.
 -   utilities: Various utilities and data structures.
 """
@@ -23,12 +24,14 @@ from .config import (
     ConfigData, build_aces_conversion_graph, classify_aces_ctl_transforms,
     colorspace_factory, conversion_path, ctl_transform_to_node,
     deserialize_config_data, discover_aces_ctl_transforms,
-    filter_ctl_transforms, filter_nodes, generate_clf, generate_config,
-    generate_config_aces, generate_config_cg, group_transform_factory,
-    look_factory, produce_transform, node_to_ctl_transform,
-    plot_aces_conversion_graph, print_aces_taxonomy, serialize_config_data,
-    transform_factory, unclassify_ctl_transforms, validate_config,
-    view_transform_factory)
+    filter_ctl_transforms, filter_nodes, generate_config, generate_config_aces,
+    generate_config_cg, group_transform_factory, look_factory,
+    produce_transform, node_to_ctl_transform, plot_aces_conversion_graph,
+    print_aces_taxonomy, serialize_config_data, transform_factory,
+    unclassify_ctl_transforms, validate_config, view_transform_factory)
+from .clf import (classify_clf_transforms, discover_clf_transforms,
+                  filter_clf_transforms, generate_clf, print_clf_taxonomy,
+                  unclassify_clf_transforms)
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -42,11 +45,16 @@ __all__ = [
     'classify_aces_ctl_transforms', 'colorspace_factory', 'conversion_path',
     'ctl_transform_to_node', 'deserialize_config_data',
     'discover_aces_ctl_transforms', 'filter_ctl_transforms', 'filter_nodes',
-    'generate_clf', 'generate_config', 'generate_config_aces',
-    'generate_config_cg', 'group_transform_factory', 'look_factory',
-    'produce_transform', 'node_to_ctl_transform', 'plot_aces_conversion_graph',
+    'generate_config', 'generate_config_aces', 'generate_config_cg',
+    'group_transform_factory', 'look_factory', 'produce_transform',
+    'node_to_ctl_transform', 'plot_aces_conversion_graph',
     'print_aces_taxonomy', 'serialize_config_data', 'transform_factory',
     'unclassify_ctl_transforms', 'validate_config', 'view_transform_factory'
+]
+__all__ += [
+    'classify_clf_transforms', 'discover_clf_transforms',
+    'filter_clf_transforms', 'generate_clf', 'print_clf_taxonomy',
+    'unclassify_clf_transforms'
 ]
 
 __application_name__ = 'OpenColorIO Configuration for ACES'

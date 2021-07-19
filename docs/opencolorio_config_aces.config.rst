@@ -91,8 +91,8 @@ Reference Configuration
 
     generate_config_cg
 
-Common LUT Format Generation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*ACES* Studio Config Generator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``opencolorio_config_aces``
 
@@ -100,5 +100,3 @@ Common LUT Format Generation
 
 .. autosummary::
     :toctree: generated/
-
-    generate_clf

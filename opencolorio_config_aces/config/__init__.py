@@ -6,7 +6,6 @@ from .generation import (
     group_transform_factory, look_factory, produce_transform,
     serialize_config_data, transform_factory, validate_config,
     view_transform_factory)
-from .clf import generate_clf
 from .reference import (
     ColorspaceDescriptionStyle, build_aces_conversion_graph,
     classify_aces_ctl_transforms, conversion_path, ctl_transform_to_node,
@@ -21,7 +20,6 @@ __all__ = [
     'produce_transform', 'serialize_config_data', 'transform_factory',
     'validate_config', 'view_transform_factory'
 ]
-__all__ += ['generate_clf']
 __all__ += [
     'ColorspaceDescriptionStyle', 'build_aces_conversion_graph',
     'classify_aces_ctl_transforms', 'conversion_path', 'ctl_transform_to_node',

@@ -1048,6 +1048,7 @@ def generate_config_aces(
                 ],
                 describe,
                 signature_only=True)
+            view_transform['transforms_data'] = transforms_data
             view_transforms.append(view_transform)
             view_transform_name = view_transform['name']
             view_transform_names.append(view_transform_name)
@@ -1061,6 +1062,7 @@ def generate_config_aces(
                     signature_only=True,
                     encoding=transform_data.get('encoding'),
                     categories=transform_data.get('categories'))
+                display['transforms_data'] = [transform_data]
                 display_name = display['name']
 
                 if display_name not in display_names:
@@ -1088,7 +1090,7 @@ def generate_config_aces(
                         },
                         process_space=scene_reference_colorspace['name'],
                     )
-
+                    look['transforms_data'] = [transform_data]
                     looks.append(look)
                 else:
                     colorspace = ctl_transform_to_colorspace(
@@ -1102,7 +1104,7 @@ def generate_config_aces(
                         },
                         encoding=transform_data.get('encoding'),
                         categories=transform_data.get('categories'))
-
+                    colorspace['transforms_data'] = [transform_data]
                     colorspaces.append(colorspace)
 
     untonemapped_view_transform = {
