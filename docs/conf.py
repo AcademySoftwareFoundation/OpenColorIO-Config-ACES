@@ -356,5 +356,5 @@ def _autodoc_process_docstring(app, what, name, obj, options, lines):
 
 
 def setup(app):
-    app.add_stylesheet('custom.css')
+    app.add_css_file('custom.css')
     app.connect('autodoc-process-docstring', _autodoc_process_docstring)
