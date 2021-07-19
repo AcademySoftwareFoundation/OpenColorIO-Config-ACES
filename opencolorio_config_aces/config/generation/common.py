@@ -19,7 +19,7 @@ Defines various objects related to *OpenColorIO* config generation:
 -   :func:`opencolorio_config_aces.generate_config`
 """
 
-import json
+import jsonpickle
 import logging
 import re
 from collections import OrderedDict
@@ -492,7 +492,7 @@ def deserialize_config_data(path):
     """
 
     with open(path) as config_json:
-        return ConfigData(**json.load(config_json))
+        return ConfigData(**jsonpickle.decode(config_json.read()))
 
 
 # TODO: Implement schema verification support for serialized data.
@@ -508,13 +508,8 @@ def serialize_config_data(data, path):
         *JSON* file path.
     """
 
-    try:
-        with open(path, 'w') as config_json:
-            json.dump(asdict(data), config_json, indent=2)
-    except Exception as error:
-        logging.critical(
-            f'Config data could not be serialised, please verify that you are '
-            f'only using colorspace and transform signatures: {error}')
+    with open(path, 'w') as config_json:
+        config_json.write(jsonpickle.encode(asdict(data), indent=2))
 
 
 def validate_config(config):
