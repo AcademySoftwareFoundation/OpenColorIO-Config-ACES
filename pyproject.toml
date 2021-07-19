@@ -19,6 +19,7 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
+jsonpickle = "^2.0.0"
 
 colour-science = { version = "^0.3.16", optional = true }
 coverage = { version = "*", optional = true }  # Development dependency.
