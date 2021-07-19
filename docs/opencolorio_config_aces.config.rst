@@ -78,3 +78,15 @@ Reference Configuration
 
     ColorspaceDescriptionStyle
     generate_config_aces
+
+*ACES* Computer Graphics (CG) Config Generator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/
+
+    generate_config_cg

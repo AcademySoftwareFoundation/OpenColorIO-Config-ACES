@@ -12,6 +12,7 @@ from .reference import (
     discover_aces_ctl_transforms, filter_ctl_transforms, filter_nodes,
     generate_config_aces, node_to_ctl_transform, plot_aces_conversion_graph,
     print_aces_taxonomy, unclassify_ctl_transforms)
+from .cg import generate_config_cg
 
 __all__ = [
     'ConfigData', 'colorspace_factory', 'deserialize_config_data',
@@ -27,3 +28,4 @@ __all__ += [
     'plot_aces_conversion_graph', 'print_aces_taxonomy',
     'unclassify_ctl_transforms'
 ]
+__all__ += ['generate_config_cg']
