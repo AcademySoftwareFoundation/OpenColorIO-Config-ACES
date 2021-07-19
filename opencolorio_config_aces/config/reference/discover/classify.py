@@ -1077,7 +1077,7 @@ class CTLTransformPair:
 
         return (f"{self.__class__.__name__}("
                 f"{str(self._forward_transform)}', "
-                f"{str(self._forward_transform)}')")
+                f"{str(self._inverse_transform)}')")
 
     def __repr__(self):
         """
@@ -1274,10 +1274,9 @@ def classify_aces_ctl_transforms(unclassified_ctl_transforms):
 'panasonic', 'red', 'sony']
     >>> genus = genera[0]
     >>> sorted(ctl_transforms[family][genus].items())  # doctest: +ELLIPSIS
-    [('ACEScsc.Academy.ACEScc', \
-CTLTransformPair(\
+    [('ACEScsc.Academy.ACEScc', CTLTransformPair(\
 CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')', \
-CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')'))]
+CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
     """
 
     classified_ctl_transforms = defaultdict(lambda: defaultdict(dict))
