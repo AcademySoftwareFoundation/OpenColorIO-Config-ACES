@@ -7,17 +7,6 @@
 Defines various objects related to *aces-dev* reference implementation *CTL*
 transforms discovery and classification:
 
--   :attr:`opencolorio_config_aces.config.reference.ACES_URN`
--   :attr:`opencolorio_config_aces.config.reference.ACES_NAMESPACE`
--   :attr:`opencolorio_config_aces.config.reference.ACES_TYPES`
--   :attr:`opencolorio_config_aces.config.reference.ACES_CTL_TRANSFORMS_ROOT`
--   :attr:`opencolorio_config_aces.config.reference.\
-ACES_CTL_TRANSFORM_FAMILIES`
--   :class:`opencolorio_config_aces.config.reference.ACESTransformID`
--   :class:`opencolorio_config_aces.config.reference.CTLTransform`
--   :class:`opencolorio_config_aces.config.reference.CTLTransformPair`
--   :func:`opencolorio_config_aces.config.reference.discover.\
-find_ctl_transform_pairs`
 -   :func:`opencolorio_config_aces.discover_aces_ctl_transforms`
 -   :func:`opencolorio_config_aces.classify_aces_ctl_transforms`
 -   :func:`opencolorio_config_aces.unclassify_ctl_transforms`
