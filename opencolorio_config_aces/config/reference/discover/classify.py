@@ -7,17 +7,6 @@
 Defines various objects related to *aces-dev* reference implementation *CTL*
 transforms discovery and classification:
 
--   :attr:`opencolorio_config_aces.config.reference.ACES_URN`
--   :attr:`opencolorio_config_aces.config.reference.ACES_NAMESPACE`
--   :attr:`opencolorio_config_aces.config.reference.ACES_TYPES`
--   :attr:`opencolorio_config_aces.config.reference.ACES_CTL_TRANSFORMS_ROOT`
--   :attr:`opencolorio_config_aces.config.reference.\
-ACES_CTL_TRANSFORM_FAMILIES`
--   :class:`opencolorio_config_aces.config.reference.ACESTransformID`
--   :class:`opencolorio_config_aces.config.reference.CTLTransform`
--   :class:`opencolorio_config_aces.config.reference.CTLTransformPair`
--   :func:`opencolorio_config_aces.config.reference.discover.\
-find_ctl_transform_pairs`
 -   :func:`opencolorio_config_aces.discover_aces_ctl_transforms`
 -   :func:`opencolorio_config_aces.classify_aces_ctl_transforms`
 -   :func:`opencolorio_config_aces.unclassify_ctl_transforms`
@@ -686,8 +675,6 @@ class CTLTransform:
         self._aces_transform_id = None
         self._user_name = None
         self._description = ''
-        self._source = None
-        self._target = None
 
         self._family = family
         self._genus = genus
@@ -1077,7 +1064,7 @@ class CTLTransformPair:
 
         return (f"{self.__class__.__name__}("
                 f"{str(self._forward_transform)}', "
-                f"{str(self._forward_transform)}')")
+                f"{str(self._inverse_transform)}')")
 
     def __repr__(self):
         """
@@ -1274,10 +1261,9 @@ def classify_aces_ctl_transforms(unclassified_ctl_transforms):
 'panasonic', 'red', 'sony']
     >>> genus = genera[0]
     >>> sorted(ctl_transforms[family][genus].items())  # doctest: +ELLIPSIS
-    [('ACEScsc.Academy.ACEScc', \
-CTLTransformPair(\
+    [('ACEScsc.Academy.ACEScc', CTLTransformPair(\
 CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')', \
-CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')'))]
+CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
     """
 
     classified_ctl_transforms = defaultdict(lambda: defaultdict(dict))

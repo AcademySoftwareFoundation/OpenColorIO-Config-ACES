@@ -25,8 +25,9 @@ __all__ = [
     'APPLICATION_NAME', 'APPLICATION_VERSION', 'PYTHON_PACKAGE_NAME',
     'GITHUB_REPOSITORY_NAME', 'PYPI_PACKAGE_NAME', 'ORG', 'CONTAINER', 'clean',
     'formatting', 'tests', 'quality', 'preflight', 'docs',
-    'build_reference_config', 'requirements', 'docker_build', 'docker_remove',
-    'run_in_container', 'docker_run_docs', 'docker_run_build_reference_config'
+    'build_config_reference', 'build_config_cg', 'requirements',
+    'docker_build', 'docker_remove', 'run_in_container', 'docker_run_docs',
+    'docker_run_build_config_reference', 'docker_run_build_config_cg'
 ]
 
 APPLICATION_NAME = opencolorio_config_aces.__application_name__
@@ -224,7 +225,7 @@ def docs(ctx, html=True, pdf=True):
 
 
 @task
-def build_reference_config(ctx):
+def build_config_reference(ctx):
     """
     Builds the *aces-dev* reference *OpenColorIO* Config.
 
@@ -239,8 +240,30 @@ def build_reference_config(ctx):
         Task success.
     """
 
-    message_box(f'Building the "aces-dev" reference *OpenColorIO* config...')
+    message_box(f'Building the "aces-dev" reference "OpenColorIO" config...')
     with ctx.cd('opencolorio_config_aces/config/reference/generate'):
+        ctx.run('python config.py')
+
+
+@task
+def build_config_cg(ctx):
+    """
+    Builds the *ACES* Computer Graphics (CG) *OpenColorIO* Config.
+
+    Parameters
+    ----------
+    ctx : invoke.context.Context
+        Context.
+
+    Returns
+    -------
+    bool
+        Task success.
+    """
+
+    message_box(
+        f'Building the "ACES" Computer Graphics (CG) "OpenColorIO" config...')
+    with ctx.cd('opencolorio_config_aces/config/cg/generate'):
         ctx.run('python config.py')
 
 
@@ -370,7 +393,7 @@ def docker_run_docs(ctx, html=True, pdf=True):
 
 
 @task
-def docker_run_build_reference_config(ctx):
+def docker_run_build_config_reference(ctx):
     """
     Builds the *aces-dev* reference *OpenColorIO* Config in the *docker*
     container.
@@ -386,4 +409,24 @@ def docker_run_build_reference_config(ctx):
         Task success.
     """
 
-    run_in_container(ctx, 'invoke build-reference-config')
+    run_in_container(ctx, 'invoke build-config-reference')
+
+
+@task
+def docker_run_build_config_cg(ctx):
+    """
+    Builds the *ACES* Computer Graphics (CG) *OpenColorIO* Config in the
+    *docker* container.
+
+    Parameters
+    ----------
+    ctx : invoke.context.Context
+        Context.
+
+    Returns
+    -------
+    bool
+        Task success.
+    """
+
+    run_in_container(ctx, 'invoke build-config-cg')

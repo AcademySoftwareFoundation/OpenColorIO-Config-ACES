@@ -20,7 +20,7 @@ from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
     ConfigData, colorspace_factory, generate_config, look_factory,
-    view_transform_factory)
+    produce_transform, view_transform_factory)
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     unclassify_ctl_transforms)
@@ -50,9 +50,8 @@ __all__ = [
     'beautify_display_name', 'ctl_transform_to_colorspace_name',
     'ctl_transform_to_look_name', 'ctl_transform_to_transform_family',
     'ctl_transform_to_description', 'ctl_transform_to_colorspace',
-    'ctl_transform_to_look', 'create_builtin_transform',
-    'style_to_view_transform', 'style_to_display_colorspace',
-    'generate_config_aces'
+    'ctl_transform_to_look', 'style_to_view_transform',
+    'style_to_display_colorspace', 'generate_config_aces'
 ]
 
 ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH = (
@@ -563,7 +562,7 @@ def ctl_transform_to_description(
                                             kwargs.get(inverse))
                 if transform is not None
             ]
-            transform = next(iter(transforms), None)
+            transform = produce_transform(next(iter(transforms), None))
             if isinstance(transform, ocio.BuiltinTransform):
                 description.append(transform.getDescription())
 
@@ -598,9 +597,11 @@ def ctl_transform_to_description(
 def ctl_transform_to_colorspace(ctl_transform,
                                 describe=ColorspaceDescriptionStyle.LONG_UNION,
                                 analytical=True,
+                                signature_only=False,
                                 **kwargs):
     """
-    Generates the *OpenColorIO* colorspace for given *ACES* *CTL* transform.
+    Generates the *OpenColorIO* colorspace or its signature for given *ACES*
+    *CTL* transform.
 
     Parameters
     ----------
@@ -613,6 +614,9 @@ def ctl_transform_to_colorspace(ctl_transform,
         Whether to generate the *OpenColorIO* transform family that
         analytically matches the given *ACES* *CTL* transform, i.e. true to
         the *aces-dev* reference but not necessarily user friendly.
+    signature_only : bool, optional
+        Whether to return the *OpenColorIO* colorspace signature only, i.e. the
+        arguments for its instantiation.
 
     Other Parameters
     ----------------
@@ -622,17 +626,16 @@ def ctl_transform_to_colorspace(ctl_transform,
 
     Returns
     -------
-    ColorSpace
-        *OpenColorIO* colorspace.
+    ColorSpace or dict
+        *OpenColorIO* colorspace or its signature.
     """
 
     name = ctl_transform_to_colorspace_name(ctl_transform)
     family = ctl_transform_to_transform_family(ctl_transform, analytical)
-
     description = ctl_transform_to_description(ctl_transform, describe,
                                                colorspace_factory, **kwargs)
 
-    settings = {
+    signature = {
         'name': (f'{beautify_colorspace_name(family)}'
                  f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
                  f'{name}'),
@@ -641,19 +644,24 @@ def ctl_transform_to_colorspace(ctl_transform,
         'description':
         description,
     }
-    settings.update(kwargs)
+    signature.update(kwargs)
 
-    colorspace = colorspace_factory(**settings)
+    if signature_only:
+        return signature
+    else:
+        colorspace = colorspace_factory(**signature)
 
-    return colorspace
+        return colorspace
 
 
 def ctl_transform_to_look(ctl_transform,
                           describe=ColorspaceDescriptionStyle.LONG_UNION,
                           analytical=True,
+                          signature_only=False,
                           **kwargs):
     """
-    Generates the *OpenColorIO* look for given *ACES* *CTL* transform.
+    Generates the *OpenColorIO* look or its signature for given *ACES* *CTL*
+    transform.
 
     Parameters
     ----------
@@ -666,6 +674,9 @@ def ctl_transform_to_look(ctl_transform,
         Whether to generate the *OpenColorIO* transform family that
         analytically matches the given *ACES* *CTL* transform, i.e. true to
         the *aces-dev* reference but not necessarily user friendly.
+    signature_only : bool, optional
+        Whether to return the *OpenColorIO* look signature only, i.e. the
+        arguments for its instantiation.
 
     Other Parameters
     ----------------
@@ -675,70 +686,40 @@ def ctl_transform_to_look(ctl_transform,
 
     Returns
     -------
-    ColorSpace
-        *OpenColorIO* look.
+    ColorSpace or dict
+        *OpenColorIO* look or its signature.
     """
 
     name = ctl_transform_to_look_name(ctl_transform)
     family = ctl_transform_to_transform_family(ctl_transform, analytical)
-
     description = ctl_transform_to_description(ctl_transform, describe,
                                                look_factory, **kwargs)
 
-    settings = {
+    signature = {
         'name': (f'{beautify_colorspace_name(family)}'
                  f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
                  f'{name}'),
         'description':
         description,
     }
-    settings.update(kwargs)
+    signature.update(kwargs)
 
-    look = look_factory(**settings)
+    if signature_only:
+        return signature
+    else:
+        look = look_factory(**signature)
 
-    return look
-
-
-@required('OpenColorIO')
-def create_builtin_transform(style):
-    """
-    Creates an *OpenColorIO* builtin transform for given style.
-
-    If the style does not exist, a placeholder transform is used in place
-    of the builtin transform.
-
-    Parameters
-    ----------
-    style : unicode
-        *OpenColorIO* builtin transform style
-
-    Returns
-    -------
-    BuiltinTransform
-        *OpenColorIO* builtin transform for given style.
-    """
-
-    import PyOpenColorIO as ocio
-
-    builtin_transform = ocio.BuiltinTransform()
-
-    try:
-        builtin_transform.setStyle(style)
-    except ocio.Exception:
-        logging.warning(f'{style} style is not defined, '
-                        f'using a placeholder "FileTransform" instead!')
-        builtin_transform = ocio.FileTransform()
-        builtin_transform.setSrc(style)
-
-    return builtin_transform
+        return look
 
 
 @required('OpenColorIO')
 def style_to_view_transform(style,
                             ctl_transforms,
-                            describe=ColorspaceDescriptionStyle.LONG_UNION):
+                            describe=ColorspaceDescriptionStyle.LONG_UNION,
+                            signature_only=False,
+                            **kwargs):
     """
-    Creates an *OpenColorIO* view transform for given style.
+    Creates an *OpenColorIO* view transform or its signature for given style.
 
     Parameters
     ----------
@@ -750,11 +731,20 @@ def style_to_view_transform(style,
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+    signature_only : bool, optional
+        Whether to return the *OpenColorIO* view colorspace signature only,
+        i.e. the arguments for its instantiation.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.colorspace_factory` definition.
 
     Returns
     -------
-    ViewTransform
-        *OpenColorIO* view transform for given style.
+    ViewTransform or dict
+        *OpenColorIO* view transform or its signature for given style.
     """
 
     import PyOpenColorIO as ocio
@@ -805,17 +795,34 @@ def style_to_view_transform(style,
 
         description = '\n'.join(description)
 
-    view_transform = view_transform_factory(
-        name, from_reference=builtin_transform, description=description)
+    signature = {
+        'name': name,
+        'from_reference': builtin_transform,
+        'description': description
+    }
+    signature.update(**kwargs)
 
-    return view_transform
+    if signature_only:
+        signature['from_reference'] = {
+            'name': 'BuiltinTransform',
+            'style': style,
+        }
+        return signature
+    else:
+        view_transform = view_transform_factory(**signature)
+
+        return view_transform
 
 
 @required('OpenColorIO')
 def style_to_display_colorspace(
-        style, describe=ColorspaceDescriptionStyle.OPENCOLORIO, **kwargs):
+        style,
+        describe=ColorspaceDescriptionStyle.OPENCOLORIO,
+        signature_only=False,
+        **kwargs):
     """
-    Creates an *OpenColorIO* display colorspace for given style.
+    Creates an *OpenColorIO* display colorspace or its signature for given
+    style.
 
     Parameters
     ----------
@@ -824,6 +831,10 @@ def style_to_display_colorspace(
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+    signature_only : bool, optional
+        Whether to return the *OpenColorIO* display colorspace signature only,
+        i.e. the arguments for its instantiation.
+
     Other Parameters
     ----------------
     \\**kwargs : dict, optional
@@ -832,8 +843,8 @@ def style_to_display_colorspace(
 
     Returns
     -------
-    ColorSpace
-        *OpenColorIO* display colorspace for given style.
+    ColorSpace or dict
+        *OpenColorIO* display colorspace or its signature for given style.
     """
 
     import PyOpenColorIO as ocio
@@ -854,18 +865,26 @@ def style_to_display_colorspace(
 
         description = '\n'.join(description)
 
-    settings = {
+    signature = {
         'name': name,
         'family': ACES_CONFIG_DISPLAY_FAMILY,
         'description': description,
         'from_reference': builtin_transform,
-        'reference_space': ocio.REFERENCE_SPACE_DISPLAY,
+        'reference_space': 'REFERENCE_SPACE_DISPLAY',
     }
-    settings.update(kwargs)
+    signature.update(kwargs)
 
-    colorspace = colorspace_factory(**settings)
+    if signature_only:
+        signature['from_reference'] = {
+            'name': 'BuiltinTransform',
+            'style': style,
+        }
 
-    return colorspace
+        return signature
+    else:
+        colorspace = colorspace_factory(**signature)
+
+        return colorspace
 
 
 @required('OpenColorIO')
@@ -912,11 +931,8 @@ def generate_config_aces(
     Returns
     -------
     Config or tuple
-        *OpenColorIO* config or tuple of *OpenColorIO* config,
-        :class:`opencolorio_config_aces.ConfigData` class instance and dict of
-        *OpenColorIO* colorspaces and
-        :class:`opencolorio_config_aces.config.reference.CTLTransform` class
-        instances.
+        *OpenColorIO* config or tuple of *OpenColorIO* config and
+        :class:`opencolorio_config_aces.ConfigData` class instance.
     """
 
     import PyOpenColorIO as ocio
@@ -993,23 +1009,29 @@ def generate_config_aces(
 
     aces_family_prefix = 'CSC' if analytical else 'ACES'
 
-    scene_reference_colorspace = colorspace_factory(
+    scene_reference_colorspace = {
+        'name':
         f'{aces_family_prefix} - {ACES_CONFIG_REFERENCE_COLORSPACE}',
+        'family':
         'ACES',
-        description=(
-            'The "Academy Color Encoding System" reference colorspace.'),
-        encoding='scene-linear')
+        'description':
+        'The "Academy Color Encoding System" reference colorspace.',
+        'encoding':
+        'scene-linear',
+    }
 
-    display_reference_colorspace = colorspace_factory(
-        'CIE-XYZ-D65',
-        description='The "CIE XYZ (D65)" display connection colorspace.',
-        reference_space=ocio.REFERENCE_SPACE_DISPLAY)
+    display_reference_colorspace = {
+        'name': 'CIE-XYZ-D65',
+        'description': 'The "CIE XYZ (D65)" display connection colorspace.',
+        'reference_space': 'REFERENCE_SPACE_DISPLAY',
+    }
 
-    raw_colorspace = colorspace_factory(
-        'Utility - Raw',
-        'Utility',
-        description='The utility "Raw" colorspace.',
-        is_data=True)
+    raw_colorspace = {
+        'name': 'Utility - Raw',
+        'family': 'Utility',
+        'description': 'The utility "Raw" colorspace.',
+        'is_data': True,
+    }
 
     colorspaces += [
         scene_reference_colorspace,
@@ -1019,12 +1041,16 @@ def generate_config_aces(
 
     for style, transforms_data in config_mapping.items():
         if transforms_data[0]['interface'] == 'ViewTransform':
-            view_transform = style_to_view_transform(style, [
-                transform_data['ctl_transform']
-                for transform_data in transforms_data
-            ], describe)
+            view_transform = style_to_view_transform(
+                style, [
+                    transform_data['ctl_transform']
+                    for transform_data in transforms_data
+                ],
+                describe,
+                signature_only=True)
+            view_transform['transforms_data'] = transforms_data
             view_transforms.append(view_transform)
-            view_transform_name = view_transform.getName()
+            view_transform_name = view_transform['name']
             view_transform_names.append(view_transform_name)
 
             for transform_data in transforms_data:
@@ -1033,9 +1059,11 @@ def generate_config_aces(
 
                 display = style_to_display_colorspace(
                     display_style,
+                    signature_only=True,
                     encoding=transform_data.get('encoding'),
                     categories=transform_data.get('categories'))
-                display_name = display.getName()
+                display['transforms_data'] = [transform_data]
+                display_name = display['name']
 
                 if display_name not in display_names:
                     displays.append(display)
@@ -1055,28 +1083,38 @@ def generate_config_aces(
                         ctl_transform,
                         describe,
                         analytical=analytical,
-                        forward_transform=create_builtin_transform(style),
-                        process_space=scene_reference_colorspace.getName(),
+                        signature_only=True,
+                        forward_transform={
+                            'name': 'BuiltinTransform',
+                            'style': style,
+                        },
+                        process_space=scene_reference_colorspace['name'],
                     )
-
+                    look['transforms_data'] = [transform_data]
                     looks.append(look)
                 else:
                     colorspace = ctl_transform_to_colorspace(
                         ctl_transform,
                         describe,
                         analytical=analytical,
-                        to_reference=create_builtin_transform(style),
+                        signature_only=True,
+                        to_reference={
+                            'name': 'BuiltinTransform',
+                            'style': style,
+                        },
                         encoding=transform_data.get('encoding'),
                         categories=transform_data.get('categories'))
-
+                    colorspace['transforms_data'] = [transform_data]
                     colorspaces.append(colorspace)
 
-    untonemapped_view_transform = view_transform_factory(
-        'Un-tone-mapped',
-        from_reference=ocio.BuiltinTransform(
-            'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'),
-    )
-    untonemapped_view_transform_name = untonemapped_view_transform.getName()
+    untonemapped_view_transform = {
+        'name': 'Un-tone-mapped',
+        'from_reference': {
+            'name': 'BuiltinTransform',
+            'style': 'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'
+        },
+    }
+    untonemapped_view_transform_name = untonemapped_view_transform['name']
     for display in display_names:
         shared_views.append({
             'display': display,
@@ -1086,7 +1124,9 @@ def generate_config_aces(
 
     data = ConfigData(
         description=(
-            f'The "Academy Color Encoding System" (ACES) "Reference Config".'
+            f'The "Academy Color Encoding System" (ACES) "Reference Config"'
+            f'\n'
+            f'-------------------------------------------------------------'
             f'\n\n'
             f'This "OpenColorIO" config is a strict and quasi-analytical '
             f'implementation of "aces-dev" and is designed as a reference for '
@@ -1099,11 +1139,11 @@ def generate_config_aces(
             ocio.ROLE_COLOR_TIMING: f'{aces_family_prefix} - ACEScct',
             ocio.ROLE_COMPOSITING_LOG: f'{aces_family_prefix} - ACEScct',
             ocio.ROLE_DATA: 'Utility - Raw',
-            ocio.ROLE_DEFAULT: scene_reference_colorspace.getName(),
+            ocio.ROLE_DEFAULT: scene_reference_colorspace['name'],
             ocio.ROLE_INTERCHANGE_DISPLAY:
-            display_reference_colorspace.getName(),
-            ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace.getName(),
-            ocio.ROLE_REFERENCE: scene_reference_colorspace.getName(),
+            display_reference_colorspace['name'],
+            ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace['name'],
+            ocio.ROLE_REFERENCE: scene_reference_colorspace['name'],
             ocio.ROLE_RENDERING: f'{aces_family_prefix} - ACEScg',
             ocio.ROLE_SCENE_LINEAR: f'{aces_family_prefix} - ACEScg',
         },
@@ -1120,10 +1160,10 @@ def generate_config_aces(
         active_views=view_transform_names + ['Raw'],
         file_rules=[{
             'name': 'Default',
-            'colorspace': scene_reference_colorspace.getName()
+            'colorspace': scene_reference_colorspace['name']
         }],
         inactive_colorspaces=['CIE-XYZ-D65'],
-        default_view_transform=untonemapped_view_transform.getName(),
+        default_view_transform=untonemapped_view_transform['name'],
         profile_version=2)
 
     config = generate_config(data, config_name, validate)
@@ -1137,6 +1177,7 @@ def generate_config_aces(
 if __name__ == '__main__':
     import os
     import opencolorio_config_aces
+    from opencolorio_config_aces import serialize_config_data
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
@@ -1152,3 +1193,6 @@ if __name__ == '__main__':
                                  'config-aces-reference.ocio'),
         analytical=False,
         additional_data=True)
+
+    serialize_config_data(
+        data, os.path.join(build_directory, 'config-aces-reference.json'))
