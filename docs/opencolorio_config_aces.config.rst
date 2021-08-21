@@ -17,10 +17,15 @@ Config Generation Common Objects
 .. autosummary::
     :toctree: generated/
 
+    produce_transform
+    transform_factory
+    group_transform_factory
     colorspace_factory
     view_transform_factory
     look_factory
     ConfigData
+    deserialize_config_data
+    serialize_config_data
     validate_config
     generate_config
 
@@ -73,3 +78,25 @@ Reference Configuration
 
     ColorspaceDescriptionStyle
     generate_config_aces
+
+*ACES* Computer Graphics (CG) Config Generator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/
+
+    generate_config_cg
+
+*ACES* Studio Config Generator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/

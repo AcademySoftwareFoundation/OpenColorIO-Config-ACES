@@ -23,9 +23,10 @@ __status__ = 'Production'
 
 __all__ = [
     'DocstringDict', 'first_item', 'common_ancestor', 'paths_common_ancestor',
-    'vivification', 'vivified_to_dict', 'message_box', 'is_networkx_installed',
-    'is_opencolorio_installed', 'REQUIREMENTS_TO_CALLABLE', 'required',
-    'is_string', 'is_iterable', 'git_describe'
+    'vivification', 'vivified_to_dict', 'message_box', 'is_colour_installed',
+    'is_networkx_installed', 'is_opencolorio_installed',
+    'REQUIREMENTS_TO_CALLABLE', 'required', 'is_string', 'is_iterable',
+    'git_describe'
 ]
 
 
@@ -253,6 +254,37 @@ def message_box(message, width=79, padding=3, print_callable=print):
     return True
 
 
+def is_colour_installed(raise_exception=False):
+    """
+    Returns if *Colour* is installed and available.
+
+    Parameters
+    ----------
+    raise_exception : bool
+        Raise exception if *Colour* is unavailable.
+
+    Returns
+    -------
+    bool
+        Is *Colour* installed.
+
+    Raises
+    ------
+    ImportError
+        If *Colour* is not installed.
+    """
+
+    try:  # pragma: no cover
+        import colour  # noqa
+
+        return True
+    except ImportError as error:  # pragma: no cover
+        if raise_exception:
+            raise ImportError(('"Colour" related API features '
+                               'are not available: "{0}".').format(error))
+        return False
+
+
 def is_networkx_installed(raise_exception=False):
     """
     Returns if *NetworkX* is installed and available.
@@ -317,6 +349,8 @@ def is_opencolorio_installed(raise_exception=False):
 
 
 REQUIREMENTS_TO_CALLABLE = DocstringDict({
+    'Colour':
+    is_colour_installed,
     'NetworkX':
     is_networkx_installed,
     'OpenColorIO':
@@ -326,7 +360,7 @@ REQUIREMENTS_TO_CALLABLE.__doc__ = """
 Mapping of requirements to their respective callables.
 
 _REQUIREMENTS_TO_CALLABLE : CaseInsensitiveMapping
-    **{'NetworkX', 'OpenImageIO'}**
+    **{'Colour', 'NetworkX', 'OpenImageIO'}**
 """
 
 
