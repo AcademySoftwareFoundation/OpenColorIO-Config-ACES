@@ -19,7 +19,6 @@ Defines various objects related to *OpenColorIO* config generation:
 -   :func:`opencolorio_config_aces.generate_config`
 """
 
-import jsonpickle
 import logging
 import re
 from collections import OrderedDict
@@ -498,6 +497,7 @@ class ConfigData:
     default_view_transform: str = field(default_factory=str)
 
 
+@required('jsonpickle')
 def deserialize_config_data(path):
     """
     Deserializes the *JSON* *OpenColorIO* config data container at given path.
@@ -513,11 +513,14 @@ def deserialize_config_data(path):
         Deserialized *JSON* *OpenColorIO* config data container.
     """
 
+    import jsonpickle
+
     with open(path) as config_json:
         return ConfigData(**jsonpickle.decode(config_json.read()))
 
 
 # TODO: Implement schema verification support for serialized data.
+@required('jsonpickle')
 def serialize_config_data(data, path):
     """
     Serializes the *OpenColorIO* config data container as a *JSON* file.
@@ -529,6 +532,8 @@ def serialize_config_data(data, path):
     path : unicode
         *JSON* file path.
     """
+
+    import jsonpickle
 
     with open(path, 'w') as config_json:
         config_json.write(jsonpickle.encode(asdict(data), indent=2))
