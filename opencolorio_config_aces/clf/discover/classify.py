@@ -71,7 +71,7 @@ CLF_ID_SEPARATOR : unicode
 
 CLF_NAMESPACE = 'OCIO'
 """
-*ACES* namespace for *A.M.P.A.S* official *CTL* transforms.
+*ACES* namespace for the *OCIO* *CTL* transforms.
 
 CLF_NAMESPACE : unicode
 """
@@ -100,19 +100,10 @@ the local 'transforms/clf' directory.
 CLF_TRANSFORMS_ROOT : unicode
 """
 
-CLF_TRANSFORM_FAMILIES = {
-    'csc': 'csc',
-    'idt': 'input_transform',
-    'lib': 'lib',
-    'lmt': 'lmt',
-    'odt': 'output_transform',
-    'outputTransforms': 'output_transform',
-    'rrt': 'rrt',
-    'utilities': 'utility'
-}
+CLF_TRANSFORM_FAMILIES = {'aces': 'aces'}
 """
-*CLF* transform families mapping the *CTL* transform directories to
-family names.
+*CLF* transform families mapping the *CTL* transform directories to family
+names.
 
 CLF_TRANSFORM_FAMILIES : dict
 """
@@ -141,8 +132,8 @@ DEFAULT_CLF_TRANSFORM_FILTERERS : list
 
 def clf_transform_relative_path(path, root_directory=CLF_TRANSFORMS_ROOT):
     """
-    Helper definition returning the relative path from given *CLF*
-    transform to *CLF* transforms root directory.
+    Helper definition returning the relative path from given *CLF* transform to
+    *CLF* transforms root directory.
 
     Parameters
     ----------
@@ -162,8 +153,8 @@ def clf_transform_relative_path(path, root_directory=CLF_TRANSFORMS_ROOT):
 
 class CLFTransformID:
     """
-    Defines the *CLF* transform *CLFtransformID*: an object parsing and
-    storing information about an *CLFtransformID* unicode string.
+    Defines the *CLF* transform *CLFtransformID*: an object parsing and storing
+    information about a *CLFtransformID* unicode string.
 
     Parameters
     ----------
@@ -346,7 +337,7 @@ class CLFTransformID:
     def minor_version_number(self):
         """
         Getter and setter property for the *CLFtransformID* minor version
-        number, e.g. *0*.
+        number, e.g. *v1*.
 
         Parameters
         ----------
@@ -369,7 +360,7 @@ class CLFTransformID:
     def patch_version_number(self):
         """
         Getter and setter property for the *CLFtransformID* patch version
-        number, e.g. *1*.
+        number.
 
         Parameters
         ----------
@@ -391,8 +382,7 @@ class CLFTransformID:
     @property
     def source(self):
         """
-        Getter and setter property for the *CLFtransformID* source
-        colourspace.
+        Getter and setter property for the *CLFtransformID* source colourspace.
 
         Parameters
         ----------
@@ -495,17 +485,17 @@ class CLFTransformID:
 
 class CLFTransform:
     """
-    Defines the *CLF* transform class: an object storing information
-    about an *CLF* transform file.
+    Defines the *CLF* transform class: an object storing information about a
+    *CLF* transform file.
 
     Parameters
     ----------
     path : unicode
         *CLF* transform path.
     family : unicode, optional
-        *CLF* transform family, e.g. *output_transform*
+        *CLF* transform family, e.g. *aces*
     genus : unicode, optional
-        *CLF* transform genus, e.g. *dcdm*
+        *CLF* transform genus, e.g. *undefined*
 
     Attributes
     ----------
@@ -514,8 +504,6 @@ class CLFTransform:
     clf_transform_id
     user_name
     description
-    source
-    target
     family
     genus
 
@@ -565,8 +553,8 @@ class CLFTransform:
     @property
     def code(self):
         """
-        Getter and setter property for the *CLF* transform code, i.e.
-        the *CLF* transform file content.
+        Getter and setter property for the *CLF* transform code, i.e. the *CLF*
+        transform file content.
 
         Parameters
         ----------
@@ -590,8 +578,7 @@ class CLFTransform:
     @property
     def clf_transform_id(self):
         """
-        Getter and setter property for the *CLF* transform
-        *CLFtransformID*.
+        Getter and setter property for the *CLF* transform *CLFtransformID*.
 
         Parameters
         ----------
@@ -613,7 +600,7 @@ class CLFTransform:
     @property
     def user_name(self):
         """
-        Getter and setter property for the *CLF* transform *ACESuserName*.
+        Getter and setter property for the *CLF* transform user name.
 
         Parameters
         ----------
@@ -623,7 +610,7 @@ class CLFTransform:
         Returns
         -------
         unicode
-            *CLF* transform *ACESuserName*.
+            *CLF* transform user name.
 
         Notes
         -----
@@ -659,7 +646,7 @@ class CLFTransform:
     def family(self):
         """
         Getter and setter property for the *CLF* transform family, e.g.
-        *output_transform*, a value in
+        *aces*, a value in
         :attr:`opencolorio_config_aces.clf.reference.\
 CLF_TRANSFORM_FAMILIES` attribute dictionary.
 
@@ -684,7 +671,7 @@ CLF_TRANSFORM_FAMILIES` attribute dictionary.
     def genus(self):
         """
         Getter and setter property for the *CLF* transform genus, e.g.
-        *dcdm*.
+        *undefined*.
 
         Parameters
         ----------
@@ -754,8 +741,7 @@ CLFTransform` class are tried on the underlying
 
     def __eq__(self, other):
         """
-         Returns whether the *CLF* transform is equal to given other
-         object.
+         Returns whether the *CLF* transform is equal to given other object.
 
          Parameters
          ----------
@@ -781,13 +767,12 @@ CLFTransform` class are tried on the underlying
          Parameters
          ----------
          other : object
-             Object to test whether it is not equal to the *CLF*
-             transform.
+             Object to test whether it is not equal to the *CLF* transform.
 
          Returns
          -------
          bool
-             Is given object notequal to *CLF* transform.
+             Is given object not equal to *CLF* transform.
         """
 
         return not (self == other)
@@ -795,7 +780,6 @@ CLFTransform` class are tried on the underlying
     def _parse(self):
         """
         Parses the *CLF* transform.
-
         """
 
         tree = ET.parse(self._path)
@@ -886,8 +870,7 @@ class CLFTransformPair:
 
     def __str__(self):
         """
-        Returns a formatted string representation of the *CLF*
-        transform pair.
+        Returns a formatted string representation of the *CLF* transform pair.
 
         Returns
         -------
@@ -901,8 +884,7 @@ class CLFTransformPair:
 
     def __repr__(self):
         """
-        Returns an evaluable string representation of the *CLF*
-        transform pair.
+        Returns an evaluable string representation of the *CLF* transform pair.
 
         Returns
         -------
@@ -914,14 +896,13 @@ class CLFTransformPair:
 
     def __eq__(self, other):
         """
-         Returns whether the *CLF* transform pair is equal to given
-         other object.
+         Returns whether the *CLF* transform pair is equal to given other
+         object.
 
          Parameters
          ----------
          other : object
-             Object to test whether it is equal to the *CLF* transform
-             pair.
+             Object to test whether it is equal to the *CLF* transform pair.
 
          Returns
          -------
@@ -937,19 +918,19 @@ class CLFTransformPair:
 
     def __ne__(self, other):
         """
-         Returns whether the *CLF* transform pair is not equal to given
-         other object.
+         Returns whether the *CLF* transform pair is not equal to given other
+         object.
 
          Parameters
          ----------
          other : object
-             Object to test whether it is not equal to the *CLF*
-             transform pair.
+             Object to test whether it is not equal to the *CLF* transform
+             pair.
 
          Returns
          -------
          bool
-             Is given object notequal to *CLF* transform pair.
+             Is given object not equal to *CLF* transform pair.
         """
 
         return not (self == other)
@@ -1010,7 +991,7 @@ def find_clf_transform_pairs(clf_transforms):
 def discover_clf_transforms(root_directory=CLF_TRANSFORMS_ROOT):
     """
     Discovers the *CLF* transform paths in given root directory: The
-    given directory is traversed and `*.clf` files are collected.
+    given directory is traversed and the `*.clf` files are collected.
 
     Parameters
     ----------
@@ -1203,7 +1184,7 @@ def filter_clf_transforms(clf_transforms, filterers=None):
         definitions.
     filterers : array_like, optional
         List of callables used to filter the *CLF* transforms, each
-        callable takes an *CLF* transform as argument and returns
+        callable takes a *CLF* transform as argument and returns
         whether to include or exclude the *CLF* transform as a bool.
 
     Returns
@@ -1215,8 +1196,8 @@ def filter_clf_transforms(clf_transforms, filterers=None):
 
     Warnings
     --------
-    -   This definition will forcibly unclassify the given *CLF*
-        transforms and return a flattened list.
+    -   This definition will forcibly unclassify the given *CLF* transforms and
+        return a flattened list.
 
     Examples
     --------
@@ -1258,10 +1239,10 @@ reference.CLF_TRANSFORMS_ROOT` attribute using the
         :func:`opencolorio_config_aces.discover_clf_transforms`
         definition.
     -   The *CTL* transforms are classified by *family* e.g.
-        *output_transform*, and *genus* e.g. *dcdm* using the
+        *aces*, and *genus* e.g. *undefined* using the
         :func:`opencolorio_config_aces.classify_clf_transforms`
         definition.
-    -   The resulting datastructure is printed.
+    -   The resulting data structure is printed.
     """
 
     classified_clf_transforms = classify_clf_transforms(
