@@ -71,7 +71,7 @@ CLF_ID_SEPARATOR : unicode
 
 CLF_NAMESPACE = 'OCIO'
 """
-*ACES* namespace for the *OCIO* *CTL* transforms.
+*ACES* namespace for the *OCIO* *CLF* transforms.
 
 CLF_NAMESPACE : unicode
 """
@@ -102,7 +102,7 @@ CLF_TRANSFORMS_ROOT : unicode
 
 CLF_TRANSFORM_FAMILIES = {'aces': 'aces'}
 """
-*CLF* transform families mapping the *CTL* transform directories to family
+*CLF* transform families mapping the *CLF* transform directories to family
 names.
 
 CLF_TRANSFORM_FAMILIES : dict
@@ -404,8 +404,7 @@ class CLFTransformID:
     @property
     def target(self):
         """
-        Getter and setter property for the *CLFtransformID* target
-        colourspace.
+        Getter and setter property for the *CLFtransformID* target colourspace.
 
         Parameters
         ----------
@@ -715,8 +714,7 @@ CLFTransform` class are tried on the underlying
 
     def __str__(self):
         """
-        Returns a formatted string representation of the *CLF*
-        transform.
+        Returns a formatted string representation of the *CLF* transform.
 
         Returns
         -------
@@ -795,8 +793,8 @@ CLFTransform` class are tried on the underlying
 class CLFTransformPair:
     """
     Defines the *CLF* transform pair class: an object storing a pair of
-    :class:`opencolorio_config_aces.clf.reference.CLFTransform` class
-    instances representing forward and inverse transformation.
+    :class:`opencolorio_config_aces.clf.reference.CLFTransform` class instances
+    representing forward and inverse transformation.
 
     Parameters
     ----------
@@ -990,8 +988,8 @@ def find_clf_transform_pairs(clf_transforms):
 
 def discover_clf_transforms(root_directory=CLF_TRANSFORMS_ROOT):
     """
-    Discovers the *CLF* transform paths in given root directory: The
-    given directory is traversed and the `*.clf` files are collected.
+    Discovers the *CLF* transform paths in given root directory: The given
+    directory is traversed and the `*.clf` files are collected.
 
     Parameters
     ----------
@@ -1048,23 +1046,22 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ----------
     unclassified_clf_transforms : dict
         Unclassified *CLF* transforms as returned by
-        :func:`opencolorio_config_aces.discover_clf_transforms`
-        definition.
+        :func:`opencolorio_config_aces.discover_clf_transforms` definition.
 
     Returns
     -------
     dict
         .. math::
 
-            \\{``family_1'': \\{``genus_1'': \\{\\}_{CTL_1},
+            \\{``family_1'': \\{``genus_1'': \\{\\}_{CLF_1},
             \\ldots,
-            ``family_n'': \\{``genus_2'':\\{\\}_{CTL_2}\\}\\}
+            ``family_n'': \\{``genus_2'':\\{\\}_{CLF_2}\\}\\}
 
         where
 
         .. math::
 
-            \\{\\}_{CTL_n}=\\{``basename_n'': CLFTransform_n,
+            \\{\\}_{CLF_n}=\\{``basename_n'': CLFTransform_n,
             \\ldots,
             ``basename_{n + 1}'': CLFTransform_{n + 1}\\}
 
@@ -1137,8 +1134,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ----------
     classified_clf_transforms : dict
         Classified *CLF* transforms as returned by
-        :func:`opencolorio_config_aces.classify_clf_transforms`
-        definition.
+        :func:`opencolorio_config_aces.classify_clf_transforms` definition.
 
     Returns
     -------
@@ -1183,9 +1179,9 @@ def filter_clf_transforms(clf_transforms, filterers=None):
         :func:`opencolorio_config_aces.unclassify_clf_transforms`
         definitions.
     filterers : array_like, optional
-        List of callables used to filter the *CLF* transforms, each
-        callable takes a *CLF* transform as argument and returns
-        whether to include or exclude the *CLF* transform as a bool.
+        List of callables used to filter the *CLF* transforms, each callable
+        takes a *CLF* transform as argument and returns whether to include or
+        exclude the *CLF* transform as a bool.
 
     Returns
     -------
@@ -1233,15 +1229,13 @@ def print_clf_taxonomy():
     """
     Prints the *builtins* *CLF* taxonomy:
 
-    -   The *CLF* transforms are discovered by traversing the
-        directory defined by the :attr:`opencolorio_config_aces.clf.\
+    -   The *CLF* transforms are discovered by traversing the directory defined
+    by the :attr:`opencolorio_config_aces.clf.\
 reference.CLF_TRANSFORMS_ROOT` attribute using the
-        :func:`opencolorio_config_aces.discover_clf_transforms`
-        definition.
-    -   The *CTL* transforms are classified by *family* e.g.
-        *aces*, and *genus* e.g. *undefined* using the
-        :func:`opencolorio_config_aces.classify_clf_transforms`
-        definition.
+        :func:`opencolorio_config_aces.discover_clf_transforms` definition.
+    -   The *CLF* transforms are classified by *family* e.g. *aces*, and
+        *genus* e.g. *undefined* using the
+        :func:`opencolorio_config_aces.classify_clf_transforms` definition.
     -   The resulting data structure is printed.
     """
 
