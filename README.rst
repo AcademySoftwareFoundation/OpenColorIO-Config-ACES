@@ -29,10 +29,86 @@ The following features are available:
 
 -   Automatic *OCIO* **Reference** configuration generation for *aces-dev*
     *CTL* reference implementation.
--   Configurable generator producing the *OCIO* **Studio** configuration.
+
+    - Discovery of *aces-dev* *CTL* transforms.
+    - Generation of the *CTL* transforms graph.
+
+-   Configurable generator producing the *OCIO* **CG** and **Studio**
+    configurations.
+-   Included *CLF* transforms along with generator and discovery support.
+
+Components Status
+^^^^^^^^^^^^^^^^^
+
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Component                     | Status         | Notes                                                                            |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *aces-dev* Discovery          | Complete       | Minor updates might be required when *aces-dev* is updated.                      |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Common Config Generator       | Quasi-Complete | Support for *NamedTransform* must be implemented.                                |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *Reference* Config Generation | Complete       |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *CG* Config Generation        | In-Progress    | Relies on *NamedTransform* support and shipped *CLF* transforms completion.      |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Custom Config Generation      | In-Progress    | We are designing the components so that one can generate a custom *ACES* config. |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *Studio* Config Generation    | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *CLF* Transforms Discovery    | Complete       | Minor updates will be required if classification changes.                        |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *CLF* Transforms Generation   | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Public API Surfacing          | In-Progress    | What is part of the Public API is not well defined currently.                    |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Unit Tests                    | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| API Documentation             | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Continuous Integration        | Complete       |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| CLI                           | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Containerisation              | Complete       | Minor updates will be required as the CLI evolves.                               |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
 
 Installation
 ------------
+
+Cloning the Repository
+^^^^^^^^^^^^^^^^^^^^^^
+
+The *OpenColorIO Configuration for ACES* repository uses `Git submodules <https://git-scm.com/book/en/v2/Git-Tools-Submodules>`__
+thus cloning the repository requires initializing them::
+
+    git clone --recursive https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES.git
+
+If you have already cloned the repository and forgot the `--recursive`
+argument, it is possible to initialize the submodules as follows::
+
+    git submodule update --init --recursive
+
+Poetry
+^^^^^^
+
+The *OpenColorIO Configuration for ACES* repository adopts `Poetry <https://poetry.eustace.io>`__
+to help managing its dependencies, this is the recommended way to get started
+with development.
+
+Assuming `python>=3.7 <https://www.python.org/download/releases/>`__ is
+available on your system along with `OpenColorIO <https://opencolorio.org/>`__,
+the development dependencies are installed with `Poetry <https://poetry.eustace.io>`__
+as follows::
+
+    git clone --recursive https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES.git
+    cd OpenColorIO-Config-ACES
+    poetry install --extras "optional"
+
+The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <https://graphviz.org/>`__
+to be installed on the system and having installed the optional `pygraphviz <https://pypi.org/project/pygraphviz/>`__:
+python package::
+
+    poetry install --extras "optional graphviz"
 
 Docker
 ^^^^^^
@@ -55,7 +131,6 @@ Then, to run *bash* in the container::
 
     docker run -it -v ${PWD}:/home/aswf/OpenColorIO-Config-ACES aswf/opencolorio-config-aces:latest /bin/bash
 
-
 Pypi
 ^^^^
 
@@ -66,13 +141,15 @@ Primary Dependencies
 ********************
 
 -   `python>=3.7 <https://www.python.org/download/releases/>`__
--   `networkx <https://pypi.org/project/networkx/>`__
 -   `OpenColorIO <https://opencolorio.org/>`__
 
-Plotting Dependencies
+Optional Dependencies
 *********************
 
+-   `colour <https://www.colour-science.org/>`__
 -   `graphviz <https://www.graphviz.org/>`__
+-   `jsonpickle <https://jsonpickle.github.io/>`__
+-   `networkx <https://pypi.org/project/networkx/>`__
 -   `pygraphviz <https://pypi.org/project/pygraphviz/>`__
 
 Development Dependencies
@@ -112,14 +189,22 @@ Listing the tasks is done as follows::
 
     invoke --list
 
-Assuming the dependencies are satisfied, the task to build the reference
+Assuming the dependencies are satisfied, the task to build the **Reference**
 configuration is::
 
-    invoke build-reference-config
+    invoke build-config-reference
 
 Alternatively, with the docker container built::
 
-    invoke docker-run-build-reference-config
+    invoke docker-run-build-config-reference
+
+Likewise, for the **CG** configuration::
+
+    invoke build-config-cg
+
+Or::
+
+    invoke docker-run-build-config-cg
 
 API
 ^^^

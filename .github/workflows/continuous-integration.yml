@@ -35,7 +35,7 @@ jobs:
       shell: bash
     - name: Install Package Dependencies
       run: |
-        poetry install --extras "graph"
+        poetry install --extras "optional"
       shell: bash
     - name: Lint with flake8
       run: |

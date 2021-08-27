@@ -26,7 +26,7 @@ RUN git clone https://github.com/AcademySoftwareFoundation/OpenColorIO \
 # LaTeX Dependencies for Sphinx Generated PDF
 WORKDIR /tmp
 COPY ./utilities/resources/texlive.profile .
-RUN wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
+RUN wget https://mirrors.rit.edu/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz \
     && tar -xvf install-tl-unx.tar.gz \
     && cd install-tl-* \
     && perl install-tl --profile ../texlive.profile \
@@ -52,6 +52,7 @@ RUN wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
 # Python Requirements
 WORKDIR /tmp
 COPY ./requirements.txt /tmp
+RUN sed -i 's/<cgraph.h>/"cgraph.h"/g' /usr/include/graphviz/types.h
 RUN pip install -r requirements.txt \
     && rm /tmp/requirements.txt
 
