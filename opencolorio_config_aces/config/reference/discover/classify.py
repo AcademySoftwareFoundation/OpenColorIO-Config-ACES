@@ -929,7 +929,7 @@ CTLTransform` class are tried on the underlying
          Returns
          -------
          bool
-             Is given object notequal to *ACES* *CTL* transform.
+             Is given object not equal to *ACES* *CTL* transform.
         """
 
         return not (self == other)
@@ -937,7 +937,6 @@ CTLTransform` class are tried on the underlying
     def _parse(self):
         """
         Parses the *ACES* *CTL* transform.
-
         """
 
         with open(self._path) as ctl_file:
@@ -1116,7 +1115,7 @@ class CTLTransformPair:
          Returns
          -------
          bool
-             Is given object notequal to *ACES* *CTL* transform pair.
+             Is given object not equal to *ACES* *CTL* transform pair.
         """
 
         return not (self == other)
@@ -1170,7 +1169,7 @@ def find_ctl_transform_pairs(ctl_transforms):
 def discover_aces_ctl_transforms(root_directory=ACES_CTL_TRANSFORMS_ROOT):
     """
     Discovers the *ACES* *CTL* transform paths in given root directory: The
-    given directory is traversed and `*.ctl` files are collected.
+    given directory is traversed and the `*.ctl` files are collected.
 
     Parameters
     ----------
@@ -1421,7 +1420,7 @@ reference.ACES_CTL_TRANSFORMS_ROOT` attribute using the
         *output_transform*, and *genus* e.g. *dcdm* using the
         :func:`opencolorio_config_aces.classify_aces_ctl_transforms`
         definition.
-    -   The resulting datastructure is printed.
+    -   The resulting data structure is printed.
     """
 
     classified_ctl_transforms = classify_aces_ctl_transforms(
