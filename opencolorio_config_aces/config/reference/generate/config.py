@@ -56,7 +56,8 @@ __all__ = [
 
 ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH = (
     Path(__file__).parents[0] / 'resources' /
-    'OpenColorIO-ACES-Config Transforms - Reference Config - Mapping.csv')
+    'OpenColorIO-Config-ACES _Reference_ Transforms - '
+    'Reference Config - Mapping.csv')
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 
@@ -142,8 +143,9 @@ COLORSPACE_NAME_SUBSTITUTION_PATTERNS.update({
 
 LOOK_NAME_SUBSTITUTION_PATTERNS = {
     # TODO: Implement support for callable patterns.
-    # The following one should be a dedicated definition/callable.
-    'BlueLightArtifactFix': 'Blue Light Artifact Fix'
+    # The following ones should be a dedicated definition/callable.
+    'BlueLightArtifactFix': 'Blue Light Artifact Fix',
+    'GamutCompress': 'ACES 1.3 Reference Gamut Compression',
 }
 """
 *OpenColorIO* look name substitution patterns.
