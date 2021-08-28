@@ -139,6 +139,7 @@ def group_transform_factory(transforms):
 def colorspace_factory(name,
                        family=None,
                        encoding=None,
+                       aliases=None,
                        categories=None,
                        description=None,
                        equality_group=None,
@@ -162,6 +163,8 @@ def colorspace_factory(name,
         *OpenColorIO* colorspace family.
     encoding : unicode, optional
         *OpenColorIO* colorspace encoding.
+    aliases : unicode or array_like, optional
+        *OpenColorIO* colorspace aliases.
     categories : unicode or array_like, optional
         *OpenColorIO* colorspace categories.
     description : unicode, optional
@@ -197,9 +200,6 @@ def colorspace_factory(name,
     """
 
     import PyOpenColorIO as ocio
-
-    if categories is None:
-        categories = []
 
     if bit_depth is None:
         bit_depth = ocio.BIT_DEPTH_F32
@@ -242,6 +242,13 @@ def colorspace_factory(name,
 
     if encoding is not None:
         colorspace.setEncoding(encoding)
+
+    if aliases is not None:
+        if isinstance(aliases, str):
+            aliases = [aliases]
+
+        for alias in aliases:
+            colorspace.addAlias(alias)
 
     if categories is not None:
         if isinstance(categories, str):
@@ -829,7 +836,11 @@ if __name__ == '__main__':
     generate_config(data, os.path.join(build_directory, 'config-v1.ocio'))
 
     # "OpenColorIO 2" configuration.
-    colorspace_1 = {'name': 'ACES - ACES2065-1', 'family': 'ACES'}
+    colorspace_1 = {
+        'name': 'ACES - ACES2065-1',
+        'family': 'ACES',
+        'aliases': 'lin_ap0'
+    }
     colorspace_2 = {
         'name': 'ACES - ACEScg',
         'family': 'ACES',
@@ -837,6 +848,7 @@ if __name__ == '__main__':
             'name': 'BuiltinTransform',
             'style': 'ACEScg_to_ACES2065-1',
         },
+        'aliases': ['lin_ap1']
     }
     colorspace_3 = {
         'name': 'Gamut - sRGB',
