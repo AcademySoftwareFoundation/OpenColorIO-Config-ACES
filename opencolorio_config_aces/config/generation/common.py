@@ -751,8 +751,8 @@ if __name__ == '__main__':
                         'only a placeholder!'),
         'to_reference': {
             'name': 'ExponentTransform',
-            'value': [2.2, 2.2, 2.2, 1],
-        },
+            'value': [2.2, 2.2, 2.2, 1]
+        }
     }
     colorspace_3 = {
         'name': 'Colorspace - sRGB',
@@ -761,7 +761,7 @@ if __name__ == '__main__':
             'name': 'ColorSpaceTransform',
             'src': 'CCTF - sRGB',
             'dst': 'Gamut - sRGB',
-        },
+        }
     }
     colorspace_4 = colorspace_factory(**{
         'name': 'Utility - Raw',
@@ -796,7 +796,7 @@ if __name__ == '__main__':
                 _gain_cdl_transform,
             ],
             _gain_cdl_transform,
-        ],
+        ]
     }
     display_1 = {
         'name': 'View - sRGB Monitor - sRGB',
@@ -814,12 +814,12 @@ if __name__ == '__main__':
             {
                 'display': 'sRGB Monitor',
                 'view': 'sRGB - sRGB',
-                'colorspace': display_1['name'],
+                'colorspace': display_1['name']
             },
             {
                 'display': 'sRGB Monitor',
                 'view': 'Raw',
-                'colorspace': colorspace_4.getName(),
+                'colorspace': colorspace_4.getName()
             },
         ],
         active_displays=['sRGB Monitor'],
@@ -861,7 +861,7 @@ if __name__ == '__main__':
                 0.0000000000,
                 0.0000000000,
                 1.0000000000,
-            ],
+            ]
         }
     }
     colorspace_4 = {
@@ -870,7 +870,7 @@ if __name__ == '__main__':
         'to_reference': {
             'name': 'ExponentWithLinearTransform',
             'gamma': [2.4, 2.4, 2.4, 1],
-            'offset': [0.055, 0.055, 0.055, 0],
+            'offset': [0.055, 0.055, 0.055, 0]
         }
     }
     colorspace_5 = {
@@ -884,7 +884,7 @@ if __name__ == '__main__':
         'forward_transform': {
             'name': 'CDLTransform',
             'slope': [0, 0, 0],
-            'offset': [1, 0, 0],
+            'offset': [1, 0, 0]
         }
     }
 
@@ -912,14 +912,14 @@ if __name__ == '__main__':
         'from_reference': {
             'name': 'BuiltinTransform',
             'style': 'ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0'
-        },
+        }
     }
     view_transform_2 = {
         'name': 'Output - No Tonescale',
         'from_reference': {
             'name': 'BuiltinTransform',
             'style': 'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'
-        },
+        }
     }
 
     displays = (display_1, display_2)
@@ -927,7 +927,7 @@ if __name__ == '__main__':
     shared_views = [{
         'display': display['name'],
         'view': view_transform['name'],
-        'view_transform': view_transform['name'],
+        'view_transform': view_transform['name']
     } for display in displays for view_transform in view_transforms]
 
     data = ConfigData(
@@ -935,7 +935,7 @@ if __name__ == '__main__':
         roles={
             'aces_interchange': 'ACES - ACES2065-1',
             'cie_xyz_d65_interchange': 'CIE-XYZ D65',
-            ocio.ROLE_SCENE_LINEAR: colorspace_2['name'],
+            ocio.ROLE_SCENE_LINEAR: colorspace_2['name']
         },
         colorspaces=[
             colorspace_1, colorspace_2, colorspace_3, colorspace_4,
