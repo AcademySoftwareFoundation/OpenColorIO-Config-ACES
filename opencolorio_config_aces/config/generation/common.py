@@ -183,8 +183,7 @@ def colorspace_factory(name,
     is_data : bool, optional
         Whether the colorspace represents data.
     base_colorspace : dict or ColorSpace, optional
-        *OpenColorIO* base colorspace inherited for bit depth, allocation,
-        allocation variables, and to/from reference transforms.
+        *OpenColorIO* base colorspace inherited for initial attribute values.
 
     Other Parameters
     ----------------
@@ -287,13 +286,14 @@ def view_transform_factory(name,
     description : unicode, optional
         *OpenColorIO* view transform description.
     to_reference : dict or object, optional
-        *To Reference* *OpenColorIO* view transform transform.
+        *To Reference* *OpenColorIO* view transform.
     from_reference : dict or object, optional
-        *From Reference* *OpenColorIO* view transform transform.
+        *From Reference* *OpenColorIO* view transform.
     reference_space : unicode or ReferenceSpaceType, optional
         *OpenColorIO* view transform reference space.
     base_view_transform : dict or ViewTransform, optional
-        Inherited *OpenColorIO* base view transform.
+        *OpenColorIO* base view transform inherited for initial attribute
+        values.
 
     Other Parameters
     ----------------
@@ -373,7 +373,7 @@ def look_factory(name,
     inverse_transform : dict or object, optional
         *From Reference* *OpenColorIO* look transform.
     base_look : dict or ViewTransform, optional
-        Inherited *OpenColorIO* base look.
+        *OpenColorIO* base look inherited for initial attribute values.
 
     Other Parameters
     ----------------
@@ -432,13 +432,18 @@ class ConfigData:
         Config roles, a dict of role and colorspace name.
     colorspaces : array_like
         Config colorspaces, an iterable of
-        :attr:`PyOpenColorIO.ColorSpace` class instances.
-    looks : array_like, optional
-        Config looks, an iterable of :attr:`PyOpenColorIO.Look` class
-        instances.
+        :attr:`PyOpenColorIO.ColorSpace` class instances or mappings to create
+        them with :func:`opencolorio_config_aces.colorspace_factory`
+        definition.
     view_transforms : array_like, optional
         Config view transforms, an iterable of
-        :attr:`PyOpenColorIO.ViewTransform` class instances.
+        :attr:`PyOpenColorIO.ViewTransform` class instances or mappings to
+        create them with :func:`opencolorio_config_aces.view_transform_factory`
+        definition.
+    looks : array_like, optional
+        Config looks, an iterable of :attr:`PyOpenColorIO.Look` class
+        instances or mappings to create them with
+        :func:`opencolorio_config_aces.look_factory` definition.
     shared_views : array_like, optional
         Config shared views, an iterable of dicts of view, view transform,
         colorspace and rule names, iterable of looks and description.
@@ -466,8 +471,8 @@ class ConfigData:
     search_path
     roles
     colorspaces
-    looks
     view_transforms
+    looks
     shared_views
     views
     active_displays
@@ -485,8 +490,8 @@ class ConfigData:
     search_path: Union[list] = field(default_factory=list)
     roles: Union[dict, OrderedDict] = field(default_factory=dict)
     colorspaces: Union[list] = field(default_factory=list)
-    looks: Union[list] = field(default_factory=list)
     view_transforms: Union[list] = field(default_factory=list)
+    looks: Union[list] = field(default_factory=list)
     shared_views: Union[list] = field(default_factory=list)
     views: Union[list] = field(default_factory=list)
     active_displays: Union[list] = field(default_factory=list)
