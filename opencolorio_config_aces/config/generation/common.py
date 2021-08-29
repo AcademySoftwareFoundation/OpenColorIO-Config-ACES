@@ -10,6 +10,7 @@ Defines various objects related to *OpenColorIO* config generation:
 -   :func:`opencolorio_config_aces.transform_factory`
 -   :func:`opencolorio_config_aces.group_transform_factory`
 -   :func:`opencolorio_config_aces.colorspace_factory`
+-   :func:`opencolorio_config_aces.named_transform_factory`
 -   :func:`opencolorio_config_aces.view_transform_factory`
 -   :func:`opencolorio_config_aces.look_factory`
 -   :class:`opencolorio_config_aces.ConfigData`
@@ -37,9 +38,10 @@ __status__ = 'Production'
 
 __all__ = [
     'LOG_ALLOCATION_VARS', 'produce_transform', 'transform_factory',
-    'group_transform_factory', 'colorspace_factory', 'view_transform_factory',
-    'look_factory', 'ConfigData', 'deserialize_config_data',
-    'serialize_config_data', 'validate_config', 'generate_config'
+    'group_transform_factory', 'colorspace_factory', 'named_transform_factory',
+    'view_transform_factory', 'look_factory', 'ConfigData',
+    'deserialize_config_data', 'serialize_config_data', 'validate_config',
+    'generate_config'
 ]
 
 LOG_ALLOCATION_VARS = (-8, 5, 2**-8)
@@ -270,6 +272,102 @@ def colorspace_factory(name,
 
 
 @required('OpenColorIO')
+def named_transform_factory(name,
+                            family=None,
+                            encoding=None,
+                            aliases=None,
+                            categories=None,
+                            description=None,
+                            forward_transform=None,
+                            inverse_transform=None,
+                            base_named_transform=None,
+                            **kwargs):
+    """
+    *OpenColorIO* named transform factory.
+
+    Parameters
+    ----------
+    name : unicode
+        *OpenColorIO* colorspace name.
+    family : unicode, optional
+        *OpenColorIO* colorspace family.
+    encoding : unicode, optional
+        *OpenColorIO* colorspace encoding.
+    aliases : unicode or array_like, optional
+        *OpenColorIO* colorspace aliases.
+    categories : unicode or array_like, optional
+        *OpenColorIO* colorspace categories.
+    description : unicode, optional
+        *OpenColorIO* colorspace description.
+    forward_transform : dict or object, optional
+        *Forward* *OpenColorIO* transform.
+    inverse_transform : dict or object, optional
+        *Inverse* *OpenColorIO* transform.
+    base_named_transform : dict or NamedTransform, optional
+        *OpenColorIO* base named transform inherited for initial attribute
+        values.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments.
+
+    Returns
+    -------
+    NamedTransform
+        *OpenColorIO* named transform.
+    """
+
+    import PyOpenColorIO as ocio
+
+    if base_named_transform is not None:
+        if isinstance(base_named_transform, Mapping):
+            base_named_transform = named_transform_factory(
+                **base_named_transform)
+
+        named_transform = base_named_transform
+    else:
+        named_transform = ocio.NamedTransform()
+
+        if forward_transform is not None:
+            named_transform.setTransform(
+                produce_transform(forward_transform),
+                ocio.TRANSFORM_DIR_FORWARD)
+
+        if inverse_transform is not None:
+            named_transform.setTransform(
+                produce_transform(inverse_transform),
+                ocio.TRANSFORM_DIR_INVERSE)
+
+    named_transform.setName(name)
+
+    if family is not None:
+        named_transform.setFamily(family)
+
+    if encoding is not None:
+        named_transform.setEncoding(encoding)
+
+    if aliases is not None:
+        if isinstance(aliases, str):
+            aliases = [aliases]
+
+        for alias in aliases:
+            named_transform.addAlias(alias)
+
+    if categories is not None:
+        if isinstance(categories, str):
+            categories = re.split('[,;\\s]+', categories)
+
+        for category in categories:
+            named_transform.addCategory(category)
+
+    if description is not None:
+        named_transform.setDescription(description)
+
+    return named_transform
+
+
+@required('OpenColorIO')
 def view_transform_factory(name,
                            family=None,
                            categories=None,
@@ -442,6 +540,11 @@ class ConfigData:
         :attr:`PyOpenColorIO.ColorSpace` class instances or mappings to create
         them with :func:`opencolorio_config_aces.colorspace_factory`
         definition.
+    named_transforms : array_like
+        Config named transforms, an iterable of
+        :attr:`PyOpenColorIO.NamedTransfom` class instances or mappings to
+        create them with
+        :func:`opencolorio_config_aces.named_transform_factory` definition.
     view_transforms : array_like, optional
         Config view transforms, an iterable of
         :attr:`PyOpenColorIO.ViewTransform` class instances or mappings to
@@ -478,6 +581,7 @@ class ConfigData:
     search_path
     roles
     colorspaces
+    named_transforms
     view_transforms
     looks
     shared_views
@@ -497,6 +601,7 @@ class ConfigData:
     search_path: Union[list] = field(default_factory=list)
     roles: Union[dict, OrderedDict] = field(default_factory=dict)
     colorspaces: Union[list] = field(default_factory=list)
+    named_transforms: Union[list] = field(default_factory=list)
     view_transforms: Union[list] = field(default_factory=list)
     looks: Union[list] = field(default_factory=list)
     shared_views: Union[list] = field(default_factory=list)
@@ -617,6 +722,13 @@ def generate_config(data, config_name=None, validate=True):
 
         logging.debug(f'Adding "{colorspace.getName()}" colorspace.')
         config.addColorSpace(colorspace)
+
+    for named_transform in data.named_transforms:
+        if isinstance(named_transform, Mapping):
+            named_transform = named_transform_factory(**named_transform)
+
+        logging.debug(f'Adding "{named_transform.getName()}" named transform.')
+        config.addNamedTransform(named_transform)
 
     for view_transform in data.view_transforms:
         if isinstance(view_transform, Mapping):
@@ -891,6 +1003,32 @@ if __name__ == '__main__':
         'is_data': True
     }
 
+    named_transform_1 = {
+        'name': '+1 Stop',
+        'family': 'Exposure',
+        'forward_transform': {
+            'name':
+            'MatrixTransform',
+            'matrix': [
+                2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+            ]
+        }
+    }
     look_1 = {
         'name': 'Look - Red',
         'forward_transform': {
@@ -953,6 +1091,7 @@ if __name__ == '__main__':
             colorspace_1, colorspace_2, colorspace_3, colorspace_4,
             colorspace_5, interchange, display_1, display_2
         ],
+        named_transforms=[named_transform_1],
         looks=[look_1],
         view_transforms=[view_transform_1, view_transform_2],
         inactive_colorspaces=['CIE-XYZ D65'],

@@ -21,6 +21,7 @@ Config Generation Common Objects
     transform_factory
     group_transform_factory
     colorspace_factory
+    named_transform_factory
     view_transform_factory
     look_factory
     ConfigData
