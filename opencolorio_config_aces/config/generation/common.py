@@ -680,7 +680,7 @@ def validate_config(config):
 
 
 @required('OpenColorIO')
-def generate_config(data, config_name=None, validate=True):
+def generate_config(data, config_name=None, validate=True, base_config=None):
     """
     Generates the *OpenColorIO* config from given data.
 
@@ -693,6 +693,8 @@ def generate_config(data, config_name=None, validate=True):
         disk.
     validate : bool, optional
         Whether to validate the config.
+    base_config : bool, optional
+        *OpenColorIO* base config inherited for initial data.
 
     Returns
     -------
@@ -702,8 +704,11 @@ def generate_config(data, config_name=None, validate=True):
 
     import PyOpenColorIO as ocio
 
-    config = ocio.Config()
-    config.setMajorVersion(data.profile_version)
+    if base_config is not None:
+        config = base_config
+    else:
+        config = ocio.Config()
+        config.setMajorVersion(data.profile_version)
 
     if data.description is not None:
         config.setDescription(data.description)
@@ -791,44 +796,49 @@ def generate_config(data, config_name=None, validate=True):
             logging.debug(f'Adding "{view}" view to "{display}" display.')
             config.addDisplaySharedView(display, view)
 
-    logging.debug(f'Activating "{data.active_displays}" displays.')
-    config.setActiveDisplays(','.join(data.active_displays))
+    if data.active_displays:
+        logging.debug(f'Activating "{data.active_displays}" displays.')
+        config.setActiveDisplays(','.join(data.active_displays))
 
-    logging.debug(f'Activating "{data.active_views}" views.')
-    config.setActiveViews(','.join(data.active_views))
+    if data.active_views:
+        logging.debug(f'Activating "{data.active_views}" views.')
+        config.setActiveViews(','.join(data.active_views))
 
-    file_rules = ocio.FileRules()
-    rule_index = 0
-    for file_rule in reversed(data.file_rules):
-        name = file_rule['name']
-        colorspace = file_rule['colorspace']
-        regex = file_rule.get('regex')
-        pattern = file_rule.get('pattern')
-        extension = file_rule.get('extension')
-        if name == 'Default':
-            logging.debug(f'Setting "{name}" file rule with '
-                          f'"{colorspace}" colorspace.')
-            file_rules.setDefaultRuleColorSpace(colorspace)
-        elif regex:
-            logging.debug(f'Adding "{name}" file rule with '
-                          f'"{regex}" regex pattern for '
-                          f'"{colorspace}" colorspace.')
-            file_rules.insertRule(rule_index, name, colorspace, regex)
-            rule_index += 1
-        else:
-            logging.debug(f'Adding "{name}" file rule with '
-                          f'"{pattern}" pattern and "{extension}" extension '
-                          f'for "{colorspace}" colorspace.')
-            file_rules.insertRule(rule_index, name, colorspace, pattern,
-                                  extension)
-            rule_index += 1
-    config.setFileRules(file_rules)
+    if data.file_rules:
+        file_rules = ocio.FileRules()
+        rule_index = 0
+        for file_rule in reversed(data.file_rules):
+            name = file_rule['name']
+            colorspace = file_rule['colorspace']
+            regex = file_rule.get('regex')
+            pattern = file_rule.get('pattern')
+            extension = file_rule.get('extension')
+            if name == 'Default':
+                logging.debug(f'Setting "{name}" file rule with '
+                              f'"{colorspace}" colorspace.')
+                file_rules.setDefaultRuleColorSpace(colorspace)
+            elif regex:
+                logging.debug(f'Adding "{name}" file rule with '
+                              f'"{regex}" regex pattern for '
+                              f'"{colorspace}" colorspace.')
+                file_rules.insertRule(rule_index, name, colorspace, regex)
+                rule_index += 1
+            else:
+                logging.debug(
+                    f'Adding "{name}" file rule with '
+                    f'"{pattern}" pattern and "{extension}" extension '
+                    f'for "{colorspace}" colorspace.')
+                file_rules.insertRule(rule_index, name, colorspace, pattern,
+                                      extension)
+                rule_index += 1
+        config.setFileRules(file_rules)
 
-    viewing_rules = ocio.ViewingRules()
-    for i, viewing_rule in enumerate(reversed(data.viewing_rules)):
-        logging.warning('Inserting a viewing rule is not supported yet!')
-        # viewing_rules.insertRule()
-    config.setViewingRules(viewing_rules)
+    if data.viewing_rules:
+        viewing_rules = ocio.ViewingRules()
+        for i, viewing_rule in enumerate(reversed(data.viewing_rules)):
+            logging.warning('Inserting a viewing rule is not supported yet!')
+            # viewing_rules.insertRule()
+        config.setViewingRules(viewing_rules)
 
     if data.default_view_transform is not None:
         config.setDefaultViewTransformName(data.default_view_transform)
@@ -1123,7 +1133,45 @@ if __name__ == '__main__':
         ],
         viewing_rules=[])
 
-    generate_config(data, os.path.join(build_directory, 'config-v2.ocio'))
+    config = generate_config(data,
+                             os.path.join(build_directory, 'config-v2.ocio'))
 
     serialize_config_data(data, os.path.join(build_directory,
                                              'config-v2.json'))
+
+    named_transform_2 = {
+        'name': '-1 Stop',
+        'family': 'Exposure',
+        'forward_transform': {
+            'name':
+            'MatrixTransform',
+            'matrix': [
+                -2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                -2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                -2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+            ]
+        }
+    }
+
+    data = ConfigData(named_transforms=[named_transform_2])
+
+    generate_config(
+        data,
+        os.path.join(build_directory, 'config-v3.ocio'),
+        base_config=config)
+
+    serialize_config_data(data, os.path.join(build_directory,
+                                             'config-v3.json'))
