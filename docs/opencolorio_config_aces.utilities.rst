@@ -33,3 +33,4 @@ Common
     is_string
     is_iterable
     git_describe
+    matrix_3x3_to_4x4

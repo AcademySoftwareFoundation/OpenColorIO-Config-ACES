@@ -25,20 +25,7 @@ __maintainer__ = 'OpenColorIO Contributors'
 __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
-__all__ = ['matrix_3x3_to_4x4', 'generate_clf', 'generate_clf_common']
-
-
-def matrix_3x3_to_4x4(M):
-    """
-    Converts given 3x3 matrix :math:`M` to a raveled 4x4 matrix.
-    """
-
-    import numpy as np
-
-    M_I = np.identity(4)
-    M_I[:3, :3] = M
-
-    return np.ravel(M_I).tolist()
+__all__ = ['generate_clf', 'generate_clf_common']
 
 
 @required('OpenColorIO')

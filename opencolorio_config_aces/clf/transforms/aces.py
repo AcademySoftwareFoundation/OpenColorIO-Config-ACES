@@ -11,9 +11,9 @@ Defines various objects related to the generation of the *ACES* specific
 import logging
 from pathlib import Path
 
-from opencolorio_config_aces.clf import generate_clf, matrix_3x3_to_4x4
+from opencolorio_config_aces.clf import generate_clf
 from opencolorio_config_aces.config.generation import transform_factory
-from opencolorio_config_aces.utilities import required
+from opencolorio_config_aces.utilities import matrix_3x3_to_4x4, required
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'

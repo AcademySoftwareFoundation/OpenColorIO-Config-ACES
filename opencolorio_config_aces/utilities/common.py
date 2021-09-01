@@ -26,7 +26,7 @@ __all__ = [
     'vivification', 'vivified_to_dict', 'message_box', 'is_colour_installed',
     'is_jsonpickle_installed', 'is_networkx_installed',
     'is_opencolorio_installed', 'REQUIREMENTS_TO_CALLABLE', 'required',
-    'is_string', 'is_iterable', 'git_describe'
+    'is_string', 'is_iterable', 'git_describe', 'matrix_3x3_to_4x4'
 ]
 
 
@@ -505,3 +505,29 @@ def git_describe():
         version = opencolorio_config_aces.__version__
 
     return version
+
+
+# TODO: Numpy currently comes via "Colour", we might want that to be an
+# explicit dependency in the future.
+@required('Colour')
+def matrix_3x3_to_4x4(M):
+    """
+    Converts given 3x3 matrix :math:`M` to a raveled 4x4 matrix.
+
+    Parameters
+    ----------
+    M : array_like
+        3x3 matrix :math:`M` to convert.
+
+    Returns
+    -------
+    list
+        Raveled 4x4 matrix.
+    """
+
+    import numpy as np
+
+    M_I = np.identity(4)
+    M_I[:3, :3] = M
+
+    return np.ravel(M_I).tolist()
