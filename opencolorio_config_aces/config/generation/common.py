@@ -10,6 +10,7 @@ Defines various objects related to *OpenColorIO* config generation:
 -   :func:`opencolorio_config_aces.transform_factory`
 -   :func:`opencolorio_config_aces.group_transform_factory`
 -   :func:`opencolorio_config_aces.colorspace_factory`
+-   :func:`opencolorio_config_aces.named_transform_factory`
 -   :func:`opencolorio_config_aces.view_transform_factory`
 -   :func:`opencolorio_config_aces.look_factory`
 -   :class:`opencolorio_config_aces.ConfigData`
@@ -37,9 +38,10 @@ __status__ = 'Production'
 
 __all__ = [
     'LOG_ALLOCATION_VARS', 'produce_transform', 'transform_factory',
-    'group_transform_factory', 'colorspace_factory', 'view_transform_factory',
-    'look_factory', 'ConfigData', 'deserialize_config_data',
-    'serialize_config_data', 'validate_config', 'generate_config'
+    'group_transform_factory', 'colorspace_factory', 'named_transform_factory',
+    'view_transform_factory', 'look_factory', 'ConfigData',
+    'deserialize_config_data', 'serialize_config_data', 'validate_config',
+    'generate_config'
 ]
 
 LOG_ALLOCATION_VARS = (-8, 5, 2**-8)
@@ -139,6 +141,7 @@ def group_transform_factory(transforms):
 def colorspace_factory(name,
                        family=None,
                        encoding=None,
+                       aliases=None,
                        categories=None,
                        description=None,
                        equality_group=None,
@@ -162,6 +165,8 @@ def colorspace_factory(name,
         *OpenColorIO* colorspace family.
     encoding : unicode, optional
         *OpenColorIO* colorspace encoding.
+    aliases : unicode or array_like, optional
+        *OpenColorIO* colorspace aliases.
     categories : unicode or array_like, optional
         *OpenColorIO* colorspace categories.
     description : unicode, optional
@@ -183,8 +188,7 @@ def colorspace_factory(name,
     is_data : bool, optional
         Whether the colorspace represents data.
     base_colorspace : dict or ColorSpace, optional
-        *OpenColorIO* base colorspace inherited for bit depth, allocation,
-        allocation variables, and to/from reference transforms.
+        *OpenColorIO* base colorspace inherited for initial attribute values.
 
     Other Parameters
     ----------------
@@ -198,9 +202,6 @@ def colorspace_factory(name,
     """
 
     import PyOpenColorIO as ocio
-
-    if categories is None:
-        categories = []
 
     if bit_depth is None:
         bit_depth = ocio.BIT_DEPTH_F32
@@ -244,6 +245,13 @@ def colorspace_factory(name,
     if encoding is not None:
         colorspace.setEncoding(encoding)
 
+    if aliases is not None:
+        if isinstance(aliases, str):
+            aliases = [aliases]
+
+        for alias in aliases:
+            colorspace.addAlias(alias)
+
     if categories is not None:
         if isinstance(categories, str):
             categories = re.split('[,;\\s]+', categories)
@@ -261,6 +269,102 @@ def colorspace_factory(name,
         colorspace.setIsData(is_data)
 
     return colorspace
+
+
+@required('OpenColorIO')
+def named_transform_factory(name,
+                            family=None,
+                            encoding=None,
+                            aliases=None,
+                            categories=None,
+                            description=None,
+                            forward_transform=None,
+                            inverse_transform=None,
+                            base_named_transform=None,
+                            **kwargs):
+    """
+    *OpenColorIO* named transform factory.
+
+    Parameters
+    ----------
+    name : unicode
+        *OpenColorIO* colorspace name.
+    family : unicode, optional
+        *OpenColorIO* colorspace family.
+    encoding : unicode, optional
+        *OpenColorIO* colorspace encoding.
+    aliases : unicode or array_like, optional
+        *OpenColorIO* colorspace aliases.
+    categories : unicode or array_like, optional
+        *OpenColorIO* colorspace categories.
+    description : unicode, optional
+        *OpenColorIO* colorspace description.
+    forward_transform : dict or object, optional
+        *Forward* *OpenColorIO* transform.
+    inverse_transform : dict or object, optional
+        *Inverse* *OpenColorIO* transform.
+    base_named_transform : dict or NamedTransform, optional
+        *OpenColorIO* base named transform inherited for initial attribute
+        values.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments.
+
+    Returns
+    -------
+    NamedTransform
+        *OpenColorIO* named transform.
+    """
+
+    import PyOpenColorIO as ocio
+
+    if base_named_transform is not None:
+        if isinstance(base_named_transform, Mapping):
+            base_named_transform = named_transform_factory(
+                **base_named_transform)
+
+        named_transform = base_named_transform
+    else:
+        named_transform = ocio.NamedTransform()
+
+        if forward_transform is not None:
+            named_transform.setTransform(
+                produce_transform(forward_transform),
+                ocio.TRANSFORM_DIR_FORWARD)
+
+        if inverse_transform is not None:
+            named_transform.setTransform(
+                produce_transform(inverse_transform),
+                ocio.TRANSFORM_DIR_INVERSE)
+
+    named_transform.setName(name)
+
+    if family is not None:
+        named_transform.setFamily(family)
+
+    if encoding is not None:
+        named_transform.setEncoding(encoding)
+
+    if aliases is not None:
+        if isinstance(aliases, str):
+            aliases = [aliases]
+
+        for alias in aliases:
+            named_transform.addAlias(alias)
+
+    if categories is not None:
+        if isinstance(categories, str):
+            categories = re.split('[,;\\s]+', categories)
+
+        for category in categories:
+            named_transform.addCategory(category)
+
+    if description is not None:
+        named_transform.setDescription(description)
+
+    return named_transform
 
 
 @required('OpenColorIO')
@@ -287,13 +391,14 @@ def view_transform_factory(name,
     description : unicode, optional
         *OpenColorIO* view transform description.
     to_reference : dict or object, optional
-        *To Reference* *OpenColorIO* view transform transform.
+        *To Reference* *OpenColorIO* view transform.
     from_reference : dict or object, optional
-        *From Reference* *OpenColorIO* view transform transform.
+        *From Reference* *OpenColorIO* view transform.
     reference_space : unicode or ReferenceSpaceType, optional
         *OpenColorIO* view transform reference space.
     base_view_transform : dict or ViewTransform, optional
-        Inherited *OpenColorIO* base view transform.
+        *OpenColorIO* base view transform inherited for initial attribute
+        values.
 
     Other Parameters
     ----------------
@@ -373,7 +478,7 @@ def look_factory(name,
     inverse_transform : dict or object, optional
         *From Reference* *OpenColorIO* look transform.
     base_look : dict or ViewTransform, optional
-        Inherited *OpenColorIO* base look.
+        *OpenColorIO* base look inherited for initial attribute values.
 
     Other Parameters
     ----------------
@@ -432,13 +537,23 @@ class ConfigData:
         Config roles, a dict of role and colorspace name.
     colorspaces : array_like
         Config colorspaces, an iterable of
-        :attr:`PyOpenColorIO.ColorSpace` class instances.
-    looks : array_like, optional
-        Config looks, an iterable of :attr:`PyOpenColorIO.Look` class
-        instances.
+        :attr:`PyOpenColorIO.ColorSpace` class instances or mappings to create
+        them with :func:`opencolorio_config_aces.colorspace_factory`
+        definition.
+    named_transforms : array_like
+        Config named transforms, an iterable of
+        :attr:`PyOpenColorIO.NamedTransfom` class instances or mappings to
+        create them with
+        :func:`opencolorio_config_aces.named_transform_factory` definition.
     view_transforms : array_like, optional
         Config view transforms, an iterable of
-        :attr:`PyOpenColorIO.ViewTransform` class instances.
+        :attr:`PyOpenColorIO.ViewTransform` class instances or mappings to
+        create them with :func:`opencolorio_config_aces.view_transform_factory`
+        definition.
+    looks : array_like, optional
+        Config looks, an iterable of :attr:`PyOpenColorIO.Look` class
+        instances or mappings to create them with
+        :func:`opencolorio_config_aces.look_factory` definition.
     shared_views : array_like, optional
         Config shared views, an iterable of dicts of view, view transform,
         colorspace and rule names, iterable of looks and description.
@@ -466,8 +581,9 @@ class ConfigData:
     search_path
     roles
     colorspaces
-    looks
+    named_transforms
     view_transforms
+    looks
     shared_views
     views
     active_displays
@@ -485,8 +601,9 @@ class ConfigData:
     search_path: Union[list] = field(default_factory=list)
     roles: Union[dict, OrderedDict] = field(default_factory=dict)
     colorspaces: Union[list] = field(default_factory=list)
-    looks: Union[list] = field(default_factory=list)
+    named_transforms: Union[list] = field(default_factory=list)
     view_transforms: Union[list] = field(default_factory=list)
+    looks: Union[list] = field(default_factory=list)
     shared_views: Union[list] = field(default_factory=list)
     views: Union[list] = field(default_factory=list)
     active_displays: Union[list] = field(default_factory=list)
@@ -563,7 +680,7 @@ def validate_config(config):
 
 
 @required('OpenColorIO')
-def generate_config(data, config_name=None, validate=True):
+def generate_config(data, config_name=None, validate=True, base_config=None):
     """
     Generates the *OpenColorIO* config from given data.
 
@@ -576,6 +693,8 @@ def generate_config(data, config_name=None, validate=True):
         disk.
     validate : bool, optional
         Whether to validate the config.
+    base_config : bool, optional
+        *OpenColorIO* base config inherited for initial data.
 
     Returns
     -------
@@ -585,8 +704,11 @@ def generate_config(data, config_name=None, validate=True):
 
     import PyOpenColorIO as ocio
 
-    config = ocio.Config()
-    config.setMajorVersion(data.profile_version)
+    if base_config is not None:
+        config = base_config
+    else:
+        config = ocio.Config()
+        config.setMajorVersion(data.profile_version)
 
     if data.description is not None:
         config.setDescription(data.description)
@@ -605,6 +727,13 @@ def generate_config(data, config_name=None, validate=True):
 
         logging.debug(f'Adding "{colorspace.getName()}" colorspace.')
         config.addColorSpace(colorspace)
+
+    for named_transform in data.named_transforms:
+        if isinstance(named_transform, Mapping):
+            named_transform = named_transform_factory(**named_transform)
+
+        logging.debug(f'Adding "{named_transform.getName()}" named transform.')
+        config.addNamedTransform(named_transform)
 
     for view_transform in data.view_transforms:
         if isinstance(view_transform, Mapping):
@@ -667,44 +796,49 @@ def generate_config(data, config_name=None, validate=True):
             logging.debug(f'Adding "{view}" view to "{display}" display.')
             config.addDisplaySharedView(display, view)
 
-    logging.debug(f'Activating "{data.active_displays}" displays.')
-    config.setActiveDisplays(','.join(data.active_displays))
+    if data.active_displays:
+        logging.debug(f'Activating "{data.active_displays}" displays.')
+        config.setActiveDisplays(','.join(data.active_displays))
 
-    logging.debug(f'Activating "{data.active_views}" views.')
-    config.setActiveViews(','.join(data.active_views))
+    if data.active_views:
+        logging.debug(f'Activating "{data.active_views}" views.')
+        config.setActiveViews(','.join(data.active_views))
 
-    file_rules = ocio.FileRules()
-    rule_index = 0
-    for file_rule in reversed(data.file_rules):
-        name = file_rule['name']
-        colorspace = file_rule['colorspace']
-        regex = file_rule.get('regex')
-        pattern = file_rule.get('pattern')
-        extension = file_rule.get('extension')
-        if name == 'Default':
-            logging.debug(f'Setting "{name}" file rule with '
-                          f'"{colorspace}" colorspace.')
-            file_rules.setDefaultRuleColorSpace(colorspace)
-        elif regex:
-            logging.debug(f'Adding "{name}" file rule with '
-                          f'"{regex}" regex pattern for '
-                          f'"{colorspace}" colorspace.')
-            file_rules.insertRule(rule_index, name, colorspace, regex)
-            rule_index += 1
-        else:
-            logging.debug(f'Adding "{name}" file rule with '
-                          f'"{pattern}" pattern and "{extension}" extension '
-                          f'for "{colorspace}" colorspace.')
-            file_rules.insertRule(rule_index, name, colorspace, pattern,
-                                  extension)
-            rule_index += 1
-    config.setFileRules(file_rules)
+    if data.file_rules:
+        file_rules = ocio.FileRules()
+        rule_index = 0
+        for file_rule in reversed(data.file_rules):
+            name = file_rule['name']
+            colorspace = file_rule['colorspace']
+            regex = file_rule.get('regex')
+            pattern = file_rule.get('pattern')
+            extension = file_rule.get('extension')
+            if name == 'Default':
+                logging.debug(f'Setting "{name}" file rule with '
+                              f'"{colorspace}" colorspace.')
+                file_rules.setDefaultRuleColorSpace(colorspace)
+            elif regex:
+                logging.debug(f'Adding "{name}" file rule with '
+                              f'"{regex}" regex pattern for '
+                              f'"{colorspace}" colorspace.')
+                file_rules.insertRule(rule_index, name, colorspace, regex)
+                rule_index += 1
+            else:
+                logging.debug(
+                    f'Adding "{name}" file rule with '
+                    f'"{pattern}" pattern and "{extension}" extension '
+                    f'for "{colorspace}" colorspace.')
+                file_rules.insertRule(rule_index, name, colorspace, pattern,
+                                      extension)
+                rule_index += 1
+        config.setFileRules(file_rules)
 
-    viewing_rules = ocio.ViewingRules()
-    for i, viewing_rule in enumerate(reversed(data.viewing_rules)):
-        logging.warning('Inserting a viewing rule is not supported yet!')
-        # viewing_rules.insertRule()
-    config.setViewingRules(viewing_rules)
+    if data.viewing_rules:
+        viewing_rules = ocio.ViewingRules()
+        for i, viewing_rule in enumerate(reversed(data.viewing_rules)):
+            logging.warning('Inserting a viewing rule is not supported yet!')
+            # viewing_rules.insertRule()
+        config.setViewingRules(viewing_rules)
 
     if data.default_view_transform is not None:
         config.setDefaultViewTransformName(data.default_view_transform)
@@ -746,8 +880,8 @@ if __name__ == '__main__':
                         'only a placeholder!'),
         'to_reference': {
             'name': 'ExponentTransform',
-            'value': [2.2, 2.2, 2.2, 1],
-        },
+            'value': [2.2, 2.2, 2.2, 1]
+        }
     }
     colorspace_3 = {
         'name': 'Colorspace - sRGB',
@@ -756,7 +890,7 @@ if __name__ == '__main__':
             'name': 'ColorSpaceTransform',
             'src': 'CCTF - sRGB',
             'dst': 'Gamut - sRGB',
-        },
+        }
     }
     colorspace_4 = colorspace_factory(**{
         'name': 'Utility - Raw',
@@ -791,7 +925,7 @@ if __name__ == '__main__':
                 _gain_cdl_transform,
             ],
             _gain_cdl_transform,
-        ],
+        ]
     }
     display_1 = {
         'name': 'View - sRGB Monitor - sRGB',
@@ -809,12 +943,12 @@ if __name__ == '__main__':
             {
                 'display': 'sRGB Monitor',
                 'view': 'sRGB - sRGB',
-                'colorspace': display_1['name'],
+                'colorspace': display_1['name']
             },
             {
                 'display': 'sRGB Monitor',
                 'view': 'Raw',
-                'colorspace': colorspace_4.getName(),
+                'colorspace': colorspace_4.getName()
             },
         ],
         active_displays=['sRGB Monitor'],
@@ -824,7 +958,11 @@ if __name__ == '__main__':
     generate_config(data, os.path.join(build_directory, 'config-v1.ocio'))
 
     # "OpenColorIO 2" configuration.
-    colorspace_1 = {'name': 'ACES - ACES2065-1', 'family': 'ACES'}
+    colorspace_1 = {
+        'name': 'ACES - ACES2065-1',
+        'family': 'ACES',
+        'aliases': 'lin_ap0'
+    }
     colorspace_2 = {
         'name': 'ACES - ACEScg',
         'family': 'ACES',
@@ -832,6 +970,7 @@ if __name__ == '__main__':
             'name': 'BuiltinTransform',
             'style': 'ACEScg_to_ACES2065-1',
         },
+        'aliases': ['lin_ap1']
     }
     colorspace_3 = {
         'name': 'Gamut - sRGB',
@@ -856,7 +995,7 @@ if __name__ == '__main__':
                 0.0000000000,
                 0.0000000000,
                 1.0000000000,
-            ],
+            ]
         }
     }
     colorspace_4 = {
@@ -865,7 +1004,7 @@ if __name__ == '__main__':
         'to_reference': {
             'name': 'ExponentWithLinearTransform',
             'gamma': [2.4, 2.4, 2.4, 1],
-            'offset': [0.055, 0.055, 0.055, 0],
+            'offset': [0.055, 0.055, 0.055, 0]
         }
     }
     colorspace_5 = {
@@ -874,12 +1013,38 @@ if __name__ == '__main__':
         'is_data': True
     }
 
+    named_transform_1 = {
+        'name': '+1 Stop',
+        'family': 'Exposure',
+        'forward_transform': {
+            'name':
+            'MatrixTransform',
+            'matrix': [
+                2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+            ]
+        }
+    }
     look_1 = {
         'name': 'Look - Red',
         'forward_transform': {
             'name': 'CDLTransform',
             'slope': [0, 0, 0],
-            'offset': [1, 0, 0],
+            'offset': [1, 0, 0]
         }
     }
 
@@ -907,14 +1072,14 @@ if __name__ == '__main__':
         'from_reference': {
             'name': 'BuiltinTransform',
             'style': 'ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0'
-        },
+        }
     }
     view_transform_2 = {
         'name': 'Output - No Tonescale',
         'from_reference': {
             'name': 'BuiltinTransform',
             'style': 'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'
-        },
+        }
     }
 
     displays = (display_1, display_2)
@@ -922,7 +1087,7 @@ if __name__ == '__main__':
     shared_views = [{
         'display': display['name'],
         'view': view_transform['name'],
-        'view_transform': view_transform['name'],
+        'view_transform': view_transform['name']
     } for display in displays for view_transform in view_transforms]
 
     data = ConfigData(
@@ -930,12 +1095,13 @@ if __name__ == '__main__':
         roles={
             'aces_interchange': 'ACES - ACES2065-1',
             'cie_xyz_d65_interchange': 'CIE-XYZ D65',
-            ocio.ROLE_SCENE_LINEAR: colorspace_2['name'],
+            ocio.ROLE_SCENE_LINEAR: colorspace_2['name']
         },
         colorspaces=[
             colorspace_1, colorspace_2, colorspace_3, colorspace_4,
             colorspace_5, interchange, display_1, display_2
         ],
+        named_transforms=[named_transform_1],
         looks=[look_1],
         view_transforms=[view_transform_1, view_transform_2],
         inactive_colorspaces=['CIE-XYZ D65'],
@@ -967,7 +1133,45 @@ if __name__ == '__main__':
         ],
         viewing_rules=[])
 
-    generate_config(data, os.path.join(build_directory, 'config-v2.ocio'))
+    config = generate_config(data,
+                             os.path.join(build_directory, 'config-v2.ocio'))
 
     serialize_config_data(data, os.path.join(build_directory,
                                              'config-v2.json'))
+
+    named_transform_2 = {
+        'name': '-1 Stop',
+        'family': 'Exposure',
+        'forward_transform': {
+            'name':
+            'MatrixTransform',
+            'matrix': [
+                -2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                -2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                -2.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+            ]
+        }
+    }
+
+    data = ConfigData(named_transforms=[named_transform_2])
+
+    generate_config(
+        data,
+        os.path.join(build_directory, 'config-v3.ocio'),
+        base_config=config)
+
+    serialize_config_data(data, os.path.join(build_directory,
+                                             'config-v3.json'))
