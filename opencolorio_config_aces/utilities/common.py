@@ -9,6 +9,7 @@ Defines common utilities objects that don't fall in any specific category.
 
 import functools
 import os
+import re
 import subprocess
 from collections import defaultdict
 from itertools import chain
@@ -26,7 +27,8 @@ __all__ = [
     'vivification', 'vivified_to_dict', 'message_box', 'is_colour_installed',
     'is_jsonpickle_installed', 'is_networkx_installed',
     'is_opencolorio_installed', 'REQUIREMENTS_TO_CALLABLE', 'required',
-    'is_string', 'is_iterable', 'git_describe', 'matrix_3x3_to_4x4'
+    'is_string', 'is_iterable', 'git_describe', 'matrix_3x3_to_4x4',
+    'multi_replace'
 ]
 
 
@@ -531,3 +533,35 @@ def matrix_3x3_to_4x4(M):
     M_I[:3, :3] = M
 
     return np.ravel(M_I).tolist()
+
+
+def multi_replace(name, patterns):
+    """
+    Updates given name by applying in succession the given patterns and
+    substitutions.
+
+    Parameters
+    ----------
+    name : unicode
+        Name to update.
+    patterns : dict
+        Dictionary of regular expression patterns and substitution to apply
+        onto the name.
+
+    Returns
+    -------
+    unicode
+        Updated name.
+
+    Examples
+    --------
+    >>> multi_replace(
+    ...     'Canon Luke Skywalker was weak and powerless.',
+    ...     {'Canon': 'Legends', 'weak': 'strong', '\\w+less': 'powerful'})
+    'Legends Luke Skywalker was strong and powerful.'
+    """
+
+    for pattern, substitution in patterns.items():
+        name = re.sub(pattern, substitution, name)
+
+    return name

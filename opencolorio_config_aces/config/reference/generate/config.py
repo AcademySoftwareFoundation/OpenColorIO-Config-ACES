@@ -24,7 +24,8 @@ from opencolorio_config_aces.config.generation import (
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     unclassify_ctl_transforms)
-from opencolorio_config_aces.utilities import git_describe, required
+from opencolorio_config_aces.utilities import (git_describe, multi_replace,
+                                               required)
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -260,10 +261,7 @@ def beautify_name(name, patterns):
     'Rec. 709 (100 nits) dim'
     """
 
-    for pattern, substitution in patterns.items():
-        name = re.sub(pattern, substitution, name)
-
-    return name.strip()
+    return multi_replace(name, patterns).strip()
 
 
 def beautify_colorspace_name(name):
