@@ -159,7 +159,7 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = os.path.join(
-        opencolorio_config_aces.clf.discover.classify.CLF_TRANSFORMS_ROOT,
+        opencolorio_config_aces.clf.discover.classify.ROOT_TRANSFORMS_CLF,
         'aces')
 
     if os.path.exists(build_directory):

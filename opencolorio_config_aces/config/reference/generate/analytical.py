@@ -14,17 +14,17 @@ import logging
 from opencolorio_config_aces.config.generation import (
     ConfigData, colorspace_factory, generate_config)
 from opencolorio_config_aces.config.reference.discover.graph import (
-    NODE_NAME_SEPARATOR)
+    SEPARATOR_NODE_NAME_CTL)
 from opencolorio_config_aces.config.reference import (
     ColorspaceDescriptionStyle, build_aces_conversion_graph,
     classify_aces_ctl_transforms, conversion_path,
     discover_aces_ctl_transforms, filter_nodes, filter_ctl_transforms,
     node_to_ctl_transform)
 from opencolorio_config_aces.config.reference.generate.config import (
-    ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR,
-    ACES_CONFIG_COLORSPACE_NAME_SEPARATOR,
-    ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE, ACES_CONFIG_REFERENCE_COLORSPACE,
-    beautify_display_name, beautify_name, ctl_transform_to_colorspace)
+    SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE,
+    SEPARATOR_COLORSPACE_NAME_REFERENCE, COLORSPACE_OUTPUT_ENCODING_REFERENCE,
+    COLORSPACE_SCENE_ENCODING_REFERENCE, beautify_display_name, beautify_name,
+    ctl_transform_to_colorspace)
 from opencolorio_config_aces.utilities import required
 
 __author__ = 'OpenColorIO Contributors'
@@ -35,21 +35,21 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'VIEW_NAME_SUBSTITUTION_PATTERNS', 'beautify_view_name',
+    'PATTERNS_VIEW_NAME_REFERENCE', 'beautify_view_name',
     'create_builtin_transform', 'node_to_builtin_transform',
     'node_to_colorspace', 'generate_config_aces'
 ]
 
-VIEW_NAME_SUBSTITUTION_PATTERNS = {
+PATTERNS_VIEW_NAME_REFERENCE = {
     '\\(100 nits\\) dim': '',
     '\\(100 nits\\)': '',
     '\\(48 nits\\)': '',
-    f'Output{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}': '',
+    f'Output{SEPARATOR_COLORSPACE_NAME_REFERENCE}': '',
 }
 """
 *OpenColorIO* view name substitution patterns.
 
-VIEW_NAME_SUBSTITUTION_PATTERNS : dict
+PATTERNS_VIEW_NAME_REFERENCE : dict
 """
 
 
@@ -74,7 +74,7 @@ def beautify_view_name(name):
     'Rec. 709'
     """
 
-    return beautify_name(name, VIEW_NAME_SUBSTITUTION_PATTERNS)
+    return beautify_name(name, PATTERNS_VIEW_NAME_REFERENCE)
 
 
 @required('OpenColorIO')
@@ -139,7 +139,7 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
     try:
         transform_styles = []
 
-        path = (node, ACES_CONFIG_REFERENCE_COLORSPACE)
+        path = (node, COLORSPACE_SCENE_ENCODING_REFERENCE)
         path = path if direction.lower() == 'forward' else reversed(path)
         path = conversion_path(graph, *path)
 
@@ -153,9 +153,9 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
         for edge in path:
             source, target = edge
             transform_styles.append(
-                f'{source.split(NODE_NAME_SEPARATOR)[-1]}'
-                f'{ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR}'
-                f'{target.split(NODE_NAME_SEPARATOR)[-1]}')
+                f'{source.split(SEPARATOR_NODE_NAME_CTL)[-1]}'
+                f'{SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE}'
+                f'{target.split(SEPARATOR_NODE_NAME_CTL)[-1]}')
 
         if len(transform_styles) == 1:
             builtin_transform = create_builtin_transform(transform_styles[0])
@@ -172,7 +172,7 @@ def node_to_builtin_transform(graph, node, direction='Forward'):
 
     except NetworkXNoPath:
         logging.debug(
-            f'No path to {ACES_CONFIG_REFERENCE_COLORSPACE} for {node}!')
+            f'No path to {COLORSPACE_SCENE_ENCODING_REFERENCE} for {node}!')
 
 
 def node_to_colorspace(graph,
@@ -267,17 +267,17 @@ def generate_config_aces(config_name=None,
     views = []
 
     scene_reference_colorspace = colorspace_factory(
-        f'CSC - {ACES_CONFIG_REFERENCE_COLORSPACE}',
+        f'CSC - {COLORSPACE_SCENE_ENCODING_REFERENCE}',
         'ACES',
         description='The "Academy Color Encoding System" reference colorspace.'
     )
 
     display_reference_colorspace = colorspace_factory(
-        f'CSC - {ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE}',
+        f'CSC - {COLORSPACE_OUTPUT_ENCODING_REFERENCE}',
         'ACES',
         description='The "Output Color Encoding Specification" colorspace.',
         from_reference=node_to_builtin_transform(
-            graph, ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE, 'Reverse'))
+            graph, COLORSPACE_OUTPUT_ENCODING_REFERENCE, 'Reverse'))
 
     raw_colorspace = colorspace_factory(
         'Utility - Raw',
@@ -294,8 +294,8 @@ def generate_config_aces(config_name=None,
     for family in ('csc', 'input_transform', 'lmt', 'output_transform'):
         family_colourspaces = []
         for node in filter_nodes(graph, [lambda x: x.family == family]):
-            if node in (ACES_CONFIG_REFERENCE_COLORSPACE,
-                        ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+            if node in (COLORSPACE_SCENE_ENCODING_REFERENCE,
+                        COLORSPACE_OUTPUT_ENCODING_REFERENCE):
                 continue
 
             colorspace = node_to_colorspace(graph, node, describe)

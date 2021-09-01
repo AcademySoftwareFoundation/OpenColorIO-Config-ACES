@@ -176,7 +176,7 @@ if __name__ == '__main__':
         description='Conversion from sRGB gamut to ACES2065-1 gamut.')
 
     build_directory = os.path.join(
-        opencolorio_config_aces.clf.discover.classify.CLF_TRANSFORMS_ROOT,
+        opencolorio_config_aces.clf.discover.classify.ROOT_TRANSFORMS_CLF,
         'common')
 
     if os.path.exists(build_directory):

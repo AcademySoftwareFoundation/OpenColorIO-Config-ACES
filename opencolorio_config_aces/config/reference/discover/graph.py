@@ -32,16 +32,16 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'NODE_NAME_SEPARATOR', 'build_aces_conversion_graph',
+    'SEPARATOR_NODE_NAME_CTL', 'build_aces_conversion_graph',
     'node_to_ctl_transform', 'ctl_transform_to_node', 'filter_nodes',
     'conversion_path', 'plot_aces_conversion_graph'
 ]
 
-NODE_NAME_SEPARATOR = '/'
+SEPARATOR_NODE_NAME_CTL = '/'
 """
 *aces-dev* conversion graph node name separator.
 
-NODE_NAME_SEPARATOR : unicode
+SEPARATOR_NODE_NAME_CTL : unicode
 """
 
 
@@ -111,9 +111,9 @@ def build_aces_conversion_graph(ctl_transforms):
                 continue
 
         source = (source if source in ('ACES2065-1', 'OCES') else
-                  f'{type_}{NODE_NAME_SEPARATOR}{source}')
+                  f'{type_}{SEPARATOR_NODE_NAME_CTL}{source}')
         target = (target if target in ('ACES2065-1', 'OCES') else
-                  f'{type_}{NODE_NAME_SEPARATOR}{target}')
+                  f'{type_}{SEPARATOR_NODE_NAME_CTL}{target}')
 
         # Serializing the data for "Graphviz AGraph".
         serialized = codecs.encode(pickle.dumps(ctl_transform, 4),

@@ -34,11 +34,11 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'ACES_CONFIG_CG_MAPPING_FILE_PATH', 'clf_transform_to_description',
+    'PATH_TRANSFORMS_MAPPING_FILE_CG', 'clf_transform_to_description',
     'clf_transform_to_colorspace', 'generate_config_cg'
 ]
 
-ACES_CONFIG_CG_MAPPING_FILE_PATH = (
+PATH_TRANSFORMS_MAPPING_FILE_CG = (
     Path(__file__).parents[0] / 'resources' /
     'OpenColorIO-Config-ACES _CG_ Transforms - CG Config - Mapping.csv')
 """
@@ -146,7 +146,7 @@ def generate_config_cg(
         config_name=None,
         validate=True,
         describe=ColorspaceDescriptionStyle.SHORT_UNION,
-        config_mapping_file_path=ACES_CONFIG_CG_MAPPING_FILE_PATH,
+        config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
         additional_data=False):
     """
     Generates the *ACES* Computer Graphics (CG) *OpenColorIO* config.

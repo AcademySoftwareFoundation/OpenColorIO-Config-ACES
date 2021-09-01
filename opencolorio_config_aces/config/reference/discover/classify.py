@@ -31,32 +31,32 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'ACES_URN', 'ACES_URN_SEPARATOR', 'ACES_ID_SEPARATOR', 'ACES_NAMESPACE',
-    'ACES_TYPES', 'ACES_CTL_TRANSFORMS_ROOT', 'ACES_CTL_TRANSFORM_FAMILIES',
-    'DEFAULT_ACES_CTL_TRANSFORM_GENUS', 'DEFAULT_ACES_CTL_TRANSFORM_FILTERERS',
-    'DESCRIPTION_SUBSTITUTION_PATTERNS', 'patch_invalid_aces_transform_id',
-    'ctl_transform_relative_path', 'ACESTransformID', 'CTLTransform',
-    'CTLTransformPair', 'find_ctl_transform_pairs',
+    'URN_CTL', 'SEPARATOR_URN_CTL', 'SEPARATOR_ID_CTL', 'NAMESPACE_CTL',
+    'TRANSFORM_TYPES_CTL', 'TRANSFORM_FAMILIES_CTL',
+    'TRANSFORM_GENUS_DEFAULT_CTL', 'TRANSFORM_FILTERERS_DEFAULT_CTL',
+    'PATTERNS_DESCRIPTION_CTL', 'patch_invalid_aces_transform_id',
+    'ROOT_TRANSFORMS_CTL', 'ctl_transform_relative_path', 'ACESTransformID',
+    'CTLTransform', 'CTLTransformPair', 'find_ctl_transform_pairs',
     'discover_aces_ctl_transforms', 'classify_aces_ctl_transforms',
     'unclassify_ctl_transforms', 'filter_ctl_transforms', 'print_aces_taxonomy'
 ]
 
-ACES_URN = 'urn:ampas:aces:transformId:v1.5'
+URN_CTL = 'urn:ampas:aces:transformId:v1.5'
 """
 *ACES* Uniform Resource Name (*URN*).
 
-ACES_URN : unicode
+URN_CTL : unicode
 """
 
-ACES_URN_SEPARATOR = ':'
+SEPARATOR_URN_CTL = ':'
 """
 *ACEStransformID* separator used to separate the *URN* and *ID* part of the
 *ACEStransformID*.
 
-ACES_URN_SEPARATOR : unicode
+SEPARATOR_URN_CTL : unicode
 """
 
-ACES_ID_SEPARATOR = '.'
+SEPARATOR_ID_CTL = '.'
 """
 *ACEStransformID* separator used to tokenize the *ID* part of the
 *ACEStransformID*.
@@ -64,17 +64,17 @@ ACES_ID_SEPARATOR = '.'
 urn:ampas:aces:transformId:v1.5:ODT.Academy.DCDM.a1.0.3
 |-------------URN-------------|:|----------ID---------|
 
-ACES_ID_SEPARATOR : unicode
+SEPARATOR_ID_CTL : unicode
 """
 
-ACES_NAMESPACE = 'Academy'
+NAMESPACE_CTL = 'Academy'
 """
 *ACES* namespace for *A.M.P.A.S* official *CTL* transforms.
 
-ACES_NAMESPACE : unicode
+NAMESPACE_CTL : unicode
 """
 
-ACES_TYPES = [
+TRANSFORM_TYPES_CTL = [
     'IDT',
     'LMT',
     'ODT',
@@ -90,25 +90,10 @@ ACES_TYPES = [
 """
 *ACES* *CTL* transform types.
 
-ACES_TYPES : list
+TRANSFORM_TYPES_CTL : list
 """
 
-ACES_CTL_TRANSFORMS_ROOT = os.path.normpath(
-    os.environ.get(
-        'OPENCOLORIO_CONFIG_ACES__ACES_CTL_TRANSFORMS_ROOT',
-        os.path.join(
-            os.path.dirname(__file__), '../', 'aces-dev', 'transforms',
-            'ctl')))
-"""
-*aces-dev* *CTL* transforms root directory, default to the version controlled
-sub-module repository. It can be defined by setting the
-`OPENCOLORIO_CONFIG_ACES__ACES_CTL_TRANSFORMS_ROOT` environment variable with
-the local 'aces-dev/transforms/ctl' directory.
-
-ACES_CTL_TRANSFORMS_ROOT : unicode
-"""
-
-ACES_CTL_TRANSFORM_FAMILIES = {
+TRANSFORM_FAMILIES_CTL = {
     'csc': 'csc',
     'idt': 'input_transform',
     'lib': 'lib',
@@ -122,24 +107,14 @@ ACES_CTL_TRANSFORM_FAMILIES = {
 *ACES* *CTL* transform families mapping the *CTL* transform directories to
 family names.
 
-ACES_CTL_TRANSFORM_FAMILIES : dict
+TRANSFORM_FAMILIES_CTL : dict
 """
 
-DEFAULT_ACES_CTL_TRANSFORM_GENUS = 'undefined'
+TRANSFORM_GENUS_DEFAULT_CTL = 'undefined'
 """
 *ACES* *CTL* transform default genus, i.e. *undefined*.
 
-DEFAULT_ACES_CTL_TRANSFORM_GENUS : unicode
-"""
-
-DESCRIPTION_SUBSTITUTION_PATTERNS = {
-    '============ CONSTANTS ============ //': '',
-    'Written by .*_IDT_maker\\.py v.* on .*': ''
-}
-"""
-*ACES* *CTL* transform description substitution patterns.
-
-DESCRIPTION_SUBSTITUTION_PATTERNS : dict
+TRANSFORM_GENUS_DEFAULT_CTL : unicode
 """
 
 
@@ -173,13 +148,23 @@ def _exclusion_filterer_ARRIIDT(ctl_transform):
     return False
 
 
-DEFAULT_ACES_CTL_TRANSFORM_FILTERERS = [
+TRANSFORM_FILTERERS_DEFAULT_CTL = [
     _exclusion_filterer_ARRIIDT,
 ]
 """
 Default list of *ACES* *CTL* transform filterers.
 
-DEFAULT_ACES_CTL_TRANSFORM_FILTERERS : list
+TRANSFORM_FILTERERS_DEFAULT_CTL : list
+"""
+
+PATTERNS_DESCRIPTION_CTL = {
+    '============ CONSTANTS ============ //': '',
+    'Written by .*_IDT_maker\\.py v.* on .*': ''
+}
+"""
+*ACES* *CTL* transform description substitution patterns.
+
+PATTERNS_DESCRIPTION_CTL : dict
 """
 
 
@@ -210,10 +195,10 @@ commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
     # commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
     if False:
         invalid_id = aces_transform_id
-        if not aces_transform_id.startswith(ACES_URN):
+        if not aces_transform_id.startswith(URN_CTL):
             logging.warning(f'{invalid_id} is missing "ACES" URN!')
 
-            aces_transform_id = f'{ACES_URN}:{aces_transform_id}'
+            aces_transform_id = f'{URN_CTL}:{aces_transform_id}'
 
         if 'Academy.P3D65_108nits_7.2nits_ST2084' in aces_transform_id:
             logging.warning(
@@ -247,7 +232,23 @@ commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
     return aces_transform_id
 
 
-def ctl_transform_relative_path(path, root_directory=ACES_CTL_TRANSFORMS_ROOT):
+ROOT_TRANSFORMS_CTL = os.path.normpath(
+    os.environ.get(
+        'OPENCOLORIO_CONFIG_CTL__CTL_TRANSFORMS_ROOT',
+        os.path.join(
+            os.path.dirname(__file__), '../', 'aces-dev', 'transforms',
+            'ctl')))
+"""
+*aces-dev* *CTL* transforms root directory, default to the version controlled
+sub-module repository. It can be defined by setting the
+`OPENCOLORIO_CONFIG_CTL__CTL_TRANSFORMS_ROOT` environment variable with
+the local 'aces-dev/transforms/ctl' directory.
+
+ROOT_TRANSFORMS_CTL : unicode
+"""
+
+
+def ctl_transform_relative_path(path, root_directory=ROOT_TRANSFORMS_CTL):
     """
     Helper definition returning the relative path from given *ACES* *CTL*
     transform to *aces-dev* *CTL* transforms root directory.
@@ -577,11 +578,11 @@ class ACESTransformID:
         aces_transform_id = patch_invalid_aces_transform_id(
             self._aces_transform_id)
 
-        self._urn, components = aces_transform_id.rsplit(ACES_URN_SEPARATOR, 1)
-        components = components.split(ACES_ID_SEPARATOR)
+        self._urn, components = aces_transform_id.rsplit(SEPARATOR_URN_CTL, 1)
+        components = components.split(SEPARATOR_ID_CTL)
         self._type, components = components[0], components[1:]
 
-        assert self._urn == ACES_URN, (
+        assert self._urn == URN_CTL, (
             f'{self._aces_transform_id} URN {self._urn} is invalid!')
 
         assert len(components) in (3, 4, 5), (
@@ -603,7 +604,7 @@ class ACESTransformID:
              self._minor_version_number,
              self._patch_version_number) = components
 
-        assert self._type in ACES_TYPES, (
+        assert self._type in TRANSFORM_TYPES_CTL, (
             f'{self._aces_transform_id} type {self._type} is invalid!')
 
         if self._name is not None:
@@ -803,7 +804,7 @@ class CTLTransform:
         Getter and setter property for the *ACES* *CTL* transform family, e.g.
         *output_transform*, a value in
         :attr:`opencolorio_config_aces.config.reference.\
-ACES_CTL_TRANSFORM_FAMILIES` attribute dictionary.
+TRANSFORM_FAMILIES_CTL` attribute dictionary.
 
         Parameters
         ----------
@@ -960,7 +961,7 @@ CTLTransform` class are tried on the underlying
                 line = line[2:].strip()
 
                 for pattern, substitution in (
-                        DESCRIPTION_SUBSTITUTION_PATTERNS.items()):
+                        PATTERNS_DESCRIPTION_CTL.items()):
                     line = re.sub(pattern, substitution, line)
 
                 self._description += line
@@ -1166,7 +1167,7 @@ def find_ctl_transform_pairs(ctl_transforms):
     return ctl_transform_pairs
 
 
-def discover_aces_ctl_transforms(root_directory=ACES_CTL_TRANSFORMS_ROOT):
+def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
     """
     Discovers the *ACES* *CTL* transform paths in given root directory: The
     given directory is traversed and the `*.ctl` files are collected.
@@ -1272,12 +1273,11 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
     for directory, ctl_transforms in unclassified_ctl_transforms.items():
         sub_directory = directory.replace(f'{root_directory}{os.sep}', '')
         family, *genus = [
-            ACES_CTL_TRANSFORM_FAMILIES.get(part, part)
+            TRANSFORM_FAMILIES_CTL.get(part, part)
             for part in sub_directory.split(os.sep)
         ]
 
-        genus = DEFAULT_ACES_CTL_TRANSFORM_GENUS if not genus else '/'.join(
-            genus)
+        genus = TRANSFORM_GENUS_DEFAULT_CTL if not genus else '/'.join(genus)
 
         for basename, pairs in find_ctl_transform_pairs(
                 ctl_transforms).items():
@@ -1390,7 +1390,7 @@ def filter_ctl_transforms(ctl_transforms, filterers=None):
     """
 
     if filterers is None:
-        filterers = DEFAULT_ACES_CTL_TRANSFORM_FILTERERS
+        filterers = TRANSFORM_FILTERERS_DEFAULT_CTL
 
     if isinstance(ctl_transforms, Mapping):
         ctl_transforms = unclassify_ctl_transforms(ctl_transforms)
@@ -1413,7 +1413,7 @@ def print_aces_taxonomy():
 
     -   The *aces-dev* *CTL* transforms are discovered by traversing the
         directory defined by the :attr:`opencolorio_config_aces.config.\
-reference.ACES_CTL_TRANSFORMS_ROOT` attribute using the
+reference.ROOT_TRANSFORMS_CTL` attribute using the
         :func:`opencolorio_config_aces.discover_aces_ctl_transforms`
         definition.
     -   The *CTL* transforms are classified by *family* e.g.
