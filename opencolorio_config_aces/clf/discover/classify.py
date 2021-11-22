@@ -464,7 +464,8 @@ class CLFTransformID:
             f'{self._clf_transform_id} URN {self._urn} is invalid!')
 
         self._urn = clf_transform_id[:len(URN_CLF) + 1]
-        components = clf_transform_id[len(URN_CLF) + 1:].split(SEPARATOR_ID_CLF)
+        components = clf_transform_id[len(URN_CLF) + 1:]
+        components = components.split(SEPARATOR_ID_CLF)
 
         assert len(components) == 4, (
             f'{self._clf_transform_id} is an invalid "CLFtransformID"!')
