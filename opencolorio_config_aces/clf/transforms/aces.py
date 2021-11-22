@@ -11,9 +11,9 @@ Defines various objects related to the generation of the *ACES* specific
 import logging
 from pathlib import Path
 
-from opencolorio_config_aces.clf import generate_clf, matrix_3x3_to_4x4
+from opencolorio_config_aces.clf import generate_clf
 from opencolorio_config_aces.config.generation import transform_factory
-from opencolorio_config_aces.utilities import required
+from opencolorio_config_aces.utilities import matrix_3x3_to_4x4, required
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = os.path.join(
-        opencolorio_config_aces.clf.discover.classify.CLF_TRANSFORMS_ROOT,
+        opencolorio_config_aces.clf.discover.classify.ROOT_TRANSFORMS_CLF,
         'aces')
 
     if os.path.exists(build_directory):

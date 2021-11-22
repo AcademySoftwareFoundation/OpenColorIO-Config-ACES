@@ -37,18 +37,18 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'LOG_ALLOCATION_VARS', 'produce_transform', 'transform_factory',
+    'ALLOCATION_VARS_LOG', 'produce_transform', 'transform_factory',
     'group_transform_factory', 'colorspace_factory', 'named_transform_factory',
     'view_transform_factory', 'look_factory', 'ConfigData',
     'deserialize_config_data', 'serialize_config_data', 'validate_config',
     'generate_config'
 ]
 
-LOG_ALLOCATION_VARS = (-8, 5, 2**-8)
+ALLOCATION_VARS_LOG = (-8, 5, 2**-8)
 """
 Allocation variables for logarithmic data representation.
 
-LOG_ALLOCATION_VARS : tuple
+ALLOCATION_VARS_LOG : tuple
 """
 
 

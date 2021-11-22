@@ -33,32 +33,32 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'CLF_URN', 'CLF_URN_SEPARATOR', 'CLF_ID_SEPARATOR', 'CLF_NAMESPACE',
-    'CLF_TYPES', 'CLF_TRANSFORMS_ROOT', 'CLF_TRANSFORM_FAMILIES',
-    'DEFAULT_CLF_TRANSFORM_GENUS', 'DEFAULT_CLF_TRANSFORM_FILTERERS',
-    'DESCRIPTION_SUBSTITUTION_PATTERNS', 'clf_transform_relative_path',
-    'CLFTransformID', 'CLFTransform', 'CLFTransformPair',
-    'find_clf_transform_pairs', 'discover_clf_transforms',
+    'URN_CLF', 'SEPARATOR_URN_CLF', 'SEPARATOR_ID_CLF', 'NAMESPACE_CLF',
+    'TRANSFORM_TYPES_CLF', 'TRANSFORM_FAMILIES_CLF',
+    'TRANSFORM_GENUS_DEFAULT_CLF', 'TRANSFORM_FILTERERS_DEFAULT_CLF',
+    'PATTERNS_DESCRIPTION_CLF', 'ROOT_TRANSFORMS_CLF',
+    'clf_transform_relative_path', 'CLFTransformID', 'CLFTransform',
+    'CLFTransformPair', 'find_clf_transform_pairs', 'discover_clf_transforms',
     'classify_clf_transforms', 'unclassify_clf_transforms',
     'filter_clf_transforms', 'print_clf_taxonomy'
 ]
 
-CLF_URN = 'urn:aswf:ocio:transformId:v1.0'
+URN_CLF = 'urn:aswf:ocio:transformId:v1.0'
 """
 *CLF* Uniform Resource Name (*URN*).
 
-CLF_URN : unicode
+URN_CLF : unicode
 """
 
-CLF_URN_SEPARATOR = ':'
+SEPARATOR_URN_CLF = ':'
 """
 *CLFtransformID* separator used to separate the *URN* and *ID* part of the
 *CLFtransformID*.
 
-CLF_URN_SEPARATOR : unicode
+SEPARATOR_URN_CLF : unicode
 """
 
-CLF_ID_SEPARATOR = '.'
+SEPARATOR_ID_CLF = '.'
 """
 *CLFtransformID* separator used to tokenize the *ID* part of the
 *CLFtransformID*.
@@ -66,27 +66,56 @@ CLF_ID_SEPARATOR = '.'
 urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1
 |-------------URN------------|:|-----------------ID----------------|
 
-CLF_ID_SEPARATOR : unicode
+SEPARATOR_ID_CLF : unicode
 """
 
-CLF_NAMESPACE = 'OCIO'
+NAMESPACE_CLF = 'OCIO'
 """
 *ACES* namespace for the *OCIO* *CLF* transforms.
 
-CLF_NAMESPACE : unicode
+NAMESPACE_CLF : unicode
 """
 
-CLF_TYPES = [
+TRANSFORM_TYPES_CLF = [
     'ACES',
     'Common',
 ]
 """
 *CLF* transform types.
 
-CLF_TYPES : list
+TRANSFORM_TYPES_CLF : list
 """
 
-CLF_TRANSFORMS_ROOT = os.path.normpath(
+TRANSFORM_FAMILIES_CLF = {'aces': 'aces'}
+"""
+*CLF* transform families mapping the *CLF* transform directories to family
+names.
+
+TRANSFORM_FAMILIES_CLF : dict
+"""
+
+TRANSFORM_GENUS_DEFAULT_CLF = 'undefined'
+"""
+*CLF* transform default genus, i.e. *undefined*.
+
+TRANSFORM_GENUS_DEFAULT_CLF : unicode
+"""
+
+TRANSFORM_FILTERERS_DEFAULT_CLF = []
+"""
+Default list of *CLF* transform filterers.
+
+TRANSFORM_FILTERERS_DEFAULT_CLF : list
+"""
+
+PATTERNS_DESCRIPTION_CLF = {}
+"""
+*CLF* transform description substitution patterns.
+
+PATTERNS_DESCRIPTION_CLF : dict
+"""
+
+ROOT_TRANSFORMS_CLF = os.path.normpath(
     os.environ.get(
         'OPENCOLORIO_CONFIG_ACES__CLF_TRANSFORMS_ROOT',
         os.path.join(
@@ -97,40 +126,11 @@ sub-module repository. It can be defined by setting the
 `OPENCOLORIO_CONFIG_ACES__CLF_TRANSFORMS_ROOT` environment variable with
 the local 'transforms/clf' directory.
 
-CLF_TRANSFORMS_ROOT : unicode
-"""
-
-CLF_TRANSFORM_FAMILIES = {'aces': 'aces'}
-"""
-*CLF* transform families mapping the *CLF* transform directories to family
-names.
-
-CLF_TRANSFORM_FAMILIES : dict
-"""
-
-DEFAULT_CLF_TRANSFORM_GENUS = 'undefined'
-"""
-*CLF* transform default genus, i.e. *undefined*.
-
-DEFAULT_CLF_TRANSFORM_GENUS : unicode
-"""
-
-DESCRIPTION_SUBSTITUTION_PATTERNS = {}
-"""
-*CLF* transform description substitution patterns.
-
-DESCRIPTION_SUBSTITUTION_PATTERNS : dict
-"""
-
-DEFAULT_CLF_TRANSFORM_FILTERERS = []
-"""
-Default list of *CLF* transform filterers.
-
-DEFAULT_CLF_TRANSFORM_FILTERERS : list
+ROOT_TRANSFORMS_CLF : unicode
 """
 
 
-def clf_transform_relative_path(path, root_directory=CLF_TRANSFORMS_ROOT):
+def clf_transform_relative_path(path, root_directory=ROOT_TRANSFORMS_CLF):
     """
     Helper definition returning the relative path from given *CLF* transform to
     *CLF* transforms root directory.
@@ -457,11 +457,11 @@ class CLFTransformID:
 
         clf_transform_id = self._clf_transform_id
 
-        self._urn, components = clf_transform_id.rsplit(CLF_URN_SEPARATOR, 1)
-        components = components.split(CLF_ID_SEPARATOR)
+        self._urn, components = clf_transform_id.rsplit(SEPARATOR_URN_CLF, 1)
+        components = components.split(SEPARATOR_ID_CLF)
         self._type, components = components[0], components[1:]
 
-        assert self._urn == CLF_URN, (
+        assert self._urn == URN_CLF, (
             f'{self._clf_transform_id} URN {self._urn} is invalid!')
 
         assert len(components) in (4, 5), (
@@ -475,7 +475,7 @@ class CLFTransformID:
              self._minor_version_number,
              self._patch_version_number) = components
 
-        assert self._type in CLF_TYPES, (
+        assert self._type in TRANSFORM_TYPES_CLF, (
             f'{self._clf_transform_id} type {self._type} is invalid!')
 
         if self._name is not None:
@@ -647,7 +647,7 @@ class CLFTransform:
         Getter and setter property for the *CLF* transform family, e.g.
         *aces*, a value in
         :attr:`opencolorio_config_aces.clf.reference.\
-CLF_TRANSFORM_FAMILIES` attribute dictionary.
+TRANSFORM_FAMILIES_CLF` attribute dictionary.
 
         Parameters
         ----------
@@ -986,7 +986,7 @@ def find_clf_transform_pairs(clf_transforms):
     return clf_transform_pairs
 
 
-def discover_clf_transforms(root_directory=CLF_TRANSFORMS_ROOT):
+def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     """
     Discovers the *CLF* transform paths in given root directory: The given
     directory is traversed and the `*.clf` files are collected.
@@ -1090,11 +1090,11 @@ CLFTransform('aces...ACES.OCIO.AP0_to_P3-D65.clf'))]
     for directory, clf_transforms in unclassified_clf_transforms.items():
         sub_directory = directory.replace(f'{root_directory}{os.sep}', '')
         family, *genus = [
-            CLF_TRANSFORM_FAMILIES.get(part, part)
+            TRANSFORM_FAMILIES_CLF.get(part, part)
             for part in sub_directory.split(os.sep)
         ]
 
-        genus = DEFAULT_CLF_TRANSFORM_GENUS if not genus else '/'.join(genus)
+        genus = TRANSFORM_GENUS_DEFAULT_CLF if not genus else '/'.join(genus)
 
         for basename, pairs in find_clf_transform_pairs(
                 clf_transforms).items():
@@ -1208,7 +1208,7 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     """
 
     if filterers is None:
-        filterers = DEFAULT_CLF_TRANSFORM_FILTERERS
+        filterers = TRANSFORM_FILTERERS_DEFAULT_CLF
 
     if isinstance(clf_transforms, Mapping):
         clf_transforms = unclassify_clf_transforms(clf_transforms)
@@ -1231,7 +1231,7 @@ def print_clf_taxonomy():
 
     -   The *CLF* transforms are discovered by traversing the directory defined
     by the :attr:`opencolorio_config_aces.clf.\
-reference.CLF_TRANSFORMS_ROOT` attribute using the
+reference.ROOT_TRANSFORMS_CLF` attribute using the
         :func:`opencolorio_config_aces.discover_clf_transforms` definition.
     -   The *CLF* transforms are classified by *family* e.g. *aces*, and
         *genus* e.g. *undefined* using the

@@ -24,7 +24,8 @@ from opencolorio_config_aces.config.generation import (
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
     unclassify_ctl_transforms)
-from opencolorio_config_aces.utilities import git_describe, required
+from opencolorio_config_aces.utilities import (git_describe, multi_replace,
+                                               required)
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -34,17 +35,16 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH',
-    'ACES_CONFIG_REFERENCE_COLORSPACE',
-    'ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE',
-    'ACES_CONFIG_COLORSPACE_NAME_SEPARATOR',
-    'ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR',
-    'ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR',
-    'ACES_CONFIG_DISPLAY_FAMILY', 'COLORSPACE_NAME_SUBSTITUTION_PATTERNS',
-    'LOOK_NAME_SUBSTITUTION_PATTERNS',
-    'TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS',
-    'VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS',
-    'DISPLAY_NAME_SUBSTITUTION_PATTERNS', 'ColorspaceDescriptionStyle',
+    'PATH_TRANSFORMS_MAPPING_FILE_REFERENCE',
+    'COLORSPACE_SCENE_ENCODING_REFERENCE',
+    'COLORSPACE_OUTPUT_ENCODING_REFERENCE', 'FAMILY_DISPLAY_REFERENCE',
+    'SEPARATOR_COLORSPACE_NAME_REFERENCE',
+    'SEPARATOR_COLORSPACE_FAMILY_REFERENCE',
+    'SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE',
+    'PATTERNS_COLORSPACE_NAME_REFERENCE', 'PATTERNS_LOOK_NAME_REFERENCE',
+    'PATTERNS_TRANSFORM_FAMILY_REFERENCE',
+    'PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE',
+    'PATTERNS_DISPLAY_NAME_REFERENCE', 'ColorspaceDescriptionStyle',
     'beautify_name', 'beautify_colorspace_name', 'beautify_look_name',
     'beautify_transform_family', 'beautify_view_transform_name',
     'beautify_display_name', 'ctl_transform_to_colorspace_name',
@@ -54,7 +54,7 @@ __all__ = [
     'style_to_display_colorspace', 'generate_config_aces'
 ]
 
-ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH = (
+PATH_TRANSFORMS_MAPPING_FILE_REFERENCE = (
     Path(__file__).parents[0] / 'resources' /
     'OpenColorIO-Config-ACES _Reference_ Transforms - '
     'Reference Config - Mapping.csv')
@@ -64,49 +64,49 @@ Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 CONFIG_MAPPING_FILE_PATH : unicode
 """
 
-ACES_CONFIG_REFERENCE_COLORSPACE = 'ACES2065-1'
+COLORSPACE_SCENE_ENCODING_REFERENCE = 'ACES2065-1'
 """
 *OpenColorIO* config reference colorspace.
 
-ACES_CONFIG_REFERENCE_COLORSPACE : unicode
+COLORSPACE_SCENE_ENCODING_REFERENCE : unicode
 """
 
-ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE = 'OCES'
+COLORSPACE_OUTPUT_ENCODING_REFERENCE = 'OCES'
 """
 *OpenColorIO* config output encoding colorspace.
 
-ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE : unicode
+COLORSPACE_OUTPUT_ENCODING_REFERENCE : unicode
 """
 
-ACES_CONFIG_COLORSPACE_NAME_SEPARATOR = ' - '
-"""
-*OpenColorIO* config colorspace name separator.
-
-ACES_CONFIG_COLORSPACE_NAME_SEPARATOR : unicode
-"""
-
-ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR = '/'
-"""
-*OpenColorIO* config colorspace family separator.
-
-ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR : unicode
-"""
-
-ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR = '_to_'
-"""
-*OpenColorIO* config *BuiltinTransform* name separator.
-
-ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR : unicode
-"""
-
-ACES_CONFIG_DISPLAY_FAMILY = 'Display'
+FAMILY_DISPLAY_REFERENCE = 'Display'
 """
 *OpenColorIO* config display family.
 
-ACES_CONFIG_DISPLAY_FAMILY : unicode
+FAMILY_DISPLAY_REFERENCE : unicode
 """
 
-COLORSPACE_NAME_SUBSTITUTION_PATTERNS = {
+SEPARATOR_COLORSPACE_NAME_REFERENCE = ' - '
+"""
+*OpenColorIO* config colorspace name separator.
+
+SEPARATOR_COLORSPACE_NAME_REFERENCE : unicode
+"""
+
+SEPARATOR_COLORSPACE_FAMILY_REFERENCE = '/'
+"""
+*OpenColorIO* config colorspace family separator.
+
+SEPARATOR_COLORSPACE_FAMILY_REFERENCE : unicode
+"""
+
+SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE = '_to_'
+"""
+*OpenColorIO* config *BuiltinTransform* name separator.
+
+SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE : unicode
+"""
+
+PATTERNS_COLORSPACE_NAME_REFERENCE = {
     'ACES_0_1_1': 'ACES 0.1.1',
     'ACES_0_2_2': 'ACES 0.2.2',
     'ACES_0_7_1': 'ACES 0.7.1',
@@ -128,20 +128,20 @@ Notes
 -----
 - The substitutions are evaluated in order.
 
-COLORSPACE_NAME_SUBSTITUTION_PATTERNS : dict
+PATTERNS_COLORSPACE_NAME_REFERENCE : dict
 """
 
-COLORSPACE_NAME_SUBSTITUTION_PATTERNS.update({
+PATTERNS_COLORSPACE_NAME_REFERENCE.update({
     # Input transforms also use the "family" name and thus need beautifying.
-    (f'{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}Alexa'
-     f'{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}v\\d+'
-     f'{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}.*'):
+    (f'{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}Alexa'
+     f'{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}v\\d+'
+     f'{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}.*'):
     '',
-    f'{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}':
-    ACES_CONFIG_COLORSPACE_NAME_SEPARATOR,
+    f'{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}':
+    SEPARATOR_COLORSPACE_NAME_REFERENCE,
 })
 
-LOOK_NAME_SUBSTITUTION_PATTERNS = {
+PATTERNS_LOOK_NAME_REFERENCE = {
     # TODO: Implement support for callable patterns.
     # The following ones should be a dedicated definition/callable.
     'BlueLightArtifactFix': 'Blue Light Artifact Fix',
@@ -154,11 +154,11 @@ Notes
 -----
 - The substitutions are evaluated in order.
 
-LOOK_NAME_SUBSTITUTION_PATTERNS : dict
+PATTERNS_LOOK_NAME_REFERENCE : dict
 """
 
-TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS = {
-    '\\\\': ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR,
+PATTERNS_TRANSFORM_FAMILY_REFERENCE = {
+    '\\\\': SEPARATOR_COLORSPACE_FAMILY_REFERENCE,
     'vendorSupplied[/\\\\]': '',
     'arri': 'ARRI',
     'alexa': 'Alexa',
@@ -174,10 +174,10 @@ Notes
 -----
 - The substitutions are evaluated in order.
 
-TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS : dict
+PATTERNS_TRANSFORM_FAMILY_REFERENCE : dict
 """
 
-VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS = {
+PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE = {
     '7.2nit': '&',
     '15nit': '&',
     'lim': ' lim',
@@ -193,10 +193,10 @@ VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS = {
 """
 *OpenColorIO* view transform name substitution patterns.
 
-VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS : dict
+PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE : dict
 """
 
-DISPLAY_NAME_SUBSTITUTION_PATTERNS = {
+PATTERNS_DISPLAY_NAME_REFERENCE = {
     'G2.6-': '',
     '-BFD': '',
     'REC.1886': 'Rec.1886',
@@ -218,7 +218,7 @@ Notes
 -----
 - The substitutions are evaluated in order.
 
-DISPLAY_NAME_SUBSTITUTION_PATTERNS : dict
+PATTERNS_DISPLAY_NAME_REFERENCE : dict
 """
 
 
@@ -257,14 +257,11 @@ def beautify_name(name, patterns):
     --------
     >>> beautify_name(
     ...     'Rec709_100nits_dim',
-    ...     COLORSPACE_NAME_SUBSTITUTION_PATTERNS)
+    ...     PATTERNS_COLORSPACE_NAME_REFERENCE)
     'Rec. 709 (100 nits) dim'
     """
 
-    for pattern, substitution in patterns.items():
-        name = re.sub(pattern, substitution, name)
-
-    return name.strip()
+    return multi_replace(name, patterns).strip()
 
 
 def beautify_colorspace_name(name):
@@ -288,7 +285,7 @@ def beautify_colorspace_name(name):
     'Rec. 709 (100 nits) dim'
     """
 
-    return beautify_name(name, COLORSPACE_NAME_SUBSTITUTION_PATTERNS)
+    return beautify_name(name, PATTERNS_COLORSPACE_NAME_REFERENCE)
 
 
 def beautify_look_name(name):
@@ -312,7 +309,7 @@ def beautify_look_name(name):
     'Blue Light Artifact Fix'
     """
 
-    return beautify_name(name, LOOK_NAME_SUBSTITUTION_PATTERNS)
+    return beautify_name(name, PATTERNS_LOOK_NAME_REFERENCE)
 
 
 def beautify_transform_family(name):
@@ -336,7 +333,7 @@ def beautify_transform_family(name):
     'ARRI/Alexa/v3/EI800'
     """
 
-    return beautify_name(name, TRANSFORM_FAMILY_SUBSTITUTION_PATTERNS)
+    return beautify_name(name, PATTERNS_TRANSFORM_FAMILY_REFERENCE)
 
 
 def beautify_view_transform_name(name):
@@ -361,16 +358,16 @@ def beautify_view_transform_name(name):
     'Output - SDR Cinema - ACES 1.0'
     """
 
-    basename, version = name.split(ACES_CONFIG_COLORSPACE_NAME_SEPARATOR)[
+    basename, version = name.split(SEPARATOR_COLORSPACE_NAME_REFERENCE)[
         -1].split('_')
 
     tokens = basename.split('-')
     family, genus = (['-'.join(tokens[:2]), '-'.join(tokens[2:])]
                      if len(tokens) > 2 else [basename, None])
 
-    family = beautify_name(family, VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS)
+    family = beautify_name(family, PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE)
 
-    genus = (beautify_name(genus, VIEW_TRANSFORM_NAME_SUBSTITUTION_PATTERNS)
+    genus = (beautify_name(genus, PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE)
              if genus is not None else genus)
 
     return (f'Output - {family} ({genus}) - ACES {version}'
@@ -400,9 +397,9 @@ def beautify_display_name(name):
     'Display - Rec. 709'
     """
 
-    basename = name.split(ACES_CONFIG_BUILTIN_TRANSFORM_NAME_SEPARATOR)[-1]
+    basename = name.split(SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE)[-1]
 
-    name = beautify_name(basename, DISPLAY_NAME_SUBSTITUTION_PATTERNS)
+    name = beautify_name(basename, PATTERNS_DISPLAY_NAME_REFERENCE)
 
     return f'Display - {name}'
 
@@ -424,8 +421,8 @@ def ctl_transform_to_colorspace_name(ctl_transform):
         *OpenColorIO* colorspace name.
     """
 
-    if ctl_transform.source in (ACES_CONFIG_REFERENCE_COLORSPACE,
-                                ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+    if ctl_transform.source in (COLORSPACE_SCENE_ENCODING_REFERENCE,
+                                COLORSPACE_OUTPUT_ENCODING_REFERENCE):
         name = ctl_transform.target
     else:
         name = ctl_transform.source
@@ -449,8 +446,8 @@ def ctl_transform_to_look_name(ctl_transform):
         *OpenColorIO* look name.
     """
 
-    if ctl_transform.source in (ACES_CONFIG_REFERENCE_COLORSPACE,
-                                ACES_CONFIG_OUTPUT_ENCODING_COLORSPACE):
+    if ctl_transform.source in (COLORSPACE_SCENE_ENCODING_REFERENCE,
+                                COLORSPACE_OUTPUT_ENCODING_REFERENCE):
         name = ctl_transform.target
     else:
         name = ctl_transform.source
@@ -484,7 +481,7 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
                 and ctl_transform.namespace == 'Academy'):
             family = 'CSC'
         elif ctl_transform.family == 'input_transform':
-            family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
+            family = (f'Input{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}'
                       f'{ctl_transform.genus}')
         elif ctl_transform.family == 'output_transform':
             family = 'Output'
@@ -496,10 +493,10 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
             if re.match('ACES|ADX', ctl_transform.name):
                 family = 'ACES'
             else:
-                family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
+                family = (f'Input{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}'
                           f'{ctl_transform.genus}')
         elif ctl_transform.family == 'input_transform':
-            family = (f'Input{ACES_CONFIG_COLORSPACE_FAMILY_SEPARATOR}'
+            family = (f'Input{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}'
                       f'{ctl_transform.genus}')
         elif ctl_transform.family == 'output_transform':
             family = 'Output'
@@ -639,7 +636,7 @@ def ctl_transform_to_colorspace(ctl_transform,
 
     signature = {
         'name': (f'{beautify_colorspace_name(family)}'
-                 f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
+                 f'{SEPARATOR_COLORSPACE_NAME_REFERENCE}'
                  f'{name}'),
         'family':
         family,
@@ -699,7 +696,7 @@ def ctl_transform_to_look(ctl_transform,
 
     signature = {
         'name': (f'{beautify_colorspace_name(family)}'
-                 f'{ACES_CONFIG_COLORSPACE_NAME_SEPARATOR}'
+                 f'{SEPARATOR_COLORSPACE_NAME_REFERENCE}'
                  f'{name}'),
         'description':
         description,
@@ -851,7 +848,7 @@ def style_to_display_colorspace(
 
     import PyOpenColorIO as ocio
 
-    kwargs.setdefault('family', ACES_CONFIG_DISPLAY_FAMILY)
+    kwargs.setdefault('family', FAMILY_DISPLAY_REFERENCE)
 
     name = beautify_display_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
@@ -869,7 +866,7 @@ def style_to_display_colorspace(
 
     signature = {
         'name': name,
-        'family': ACES_CONFIG_DISPLAY_FAMILY,
+        'family': FAMILY_DISPLAY_REFERENCE,
         'description': description,
         'from_reference': builtin_transform,
         'reference_space': 'REFERENCE_SPACE_DISPLAY',
@@ -894,7 +891,7 @@ def generate_config_aces(
         config_name=None,
         validate=True,
         describe=ColorspaceDescriptionStyle.SHORT_UNION,
-        config_mapping_file_path=ACES_CONFIG_REFERENCE_MAPPING_FILE_PATH,
+        config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
         analytical=True,
         additional_data=False):
     """
@@ -1013,7 +1010,7 @@ def generate_config_aces(
 
     scene_reference_colorspace = {
         'name':
-        f'{aces_family_prefix} - {ACES_CONFIG_REFERENCE_COLORSPACE}',
+        f'{aces_family_prefix} - {COLORSPACE_SCENE_ENCODING_REFERENCE}',
         'family':
         'ACES',
         'description':
