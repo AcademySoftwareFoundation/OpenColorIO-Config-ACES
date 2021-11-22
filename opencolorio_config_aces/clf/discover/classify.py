@@ -33,7 +33,7 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'URN_CLF', 'SEPARATOR_URN_CLF', 'SEPARATOR_ID_CLF', 'NAMESPACE_CLF',
+    'URN_CLF', 'SEPARATOR_VERSION_CLF', 'SEPARATOR_ID_CLF', 'NAMESPACE_CLF',
     'TRANSFORM_TYPES_CLF', 'TRANSFORM_FAMILIES_CLF',
     'TRANSFORM_GENUS_DEFAULT_CLF', 'TRANSFORM_FILTERERS_DEFAULT_CLF',
     'PATTERNS_DESCRIPTION_CLF', 'ROOT_TRANSFORMS_CLF',
@@ -43,28 +43,31 @@ __all__ = [
     'filter_clf_transforms', 'print_clf_taxonomy'
 ]
 
-URN_CLF = 'urn:aswf:ocio:transformId:v1.0'
+URN_CLF = 'urn:aswf:ocio:transformId:1.0'
 """
 *CLF* Uniform Resource Name (*URN*).
 
 URN_CLF : unicode
 """
 
-SEPARATOR_URN_CLF = ':'
+SEPARATOR_VERSION_CLF = '.'
 """
-*CLFtransformID* separator used to separate the *URN* and *ID* part of the
+*CLFtransformID* separator used to tokenize the *VERSION* parts of the
 *CLFtransformID*.
 
-SEPARATOR_URN_CLF : unicode
+urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2pnt2:1.0
+                         |---|                               |---|
+
+SEPARATOR_ID_CLF : unicode
 """
 
-SEPARATOR_ID_CLF = '.'
+SEPARATOR_ID_CLF = ':'
 """
 *CLFtransformID* separator used to tokenize the *ID* part of the
 *CLFtransformID*.
 
-urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1
-|-------------URN------------|:|-----------------ID----------------|
+urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2pnt2:1.0
+|-------------URN-----------|:|----------------ID---------------|
 
 SEPARATOR_ID_CLF : unicode
 """
@@ -457,29 +460,29 @@ class CLFTransformID:
 
         clf_transform_id = self._clf_transform_id
 
-        self._urn, components = clf_transform_id.rsplit(SEPARATOR_URN_CLF, 1)
-        components = components.split(SEPARATOR_ID_CLF)
-        self._type, components = components[0], components[1:]
-
-        assert self._urn == URN_CLF, (
+        assert clf_transform_id.startswith(URN_CLF), (
             f'{self._clf_transform_id} URN {self._urn} is invalid!')
 
-        assert len(components) in (4, 5), (
+        self._urn = clf_transform_id[:len(URN_CLF) + 1]
+        components = clf_transform_id[len(URN_CLF) + 1:].split(SEPARATOR_ID_CLF)
+
+        assert len(components) == 4, (
             f'{self._clf_transform_id} is an invalid "CLFtransformID"!')
 
-        if len(components) == 4:
-            (self._namespace, self._name, self._major_version_number,
-             self._minor_version_number) = components
-        else:
-            (self._namespace, self._name, self._major_version_number,
-             self._minor_version_number,
-             self._patch_version_number) = components
+        (self._namespace, self._type, self._name, version) = components
 
         assert self._type in TRANSFORM_TYPES_CLF, (
             f'{self._clf_transform_id} type {self._type} is invalid!')
 
         if self._name is not None:
             self._source, self._target = self._name.split('_to_')
+
+        assert version.count(SEPARATOR_VERSION_CLF) == 1, (
+            f'{self._clf_transform_id} has an invalid "CLFtransformID" '
+            f'version!')
+
+        (self._major_version_number,
+         self._minor_version_number) = version.split(SEPARATOR_VERSION_CLF)
 
 
 class CLFTransform:
