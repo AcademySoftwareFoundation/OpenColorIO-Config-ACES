@@ -17,7 +17,6 @@ discovery and classification:
 import itertools
 import logging
 import os
-import re
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from collections.abc import Mapping
@@ -969,9 +968,7 @@ def find_clf_transform_pairs(clf_transforms):
     # to define which transform is the forward transform.
     paths = defaultdict(list)
     for clf_transform in sorted(clf_transforms, key=stem):
-        forward_path = tuple(
-            re.split('_to_',
-                     stem(clf_transform).split('.', 2)[-1]))
+        forward_path = tuple(stem(clf_transform).split('_to_', 1))
         inverse_path = tuple(reversed(forward_path))
         if inverse_path in paths:
             paths[inverse_path].append(clf_transform)
@@ -1018,7 +1015,7 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> os.path.basename(key)
     'aces'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
-    ['ACES.OCIO.AP0_to_AP1-Gamma2.2.clf', 'ACES.OCIO.AP0_to_P3-D65.clf']
+    ['AP0_to_AP1-Gamma2.2.clf', 'AP0_to_P3-D65-Linear.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1081,10 +1078,10 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ['undefined']
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
-    [('ACES.OCIO.AP0_to_AP1-Gamma2.2', \
-CLFTransform('aces...ACES.OCIO.AP0_to_AP1-Gamma2.2.clf')), \
-('ACES.OCIO.AP0_to_P3-D65', \
-CLFTransform('aces...ACES.OCIO.AP0_to_P3-D65.clf'))]
+    [('AP0_to_AP1-Gamma2.2', \
+CLFTransform('aces...AP0_to_AP1-Gamma2.2.clf')), \
+('AP0_to_P3-D65-Linear', \
+CLFTransform('aces...AP0_to_P3-D65-Linear.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1153,7 +1150,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform('aces...ACES.OCIO.AP0_to_AP1-Gamma2.2.clf')
+    CLFTransform('aces...AP0_to_AP1-Gamma2.2.clf')
     """
 
     unclassified_clf_transforms = []
@@ -1208,7 +1205,7 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     ...         clf_transforms,
     ...         [lambda x: x.family == 'common']),
     ...     key=lambda x: x.path)[0]
-    CLFTransform('common...Common.OCIO.Linear_to_Rec1886.clf')
+    CLFTransform('common...Linear_to_Rec1886.clf')
     """
 
     if filterers is None:
