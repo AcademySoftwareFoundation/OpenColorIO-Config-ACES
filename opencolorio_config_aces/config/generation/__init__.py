@@ -4,8 +4,8 @@
 from .common import (produce_transform, transform_factory,
                      group_transform_factory, colorspace_factory,
                      named_transform_factory, view_transform_factory,
-                     look_factory, VersionData, ConfigData, 
-                     deserialize_config_data, serialize_config_data, 
+                     look_factory, VersionData, ConfigData,
+                     deserialize_config_data, serialize_config_data,
                      validate_config, generate_config)
 
 __all__ = [

@@ -729,7 +729,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         config = base_config
     else:
         config = ocio.Config()
-        config.setVersion(data.profile_version.major, 
+        config.setVersion(data.profile_version.major,
                           data.profile_version.minor)
 
     if data.description is not None:

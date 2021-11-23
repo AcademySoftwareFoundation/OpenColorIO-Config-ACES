@@ -19,7 +19,7 @@ from enum import Flag, auto
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
-    VersionData, ConfigData, colorspace_factory, generate_config, 
+    VersionData, ConfigData, colorspace_factory, generate_config,
     look_factory, produce_transform, view_transform_factory)
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
