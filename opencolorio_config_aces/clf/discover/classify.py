@@ -1132,7 +1132,7 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ...     discover_clf_transforms())
     >>> family = sorted(clf_transforms.keys())[0]
     >>> str(family)
-    'utility'
+    'Utility'
     >>> genera = sorted(clf_transforms[family])
     >>> print(genera)
     ['undefined']
@@ -1267,7 +1267,7 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     >>> sorted(  # doctest: +ELLIPSIS
     ...     filter_clf_transforms(
     ...         clf_transforms,
-    ...         [lambda x: x.family == 'utility']),
+    ...         [lambda x: x.family == 'Utility']),
     ...     key=lambda x: x.path)[0]
     CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')
     """
