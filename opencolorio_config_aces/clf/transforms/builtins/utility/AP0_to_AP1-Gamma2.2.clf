@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2.2:1.0" name="AP0 to AP1 - Gamma 2.2">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_AP1-Gamma2.2:1.0" name="AP0 to AP1 - Gamma 2.2">
     <InputDescriptor>ACES2065-1</InputDescriptor>
     <OutputDescriptor>2.2 gamma-corrected AP1 primaries, D60 white point</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">

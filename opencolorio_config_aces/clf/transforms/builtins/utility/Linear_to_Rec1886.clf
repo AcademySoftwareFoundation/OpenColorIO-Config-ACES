@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Common:Linear_to_Rec1886:1.0" name="Linear to Rec.1886">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886:1.0" name="Linear to Rec.1886">
     <InputDescriptor>generic linear RGB</InputDescriptor>
     <OutputDescriptor>generic gamma-corrected RGB</OutputDescriptor>
     <Exponent inBitDepth="32f" outBitDepth="32f" style="basicRev">

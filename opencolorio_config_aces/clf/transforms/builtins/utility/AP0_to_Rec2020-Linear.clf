@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec2020-Linear:1.0" name="AP0 to Rec.2020 - Linear">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec2020-Linear:1.0" name="AP0 to Rec.2020 - Linear">
     <InputDescriptor>ACES2065-1</InputDescriptor>
     <OutputDescriptor>linear Rec.2020 primaries, D65 white point</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">

@@ -2,19 +2,19 @@ Ordering,Transform Name,ACEStransformID,CLFtransformID,Linked DisplayColorSpace 
 100,ACES - ACEScc,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScc_to_ACES.a1.0.3,,,ColorSpace,log,file-io
 100,ACES - ACEScct,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScct_to_ACES.a1.0.3,,,ColorSpace,log,"file-io,working-space"
 100,ACES - ACEScg,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,,ColorSpace,scene-linear,"file-io,working-space"
-100,Input - Generic - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-sRGB:1.0,,ColorSpace,sdr-video,file-io
 100,Output - P3-D65 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_1000nits_15nits_ST2084.a1.1.0,,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform,hdr-video,file-io
 100,Output - P3D65,urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_48nits.a1.1.0,,DISPLAY - CIE-XYZ-D65_to_G2.6-P3-D65,ViewTransform,sdr-video,file-io
 100,Output - Rec.2020 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_ST2084.a1.1.0,,DISPLAY - CIE-XYZ-D65_to_REC.2100-PQ,ViewTransform,hdr-video,file-io
 100,Output - Rec.709,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_100nits_dim.a1.0.3,,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709,ViewTransform,sdr-video,file-io
 100,Output - sRGB,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform,sdr-video,file-io
-100,Utility - Curve - Rec.1886,,urn:aswf:ocio:transformId:1.0:OCIO:Common:Linear_to_Rec1886:1.0,,NamedTransform,sdr-video,file-io
-100,Utility - Curve - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Common:Linear_to_sRGB:1.0,,NamedTransform,sdr-video,file-io
-100,Utility - Gamma 1.8 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-Gamma1.8:1.0,,ColorSpace,sdr-video,file-io
-100,Utility - Gamma 2.2 - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2.2:1.0,,ColorSpace,sdr-video,file-io
-100,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-Gamma2.2:1.0,,ColorSpace,sdr-video,file-io
-100,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-Gamma2.4:1.0,,ColorSpace,sdr-video,file-io
-100,Utility - Linear - P3-D65,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_P3-D65-Linear:1.0,,ColorSpace,scene-linear,file-io
-100,Utility - Linear - Rec.2020,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec2020-Linear:1.0,,ColorSpace,scene-linear,file-io
-100,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-Linear:1.0,,ColorSpace,scene-linear,file-io
-100,Utility - Linear - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-Linear:1.0,,ColorSpace,scene-linear,file-io
+100,Utility - Curve - Rec.1886,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886:1.0,,NamedTransform,sdr-video,file-io
+100,Utility - Curve - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB:1.0,,NamedTransform,sdr-video,file-io
+100,Utility - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-sRGB:1.0,,ColorSpace,sdr-video,file-io
+100,Utility - Gamma 1.8 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma1.8:1.0,,ColorSpace,sdr-video,file-io
+100,Utility - Gamma 2.2 - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_AP1-Gamma2.2:1.0,,ColorSpace,sdr-video,file-io
+100,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.2:1.0,,ColorSpace,sdr-video,file-io
+100,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.4:1.0,,ColorSpace,sdr-video,file-io
+100,Utility - Linear - P3-D65,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_P3-D65-Linear:1.0,,ColorSpace,scene-linear,file-io
+100,Utility - Linear - Rec.2020,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec2020-Linear:1.0,,ColorSpace,scene-linear,file-io
+100,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0,,ColorSpace,scene-linear,file-io
+100,Utility - Linear - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0,,ColorSpace,scene-linear,file-io

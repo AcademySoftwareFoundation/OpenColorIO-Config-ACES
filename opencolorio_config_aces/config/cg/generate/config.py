@@ -77,13 +77,15 @@ def clf_transform_to_description(
                         ColorspaceDescriptionStyle.SHORT,
                         ColorspaceDescriptionStyle.SHORT_UNION):
             if clf_transform.description is not None:
-                description.append(clf_transform.description.split('\n')[0])
+                description.append(
+                    f'Convert {clf_transform.input_descriptor} '
+                    f'to {clf_transform.output_descriptor}')
 
         elif describe in (ColorspaceDescriptionStyle.OPENCOLORIO,
                           ColorspaceDescriptionStyle.LONG,
                           ColorspaceDescriptionStyle.LONG_UNION):
             if clf_transform.description is not None:
-                description.append(clf_transform.description)
+                description.append('\n' + clf_transform.description)
 
         description.append(
             f'\nCLFtransformID: '

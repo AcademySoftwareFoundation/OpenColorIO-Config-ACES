@@ -79,8 +79,7 @@ NAMESPACE_CLF : unicode
 """
 
 TRANSFORM_TYPES_CLF = [
-    'ACES',
-    'Common',
+    'Utility',
 ]
 """
 *CLF* transform types.
@@ -506,6 +505,8 @@ class CLFTransform:
     clf_transform_id
     user_name
     description
+    input_descriptor
+    output_descriptor
     family
     genus
 
@@ -524,6 +525,8 @@ class CLFTransform:
         self._clf_transform_id = None
         self._user_name = None
         self._description = ''
+        self._input_descriptor = ''
+        self._output_descriptor = ''
 
         self._family = family
         self._genus = genus
@@ -643,6 +646,52 @@ class CLFTransform:
         """
 
         return self._description
+
+    @property
+    def input_descriptor(self):
+        """
+        Getter and setter property for the *CLF* transform input descriptor
+        extracted from parsing the file content header.
+
+        Parameters
+        ----------
+        value : unicode
+            Attribute value.
+
+        Returns
+        -------
+        unicode
+            *CLF* transform input descriptor.
+
+        Notes
+        -----
+        -   This property is read only.
+        """
+
+        return self._input_descriptor
+
+    @property
+    def output_descriptor(self):
+        """
+        Getter and setter property for the *CLF* transform output descriptor
+        extracted from parsing the file content header.
+
+        Parameters
+        ----------
+        value : unicode
+            Attribute value.
+
+        Returns
+        -------
+        unicode
+            *CLF* transform output descriptor.
+
+        Notes
+        -----
+        -   This property is read only.
+        """
+
+        return self._output_descriptor
 
     @property
     def family(self):
@@ -788,9 +837,20 @@ CLFTransform` class are tried on the underlying
 
         self._clf_transform_id = CLFTransformID(root.attrib['id'])
         self._user_name = root.attrib['name']
+
         description = next(iter(root.findall('./Description')), None)
         if description is not None:
             self._description = description.text
+
+        input_descriptor = next(
+            iter(root.findall('./InputDescriptor')), None)
+        if input_descriptor is not None:
+            self._input_descriptor = input_descriptor.text
+
+        output_descriptor = next(
+            iter(root.findall('./OutputDescriptor')), None)
+        if output_descriptor is not None:
+            self._output_descriptor = output_descriptor.text
 
 
 class CLFTransformPair:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_Rec709-Gamma1.8:1.0" name="AP0 to Rec.709 - Gamma 1.8">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.4:1.0" name="AP0 to Rec.709 - Gamma 2.4">
     <InputDescriptor>ACES2065-1</InputDescriptor>
-    <OutputDescriptor>1.8 gamma-corrected Rec.709 primaries, D65 white point</OutputDescriptor>
+    <OutputDescriptor>2.4 gamma-corrected Rec.709 primaries, D65 white point</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">
         <Array dim="3 3">
    2.52168618674388   -1.13413098823972  -0.387555198504164
@@ -10,6 +10,6 @@
         </Array>
     </Matrix>
     <Exponent inBitDepth="32f" outBitDepth="32f" style="basicRev">
-        <ExponentParams exponent="1.8" />
+        <ExponentParams exponent="2.4" />
     </Exponent>
 </ProcessList>
