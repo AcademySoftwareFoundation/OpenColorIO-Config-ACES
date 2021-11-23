@@ -19,9 +19,8 @@ from pathlib import Path
 from opencolorio_config_aces.clf import (discover_clf_transforms,
                                          classify_clf_transforms,
                                          unclassify_clf_transforms)
-from opencolorio_config_aces.config.generation import (colorspace_factory,
-                                                       named_transform_factory,
-                                                       generate_config)
+from opencolorio_config_aces.config.generation import (
+    colorspace_factory, named_transform_factory, generate_config)
 from opencolorio_config_aces.config.reference import (
     ColorspaceDescriptionStyle, generate_config_aces)
 from opencolorio_config_aces.utilities import git_describe, required
@@ -77,9 +76,8 @@ def clf_transform_to_description(
                         ColorspaceDescriptionStyle.SHORT,
                         ColorspaceDescriptionStyle.SHORT_UNION):
             if clf_transform.description is not None:
-                description.append(
-                    f'Convert {clf_transform.input_descriptor} '
-                    f'to {clf_transform.output_descriptor}')
+                description.append(f'Convert {clf_transform.input_descriptor} '
+                                   f'to {clf_transform.output_descriptor}')
 
         elif describe in (ColorspaceDescriptionStyle.OPENCOLORIO,
                           ColorspaceDescriptionStyle.LONG,
@@ -388,7 +386,7 @@ def generate_config_cg(
         for transform_data in transforms_data:
             # Finding the "CLFTransform" class instance that matches given
             # "CLFtransformID", if it does not exist, there is a critical
-            # mismatch in the mapping file..
+            # mismatch in the mapping file.
             clf_transform_id = transform_data['clf_transform_id']
             if not clf_transform_id:
                 continue
