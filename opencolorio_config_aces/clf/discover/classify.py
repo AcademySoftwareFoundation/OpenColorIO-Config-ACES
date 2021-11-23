@@ -73,7 +73,7 @@ SEPARATOR_ID_CLF : unicode
 
 NAMESPACE_CLF = 'OCIO'
 """
-*ACES* namespace for the *OCIO* *CLF* transforms.
+Namespace for the *OCIO* *CLF* transforms.
 
 NAMESPACE_CLF : unicode
 """
@@ -87,7 +87,7 @@ TRANSFORM_TYPES_CLF = [
 TRANSFORM_TYPES_CLF : list
 """
 
-TRANSFORM_FAMILIES_CLF = {'aces': 'aces'}
+TRANSFORM_FAMILIES_CLF = {'utility': 'Utility'}
 """
 *CLF* transform families mapping the *CLF* transform directories to family
 names.
@@ -1073,7 +1073,7 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> clf_transforms = discover_clf_transforms()
     >>> key = sorted(clf_transforms.keys())[0]
     >>> os.path.basename(key)
-    'aces'
+    'utility'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
     ['AP0_to_AP1-Gamma2.2.clf', 'AP0_to_P3-D65-Linear.clf']
     """
@@ -1132,16 +1132,16 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ...     discover_clf_transforms())
     >>> family = sorted(clf_transforms.keys())[0]
     >>> str(family)
-    'aces'
+    'utility'
     >>> genera = sorted(clf_transforms[family])
     >>> print(genera)
     ['undefined']
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
     [('AP0_to_AP1-Gamma2.2', \
-CLFTransform('aces...AP0_to_AP1-Gamma2.2.clf')), \
+CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')), \
 ('AP0_to_P3-D65-Linear', \
-CLFTransform('aces...AP0_to_P3-D65-Linear.clf'))]
+CLFTransform('utility...AP0_to_P3-D65-Linear.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1149,7 +1149,11 @@ CLFTransform('aces...AP0_to_P3-D65-Linear.clf'))]
     root_directory = paths_common_ancestor(
         *itertools.chain.from_iterable(unclassified_clf_transforms.values()))
     for directory, clf_transforms in unclassified_clf_transforms.items():
-        sub_directory = directory.replace(f'{root_directory}{os.sep}', '')
+        if directory == root_directory:
+            sub_directory = os.path.basename(root_directory)
+        else:
+            sub_directory = directory.replace(f'{root_directory}{os.sep}', '')
+
         family, *genus = [
             TRANSFORM_FAMILIES_CLF.get(part, part)
             for part in sub_directory.split(os.sep)
@@ -1210,7 +1214,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform('aces...AP0_to_AP1-Gamma2.2.clf')
+    CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')
     """
 
     unclassified_clf_transforms = []
@@ -1263,9 +1267,9 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     >>> sorted(  # doctest: +ELLIPSIS
     ...     filter_clf_transforms(
     ...         clf_transforms,
-    ...         [lambda x: x.family == 'common']),
+    ...         [lambda x: x.family == 'utility']),
     ...     key=lambda x: x.path)[0]
-    CLFTransform('common...Linear_to_Rec1886.clf')
+    CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')
     """
 
     if filterers is None:
