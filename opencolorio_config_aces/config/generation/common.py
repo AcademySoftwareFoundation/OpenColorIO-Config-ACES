@@ -88,6 +88,10 @@ def transform_factory(name, **kwargs):
 
     Other Parameters
     ----------------
+    clf_transform_to_group_transform : bool, optional
+        Whether to convert the *CLF* transform to an *OpenColorIO* group
+        transform. The assumption is that ``name`` is *FileTransform* and that
+        ``src`` is an absolute path to the *CLF* transform file.
     \\**kwargs : dict, optional
         Setter keywords arguments. They are converted to *camelCase* with *set*
         prepended, e.g. `base_colorspace` is transformed into
@@ -100,6 +104,13 @@ def transform_factory(name, **kwargs):
     """
 
     import PyOpenColorIO as ocio
+
+    if (kwargs.get('clf_transform_to_group_transform', False)
+            and name == 'FileTransform'):
+        raw_config = ocio.Config().CreateRaw()
+        file_transform = ocio.FileTransform(kwargs['src'])
+        processor = raw_config.getProcessor(file_transform)
+        return processor.createGroupTransform()
 
     transform = getattr(ocio, name)()
     for kwarg, value in kwargs.items():

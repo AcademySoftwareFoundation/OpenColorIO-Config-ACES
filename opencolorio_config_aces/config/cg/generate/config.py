@@ -33,9 +33,8 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'PATH_TRANSFORMS_MAPPING_FILE_CG', 'clf_transform_to_group_transform',
-    'clf_transform_to_description', 'clf_transform_to_colorspace',
-    'generate_config_cg'
+    'PATH_TRANSFORMS_MAPPING_FILE_CG', 'clf_transform_to_description',
+    'clf_transform_to_colorspace', 'generate_config_cg'
 ]
 
 PATH_TRANSFORMS_MAPPING_FILE_CG = (
@@ -95,36 +94,6 @@ def clf_transform_to_description(
 
 
 @required('OpenColorIO')
-def clf_transform_to_group_transform(clf_transform):
-    """
-    Generates a *OpenColorIO* group transform for given *CLF* transform. This
-    losslessly converts the *CLF* operators to native *OpenColorIO* transforms
-    for use in an *OpenColorIO* colorspace without referencing the source
-    *CLF* file.
-
-    Parameters
-    ----------
-    clf_transform : CLFTransform
-        *CLF* transform.
-
-    Returns
-    -------
-    object
-        *OpenColorIO* group transform.
-    """
-
-    import PyOpenColorIO as ocio
-
-    temp_config = ocio.Config().CreateRaw()
-
-    file_transform = ocio.FileTransform(clf_transform.path)
-    processor = temp_config.getProcessor(file_transform)
-    group_transform = processor.createGroupTransform()
-
-    return group_transform
-
-
-@required('OpenColorIO')
 def clf_transform_to_colorspace(clf_transform,
                                 describe=ColorspaceDescriptionStyle.LONG_UNION,
                                 signature_only=False,
@@ -157,7 +126,11 @@ def clf_transform_to_colorspace(clf_transform,
     signature = {
         'name': clf_transform.user_name,
         'description': clf_transform_to_description(clf_transform, describe),
-        'from_reference': clf_transform_to_group_transform(clf_transform),
+        'from_reference': {
+            'name': 'FileTransform',
+            'src': clf_transform.path,
+            'clf_transform_to_group_transform': True,
+        },
     }
     signature.update(kwargs)
 
@@ -203,7 +176,11 @@ def clf_transform_to_named_transform(
     signature = {
         'name': clf_transform.user_name,
         'description': clf_transform_to_description(clf_transform, describe),
-        'forward_transform': clf_transform_to_group_transform(clf_transform),
+        'forward_transform': {
+            'name': 'FileTransform',
+            'src': clf_transform.path,
+            'clf_transform_to_group_transform': True,
+        },
     }
     signature.update(kwargs)
 
@@ -443,6 +420,7 @@ def generate_config_cg(
 if __name__ == '__main__':
     import os
     import opencolorio_config_aces
+    from opencolorio_config_aces import serialize_config_data
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
@@ -456,3 +434,6 @@ if __name__ == '__main__':
     config, data = generate_config_cg(
         config_name=os.path.join(build_directory, 'config-aces-cg.ocio'),
         additional_data=True)
+
+    serialize_config_data(data,
+                          os.path.join(build_directory, 'config-aces-cg.json'))
