@@ -1139,9 +1139,9 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ['undefined']
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
-    [('AP0_to_AP1-Gamma2.2', \
+    [('OCIO.Utility.AP0_to_AP1-Gamma2.2', \
 CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')), \
-('AP0_to_P3-D65-Linear', \
+('OCIO.Utility.AP0_to_P3-D65-Linear', \
 CLFTransform('utility...OCIO.Utility.AP0_to_P3-D65-Linear.clf'))]
     """
 
