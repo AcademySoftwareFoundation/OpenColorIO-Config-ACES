@@ -1075,7 +1075,8 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> os.path.basename(key)
     'utility'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
-    ['OCIO.Utility.AP0_to_AP1-Gamma2.2.clf', 'OCIO.Utility.AP0_to_P3-D65-Linear.clf']
+    ['OCIO.Utility.AP0_to_AP1-Gamma2.2.clf', \
+'OCIO.Utility.AP0_to_P3-D65-Linear.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
