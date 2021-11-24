@@ -25,6 +25,7 @@ Config Generation Common Objects
     view_transform_factory
     look_factory
     ConfigData
+    VersionData
     deserialize_config_data
     serialize_config_data
     validate_config

@@ -21,15 +21,15 @@ Sub-packages
 """
 
 from .config import (
-    ConfigData, build_aces_conversion_graph, classify_aces_ctl_transforms,
-    colorspace_factory, conversion_path, ctl_transform_to_node,
-    deserialize_config_data, discover_aces_ctl_transforms,
-    filter_ctl_transforms, filter_nodes, generate_config, generate_config_aces,
-    generate_config_cg, group_transform_factory, look_factory,
-    named_transform_factory, node_to_ctl_transform, plot_aces_conversion_graph,
-    print_aces_taxonomy, produce_transform, serialize_config_data,
-    transform_factory, unclassify_ctl_transforms, validate_config,
-    view_transform_factory)
+    ConfigData, VersionData, build_aces_conversion_graph,
+    classify_aces_ctl_transforms, colorspace_factory, conversion_path,
+    ctl_transform_to_node, deserialize_config_data,
+    discover_aces_ctl_transforms, filter_ctl_transforms, filter_nodes,
+    generate_config, generate_config_aces, generate_config_cg,
+    group_transform_factory, look_factory, named_transform_factory,
+    node_to_ctl_transform, plot_aces_conversion_graph, print_aces_taxonomy,
+    produce_transform, serialize_config_data, transform_factory,
+    unclassify_ctl_transforms, validate_config, view_transform_factory)
 from .clf import (classify_clf_transforms, discover_clf_transforms,
                   filter_clf_transforms, generate_clf, print_clf_taxonomy,
                   unclassify_clf_transforms)
@@ -42,7 +42,7 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'ConfigData', 'build_aces_conversion_graph',
+    'ConfigData', 'VersionData', 'build_aces_conversion_graph',
     'classify_aces_ctl_transforms', 'colorspace_factory', 'conversion_path',
     'ctl_transform_to_node', 'deserialize_config_data',
     'discover_aces_ctl_transforms', 'filter_ctl_transforms', 'filter_nodes',
