@@ -120,7 +120,7 @@ ROOT_TRANSFORMS_CLF = os.path.normpath(
     os.environ.get(
         'OPENCOLORIO_CONFIG_ACES__CLF_TRANSFORMS_ROOT',
         os.path.join(
-            os.path.dirname(__file__), '..', 'transforms', 'builtins')))
+            os.path.dirname(__file__), '..', 'transforms', 'ocio')))
 """
 *CLF* transforms root directory, default to the version controlled
 sub-module repository. It can be defined by setting the
@@ -1075,7 +1075,7 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> os.path.basename(key)
     'utility'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
-    ['AP0_to_AP1-Gamma2.2.clf', 'AP0_to_P3-D65-Linear.clf']
+    ['OCIO.Utility.AP0_to_AP1-Gamma2.2.clf', 'OCIO.Utility.AP0_to_P3-D65-Linear.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1139,9 +1139,9 @@ def classify_clf_transforms(unclassified_clf_transforms):
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
     [('AP0_to_AP1-Gamma2.2', \
-CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')), \
+CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')), \
 ('AP0_to_P3-D65-Linear', \
-CLFTransform('utility...AP0_to_P3-D65-Linear.clf'))]
+CLFTransform('utility...OCIO.Utility.AP0_to_P3-D65-Linear.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1214,7 +1214,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')
+    CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')
     """
 
     unclassified_clf_transforms = []
@@ -1269,7 +1269,7 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     ...         clf_transforms,
     ...         [lambda x: x.family == 'Utility']),
     ...     key=lambda x: x.path)[0]
-    CLFTransform('utility...AP0_to_AP1-Gamma2.2.clf')
+    CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')
     """
 
     if filterers is None:

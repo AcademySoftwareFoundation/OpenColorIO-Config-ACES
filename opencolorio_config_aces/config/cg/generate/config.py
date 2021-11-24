@@ -253,6 +253,8 @@ def generate_config_cg(
         :class:`opencolorio_config_aces.ConfigData` class instance.
     """
 
+    import PyOpenColorIO as ocio
+
     if data is None:
         _config, data = generate_config_aces(
             describe=describe, additional_data=True, analytical=False)
@@ -329,16 +331,6 @@ def generate_config_cg(
                         continue
 
                     if aces_transform_id == data.get('aces_transform_id'):
-                        return True
-
-                for data in transform['transforms_data']:
-                    linked_display_colorspace_style = (
-                        transform_data['linked_display_colorspace_style'])
-                    if not linked_display_colorspace_style:
-                        continue
-
-                    if linked_display_colorspace_style == data.get(
-                            'linked_display_colorspace_style'):
                         return True
 
         return False
@@ -433,6 +425,14 @@ def generate_config_cg(
                         name=transform_data['transform_name'],
                         encoding=transform_data.get('encoding'),
                         categories=transform_data.get('categories')))
+
+    # Roles Filtering
+    for role in (
+            # Config contains multiple possible rendering color spaces
+            ocio.ROLE_RENDERING,
+            # Reference role is deprecated
+            ocio.ROLE_REFERENCE):
+        data.roles.pop(role)
 
     config = generate_config(data, config_name, validate)
 
