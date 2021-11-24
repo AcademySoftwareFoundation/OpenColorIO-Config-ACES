@@ -129,7 +129,7 @@ def clf_transform_to_colorspace(clf_transform,
         'from_reference': {
             'name': 'FileTransform',
             'src': clf_transform.path,
-            'clf_transform_to_group_transform': True,
+            'factory': 'CLF Transform to Group Transform',
         },
     }
     signature.update(kwargs)
@@ -179,7 +179,7 @@ def clf_transform_to_named_transform(
         'forward_transform': {
             'name': 'FileTransform',
             'src': clf_transform.path,
-            'clf_transform_to_group_transform': True,
+            'factory': 'CLF Transform to Group Transform',
         },
     }
     signature.update(kwargs)
