@@ -467,7 +467,7 @@ def transform_factory_default(**kwargs):
 
     import PyOpenColorIO as ocio
 
-    transform = getattr(ocio, kwargs.pop('name'))()
+    transform = getattr(ocio, kwargs.pop('transform_type'))()
     for kwarg, value in kwargs.items():
         method = re.sub(r'(?!^)_([a-zA-Z])', lambda m: m.group(1).upper(),
                         kwarg)
@@ -500,7 +500,7 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
 
     import PyOpenColorIO as ocio
 
-    assert kwargs['name'] == 'FileTransform'
+    assert kwargs['transform_type'] == 'FileTransform'
     assert Path(kwargs['src']).exists()
 
     raw_config = ocio.Config().CreateRaw()
@@ -541,7 +541,7 @@ def transform_factory(**kwargs):
         *OpenColorIO* transform.
     """
 
-    factory = TRANSFORM_FACTORIES[kwargs.get('factory', 'Default')]
+    factory = TRANSFORM_FACTORIES[kwargs.get('transform_factory', 'Default')]
 
     return factory(**kwargs)
 

@@ -127,9 +127,9 @@ def clf_transform_to_colorspace(clf_transform,
         'name': clf_transform.user_name,
         'description': clf_transform_to_description(clf_transform, describe),
         'from_reference': {
-            'name': 'FileTransform',
+            'transform_type': 'FileTransform',
+            'transform_factory': 'CLF Transform to Group Transform',
             'src': clf_transform.path,
-            'factory': 'CLF Transform to Group Transform',
         },
     }
     signature.update(kwargs)
@@ -177,9 +177,9 @@ def clf_transform_to_named_transform(
         'name': clf_transform.user_name,
         'description': clf_transform_to_description(clf_transform, describe),
         'forward_transform': {
-            'name': 'FileTransform',
+            'transform_type': 'FileTransform',
+            'transform_factory': 'CLF Transform to Group Transform',
             'src': clf_transform.path,
-            'factory': 'CLF Transform to Group Transform',
         },
     }
     signature.update(kwargs)

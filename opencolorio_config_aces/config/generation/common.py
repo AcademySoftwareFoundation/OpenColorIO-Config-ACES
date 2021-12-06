@@ -420,7 +420,7 @@ if __name__ == '__main__':
         'description': ('WARNING: The sRGB "EOTF" is purposely incorrect and '
                         'only a placeholder!'),
         'to_reference': {
-            'name': 'ExponentTransform',
+            'transform_type': 'ExponentTransform',
             'value': [2.2, 2.2, 2.2, 1]
         }
     }
@@ -428,7 +428,7 @@ if __name__ == '__main__':
         'name': 'Colorspace - sRGB',
         'family': 'Colorspace',
         'to_reference': {
-            'name': 'ColorSpaceTransform',
+            'transform_type': 'ColorSpaceTransform',
             'src': 'CCTF - sRGB',
             'dst': 'Gamut - sRGB',
         }
@@ -446,7 +446,7 @@ if __name__ == '__main__':
     look_2 = {
         'name': 'Look - Green',
         'forward_transform': {
-            'name': 'CDLTransform',
+            'transform_type': 'CDLTransform',
             'slope': [0, 0, 0],
             'offset': [0, 1, 0]
         }
@@ -459,7 +459,7 @@ if __name__ == '__main__':
         'forward_transform': [  # Note the nested "GroupTransform"s.
             [
                 {
-                    'name': 'CDLTransform',
+                    'transform_type': 'CDLTransform',
                     'slope': [0, 0, 0],
                     'offset': [0, 1, 0]
                 },
@@ -508,7 +508,7 @@ if __name__ == '__main__':
         'name': 'ACES - ACEScg',
         'family': 'ACES',
         'to_reference': {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': 'ACEScg_to_ACES2065-1',
         },
         'aliases': ['lin_ap1']
@@ -517,7 +517,7 @@ if __name__ == '__main__':
         'name': 'Gamut - sRGB',
         'family': 'Gamut',
         'to_reference': {
-            'name':
+            'transform_type':
             'MatrixTransform',
             'matrix': [
                 0.4387956642,
@@ -543,7 +543,7 @@ if __name__ == '__main__':
         'name': 'CCTF - sRGB',
         'family': 'CCTF',
         'to_reference': {
-            'name': 'ExponentWithLinearTransform',
+            'transform_type': 'ExponentWithLinearTransform',
             'gamma': [2.4, 2.4, 2.4, 1],
             'offset': [0.055, 0.055, 0.055, 0]
         }
@@ -558,7 +558,7 @@ if __name__ == '__main__':
         'name': '+1 Stop',
         'family': 'Exposure',
         'forward_transform': {
-            'name':
+            'transform_type':
             'MatrixTransform',
             'matrix': [
                 2.0000000000,
@@ -583,7 +583,7 @@ if __name__ == '__main__':
     look_1 = {
         'name': 'Look - Red',
         'forward_transform': {
-            'name': 'CDLTransform',
+            'transform_type': 'CDLTransform',
             'slope': [0, 0, 0],
             'offset': [1, 0, 0]
         }
@@ -594,7 +594,7 @@ if __name__ == '__main__':
     display_1 = {
         'name': 'sRGB Monitor',
         'from_reference': {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': 'DISPLAY - CIE-XYZ-D65_to_sRGB',
         },
         'reference_space': 'REFERENCE_SPACE_DISPLAY'
@@ -602,7 +602,7 @@ if __name__ == '__main__':
     display_2 = {
         'name': 'ITU-R BT.1886 Monitor',
         'from_reference': {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': 'DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709',
         },
         'reference_space': 'REFERENCE_SPACE_DISPLAY'
@@ -611,14 +611,14 @@ if __name__ == '__main__':
     view_transform_1 = {
         'name': 'ACES Output - SDR Video - 1.0',
         'from_reference': {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': 'ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0'
         }
     }
     view_transform_2 = {
         'name': 'Output - No Tonescale',
         'from_reference': {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': 'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'
         }
     }
@@ -684,7 +684,7 @@ if __name__ == '__main__':
         'name': '-1 Stop',
         'family': 'Exposure',
         'forward_transform': {
-            'name':
+            'transform_type':
             'MatrixTransform',
             'matrix': [
                 -2.0000000000,
