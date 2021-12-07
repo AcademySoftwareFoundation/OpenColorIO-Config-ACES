@@ -53,10 +53,11 @@ def generate_clf_aces(directory):
         1.0000000000, 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000,
         1.0000000000
     ]
-    _dummy_matrix_transform = transform_factory(**{
-        'name': 'MatrixTransform',
-        'matrix': _M_dummy,
-    })
+    _dummy_matrix_transform = transform_factory(
+        **{
+            'transform_type': 'MatrixTransform',
+            'matrix': _M_dummy,
+        })
     _dummy_metadata = {
         'ID': 'Undefined',
         'name': 'Undefined',
@@ -127,7 +128,7 @@ def generate_clf_aces(directory):
             'CAT02',
         ))
     matrix_transform = transform_factory(**{
-        'name': 'MatrixTransform',
+        'transform_type': 'MatrixTransform',
         'matrix': M_AP0_to_Rec709,
     })
     clf_path = directory / 'ACES.OCIO.AP0_to_Rec.709.clf'
