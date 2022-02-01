@@ -19,7 +19,7 @@ from enum import Flag, auto
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
-    ConfigData, colorspace_factory, generate_config, look_factory,
+    VersionData, ConfigData, colorspace_factory, generate_config, look_factory,
     produce_transform, view_transform_factory)
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms, discover_aces_ctl_transforms,
@@ -803,7 +803,7 @@ def style_to_view_transform(style,
 
     if signature_only:
         signature['from_reference'] = {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': style,
         }
         return signature
@@ -875,7 +875,7 @@ def style_to_display_colorspace(
 
     if signature_only:
         signature['from_reference'] = {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': style,
         }
 
@@ -1030,6 +1030,7 @@ def generate_config_aces(
         'family': 'Utility',
         'description': 'The utility "Raw" colorspace.',
         'is_data': True,
+        'categories': ['file-io']
     }
 
     colorspaces += [
@@ -1084,7 +1085,7 @@ def generate_config_aces(
                         analytical=analytical,
                         signature_only=True,
                         forward_transform={
-                            'name': 'BuiltinTransform',
+                            'transform_type': 'BuiltinTransform',
                             'style': style,
                         },
                         process_space=scene_reference_colorspace['name'],
@@ -1098,7 +1099,7 @@ def generate_config_aces(
                         analytical=analytical,
                         signature_only=True,
                         to_reference={
-                            'name': 'BuiltinTransform',
+                            'transform_type': 'BuiltinTransform',
                             'style': style,
                         },
                         encoding=transform_data.get('encoding'),
@@ -1109,7 +1110,7 @@ def generate_config_aces(
     untonemapped_view_transform = {
         'name': 'Un-tone-mapped',
         'from_reference': {
-            'name': 'BuiltinTransform',
+            'transform_type': 'BuiltinTransform',
             'style': 'UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD'
         },
     }
@@ -1163,7 +1164,7 @@ def generate_config_aces(
         }],
         inactive_colorspaces=['CIE-XYZ-D65'],
         default_view_transform=untonemapped_view_transform['name'],
-        profile_version=2)
+        profile_version=VersionData(2, 0))
 
     config = generate_config(data, config_name, validate)
 

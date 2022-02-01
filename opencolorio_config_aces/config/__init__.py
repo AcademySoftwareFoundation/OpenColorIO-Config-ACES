@@ -2,10 +2,10 @@
 # Copyright Contributors to the OpenColorIO Project.
 
 from .generation import (
-    ConfigData, colorspace_factory, deserialize_config_data, generate_config,
-    group_transform_factory, look_factory, named_transform_factory,
-    produce_transform, serialize_config_data, transform_factory,
-    validate_config, view_transform_factory)
+    ConfigData, VersionData, colorspace_factory, deserialize_config_data,
+    generate_config, group_transform_factory, look_factory,
+    named_transform_factory, produce_transform, serialize_config_data,
+    transform_factory, validate_config, view_transform_factory)
 from .reference import (
     ColorspaceDescriptionStyle, build_aces_conversion_graph,
     classify_aces_ctl_transforms, conversion_path, ctl_transform_to_node,
@@ -15,10 +15,11 @@ from .reference import (
 from .cg import generate_config_cg
 
 __all__ = [
-    'ConfigData', 'colorspace_factory', 'deserialize_config_data',
-    'generate_config', 'group_transform_factory', 'look_factory',
-    'named_transform_factory', 'produce_transform', 'serialize_config_data',
-    'transform_factory', 'validate_config', 'view_transform_factory'
+    'ConfigData', 'VersionData', 'colorspace_factory',
+    'deserialize_config_data', 'generate_config', 'group_transform_factory',
+    'look_factory', 'named_transform_factory', 'produce_transform',
+    'serialize_config_data', 'transform_factory', 'validate_config',
+    'view_transform_factory'
 ]
 __all__ += [
     'ColorspaceDescriptionStyle', 'build_aces_conversion_graph',

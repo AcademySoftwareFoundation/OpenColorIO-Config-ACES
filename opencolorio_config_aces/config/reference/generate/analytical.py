@@ -12,7 +12,7 @@ import itertools
 import logging
 
 from opencolorio_config_aces.config.generation import (
-    ConfigData, colorspace_factory, generate_config)
+    VersionData, ConfigData, colorspace_factory, generate_config)
 from opencolorio_config_aces.config.reference.discover.graph import (
     SEPARATOR_NODE_NAME_CTL)
 from opencolorio_config_aces.config.reference import (
@@ -345,7 +345,7 @@ def generate_config_aces(config_name=None,
             'name': 'Default',
             'colorspace': 'CSC - ACEScg'
         }],
-        profile_version=2)
+        profile_version=VersionData(2, 0))
 
     config = generate_config(data, config_name, validate)
 

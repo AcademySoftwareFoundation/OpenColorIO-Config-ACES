@@ -96,10 +96,11 @@ def generate_clf_common(directory):
         1.0000000000, 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000,
         1.0000000000
     ]
-    _dummy_matrix_transform = transform_factory(**{
-        'name': 'MatrixTransform',
-        'matrix': _M_dummy,
-    })
+    _dummy_matrix_transform = transform_factory(
+        **{
+            'transform_type': 'MatrixTransform',
+            'matrix': _M_dummy,
+        })
     _dummy_metadata = {
         'ID': 'Undefined',
         'name': 'Undefined',
@@ -146,7 +147,7 @@ if __name__ == '__main__':
 
     matrix_transform = opencolorio_config_aces.transform_factory(
         **{
-            'name':
+            'transform_type':
             'MatrixTransform',
             'matrix': [
                 0.4387956642, 0.3825367756, 0.1787151431, 0.0000000000,

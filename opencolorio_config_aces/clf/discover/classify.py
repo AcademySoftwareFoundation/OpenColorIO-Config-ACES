@@ -17,7 +17,6 @@ discovery and classification:
 import itertools
 import logging
 import os
-import re
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from collections.abc import Mapping
@@ -33,7 +32,7 @@ __email__ = 'ocio-dev@lists.aswf.io'
 __status__ = 'Production'
 
 __all__ = [
-    'URN_CLF', 'SEPARATOR_URN_CLF', 'SEPARATOR_ID_CLF', 'NAMESPACE_CLF',
+    'URN_CLF', 'SEPARATOR_VERSION_CLF', 'SEPARATOR_ID_CLF', 'NAMESPACE_CLF',
     'TRANSFORM_TYPES_CLF', 'TRANSFORM_FAMILIES_CLF',
     'TRANSFORM_GENUS_DEFAULT_CLF', 'TRANSFORM_FILTERERS_DEFAULT_CLF',
     'PATTERNS_DESCRIPTION_CLF', 'ROOT_TRANSFORMS_CLF',
@@ -43,42 +42,44 @@ __all__ = [
     'filter_clf_transforms', 'print_clf_taxonomy'
 ]
 
-URN_CLF = 'urn:aswf:ocio:transformId:v1.0'
+URN_CLF = 'urn:aswf:ocio:transformId:1.0'
 """
 *CLF* Uniform Resource Name (*URN*).
 
 URN_CLF : unicode
 """
 
-SEPARATOR_URN_CLF = ':'
+SEPARATOR_VERSION_CLF = '.'
 """
-*CLFtransformID* separator used to separate the *URN* and *ID* part of the
+*CLFtransformID* separator used to tokenize the *VERSION* parts of the
 *CLFtransformID*.
 
-SEPARATOR_URN_CLF : unicode
+urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2pnt2:1.0
+                         |---|                               |---|
+
+SEPARATOR_ID_CLF : unicode
 """
 
-SEPARATOR_ID_CLF = '.'
+SEPARATOR_ID_CLF = ':'
 """
 *CLFtransformID* separator used to tokenize the *ID* part of the
 *CLFtransformID*.
 
-urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1
-|-------------URN------------|:|-----------------ID----------------|
+urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2pnt2:1.0
+|-------------URN-----------|:|----------------ID---------------|
 
 SEPARATOR_ID_CLF : unicode
 """
 
 NAMESPACE_CLF = 'OCIO'
 """
-*ACES* namespace for the *OCIO* *CLF* transforms.
+Namespace for the *OCIO* *CLF* transforms.
 
 NAMESPACE_CLF : unicode
 """
 
 TRANSFORM_TYPES_CLF = [
-    'ACES',
-    'Common',
+    'Utility',
 ]
 """
 *CLF* transform types.
@@ -86,7 +87,7 @@ TRANSFORM_TYPES_CLF = [
 TRANSFORM_TYPES_CLF : list
 """
 
-TRANSFORM_FAMILIES_CLF = {'aces': 'aces'}
+TRANSFORM_FAMILIES_CLF = {'utility': 'Utility'}
 """
 *CLF* transform families mapping the *CLF* transform directories to family
 names.
@@ -119,7 +120,7 @@ ROOT_TRANSFORMS_CLF = os.path.normpath(
     os.environ.get(
         'OPENCOLORIO_CONFIG_ACES__CLF_TRANSFORMS_ROOT',
         os.path.join(
-            os.path.dirname(__file__), '..', 'transforms', 'builtins')))
+            os.path.dirname(__file__), '..', 'transforms', 'ocio')))
 """
 *CLF* transforms root directory, default to the version controlled
 sub-module repository. It can be defined by setting the
@@ -457,29 +458,30 @@ class CLFTransformID:
 
         clf_transform_id = self._clf_transform_id
 
-        self._urn, components = clf_transform_id.rsplit(SEPARATOR_URN_CLF, 1)
-        components = components.split(SEPARATOR_ID_CLF)
-        self._type, components = components[0], components[1:]
-
-        assert self._urn == URN_CLF, (
+        assert clf_transform_id.startswith(URN_CLF), (
             f'{self._clf_transform_id} URN {self._urn} is invalid!')
 
-        assert len(components) in (4, 5), (
+        self._urn = clf_transform_id[:len(URN_CLF) + 1]
+        components = clf_transform_id[len(URN_CLF) + 1:]
+        components = components.split(SEPARATOR_ID_CLF)
+
+        assert len(components) == 4, (
             f'{self._clf_transform_id} is an invalid "CLFtransformID"!')
 
-        if len(components) == 4:
-            (self._namespace, self._name, self._major_version_number,
-             self._minor_version_number) = components
-        else:
-            (self._namespace, self._name, self._major_version_number,
-             self._minor_version_number,
-             self._patch_version_number) = components
+        (self._namespace, self._type, self._name, version) = components
 
         assert self._type in TRANSFORM_TYPES_CLF, (
             f'{self._clf_transform_id} type {self._type} is invalid!')
 
         if self._name is not None:
             self._source, self._target = self._name.split('_to_')
+
+        assert version.count(SEPARATOR_VERSION_CLF) == 1, (
+            f'{self._clf_transform_id} has an invalid "CLFtransformID" '
+            f'version!')
+
+        (self._major_version_number,
+         self._minor_version_number) = version.split(SEPARATOR_VERSION_CLF)
 
 
 class CLFTransform:
@@ -503,6 +505,8 @@ class CLFTransform:
     clf_transform_id
     user_name
     description
+    input_descriptor
+    output_descriptor
     family
     genus
 
@@ -521,6 +525,8 @@ class CLFTransform:
         self._clf_transform_id = None
         self._user_name = None
         self._description = ''
+        self._input_descriptor = ''
+        self._output_descriptor = ''
 
         self._family = family
         self._genus = genus
@@ -640,6 +646,52 @@ class CLFTransform:
         """
 
         return self._description
+
+    @property
+    def input_descriptor(self):
+        """
+        Getter and setter property for the *CLF* transform input descriptor
+        extracted from parsing the file content header.
+
+        Parameters
+        ----------
+        value : unicode
+            Attribute value.
+
+        Returns
+        -------
+        unicode
+            *CLF* transform input descriptor.
+
+        Notes
+        -----
+        -   This property is read only.
+        """
+
+        return self._input_descriptor
+
+    @property
+    def output_descriptor(self):
+        """
+        Getter and setter property for the *CLF* transform output descriptor
+        extracted from parsing the file content header.
+
+        Parameters
+        ----------
+        value : unicode
+            Attribute value.
+
+        Returns
+        -------
+        unicode
+            *CLF* transform output descriptor.
+
+        Notes
+        -----
+        -   This property is read only.
+        """
+
+        return self._output_descriptor
 
     @property
     def family(self):
@@ -785,9 +837,20 @@ CLFTransform` class are tried on the underlying
 
         self._clf_transform_id = CLFTransformID(root.attrib['id'])
         self._user_name = root.attrib['name']
+
         description = next(iter(root.findall('./Description')), None)
         if description is not None:
             self._description = description.text
+
+        input_descriptor = next(
+            iter(root.findall('./InputDescriptor')), None)
+        if input_descriptor is not None:
+            self._input_descriptor = input_descriptor.text
+
+        output_descriptor = next(
+            iter(root.findall('./OutputDescriptor')), None)
+        if output_descriptor is not None:
+            self._output_descriptor = output_descriptor.text
 
 
 class CLFTransformPair:
@@ -965,9 +1028,7 @@ def find_clf_transform_pairs(clf_transforms):
     # to define which transform is the forward transform.
     paths = defaultdict(list)
     for clf_transform in sorted(clf_transforms, key=stem):
-        forward_path = tuple(
-            re.split('_to_',
-                     stem(clf_transform).split('.', 2)[-1]))
+        forward_path = tuple(stem(clf_transform).split('_to_', 1))
         inverse_path = tuple(reversed(forward_path))
         if inverse_path in paths:
             paths[inverse_path].append(clf_transform)
@@ -1012,9 +1073,10 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> clf_transforms = discover_clf_transforms()
     >>> key = sorted(clf_transforms.keys())[0]
     >>> os.path.basename(key)
-    'aces'
+    'utility'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
-    ['ACES.OCIO.AP0_to_AP1-Gamma2.2.clf', 'ACES.OCIO.AP0_to_P3-D65.clf']
+    ['OCIO.Utility.AP0_to_AP1-Gamma2.2.clf', \
+'OCIO.Utility.AP0_to_P3-D65-Linear.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1071,16 +1133,16 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ...     discover_clf_transforms())
     >>> family = sorted(clf_transforms.keys())[0]
     >>> str(family)
-    'aces'
+    'Utility'
     >>> genera = sorted(clf_transforms[family])
     >>> print(genera)
     ['undefined']
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
-    [('ACES.OCIO.AP0_to_AP1-Gamma2.2', \
-CLFTransform('aces...ACES.OCIO.AP0_to_AP1-Gamma2.2.clf')), \
-('ACES.OCIO.AP0_to_P3-D65', \
-CLFTransform('aces...ACES.OCIO.AP0_to_P3-D65.clf'))]
+    [('OCIO.Utility.AP0_to_AP1-Gamma2.2', \
+CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')), \
+('OCIO.Utility.AP0_to_P3-D65-Linear', \
+CLFTransform('utility...OCIO.Utility.AP0_to_P3-D65-Linear.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1088,7 +1150,11 @@ CLFTransform('aces...ACES.OCIO.AP0_to_P3-D65.clf'))]
     root_directory = paths_common_ancestor(
         *itertools.chain.from_iterable(unclassified_clf_transforms.values()))
     for directory, clf_transforms in unclassified_clf_transforms.items():
-        sub_directory = directory.replace(f'{root_directory}{os.sep}', '')
+        if directory == root_directory:
+            sub_directory = os.path.basename(root_directory)
+        else:
+            sub_directory = directory.replace(f'{root_directory}{os.sep}', '')
+
         family, *genus = [
             TRANSFORM_FAMILIES_CLF.get(part, part)
             for part in sub_directory.split(os.sep)
@@ -1149,7 +1215,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform('aces...ACES.OCIO.AP0_to_AP1-Gamma2.2.clf')
+    CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')
     """
 
     unclassified_clf_transforms = []
@@ -1202,9 +1268,9 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     >>> sorted(  # doctest: +ELLIPSIS
     ...     filter_clf_transforms(
     ...         clf_transforms,
-    ...         [lambda x: x.family == 'common']),
+    ...         [lambda x: x.family == 'Utility']),
     ...     key=lambda x: x.path)[0]
-    CLFTransform('common...Common.OCIO.Linear_to_Rec1886.clf')
+    CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')
     """
 
     if filterers is None:
