@@ -49,7 +49,7 @@ def create_matrix(matrix, offset=None):
 
     matrix44 = np.zeros((4, 4))
     matrix44[3, 3] = 1.0
-    for i in range(0,3):
+    for i in range(3):
         matrix44[i, 0:3] = matrix[i, :]
 
     offset4 = np.zeros(4)
@@ -57,7 +57,7 @@ def create_matrix(matrix, offset=None):
         offset4[0:3] = offset
 
     return ocio.MatrixTransform(
-        matrix=list(matrix44.ravel()), 
+        matrix=list(matrix44.ravel()),
         offset=list(offset4)
     )
 
@@ -85,8 +85,8 @@ def create_conversion_matrix(input_prims, output_prims):
 
     return create_matrix(
         colour.matrix_RGB_to_RGB(
-            colour.RGB_COLOURSPACES[input_prims], 
-            colour.RGB_COLOURSPACES[output_prims], 
+            colour.RGB_COLOURSPACES[input_prims],
+            colour.RGB_COLOURSPACES[output_prims],
             chromatic_adaptation_transform='Bradford'
         )
     )
@@ -126,9 +126,9 @@ def create_gamma(gamma):
         offset[0:3] = 0.055
 
         exp_tf = ocio.ExponentWithLinearTransform(
-            gamma=value, 
-            offset=offset, 
-            negativeStyle=ocio.NEGATIVE_LINEAR, 
+            gamma=value,
+            offset=offset,
+            negativeStyle=ocio.NEGATIVE_LINEAR,
             direction=direction
         )
 
@@ -137,8 +137,8 @@ def create_gamma(gamma):
         value[0:3] = gamma
 
         exp_tf = ocio.ExponentTransform(
-            value=value, 
-            negativeStyle=ocio.NEGATIVE_PASS_THRU, 
+            value=value,
+            negativeStyle=ocio.NEGATIVE_PASS_THRU,
             direction=direction
         )
 
@@ -175,8 +175,8 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
     metadata.addChildElement('OutputDescriptor', output_desc)
 
     group_tf.write(
-        formatName='Academy/ASC Common LUT Format', 
-        config=ocio.Config.CreateRaw(), 
+        formatName='Academy/ASC Common LUT Format',
+        config=ocio.Config.CreateRaw(),
         fileName=str(DEST_DIR / filename)
     )
 
@@ -194,20 +194,20 @@ def generate_clf_utility():
 
     generate_clf(
         ocio.GroupTransform(transforms=[
-            create_conversion_matrix('ACES2065-1', 'sRGB'), 
+            create_conversion_matrix('ACES2065-1', 'sRGB'),
             create_gamma('sRGB')
-        ]), 
-        'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-sRGB:1.0', 
-        'AP0 to Rec.709 - sRGB', 
-        'OCIO.Utility.AP0_to_Rec709-sRGB.clf', 
-        'ACES2065-1', 
+        ]),
+        'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-sRGB:1.0',
+        'AP0 to Rec.709 - sRGB',
+        'OCIO.Utility.AP0_to_Rec709-sRGB.clf',
+        'ACES2065-1',
         'sRGB'
     )
 
     generate_clf(
         ocio.GroupTransform(transforms=[
             create_gamma(2.4)
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886:1.0',
         'Linear to Rec.1886',
         'OCIO.Utility.Linear_to_Rec1886.clf',
@@ -218,7 +218,7 @@ def generate_clf_utility():
     generate_clf(
         ocio.GroupTransform(transforms=[
             create_gamma('sRGB')
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB:1.0',
         'Linear to sRGB',
         'OCIO.Utility.Linear_to_sRGB.clf',
@@ -229,7 +229,7 @@ def generate_clf_utility():
     generate_clf(
         ocio.GroupTransform(transforms=[
             create_conversion_matrix('ACES2065-1', 'P3-D65')
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_P3-D65-Linear:1.0',
         'AP0 to P3-D65 - Linear',
         'OCIO.Utility.AP0_to_P3-D65-Linear.clf',
@@ -240,7 +240,7 @@ def generate_clf_utility():
     generate_clf(
         ocio.GroupTransform(transforms=[
             create_conversion_matrix('ACES2065-1', 'ITU-R BT.2020')
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec2020-Linear:1.0',
         'AP0 to Rec.2020 - Linear',
         'OCIO.Utility.AP0_to_Rec2020-Linear.clf',
@@ -251,7 +251,7 @@ def generate_clf_utility():
     generate_clf(
         ocio.GroupTransform(transforms=[
             create_conversion_matrix('ACES2065-1', 'ITU-R BT.709')
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0',
         'AP0 to Rec.709 - Linear',
         'OCIO.Utility.AP0_to_Rec709-Linear.clf',
@@ -261,9 +261,9 @@ def generate_clf_utility():
 
     generate_clf(
         ocio.GroupTransform(transforms=[
-            create_conversion_matrix('ACES2065-1', 'ITU-R BT.709'), 
+            create_conversion_matrix('ACES2065-1', 'ITU-R BT.709'),
             create_gamma(1.8)
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma1.8:1.0',
         'AP0 to Rec.709 - Gamma 1.8',
         'OCIO.Utility.AP0_to_Rec709-Gamma1.8.clf',
@@ -273,9 +273,9 @@ def generate_clf_utility():
 
     generate_clf(
         ocio.GroupTransform(transforms=[
-            create_conversion_matrix('ACES2065-1', 'ITU-R BT.709'), 
+            create_conversion_matrix('ACES2065-1', 'ITU-R BT.709'),
             create_gamma(2.2)
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.2:1.0',
         'AP0 to Rec.709 - Gamma 2.2',
         'OCIO.Utility.AP0_to_Rec709-Gamma2.2.clf',
@@ -285,9 +285,9 @@ def generate_clf_utility():
 
     generate_clf(
         ocio.GroupTransform(transforms=[
-            create_conversion_matrix('ACES2065-1', 'ITU-R BT.709'), 
+            create_conversion_matrix('ACES2065-1', 'ITU-R BT.709'),
             create_gamma(2.4)
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.4:1.0',
         'AP0 to Rec.709 - Gamma 2.4',
         'OCIO.Utility.AP0_to_Rec709-Gamma2.4.clf',
@@ -297,9 +297,9 @@ def generate_clf_utility():
 
     generate_clf(
         ocio.GroupTransform(transforms=[
-            create_conversion_matrix('ACES2065-1', 'ACEScg'), 
+            create_conversion_matrix('ACES2065-1', 'ACEScg'),
             create_gamma(2.2)
-        ]), 
+        ]),
         'urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_AP1-Gamma2.2:1.0',
         'AP0 to AP1 - Gamma 2.2',
         'OCIO.Utility.AP0_to_AP1-Gamma2.2.clf',
