@@ -10,9 +10,7 @@ Defines various objects related to the generation of the *Utility* specific
 
 from pathlib import Path
 
-import colour
-import numpy as np
-import PyOpenColorIO as ocio
+from opencolorio_config_aces.utilities import required
 
 __author__ = 'OpenColorIO Contributors'
 __copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
@@ -23,13 +21,12 @@ __status__ = 'Production'
 
 __all__ = ['generate_clf', 'generate_clf_utility']
 
-
 THIS_DIR = Path(__file__).parent.resolve()
 DEST_DIR = THIS_DIR / 'ocio' / 'utility'
 
-CONFIG_RAW = ocio.Config.CreateRaw()
 
-
+@required('Colour')
+@required('OpenColorIO')
 def create_matrix(matrix, offset=None):
     """
     Convert an NumPy array into an OCIO MatrixTransform.
@@ -47,6 +44,9 @@ def create_matrix(matrix, offset=None):
         MatrixTransform representation of provided array(s).
     """
 
+    import numpy as np
+    import PyOpenColorIO as ocio
+
     matrix44 = np.zeros((4, 4))
     matrix44[3, 3] = 1.0
     for i in range(0,3):
@@ -62,6 +62,7 @@ def create_matrix(matrix, offset=None):
     )
 
 
+@required('Colour')
 def create_conversion_matrix(input_prims, output_prims):
     """
     Calculate the RGB to RGB matrix for a pair of primaries as an OCIO 
@@ -80,6 +81,8 @@ def create_conversion_matrix(input_prims, output_prims):
         Conversion MatrixTransform.
     """
 
+    import colour
+
     return create_matrix(
         colour.matrix_RGB_to_RGB(
             colour.RGB_COLOURSPACES[input_prims], 
@@ -89,6 +92,8 @@ def create_conversion_matrix(input_prims, output_prims):
     )
 
 
+@required('Colour')
+@required('OpenColorIO')
 def create_gamma(gamma):
     """
     Convert an gamma value into an OCIO ExponentTransform or 
@@ -105,6 +110,9 @@ def create_gamma(gamma):
     ocio.Transform
         ExponentTransform or ExponentWithLinearTransform.
     """
+
+    import numpy as np
+    import PyOpenColorIO as ocio
 
     # NB: Preference of working group during 2021-11-23 mtg was *not* to clamp.
     direction = ocio.TRANSFORM_DIR_INVERSE
@@ -137,6 +145,7 @@ def create_gamma(gamma):
     return exp_tf
 
 
+@required('OpenColorIO')
 def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
     """
     Take a GroupTransform and some metadata and write a CLF file.
@@ -157,6 +166,8 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
         CLF output descriptor.
     """
 
+    import PyOpenColorIO as ocio
+
     metadata = group_tf.getFormatMetadata()
     metadata.setID(tf_id)
     metadata.setName(tf_name)
@@ -165,15 +176,18 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
 
     group_tf.write(
         formatName='Academy/ASC Common LUT Format', 
-        config=CONFIG_RAW, 
+        config=ocio.Config.CreateRaw(), 
         fileName=str(DEST_DIR / filename)
     )
 
 
+@required('OpenColorIO')
 def generate_clf_utility():
     """
     Generate OCIO Utility CLF transforms.
     """
+
+    import PyOpenColorIO as ocio
 
     if not DEST_DIR.exists():
         DEST_DIR.mkdir()
