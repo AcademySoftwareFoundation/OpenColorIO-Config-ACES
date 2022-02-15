@@ -3,4 +3,4 @@
 
 from .config import generate_config_cg
 
-__all__ = ['generate_config_cg']
+__all__ = ["generate_config_cg"]

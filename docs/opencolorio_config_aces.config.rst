@@ -5,8 +5,6 @@
 Generation
 ==========
 
-.. contents:: :local:
-
 Config Generation Common Objects
 --------------------------------
 
@@ -17,19 +15,31 @@ Config Generation Common Objects
 .. autosummary::
     :toctree: generated/
 
-    produce_transform
-    transform_factory
-    group_transform_factory
-    colorspace_factory
-    named_transform_factory
-    view_transform_factory
-    look_factory
     ConfigData
     VersionData
     deserialize_config_data
+    generate_config
     serialize_config_data
     validate_config
-    generate_config
+
+Factories
+~~~~~~~~~
+
+``opencolorio_config_aces``
+
+.. autosummary::
+    :toctree: generated/
+
+    TRANSFORM_FACTORIES
+    colorspace_factory
+    group_transform_factory
+    look_factory
+    named_transform_factory
+    produce_transform
+    transform_factory
+    transform_factory_clf_transform_to_group_transform
+    transform_factory_default
+    view_transform_factory
 
 Reference Configuration
 -----------------------
@@ -44,11 +54,11 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
-    discover_aces_ctl_transforms
     classify_aces_ctl_transforms
-    unclassify_ctl_transforms
+    discover_aces_ctl_transforms
     filter_ctl_transforms
     print_aces_taxonomy
+    unclassify_ctl_transforms
 
 *aces-dev* Conversion Graph
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,11 +71,10 @@ Reference Configuration
     :toctree: generated/
 
     build_aces_conversion_graph
-    node_to_builtin_transform
-    node_to_ctl_transform
+    conversion_path
     ctl_transform_to_node
     filter_nodes
-    conversion_path
+    node_to_ctl_transform
     plot_aces_conversion_graph
 
 *aces-dev* Reference Config Generator
