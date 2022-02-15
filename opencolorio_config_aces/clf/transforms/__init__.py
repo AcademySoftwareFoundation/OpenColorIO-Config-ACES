@@ -3,4 +3,4 @@
 
 from .utility import generate_clf
 
-__all__ = ['generate_clf']
+__all__ = ["generate_clf"]

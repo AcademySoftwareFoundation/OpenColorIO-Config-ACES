@@ -18,56 +18,94 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = ">= 3.8, < 3.11"
+# numpy = ">= 1.19, < 2"
+opencolorio = ">= 2, < 3"
+# scipy = ">= 1.5, < 2"
 
-colour-science = { version = "^0.3.16", optional = true }
+colour = { git = "https://github.com/colour-science/colour.git", branch = "develop", optional = true }
+jsonpickle = { version = "^2.0.0", optional = true }
+networkx = { version = "*", optional = true }
+pygraphviz = { version = "*", optional = true }
+
+black = { version = "*", optional = true }  # Development dependency.
 coverage = { version = "*", optional = true }  # Development dependency.
 coveralls = { version = "*", optional = true }  # Development dependency.
 flake8 = { version = "*", optional = true }  # Development dependency.
+flynt = { version = "*", optional = true }  # Development dependency.
 invoke = { version = "*", optional = true }  # Development dependency.
-jsonpickle = { version = "^2.0.0", optional = true }
-networkx = { version = "*", optional = true }
-nose = { version = "*", optional = true }  # Development dependency.
+mypy = { version = "*", optional = true }  # Development dependency.
 pre-commit = { version = "*", optional = true }  # Development dependency.
-pygraphviz = { version = "*", optional = true }
+pydata-sphinx-theme = { version = "*", optional = true }  # Development dependency.
+pydocstyle = { version = "*", optional = true }  # Development dependency.
 pytest = { version = "*", optional = true }  # Development dependency.
+pytest-cov = { version = "*", optional = true }  # Development dependency.
+pyupgrade = { version = "*", optional = true }  # Development dependency.
 restructuredtext-lint = { version = "*", optional = true }  # Development dependency.
-sphinx = { version = "*", optional = true }  # Development dependency.
-sphinx_rtd_theme = { version = "*", optional = true }  # Development dependency.
+sphinx = { version = ">= 4, < 5", optional = true }  # Development dependency.
 twine = { version = "*", optional = true }  # Development dependency.
-yapf = { version = "0.23", optional = true }  # Development dependency.
 
 [tool.poetry.dev-dependencies]
+black = "*"
 coverage = "*"
 coveralls = "*"
 flake8 = "*"
+flynt = "*"
 invoke = "*"
-nose = "*"
+mypy = "*"
 pre-commit = "*"
+pydata-sphinx-theme = "*"
+pydocstyle = "*"
 pytest = "*"
+pytest-cov = "*"
+pyupgrade = "*"
 restructuredtext-lint = "*"
-sphinx = "*"
-sphinx_rtd_theme = "*"
+sphinx = ">= 4, < 5"
 twine = "*"
-yapf = "0.23"
 
 [tool.poetry.extras]
 development = [
+    "black",
     "coverage",
     "coveralls",
     "flake8",
     "invoke",
-    "nose",
+    "mypy",
     "pre-commit",
+    "pydata-sphinx-theme",
+    "pydocstyle",
     "pytest",
+    "pytest-cov",
+    "pyupgrade",
     "restructuredtext-lint",
     "sphinx",
-    "sphinx_rtd_theme",
     "twine",
-    "yapf"
 ]
 optional = [ "colour-science", "jsonpickle", "networkx" ]
 graphviz = [ "pygraphviz" ]
+
+[tool.black]
+line-length = 79
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | build
+  | dist
+  | opencolorio_config_aces/config/reference/aces-dev
+)/
+'''
+
+[tool.flynt]
+line_length=999
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
+ignore_missing_imports = true
+
+[tool.pydocstyle]
+convention = "numpy"
+add-ignore = "D104,D200,D202,D205,D301,D400"
 
 [build-system]
 requires = [ "poetry>=0.12" ]

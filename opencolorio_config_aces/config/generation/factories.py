@@ -21,22 +21,28 @@ from typing import Mapping, Sequence
 
 from opencolorio_config_aces.utilities import required
 
-__author__ = 'OpenColorIO Contributors'
-__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
-__license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO Contributors'
-__email__ = 'ocio-dev@lists.aswf.io'
-__status__ = 'Production'
+__author__ = "OpenColorIO Contributors"
+__copyright__ = "Copyright Contributors to the OpenColorIO Project."
+__license__ = "New BSD License - https://opensource.org/licenses/BSD-3-Clause"
+__maintainer__ = "OpenColorIO Contributors"
+__email__ = "ocio-dev@lists.aswf.io"
+__status__ = "Production"
 
 __all__ = [
-    'group_transform_factory', 'colorspace_factory', 'named_transform_factory',
-    'view_transform_factory', 'look_factory', 'transform_factory_default',
-    'transform_factory_clf_transform_to_group_transform',
-    'TRANSFORM_FACTORIES', 'transform_factory', 'produce_transform'
+    "group_transform_factory",
+    "colorspace_factory",
+    "named_transform_factory",
+    "view_transform_factory",
+    "look_factory",
+    "transform_factory_default",
+    "transform_factory_clf_transform_to_group_transform",
+    "TRANSFORM_FACTORIES",
+    "transform_factory",
+    "produce_transform",
 ]
 
 
-@required('OpenColorIO')
+@required("OpenColorIO")
 def group_transform_factory(transforms):
     """
     *OpenColorIO* group transform factory.
@@ -61,23 +67,25 @@ def group_transform_factory(transforms):
     return group_transform
 
 
-@required('OpenColorIO')
-def colorspace_factory(name,
-                       family=None,
-                       encoding=None,
-                       aliases=None,
-                       categories=None,
-                       description=None,
-                       equality_group=None,
-                       bit_depth=None,
-                       allocation=None,
-                       allocation_vars=None,
-                       to_reference=None,
-                       from_reference=None,
-                       is_data=None,
-                       reference_space=None,
-                       base_colorspace=None,
-                       **kwargs):
+@required("OpenColorIO")
+def colorspace_factory(
+    name,
+    family=None,
+    encoding=None,
+    aliases=None,
+    categories=None,
+    description=None,
+    equality_group=None,
+    bit_depth=None,
+    allocation=None,
+    allocation_vars=None,
+    to_reference=None,
+    from_reference=None,
+    is_data=None,
+    reference_space=None,
+    base_colorspace=None,
+    **kwargs,
+):
     """
     *OpenColorIO* colorspace factory.
 
@@ -154,12 +162,14 @@ def colorspace_factory(name,
         if to_reference is not None:
             colorspace.setTransform(
                 produce_transform(to_reference),
-                ocio.COLORSPACE_DIR_TO_REFERENCE)
+                ocio.COLORSPACE_DIR_TO_REFERENCE,
+            )
 
         if from_reference is not None:
             colorspace.setTransform(
                 produce_transform(from_reference),
-                ocio.COLORSPACE_DIR_FROM_REFERENCE)
+                ocio.COLORSPACE_DIR_FROM_REFERENCE,
+            )
 
     colorspace.setName(name)
 
@@ -178,7 +188,7 @@ def colorspace_factory(name,
 
     if categories is not None:
         if isinstance(categories, str):
-            categories = re.split('[,;\\s]+', categories)
+            categories = re.split("[,;\\s]+", categories)
 
         for category in categories:
             colorspace.addCategory(category)
@@ -195,17 +205,19 @@ def colorspace_factory(name,
     return colorspace
 
 
-@required('OpenColorIO')
-def named_transform_factory(name,
-                            family=None,
-                            encoding=None,
-                            aliases=None,
-                            categories=None,
-                            description=None,
-                            forward_transform=None,
-                            inverse_transform=None,
-                            base_named_transform=None,
-                            **kwargs):
+@required("OpenColorIO")
+def named_transform_factory(
+    name,
+    family=None,
+    encoding=None,
+    aliases=None,
+    categories=None,
+    description=None,
+    forward_transform=None,
+    inverse_transform=None,
+    base_named_transform=None,
+    **kwargs,
+):
     """
     *OpenColorIO* named transform factory.
 
@@ -247,7 +259,8 @@ def named_transform_factory(name,
     if base_named_transform is not None:
         if isinstance(base_named_transform, Mapping):
             base_named_transform = named_transform_factory(
-                **base_named_transform)
+                **base_named_transform
+            )
 
         named_transform = base_named_transform
     else:
@@ -256,12 +269,14 @@ def named_transform_factory(name,
         if forward_transform is not None:
             named_transform.setTransform(
                 produce_transform(forward_transform),
-                ocio.TRANSFORM_DIR_FORWARD)
+                ocio.TRANSFORM_DIR_FORWARD,
+            )
 
         if inverse_transform is not None:
             named_transform.setTransform(
                 produce_transform(inverse_transform),
-                ocio.TRANSFORM_DIR_INVERSE)
+                ocio.TRANSFORM_DIR_INVERSE,
+            )
 
     named_transform.setName(name)
 
@@ -280,7 +295,7 @@ def named_transform_factory(name,
 
     if categories is not None:
         if isinstance(categories, str):
-            categories = re.split('[,;\\s]+', categories)
+            categories = re.split("[,;\\s]+", categories)
 
         for category in categories:
             named_transform.addCategory(category)
@@ -291,16 +306,18 @@ def named_transform_factory(name,
     return named_transform
 
 
-@required('OpenColorIO')
-def view_transform_factory(name,
-                           family=None,
-                           categories=None,
-                           description=None,
-                           to_reference=None,
-                           from_reference=None,
-                           reference_space=None,
-                           base_view_transform=None,
-                           **kwargs):
+@required("OpenColorIO")
+def view_transform_factory(
+    name,
+    family=None,
+    categories=None,
+    description=None,
+    to_reference=None,
+    from_reference=None,
+    reference_space=None,
+    base_view_transform=None,
+    **kwargs,
+):
     """
     *OpenColorIO* view transform factory.
 
@@ -356,12 +373,14 @@ def view_transform_factory(name,
         if to_reference is not None:
             view_transform.setTransform(
                 produce_transform(to_reference),
-                ocio.VIEWTRANSFORM_DIR_TO_REFERENCE)
+                ocio.VIEWTRANSFORM_DIR_TO_REFERENCE,
+            )
 
         if from_reference is not None:
             view_transform.setTransform(
                 produce_transform(from_reference),
-                ocio.VIEWTRANSFORM_DIR_FROM_REFERENCE)
+                ocio.VIEWTRANSFORM_DIR_FROM_REFERENCE,
+            )
 
     view_transform.setName(name)
 
@@ -377,14 +396,16 @@ def view_transform_factory(name,
     return view_transform
 
 
-@required('OpenColorIO')
-def look_factory(name,
-                 process_space=None,
-                 description=None,
-                 forward_transform=None,
-                 inverse_transform=None,
-                 base_look=None,
-                 **kwargs):
+@required("OpenColorIO")
+def look_factory(
+    name,
+    process_space=None,
+    description=None,
+    forward_transform=None,
+    inverse_transform=None,
+    base_look=None,
+    **kwargs,
+):
     """
     *OpenColorIO* look factory.
 
@@ -444,7 +465,7 @@ def look_factory(name,
     return look
 
 
-@required('OpenColorIO')
+@required("OpenColorIO")
 def transform_factory_default(**kwargs):
     """
     *OpenColorIO* default transform factory that produces an *OpenColorIO*
@@ -467,18 +488,19 @@ def transform_factory_default(**kwargs):
 
     import PyOpenColorIO as ocio
 
-    transform = getattr(ocio, kwargs.pop('transform_type'))()
+    transform = getattr(ocio, kwargs.pop("transform_type"))()
     for kwarg, value in kwargs.items():
-        method = re.sub(r'(?!^)_([a-zA-Z])', lambda m: m.group(1).upper(),
-                        kwarg)
-        method = f'set{method[0].upper()}{method[1:]}'
+        method = re.sub(
+            r"(?!^)_([a-zA-Z])", lambda m: m.group(1).upper(), kwarg
+        )
+        method = f"set{method[0].upper()}{method[1:]}"
         if hasattr(transform, method):
             getattr(transform, method)(value)
 
     return transform
 
 
-@required('OpenColorIO')
+@required("OpenColorIO")
 def transform_factory_clf_transform_to_group_transform(**kwargs):
     """
     *OpenColorIO* transform factory that produces an *OpenColorIO*
@@ -500,21 +522,21 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
 
     import PyOpenColorIO as ocio
 
-    assert kwargs['transform_type'] == 'FileTransform'
-    assert Path(kwargs['src']).exists()
+    assert kwargs["transform_type"] == "FileTransform"
+    assert Path(kwargs["src"]).exists()
 
     raw_config = ocio.Config().CreateRaw()
-    file_transform = ocio.FileTransform(kwargs['src'])
+    file_transform = ocio.FileTransform(kwargs["src"])
     processor = raw_config.getProcessor(file_transform)
 
     return processor.createGroupTransform()
 
 
 TRANSFORM_FACTORIES = {
-    'Default':
-    transform_factory_default,
-    'CLF Transform to Group Transform':
-    transform_factory_clf_transform_to_group_transform,
+    "Default": transform_factory_default,
+    "CLF Transform to Group Transform": (
+        transform_factory_clf_transform_to_group_transform
+    ),
 }
 """
 *OpenColorIO* transform factories.
@@ -541,14 +563,14 @@ def transform_factory(**kwargs):
         *OpenColorIO* transform.
     """
 
-    factory = TRANSFORM_FACTORIES[kwargs.get('transform_factory', 'Default')]
+    factory = TRANSFORM_FACTORIES[kwargs.get("transform_factory", "Default")]
 
     return factory(**kwargs)
 
 
 def produce_transform(transform):
     """
-    Helper definition that produces given transform.
+    Produce given transform.
 
     Parameters
     ----------
