@@ -591,9 +591,7 @@ class ACESTransformID:
         return str(self)
 
     def _parse(self):
-        """
-        Parse the *ACEStransformID*.
-        """
+        """Parse the *ACEStransformID*."""
 
         if self._aces_transform_id is None:
             return
@@ -981,9 +979,7 @@ CTLTransform` class are tried on the underlying
         return not (self == other)
 
     def _parse(self):
-        """
-        Parse the *ACES* *CTL* transform.
-        """
+        """Parse the *ACES* *CTL* transform."""
 
         with open(self._path) as ctl_file:
             self._code = ctl_file.read()

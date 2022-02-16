@@ -249,9 +249,7 @@ PATTERNS_DISPLAY_NAME_REFERENCE : dict
 
 
 class ColorspaceDescriptionStyle(Flag):
-    """
-    Enum storing the various *OpenColorIO* colorspace description styles.
-    """
+    """Enum storing the various *OpenColorIO* colorspace description styles."""
 
     NONE = auto()
     ACES = auto()

@@ -185,9 +185,7 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
 
 @required("OpenColorIO")
 def generate_clf_utility():
-    """
-    Generate OCIO Utility CLF transforms.
-    """
+    """Generate OCIO Utility CLF transforms."""
 
     import PyOpenColorIO as ocio
 

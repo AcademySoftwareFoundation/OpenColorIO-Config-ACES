@@ -301,9 +301,7 @@ def generate_config_cg(
     )
 
     def multi_filters(array, filterers):
-        """
-        Apply given filterers on given array.
-        """
+        """Apply given filterers on given array."""
 
         return [
             element
@@ -358,9 +356,7 @@ def generate_config_cg(
     ]
 
     def view_filterer(transform):
-        """
-        Filter the views supported by a colorspace.
-        """
+        """Filter the views supported by a colorspace."""
 
         if transform["display"] not in display_colorspaces:
             return False

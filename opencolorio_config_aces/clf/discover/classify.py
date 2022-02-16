@@ -465,9 +465,7 @@ class CLFTransformID:
         return str(self)
 
     def _parse(self):
-        """
-        Parse the *CLFtransformID*.
-        """
+        """Parse the *CLFtransformID*."""
 
         if self._clf_transform_id is None:
             return
@@ -852,9 +850,7 @@ CLFTransform` class are tried on the underlying
         return not (self == other)
 
     def _parse(self):
-        """
-        Parse the *CLF* transform.
-        """
+        """Parse the *CLF* transform."""
 
         tree = ET.parse(self._path)
         root = tree.getroot()

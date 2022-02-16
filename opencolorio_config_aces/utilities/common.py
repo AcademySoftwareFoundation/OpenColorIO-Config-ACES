@@ -245,9 +245,7 @@ def message_box(message, width=79, padding=3, print_callable=print):
     ideal_width = width - padding * 2 - 2
 
     def inner(text):
-        """
-        Format and pads inner text for the message box.
-        """
+        """Format and pads inner text for the message box."""
 
         return "*{0}{1}{2}{0}*".format(
             " " * padding, text, (" " * (width - len(text) - padding * 2 - 2))
