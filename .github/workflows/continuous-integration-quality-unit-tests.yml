@@ -20,7 +20,6 @@ jobs:
         echo "CI_PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
         echo "CI_PACKAGE=opencolorio_config_aces" >> $GITHUB_ENV
         echo "CI_SHA=${{ github.sha }}" >> $GITHUB_ENV
-        echo "CI_FLAKE8_EXCLUDED=aces-dev" >> $GITHUB_ENV
         echo "COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }}" >> $GITHUB_ENV
       shell: bash
     - name: Set up Python ${{ matrix.python-version }}
