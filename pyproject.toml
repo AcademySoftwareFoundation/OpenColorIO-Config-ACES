@@ -23,7 +23,7 @@ python = ">= 3.8, < 3.11"
 opencolorio = ">= 2, < 3"
 # scipy = ">= 1.5, < 2"
 
-colour = { git = "https://github.com/colour-science/colour.git", branch = "develop", optional = true }
+colour-science = ">= 0.4.0"
 jsonpickle = { version = "^2.0.0", optional = true }
 networkx = { version = "*", optional = true }
 pygraphviz = { version = "*", optional = true }
