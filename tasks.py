@@ -33,6 +33,7 @@ __all__ = [
     "tests",
     "preflight",
     "docs",
+    "build_config_reference_analytical",
     "build_config_reference",
     "build_config_cg",
     "requirements",
@@ -40,6 +41,7 @@ __all__ = [
     "docker_remove",
     "run_in_container",
     "docker_run_docs",
+    "docker_run_build_config_reference_analytical",
     "docker_run_build_config_reference",
     "docker_run_build_config_cg",
 ]
@@ -207,6 +209,24 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
 
 
 @task
+def build_config_reference_analytical(ctx: Context):
+    """
+    Build the *aces-dev* reference analytical *OpenColorIO* Config.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box(
+        'Building the "aces-dev" reference analytical "OpenColorIO" config...'
+    )
+    with ctx.cd("opencolorio_config_aces/config/reference/generate"):
+        ctx.run("python analytical.py")
+
+
+@task
 def build_config_reference(ctx: Context):
     """
     Build the *aces-dev* reference *OpenColorIO* Config.
@@ -344,6 +364,21 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
         command += " --no-pdf"
 
     run_in_container(ctx, command)
+
+
+@task
+def docker_run_build_config_reference_analytical(ctx: Context):
+    """
+    Build the *aces-dev* reference *OpenColorIO* Config in the *docker*
+    container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-config-reference-analytical")
 
 
 @task

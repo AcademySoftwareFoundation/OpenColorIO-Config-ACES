@@ -36,6 +36,15 @@ jobs:
         poetry run python -m pip install --upgrade pip
         poetry install --extras "optional"
       shell: bash
+    - name: Generation - Config - ACES Reference (Analytical)
+      run: |
+        poetry run invoke build-config-reference-analytical
+      shell: bash
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.CI_PACKAGE }}-config-reference-analytical
+        path: |
+          build/analytical
     - name: Generation - Config - ACES Reference
       run: |
         poetry run invoke build-config-reference

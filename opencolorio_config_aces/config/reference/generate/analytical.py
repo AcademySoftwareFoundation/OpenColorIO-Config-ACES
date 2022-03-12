@@ -393,12 +393,17 @@ def generate_config_aces(
 if __name__ == "__main__":
     import os
     import opencolorio_config_aces
+    from opencolorio_config_aces import serialize_config_data
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0], "..", "build"
+        opencolorio_config_aces.__path__[0],
+        "..",
+        "build",
+        "aces",
+        "analytical",
     )
 
     if not os.path.exists(build_directory):
@@ -413,3 +418,8 @@ if __name__ == "__main__":
 
     for ctl_transform in colorspaces.values():
         print(ctl_transform.aces_transform_id)
+
+    serialize_config_data(
+        data,
+        os.path.join(build_directory, "config-aces-reference-analytical.json"),
+    )
