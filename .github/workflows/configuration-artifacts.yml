@@ -42,24 +42,24 @@ jobs:
       shell: bash
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.CI_PACKAGE }}-config-reference-analytical
+        name: config-reference-analytical
         path: |
-          build/analytical
+          build/aces/analytical/
     - name: Generation - Config - ACES Reference
       run: |
         poetry run invoke build-config-reference
       shell: bash
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.CI_PACKAGE }}-config-reference
+        name: config-reference
         path: |
-          build/reference
+          build/aces/reference/
     - name: Generation - Config - ACES CG
       run: |
         poetry run invoke build-config-cg
       shell: bash
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.CI_PACKAGE }}-config-cg
+        name: config-cg
         path: |
-          build/cg
+          build/aces/cg/
