@@ -466,6 +466,8 @@ if __name__ == "__main__":
         opencolorio_config_aces.__path__[0], "..", "build", "aces", "cg"
     )
 
+    logging.info(f'Using "{build_directory}" build directory...')
+
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 

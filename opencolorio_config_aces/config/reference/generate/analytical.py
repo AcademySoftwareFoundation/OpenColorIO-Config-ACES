@@ -406,6 +406,8 @@ if __name__ == "__main__":
         "analytical",
     )
 
+    logging.info(f'Using "{build_directory}" build directory...')
+
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 
