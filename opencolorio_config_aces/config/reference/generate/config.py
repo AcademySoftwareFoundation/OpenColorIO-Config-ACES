@@ -1271,7 +1271,7 @@ def generate_config_aces(
         ],
         inactive_colorspaces=["CIE-XYZ-D65"],
         default_view_transform=untonemapped_view_transform["name"],
-        profile_version=VersionData(2, 0),
+        profile_version=VersionData(2, 1),
     )
 
     config = generate_config(data, config_name, validate)
