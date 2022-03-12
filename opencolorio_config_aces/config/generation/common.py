@@ -429,15 +429,17 @@ if __name__ == "__main__":
     import opencolorio_config_aces
     import PyOpenColorIO as ocio
 
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
     build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0], "..", "build"
+        opencolorio_config_aces.__path__[0], "..", "build", "common", "tests"
     )
+
+    logging.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
-
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.INFO)
 
     # "OpenColorIO 1" configuration.
     colorspace_1 = {"name": "Gamut - sRGB", "family": "Gamut"}
@@ -527,6 +529,15 @@ if __name__ == "__main__":
     )
 
     generate_config(data, os.path.join(build_directory, "config-v1.ocio"))
+
+    # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
+    # versions.
+    try:
+        serialize_config_data(
+            data, os.path.join(build_directory, "config-v1.json")
+        )
+    except TypeError as error:
+        logging.critical(error)
 
     # "OpenColorIO 2" configuration.
     colorspace_1 = {
@@ -668,6 +679,7 @@ if __name__ == "__main__":
         roles={
             "aces_interchange": "ACES - ACES2065-1",
             "cie_xyz_d65_interchange": "CIE-XYZ D65",
+            ocio.ROLE_DEFAULT: "ACES - ACES2065-1",
             ocio.ROLE_SCENE_LINEAR: colorspace_2["name"],
         },
         colorspaces=[
@@ -700,7 +712,6 @@ if __name__ == "__main__":
         ]
         + ["Raw"],
         file_rules=[
-            {"name": "Default", "colorspace": "ACES - ACES2065-1"},
             {
                 "name": "Linear - sRGB",
                 "colorspace": "Gamut - sRGB",
@@ -711,6 +722,7 @@ if __name__ == "__main__":
                 "colorspace": "CCTF - sRGB",
                 "regex": "_[sS][rR][gG][bB]\\.([pP][nN][gG]|[tT][iI][fF])$",
             },
+            {"name": "Default", "colorspace": "ACES - ACES2065-1"},
         ],
         viewing_rules=[],
     )
@@ -719,9 +731,14 @@ if __name__ == "__main__":
         data, os.path.join(build_directory, "config-v2.ocio")
     )
 
-    serialize_config_data(
-        data, os.path.join(build_directory, "config-v2.json")
-    )
+    # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
+    # versions.
+    try:
+        serialize_config_data(
+            data, os.path.join(build_directory, "config-v2.json")
+        )
+    except TypeError as error:
+        logging.critical(error)
 
     named_transform_2 = {
         "name": "-1 Stop",
@@ -753,10 +770,18 @@ if __name__ == "__main__":
 
     generate_config(
         data,
-        os.path.join(build_directory, "config-v3.ocio"),
+        os.path.join(build_directory, "config-v2-with-named-transform.ocio"),
         base_config=config,
     )
 
-    serialize_config_data(
-        data, os.path.join(build_directory, "config-v3.json")
-    )
+    # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
+    # versions.
+    try:
+        serialize_config_data(
+            data,
+            os.path.join(
+                build_directory, "config-v2-with-named-transform.json"
+            ),
+        )
+    except TypeError as error:
+        logging.critical(error)

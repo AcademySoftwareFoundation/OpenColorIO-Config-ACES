@@ -36,6 +36,15 @@ jobs:
         poetry run python -m pip install --upgrade pip
         poetry install --extras "optional"
       shell: bash
+    - name: Generation - Config - Common Tests
+      run: |
+        poetry run invoke build-config-common-tests
+      shell: bash
+    - uses: actions/upload-artifact@v2
+      with:
+        name: config-common-tests
+        path: |
+          build/common/tests/
     - name: Generation - Config - ACES Reference (Analytical)
       run: |
         poetry run invoke build-config-reference-analytical

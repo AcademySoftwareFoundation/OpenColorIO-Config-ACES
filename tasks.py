@@ -33,6 +33,7 @@ __all__ = [
     "tests",
     "preflight",
     "docs",
+    "build_config_common_tests",
     "build_config_reference_analytical",
     "build_config_reference",
     "build_config_cg",
@@ -41,6 +42,7 @@ __all__ = [
     "docker_remove",
     "run_in_container",
     "docker_run_docs",
+    "docker_run_build_config_common_tests",
     "docker_run_build_config_reference_analytical",
     "docker_run_build_config_reference",
     "docker_run_build_config_cg",
@@ -209,6 +211,22 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
 
 
 @task
+def build_config_common_tests(ctx: Context):
+    """
+    Build the common tests *OpenColorIO* Config(s).
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box('Building the common tests "OpenColorIO" Config(s)...')
+    with ctx.cd("opencolorio_config_aces/config/generation"):
+        ctx.run("python common.py")
+
+
+@task
 def build_config_reference_analytical(ctx: Context):
     """
     Build the *aces-dev* reference analytical *OpenColorIO* Config.
@@ -220,7 +238,7 @@ def build_config_reference_analytical(ctx: Context):
     """
 
     message_box(
-        'Building the "aces-dev" reference analytical "OpenColorIO" config...'
+        'Building the "aces-dev" reference analytical "OpenColorIO" Config...'
     )
     with ctx.cd("opencolorio_config_aces/config/reference/generate"):
         ctx.run("python analytical.py")
@@ -237,7 +255,7 @@ def build_config_reference(ctx: Context):
         Context.
     """
 
-    message_box('Building the "aces-dev" reference "OpenColorIO" config...')
+    message_box('Building the "aces-dev" reference "OpenColorIO" Config...')
     with ctx.cd("opencolorio_config_aces/config/reference/generate"):
         ctx.run("python config.py")
 
@@ -367,10 +385,24 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
 
 
 @task
+def docker_run_build_config_common_tests(ctx: Context):
+    """
+    Build the common tests *OpenColorIO* Config(s) in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-config-common")
+
+
+@task
 def docker_run_build_config_reference_analytical(ctx: Context):
     """
-    Build the *aces-dev* reference *OpenColorIO* Config in the *docker*
-    container.
+    Build the *aces-dev* reference analytical *OpenColorIO* Config in the
+    *docker* container.
 
     Parameters
     ----------
