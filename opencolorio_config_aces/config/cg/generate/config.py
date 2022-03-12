@@ -463,7 +463,7 @@ if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0], "..", "build", "cg"
+        opencolorio_config_aces.__path__[0], "..", "build", "aces", "cg"
     )
 
     if not os.path.exists(build_directory):
