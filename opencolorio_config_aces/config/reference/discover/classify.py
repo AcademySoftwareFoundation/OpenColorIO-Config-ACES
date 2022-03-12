@@ -18,7 +18,8 @@ import itertools
 import logging
 import os
 import re
-from collections import Mapping, defaultdict
+from collections.abc import Mapping
+from collections import defaultdict
 
 from opencolorio_config_aces.utilities import (
     message_box,
