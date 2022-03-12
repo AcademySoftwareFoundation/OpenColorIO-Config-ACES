@@ -44,7 +44,7 @@ jobs:
       with:
         name: config-common-tests
         path: |
-          build/common/tests/
+          build/config/common/tests/
     - name: Generation - Config - ACES Reference (Analytical)
       run: |
         poetry run invoke build-config-reference-analytical
@@ -53,7 +53,7 @@ jobs:
       with:
         name: config-reference-analytical
         path: |
-          build/aces/analytical/
+          build/config/aces/analytical/
     - name: Generation - Config - ACES Reference
       run: |
         poetry run invoke build-config-reference
@@ -62,7 +62,7 @@ jobs:
       with:
         name: config-reference
         path: |
-          build/aces/reference/
+          build/config/aces/reference/
     - name: Generation - Config - ACES CG
       run: |
         poetry run invoke build-config-cg
@@ -71,4 +71,4 @@ jobs:
       with:
         name: config-cg
         path: |
-          build/aces/cg/
+          build/config/aces/cg/

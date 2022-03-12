@@ -402,6 +402,7 @@ if __name__ == "__main__":
         opencolorio_config_aces.__path__[0],
         "..",
         "build",
+        "config",
         "aces",
         "analytical",
     )

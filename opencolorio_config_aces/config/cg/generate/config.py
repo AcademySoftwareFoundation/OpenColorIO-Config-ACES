@@ -463,7 +463,12 @@ if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0], "..", "build", "aces", "cg"
+        opencolorio_config_aces.__path__[0],
+        "..",
+        "build",
+        "config",
+        "aces",
+        "cg",
     )
 
     logging.info(f'Using "{build_directory}" build directory...')
