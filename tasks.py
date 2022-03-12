@@ -33,6 +33,7 @@ __all__ = [
     "tests",
     "preflight",
     "docs",
+    "build_aces_conversion_graph",
     "build_config_common_tests",
     "build_config_reference_analytical",
     "build_config_reference",
@@ -42,6 +43,7 @@ __all__ = [
     "docker_remove",
     "run_in_container",
     "docker_run_docs",
+    "docker_run_build_aces_conversion_graph",
     "docker_run_build_config_common_tests",
     "docker_run_build_config_reference_analytical",
     "docker_run_build_config_reference",
@@ -208,6 +210,22 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
         if pdf:
             message_box('Building "PDF" documentation...')
             ctx.run("make latexpdf")
+
+
+@task
+def build_aces_conversion_graph(ctx: Context):
+    """
+    Build the *aces-dev* conversion graph.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box('Building the ""aces-dev" conversion graph...')
+    with ctx.cd("opencolorio_config_aces/config/reference/discover"):
+        ctx.run("python graph.py")
 
 
 @task
@@ -382,6 +400,20 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
         command += " --no-pdf"
 
     run_in_container(ctx, command)
+
+
+@task
+def docker_run_build_aces_conversion_graph(ctx: Context):
+    """
+    Build the *aces-dev* conversion graph in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-aces-conversion-graph")
 
 
 @task

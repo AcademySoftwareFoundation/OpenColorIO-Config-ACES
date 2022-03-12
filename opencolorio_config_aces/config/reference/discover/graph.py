@@ -387,7 +387,6 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
 
 if __name__ == "__main__":
     import os
-    import subprocess
     import opencolorio_config_aces
     from pprint import pprint
     from opencolorio_config_aces.utilities import message_box
@@ -396,8 +395,10 @@ if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0], "..", "build"
+        opencolorio_config_aces.__path__[0], "..", "build", "aces", "graph"
     )
+
+    logging.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
@@ -433,8 +434,3 @@ if __name__ == "__main__":
     pprint(filter_nodes(graph, [lambda x: True if x.genus == "p3" else False]))
 
     plot_aces_conversion_graph(graph, filename)
-
-    try:
-        os.startfile(filename, "open")
-    except AttributeError:
-        subprocess.call(["open", filename])
