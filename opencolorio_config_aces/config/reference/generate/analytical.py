@@ -421,7 +421,14 @@ if __name__ == "__main__":
     for ctl_transform in colorspaces.values():
         print(ctl_transform.aces_transform_id)
 
-    serialize_config_data(
-        data,
-        os.path.join(build_directory, "config-aces-reference-analytical.json"),
-    )
+    # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
+    # versions.
+    try:
+        serialize_config_data(
+            data,
+            os.path.join(
+                build_directory, "config-aces-reference-analytical.json"
+            ),
+        )
+    except TypeError as error:
+        logging.critical(error)

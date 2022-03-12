@@ -476,6 +476,11 @@ if __name__ == "__main__":
         additional_data=True,
     )
 
-    serialize_config_data(
-        data, os.path.join(build_directory, "config-aces-cg.json")
-    )
+    # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
+    # versions.
+    try:
+        serialize_config_data(
+            data, os.path.join(build_directory, "config-aces-cg.json")
+        )
+    except TypeError as error:
+        logging.critical(error)
