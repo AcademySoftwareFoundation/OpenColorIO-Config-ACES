@@ -16,10 +16,10 @@ Defines various *OpenColorIO* transform factories:
 """
 
 import re
+import PyOpenColorIO as ocio
 from pathlib import Path
 from typing import Mapping, Sequence
 
-from opencolorio_config_aces.utilities import required
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -42,7 +42,6 @@ __all__ = [
 ]
 
 
-@required("OpenColorIO")
 def group_transform_factory(transforms):
     """
     *OpenColorIO* group transform factory.
@@ -58,8 +57,6 @@ def group_transform_factory(transforms):
         *OpenColorIO* group transform.
     """
 
-    import PyOpenColorIO as ocio
-
     group_transform = ocio.GroupTransform()
     for transform in transforms:
         group_transform.appendTransform(produce_transform(transform))
@@ -67,7 +64,6 @@ def group_transform_factory(transforms):
     return group_transform
 
 
-@required("OpenColorIO")
 def colorspace_factory(
     name,
     family=None,
@@ -132,8 +128,6 @@ def colorspace_factory(
     ColorSpace
         *OpenColorIO* colorspace.
     """
-
-    import PyOpenColorIO as ocio
 
     if bit_depth is None:
         bit_depth = ocio.BIT_DEPTH_F32
@@ -205,7 +199,6 @@ def colorspace_factory(
     return colorspace
 
 
-@required("OpenColorIO")
 def named_transform_factory(
     name,
     family=None,
@@ -253,8 +246,6 @@ def named_transform_factory(
     NamedTransform
         *OpenColorIO* named transform.
     """
-
-    import PyOpenColorIO as ocio
 
     if base_named_transform is not None:
         if isinstance(base_named_transform, Mapping):
@@ -306,7 +297,6 @@ def named_transform_factory(
     return named_transform
 
 
-@required("OpenColorIO")
 def view_transform_factory(
     name,
     family=None,
@@ -352,8 +342,6 @@ def view_transform_factory(
         *OpenColorIO* view transform.
     """
 
-    import PyOpenColorIO as ocio
-
     if categories is None:
         categories = []
 
@@ -396,7 +384,6 @@ def view_transform_factory(
     return view_transform
 
 
-@required("OpenColorIO")
 def look_factory(
     name,
     process_space=None,
@@ -436,8 +423,6 @@ def look_factory(
         *OpenColorIO* look.
     """
 
-    import PyOpenColorIO as ocio
-
     if process_space is None:
         process_space = ocio.ROLE_SCENE_LINEAR
 
@@ -465,7 +450,6 @@ def look_factory(
     return look
 
 
-@required("OpenColorIO")
 def transform_factory_default(**kwargs):
     """
     *OpenColorIO* default transform factory that produces an *OpenColorIO*
@@ -486,8 +470,6 @@ def transform_factory_default(**kwargs):
         *OpenColorIO* transform.
     """
 
-    import PyOpenColorIO as ocio
-
     transform = getattr(ocio, kwargs.pop("transform_type"))()
     for kwarg, value in kwargs.items():
         method = re.sub(
@@ -500,7 +482,6 @@ def transform_factory_default(**kwargs):
     return transform
 
 
-@required("OpenColorIO")
 def transform_factory_clf_transform_to_group_transform(**kwargs):
     """
     *OpenColorIO* transform factory that produces an *OpenColorIO*
@@ -519,8 +500,6 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
     GroupTransform
         *OpenColorIO* group transform.
     """
-
-    import PyOpenColorIO as ocio
 
     assert kwargs["transform_type"] == "FileTransform"
     assert Path(kwargs["src"]).exists()

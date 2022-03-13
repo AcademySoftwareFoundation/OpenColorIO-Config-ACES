@@ -10,6 +10,7 @@ reference *OpenColorIO* config.
 
 import itertools
 import logging
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.config.generation import (
     VersionData,
@@ -94,7 +95,6 @@ def beautify_view_name(name):
     return beautify_name(name, PATTERNS_VIEW_NAME_REFERENCE)
 
 
-@required("OpenColorIO")
 def create_builtin_transform(style):
     """
     Create an *OpenColorIO* builtin transform for given style.
@@ -113,8 +113,6 @@ def create_builtin_transform(style):
         *OpenColorIO* builtin transform for given style.
     """
 
-    import PyOpenColorIO as ocio
-
     builtin_transform = ocio.BuiltinTransform()
 
     try:
@@ -131,7 +129,6 @@ def create_builtin_transform(style):
 
 
 @required("NetworkX")
-@required("OpenColorIO")
 def node_to_builtin_transform(graph, node, direction="Forward"):
     """
     Generate the *OpenColorIO* builtin transform for given *aces-dev*
@@ -152,7 +149,6 @@ def node_to_builtin_transform(graph, node, direction="Forward"):
         *OpenColorIO* builtin transform.
     """
 
-    import PyOpenColorIO as ocio
     from networkx.exception import NetworkXNoPath
 
     try:
@@ -232,7 +228,6 @@ def node_to_colorspace(
     return colorspace
 
 
-@required("OpenColorIO")
 def generate_config_aces(
     config_name=None,
     validate=True,
@@ -276,8 +271,6 @@ def generate_config_aces(
         :class:`opencolorio_config_aces.config.reference.CTLTransform` class
         instances.
     """
-
-    import PyOpenColorIO as ocio
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)

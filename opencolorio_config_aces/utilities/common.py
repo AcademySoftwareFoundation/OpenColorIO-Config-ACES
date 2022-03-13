@@ -33,7 +33,6 @@ __all__ = [
     "is_colour_installed",
     "is_jsonpickle_installed",
     "is_networkx_installed",
-    "is_opencolorio_installed",
     "REQUIREMENTS_TO_CALLABLE",
     "required",
     "is_string",
@@ -374,47 +373,11 @@ def is_networkx_installed(raise_exception=False):
         return False
 
 
-def is_opencolorio_installed(raise_exception=False):
-    """
-    Return if *OpenColorIO* is installed and available.
-
-    Parameters
-    ----------
-    raise_exception : bool
-        Raise exception if *OpenColorIO* is unavailable.
-
-    Returns
-    -------
-    bool
-        Is *OpenColorIO* installed.
-
-    Raises
-    ------
-    ImportError
-        If *OpenColorIO* is not installed.
-    """
-
-    try:  # pragma: no cover
-        import PyOpenColorIO  # noqa
-
-        return True
-    except ImportError as error:  # pragma: no cover
-        if raise_exception:
-            raise ImportError(
-                (
-                    '"OpenColorIO" related API features '
-                    'are not available: "{}".'
-                ).format(error)
-            )
-        return False
-
-
 REQUIREMENTS_TO_CALLABLE = DocstringDict(
     {
         "Colour": is_colour_installed,
         "jsonpickle": is_jsonpickle_installed,
         "NetworkX": is_networkx_installed,
-        "OpenColorIO": is_opencolorio_installed,
     }
 )
 REQUIREMENTS_TO_CALLABLE.__doc__ = """

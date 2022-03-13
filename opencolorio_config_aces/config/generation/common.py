@@ -15,6 +15,7 @@ Defines various objects related to *OpenColorIO* config generation:
 """
 
 import logging
+import PyOpenColorIO as ocio
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field
 from typing import Union
@@ -226,7 +227,6 @@ def validate_config(config):
         return False
 
 
-@required("OpenColorIO")
 def generate_config(data, config_name=None, validate=True, base_config=None):
     """
     Generate the *OpenColorIO* config from given data.
@@ -248,8 +248,6 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
     Config
         *OpenColorIO* config.
     """
-
-    import PyOpenColorIO as ocio
 
     if base_config is not None:
         config = base_config
@@ -423,11 +421,8 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
 
 
 if __name__ == "__main__":
-    required("OpenColorIO")(lambda: None)()
-
     import os
     import opencolorio_config_aces
-    import PyOpenColorIO as ocio
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)

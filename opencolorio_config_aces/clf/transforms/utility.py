@@ -8,6 +8,7 @@ Defines various objects related to the generation of the *Utility* specific
 *Common LUT Format* (CLF) transforms.
 """
 
+import PyOpenColorIO as ocio
 from pathlib import Path
 
 from opencolorio_config_aces.utilities import required
@@ -29,7 +30,6 @@ TF_ID_SUFFIX = ":1.0"
 
 
 @required("Colour")
-@required("OpenColorIO")
 def create_matrix(matrix, offset=None):
     """
     Convert an NumPy array into an OCIO MatrixTransform.
@@ -48,7 +48,6 @@ def create_matrix(matrix, offset=None):
     """
 
     import numpy as np
-    import PyOpenColorIO as ocio
 
     matrix44 = np.zeros((4, 4))
     matrix44[3, 3] = 1.0
@@ -95,7 +94,6 @@ def create_conversion_matrix(input_prims, output_prims):
 
 
 @required("Colour")
-@required("OpenColorIO")
 def create_gamma(gamma):
     """
     Convert an gamma value into an OCIO ExponentTransform or
@@ -114,7 +112,6 @@ def create_gamma(gamma):
     """
 
     import numpy as np
-    import PyOpenColorIO as ocio
 
     # NB: Preference of working group during 2021-11-23 mtg was *not* to clamp.
     direction = ocio.TRANSFORM_DIR_INVERSE
@@ -147,7 +144,6 @@ def create_gamma(gamma):
     return exp_tf
 
 
-@required("OpenColorIO")
 def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
     """
     Take a GroupTransform and some metadata and write a CLF file.
@@ -168,8 +164,6 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
         CLF output descriptor.
     """
 
-    import PyOpenColorIO as ocio
-
     metadata = group_tf.getFormatMetadata()
     metadata.setID(tf_id)
     metadata.setName(tf_name)
@@ -183,11 +177,8 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc):
     )
 
 
-@required("OpenColorIO")
 def generate_clf_utility():
     """Generate OCIO Utility CLF transforms."""
-
-    import PyOpenColorIO as ocio
 
     if not DEST_DIR.exists():
         DEST_DIR.mkdir()

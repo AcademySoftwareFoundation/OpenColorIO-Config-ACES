@@ -12,6 +12,7 @@ Graphics (CG) *OpenColorIO* config:
 
 import csv
 import logging
+import PyOpenColorIO as ocio
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -30,7 +31,7 @@ from opencolorio_config_aces.config.reference import (
     ColorspaceDescriptionStyle,
     generate_config_aces,
 )
-from opencolorio_config_aces.utilities import git_describe, required
+from opencolorio_config_aces.utilities import git_describe
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -112,7 +113,6 @@ def clf_transform_to_description(
     return description
 
 
-@required("OpenColorIO")
 def clf_transform_to_colorspace(
     clf_transform,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
@@ -163,7 +163,6 @@ def clf_transform_to_colorspace(
         return colorspace
 
 
-@required("OpenColorIO")
 def clf_transform_to_named_transform(
     clf_transform,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
@@ -214,7 +213,6 @@ def clf_transform_to_named_transform(
         return named_transform
 
 
-@required("OpenColorIO")
 def generate_config_cg(
     data=None,
     config_name=None,
@@ -250,8 +248,6 @@ def generate_config_cg(
         *OpenColorIO* config or tuple of *OpenColorIO* config and
         :class:`opencolorio_config_aces.ConfigData` class instance.
     """
-
-    import PyOpenColorIO as ocio
 
     if data is None:
         _config, data = generate_config_aces(

@@ -12,6 +12,7 @@ Defines various objects related to the generation of the *aces-dev* reference
 
 import csv
 import logging
+import PyOpenColorIO as ocio
 import re
 from collections import defaultdict
 from datetime import datetime
@@ -32,11 +33,7 @@ from opencolorio_config_aces.config.reference import (
     discover_aces_ctl_transforms,
     unclassify_ctl_transforms,
 )
-from opencolorio_config_aces.utilities import (
-    git_describe,
-    multi_replace,
-    required,
-)
+from opencolorio_config_aces.utilities import git_describe, multi_replace
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -554,7 +551,6 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
     return beautify_transform_family(family)
 
 
-@required("OpenColorIO")
 def ctl_transform_to_description(
     ctl_transform,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
@@ -587,8 +583,6 @@ def ctl_transform_to_description(
     unicode
         *OpenColorIO* colorspace or look description.
     """
-
-    import PyOpenColorIO as ocio
 
     description = None
     if describe != ColorspaceDescriptionStyle.NONE:
@@ -777,7 +771,6 @@ def ctl_transform_to_look(
         return look
 
 
-@required("OpenColorIO")
 def style_to_view_transform(
     style,
     ctl_transforms,
@@ -813,8 +806,6 @@ def style_to_view_transform(
     ViewTransform or dict
         *OpenColorIO* view transform or its signature for given style.
     """
-
-    import PyOpenColorIO as ocio
 
     name = beautify_view_transform_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
@@ -902,7 +893,6 @@ def style_to_view_transform(
         return view_transform
 
 
-@required("OpenColorIO")
 def style_to_display_colorspace(
     style,
     describe=ColorspaceDescriptionStyle.OPENCOLORIO,
@@ -935,8 +925,6 @@ def style_to_display_colorspace(
     ColorSpace or dict
         *OpenColorIO* display colorspace or its signature for given style.
     """
-
-    import PyOpenColorIO as ocio
 
     kwargs.setdefault("family", FAMILY_DISPLAY_REFERENCE)
 
@@ -978,7 +966,6 @@ def style_to_display_colorspace(
         return colorspace
 
 
-@required("OpenColorIO")
 def generate_config_aces(
     config_name=None,
     validate=True,
@@ -1026,8 +1013,6 @@ def generate_config_aces(
         *OpenColorIO* config or tuple of *OpenColorIO* config and
         :class:`opencolorio_config_aces.ConfigData` class instance.
     """
-
-    import PyOpenColorIO as ocio
 
     ctl_transforms = unclassify_ctl_transforms(
         classify_aces_ctl_transforms(discover_aces_ctl_transforms())
