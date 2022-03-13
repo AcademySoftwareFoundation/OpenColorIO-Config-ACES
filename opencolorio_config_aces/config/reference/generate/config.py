@@ -73,6 +73,8 @@ __all__ = [
     "generate_config_aces",
 ]
 
+logger = logging.getLogger(__name__)
+
 PATH_TRANSFORMS_MAPPING_FILE_REFERENCE = (
     Path(__file__).parents[0]
     / "resources"
@@ -1284,7 +1286,7 @@ if __name__ == "__main__":
         "reference",
     )
 
-    logging.info(f'Using "{build_directory}" build directory...')
+    logger.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
@@ -1304,4 +1306,4 @@ if __name__ == "__main__":
             data, os.path.join(build_directory, "config-aces-reference.json")
         )
     except TypeError as error:
-        logging.critical(error)
+        logger.critical(error)

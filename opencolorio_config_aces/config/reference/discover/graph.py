@@ -44,6 +44,8 @@ __all__ = [
     "plot_aces_conversion_graph",
 ]
 
+logger = logging.getLogger(__name__)
+
 SEPARATOR_NODE_NAME_CTL = "/"
 """
 *aces-dev* conversion graph node name separator.
@@ -94,7 +96,7 @@ def build_aces_conversion_graph(ctl_transforms):
         type_ = ctl_transform.type
 
         if source is None or target is None:
-            logging.debug(
+            logger.debug(
                 f'"{ctl_transform}" has either a missing source '
                 f"or target colourspace and won't be included in "
                 f'the "aces-dev" conversion graph!'
@@ -108,7 +110,7 @@ def build_aces_conversion_graph(ctl_transforms):
         # a "OCES" target.
         if family in ("csc", "input_transform", "lmt"):
             if source == "ACES2065-1":
-                logging.debug(
+                logger.debug(
                     f'"{ctl_transform}" ctl transform from the '
                     f'"{family}" family uses "{source}" as source, '
                     f"skipping!"
@@ -116,7 +118,7 @@ def build_aces_conversion_graph(ctl_transforms):
                 continue
         elif family == "output_transform":
             if target in ("ACES2065-1", "OCES"):
-                logging.debug(
+                logger.debug(
                     f'"{ctl_transform}" ctl transform from the '
                     f'"{family}" family uses "{target}" as target, '
                     f"skipping!"
@@ -143,7 +145,7 @@ def build_aces_conversion_graph(ctl_transforms):
             if node not in graph.nodes():
                 graph.add_node(node, data=ctl_transform, serialized=serialized)
             else:
-                logging.debug(
+                logger.debug(
                     f'"{node}" node was already added to '
                     f'the "aces-dev" conversion graph '
                     f'by the "{node_to_ctl_transform(graph, node)}" '
@@ -398,7 +400,7 @@ if __name__ == "__main__":
         opencolorio_config_aces.__path__[0], "..", "build", "aces", "graph"
     )
 
-    logging.info(f'Using "{build_directory}" build directory...')
+    logger.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)

@@ -16,8 +16,11 @@ Defines various *OpenColorIO* transform factories:
 """
 
 import re
+import logging
 import PyOpenColorIO as ocio
 from pathlib import Path
+from pprint import pformat
+from textwrap import indent
 from typing import Mapping, Sequence
 
 
@@ -56,6 +59,11 @@ def group_transform_factory(transforms):
     GroupTransform
         *OpenColorIO* group transform.
     """
+
+    logging.debug(
+        f'Producing a "GroupTransform" with the following transforms:\n'
+        f"{indent(pformat(locals()), '    ')}"
+    )
 
     group_transform = ocio.GroupTransform()
     for transform in transforms:
@@ -128,6 +136,11 @@ def colorspace_factory(
     ColorSpace
         *OpenColorIO* colorspace.
     """
+
+    logging.debug(
+        f'Producing "{name}" "ColorSpace" with the following parameters:\n'
+        f"{indent(pformat(locals()), '    ')}"
+    )
 
     if bit_depth is None:
         bit_depth = ocio.BIT_DEPTH_F32
@@ -247,6 +260,11 @@ def named_transform_factory(
         *OpenColorIO* named transform.
     """
 
+    logging.debug(
+        f'Producing "{name}" "NamedTransform" with the following parameters:\n'
+        f"{indent(pformat(locals()), '    ')}"
+    )
+
     if base_named_transform is not None:
         if isinstance(base_named_transform, Mapping):
             base_named_transform = named_transform_factory(
@@ -342,6 +360,11 @@ def view_transform_factory(
         *OpenColorIO* view transform.
     """
 
+    logging.debug(
+        f'Producing "{name}" "ViewTransform" with the following parameters:\n'
+        f"{indent(pformat(locals()), '    ')}"
+    )
+
     if categories is None:
         categories = []
 
@@ -423,6 +446,11 @@ def look_factory(
         *OpenColorIO* look.
     """
 
+    logging.debug(
+        f'Producing "{name}" "Look" with the following parameters:\n'
+        f"{indent(pformat(locals()), '    ')}"
+    )
+
     if process_space is None:
         process_space = ocio.ROLE_SCENE_LINEAR
 
@@ -471,6 +499,13 @@ def transform_factory_default(**kwargs):
     """
 
     transform = getattr(ocio, kwargs.pop("transform_type"))()
+
+    logging.debug(
+        f'Producing a "{transform.__class__.__name__}" transform with the '
+        f"following parameters:\n"
+        f"{indent(pformat(kwargs), '    ')}"
+    )
+
     for kwarg, value in kwargs.items():
         method = re.sub(
             r"(?!^)_([a-zA-Z])", lambda m: m.group(1).upper(), kwarg
@@ -503,6 +538,11 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
 
     assert kwargs["transform_type"] == "FileTransform"
     assert Path(kwargs["src"]).exists()
+
+    logging.debug(
+        f'Producing a "FileTransform" transform with the following parameters:\n'
+        f"{indent(pformat(kwargs), '    ')}"
+    )
 
     raw_config = ocio.Config().CreateRaw()
     file_transform = ocio.FileTransform(kwargs["src"])

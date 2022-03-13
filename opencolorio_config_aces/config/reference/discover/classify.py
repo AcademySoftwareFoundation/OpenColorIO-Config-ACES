@@ -58,6 +58,8 @@ __all__ = [
     "print_aces_taxonomy",
 ]
 
+logger = logging.getLogger(__name__)
+
 URN_CTL = "urn:ampas:aces:transformId:v1.5"
 """
 *ACES* Uniform Resource Name (*URN*).
@@ -212,40 +214,38 @@ commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
     if False:
         invalid_id = aces_transform_id
         if not aces_transform_id.startswith(URN_CTL):
-            logging.warning(f'{invalid_id} is missing "ACES" URN!')
+            logger.warning(f'{invalid_id} is missing "ACES" URN!')
 
             aces_transform_id = f"{URN_CTL}:{aces_transform_id}"
 
         if "Academy.P3D65_108nits_7.2nits_ST2084" in aces_transform_id:
-            logging.warning(
+            logger.warning(
                 f'{invalid_id} has an invalid separator in "7.2nits"!'
             )
 
             aces_transform_id = aces_transform_id.replace("7.2", "7")
         elif "P3D65_709limit_48nits" in aces_transform_id:
-            logging.warning(f"{invalid_id} is inconsistently named!")
+            logger.warning(f"{invalid_id} is inconsistently named!")
 
             aces_transform_id = aces_transform_id.replace(
                 "P3D65_709limit_48nits", "P3D65_Rec709limited_48nits"
             )
         elif "Rec2020_100nits.a1.1.0" in aces_transform_id:
-            logging.warning(f"{invalid_id} is incorrectly named!")
+            logger.warning(f"{invalid_id} is incorrectly named!")
 
             aces_transform_id = aces_transform_id.replace(
                 "Rec2020_100nits", "Rec2020_P3D65limited_100nits_dim"
             )
         elif "ACEScsc" in aces_transform_id:
             if "ACEScsc.Academy" not in aces_transform_id:
-                logging.warning(
-                    f'{invalid_id} is missing "Academy" namespace!'
-                )
+                logger.warning(f'{invalid_id} is missing "Academy" namespace!')
 
                 aces_transform_id = aces_transform_id.replace(
                     "ACEScsc", "ACEScsc.Academy"
                 )
 
             if aces_transform_id.endswith("a1.v1"):
-                logging.warning(f"{invalid_id} version scheme is invalid!")
+                logger.warning(f"{invalid_id} version scheme is invalid!")
 
                 aces_transform_id = aces_transform_id.replace(
                     "a1.v1", "a1.1.0"
@@ -1257,7 +1257,7 @@ def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
 
             ctl_transform = os.path.join(directory, filename)
 
-            logging.debug(
+            logger.debug(
                 f'"{ctl_transform_relative_path(ctl_transform)}" '
                 f"CTL transform was found!"
             )
@@ -1335,9 +1335,7 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
                     list(pairs.values())[0], family, genus
                 )
 
-                logging.debug(
-                    f'Classifying "{ctl_transform}" under "{genus}".'
-                )
+                logger.debug(f'Classifying "{ctl_transform}" under "{genus}".')
 
                 classified_ctl_transforms[family][genus][
                     basename
@@ -1355,9 +1353,7 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
                     forward_ctl_transform, inverse_ctl_transform
                 )
 
-                logging.debug(
-                    f'Classifying "{ctl_transform}" under "{genus}".'
-                )
+                logger.debug(f'Classifying "{ctl_transform}" under "{genus}".')
 
                 classified_ctl_transforms[family][genus][
                     basename
@@ -1487,19 +1483,19 @@ reference.ROOT_TRANSFORMS_CTL` attribute using the
     )
 
     for family, genera in classified_ctl_transforms.items():
-        message_box(family, print_callable=logging.info)
+        message_box(family, print_callable=logger.info)
         for genus, ctl_transforms in genera.items():
-            logging.info(f"[ {genus} ]")
+            logger.info(f"[ {genus} ]")
             for name, ctl_transform in ctl_transforms.items():
-                logging.info(f"\t( {name} )")
+                logger.info(f"\t( {name} )")
                 if isinstance(ctl_transform, CTLTransform):
-                    logging.info(
+                    logger.info(
                         f'\t\t"{ctl_transform.source}"'
                         f" --> "
                         f'"{ctl_transform.target}"'
                     )
                 elif isinstance(ctl_transform, CTLTransformPair):
-                    logging.info(
+                    logger.info(
                         f'\t\t"{ctl_transform.forward_transform.source}"'
                         f" <--> "
                         f'"{ctl_transform.forward_transform.target}"'

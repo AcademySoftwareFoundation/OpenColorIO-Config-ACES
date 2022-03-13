@@ -44,6 +44,8 @@ __all__ = [
     "generate_config",
 ]
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class VersionData:
@@ -223,7 +225,7 @@ def validate_config(config):
         config.validate()
         return True
     except Exception as error:
-        logging.critical(error)
+        logger.critical(error)
         return False
 
 
@@ -261,43 +263,43 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         config.setDescription(data.description)
 
     for search_path in data.search_path:
-        logging.debug(f'Adding "{search_path}".')
+        logger.debug(f'Adding "{search_path}".')
         config.addSearchPath(search_path)
 
     for role, colorspace in data.roles.items():
-        logging.debug(f'Adding "{colorspace}" colorspace as "{role}" role.')
+        logger.debug(f'Adding "{colorspace}" colorspace as "{role}" role.')
         config.setRole(role, colorspace)
 
     for colorspace in data.colorspaces:
         if isinstance(colorspace, Mapping):
             colorspace = colorspace_factory(**colorspace)
 
-        logging.debug(f'Adding "{colorspace.getName()}" colorspace.')
+        logger.debug(f'Adding "{colorspace.getName()}" colorspace.')
         config.addColorSpace(colorspace)
 
     for named_transform in data.named_transforms:
         if isinstance(named_transform, Mapping):
             named_transform = named_transform_factory(**named_transform)
 
-        logging.debug(f'Adding "{named_transform.getName()}" named transform.')
+        logger.debug(f'Adding "{named_transform.getName()}" named transform.')
         config.addNamedTransform(named_transform)
 
     for view_transform in data.view_transforms:
         if isinstance(view_transform, Mapping):
             view_transform = view_transform_factory(**view_transform)
 
-        logging.debug(f'Adding "{view_transform.getName()}" view transform.')
+        logger.debug(f'Adding "{view_transform.getName()}" view transform.')
         config.addViewTransform(view_transform)
 
     for look in data.looks:
         if isinstance(look, Mapping):
             look = look_factory(**look)
 
-        logging.debug(f'Adding "{look.getName()}" look.')
+        logger.debug(f'Adding "{look.getName()}" look.')
         config.addLook(look)
 
     if data.profile_version.major >= 2:
-        logging.debug(f'Disabling "{data.inactive_colorspaces}" colorspaces.')
+        logger.debug(f'Disabling "{data.inactive_colorspaces}" colorspaces.')
         config.setInactiveColorSpaces(",".join(data.inactive_colorspaces))
 
     for shared_view in data.shared_views:
@@ -309,7 +311,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         rule = shared_view.get("rule")
         description = shared_view.get("description")
         view = shared_view["view"]
-        logging.debug(
+        logger.debug(
             f'Adding "{view}" shared view using "{view_transform}" '
             f'view transform, "{display_colorspace}" display colorspace, '
             f'"{looks}" looks, "{rule}" rule and "{description}"'
@@ -330,14 +332,14 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         description = view.get("description")
         view = view["view"]
         if colorspace is not None:
-            logging.debug(
+            logger.debug(
                 f'Adding "{view}" view to "{display}" display '
                 f'using "{colorspace}" colorspace.'
             )
 
             config.addDisplayView(display, view, colorspace, looks)
         elif view_transform is not None and display_colorspace is not None:
-            logging.debug(
+            logger.debug(
                 f'Adding "{view}" view to "{display}" display '
                 f'using "{view_transform}" view transform, '
                 f'"{display_colorspace}" display colorspace, '
@@ -354,15 +356,15 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
                 description,
             )
         else:
-            logging.debug(f'Adding "{view}" view to "{display}" display.')
+            logger.debug(f'Adding "{view}" view to "{display}" display.')
             config.addDisplaySharedView(display, view)
 
     if data.active_displays:
-        logging.debug(f'Activating "{data.active_displays}" displays.')
+        logger.debug(f'Activating "{data.active_displays}" displays.')
         config.setActiveDisplays(",".join(data.active_displays))
 
     if data.active_views:
-        logging.debug(f'Activating "{data.active_views}" views.')
+        logger.debug(f'Activating "{data.active_views}" views.')
         config.setActiveViews(",".join(data.active_views))
 
     if data.file_rules:
@@ -375,13 +377,13 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
             pattern = file_rule.get("pattern")
             extension = file_rule.get("extension")
             if name == "Default":
-                logging.debug(
+                logger.debug(
                     f'Setting "{name}" file rule with '
                     f'"{colorspace}" colorspace.'
                 )
                 file_rules.setDefaultRuleColorSpace(colorspace)
             elif regex:
-                logging.debug(
+                logger.debug(
                     f'Adding "{name}" file rule with '
                     f'"{regex}" regex pattern for '
                     f'"{colorspace}" colorspace.'
@@ -389,7 +391,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
                 file_rules.insertRule(rule_index, name, colorspace, regex)
                 rule_index += 1
             else:
-                logging.debug(
+                logger.debug(
                     f'Adding "{name}" file rule with '
                     f'"{pattern}" pattern and "{extension}" extension '
                     f'for "{colorspace}" colorspace.'
@@ -403,7 +405,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
     if data.viewing_rules:
         viewing_rules = ocio.ViewingRules()
         for i, viewing_rule in enumerate(reversed(data.viewing_rules)):
-            logging.warning("Inserting a viewing rule is not supported yet!")
+            logger.warning("Inserting a viewing rule is not supported yet!")
             # viewing_rules.insertRule()
         config.setViewingRules(viewing_rules)
 
@@ -436,7 +438,7 @@ if __name__ == "__main__":
         "tests",
     )
 
-    logging.info(f'Using "{build_directory}" build directory...')
+    logger.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
@@ -537,7 +539,7 @@ if __name__ == "__main__":
             data, os.path.join(build_directory, "config-v1.json")
         )
     except TypeError as error:
-        logging.critical(error)
+        logger.critical(error)
 
     # "OpenColorIO 2" configuration.
     colorspace_1 = {
@@ -738,7 +740,7 @@ if __name__ == "__main__":
             data, os.path.join(build_directory, "config-v2.json")
         )
     except TypeError as error:
-        logging.critical(error)
+        logger.critical(error)
 
     named_transform_2 = {
         "name": "-1 Stop",
@@ -784,4 +786,4 @@ if __name__ == "__main__":
             ),
         )
     except TypeError as error:
-        logging.critical(error)
+        logger.critical(error)

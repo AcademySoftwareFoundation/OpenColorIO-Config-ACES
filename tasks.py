@@ -33,6 +33,7 @@ __all__ = [
     "tests",
     "preflight",
     "docs",
+    "build_clf_utility",
     "build_aces_conversion_graph",
     "build_config_common_tests",
     "build_config_reference_analytical",
@@ -43,6 +44,7 @@ __all__ = [
     "docker_remove",
     "run_in_container",
     "docker_run_docs",
+    "docker_run_build_clf_utility",
     "docker_run_build_aces_conversion_graph",
     "docker_run_build_config_common_tests",
     "docker_run_build_config_reference_analytical",
@@ -210,6 +212,22 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
         if pdf:
             message_box('Building "PDF" documentation...')
             ctx.run("make latexpdf")
+
+
+@task
+def build_clf_utility(ctx: Context):
+    """
+    Build the *CLF* utility transforms.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box('Building the "CLF" utility transforms...')
+    with ctx.cd("opencolorio_config_aces/clf/transforms"):
+        ctx.run("python utility.py")
 
 
 @task
@@ -400,6 +418,20 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
         command += " --no-pdf"
 
     run_in_container(ctx, command)
+
+
+@task
+def docker_run_build_clf_utility(ctx: Context):
+    """
+    Build the *CLF* utility transforms in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-clf-utility")
 
 
 @task

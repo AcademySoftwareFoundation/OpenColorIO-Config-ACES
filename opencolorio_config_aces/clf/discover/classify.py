@@ -57,6 +57,8 @@ __all__ = [
     "print_clf_taxonomy",
 ]
 
+logger = logging.getLogger(__name__)
+
 URN_CLF = "urn:aswf:ocio:transformId:1.0"
 """
 *CLF* Uniform Resource Name (*URN*).
@@ -1116,7 +1118,7 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
 
             clf_transform = os.path.join(directory, filename)
 
-            logging.debug(
+            logger.debug(
                 f'"{clf_transform_relative_path(clf_transform)}" '
                 f"CLF transform was found!"
             )
@@ -1197,9 +1199,7 @@ CLFTransform('utility...OCIO.Utility.AP0_to_P3-D65-Linear.clf'))]
                     list(pairs.values())[0], family, genus
                 )
 
-                logging.debug(
-                    f'Classifying "{clf_transform}" under "{genus}".'
-                )
+                logger.debug(f'Classifying "{clf_transform}" under "{genus}".')
 
                 classified_clf_transforms[family][genus][
                     basename
@@ -1217,9 +1217,7 @@ CLFTransform('utility...OCIO.Utility.AP0_to_P3-D65-Linear.clf'))]
                     forward_clf_transform, inverse_clf_transform
                 )
 
-                logging.debug(
-                    f'Classifying "{clf_transform}" under "{genus}".'
-                )
+                logger.debug(f'Classifying "{clf_transform}" under "{genus}".')
 
                 classified_clf_transforms[family][genus][
                     basename
@@ -1348,19 +1346,19 @@ reference.ROOT_TRANSFORMS_CLF` attribute using the
     )
 
     for family, genera in classified_clf_transforms.items():
-        message_box(family, print_callable=logging.info)
+        message_box(family, print_callable=logger.info)
         for genus, clf_transforms in genera.items():
-            logging.info(f"[ {genus} ]")
+            logger.info(f"[ {genus} ]")
             for name, clf_transform in clf_transforms.items():
-                logging.info(f"\t( {name} )")
+                logger.info(f"\t( {name} )")
                 if isinstance(clf_transform, CLFTransform):
-                    logging.info(
+                    logger.info(
                         f'\t\t"{clf_transform.source}"'
                         f" --> "
                         f'"{clf_transform.target}"'
                     )
                 elif isinstance(clf_transform, CLFTransformPair):
-                    logging.info(
+                    logger.info(
                         f'\t\t"{clf_transform.forward_transform.source}"'
                         f" <--> "
                         f'"{clf_transform.forward_transform.target}"'

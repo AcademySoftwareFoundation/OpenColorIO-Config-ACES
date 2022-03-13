@@ -13,6 +13,7 @@ import re
 import subprocess
 from collections import defaultdict
 from itertools import chain
+from pprint import PrettyPrinter
 from textwrap import TextWrapper
 
 __author__ = "OpenColorIO Contributors"
@@ -41,6 +42,19 @@ __all__ = [
     "matrix_3x3_to_4x4",
     "multi_replace",
 ]
+
+
+# Monkey-patching the "PrettyPrinter" mapping to handle the "TypeError"
+# exception raised with "instancemethod": https://bugs.python.org/issue33395
+class _dispatch(dict):
+    def get(self, key, default=None):
+        try:
+            return self.__get__(key, default)
+        except Exception:
+            pass
+
+
+PrettyPrinter._dispatch = _dispatch()
 
 
 class DocstringDict(dict):

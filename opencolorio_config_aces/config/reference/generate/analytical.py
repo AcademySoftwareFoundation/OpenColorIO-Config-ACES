@@ -58,6 +58,8 @@ __all__ = [
     "generate_config_aces",
 ]
 
+logger = logging.getLogger(__name__)
+
 PATTERNS_VIEW_NAME_REFERENCE = {
     "\\(100 nits\\) dim": "",
     "\\(100 nits\\)": "",
@@ -118,7 +120,7 @@ def create_builtin_transform(style):
     try:
         builtin_transform.setStyle(style)
     except ocio.Exception:
-        logging.warning(
+        logger.warning(
             f"{style} style is not defined, "
             f'using a placeholder "FileTransform" instead!'
         )
@@ -164,7 +166,7 @@ def node_to_builtin_transform(graph, node, direction="Forward"):
         verbose_path = " --> ".join(
             dict.fromkeys(itertools.chain.from_iterable(path))
         )
-        logging.debug(f'Creating "BuiltinTransform" with {verbose_path} path.')
+        logger.debug(f'Creating "BuiltinTransform" with {verbose_path} path.')
 
         for edge in path:
             source, target = edge
@@ -188,7 +190,7 @@ def node_to_builtin_transform(graph, node, direction="Forward"):
             return group_transform
 
     except NetworkXNoPath:
-        logging.debug(
+        logger.debug(
             f"No path to {COLORSPACE_SCENE_ENCODING_REFERENCE} for {node}!"
         )
 
@@ -400,7 +402,7 @@ if __name__ == "__main__":
         "analytical",
     )
 
-    logging.info(f'Using "{build_directory}" build directory...')
+    logger.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
@@ -425,4 +427,4 @@ if __name__ == "__main__":
             ),
         )
     except TypeError as error:
-        logging.critical(error)
+        logger.critical(error)
