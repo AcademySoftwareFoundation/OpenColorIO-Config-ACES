@@ -5,8 +5,6 @@
 Utilities
 =========
 
-.. contents:: :local:
-
 Common
 ------
 
@@ -27,7 +25,6 @@ Common
     is_colour_installed
     is_jsonpickle_installed
     is_networkx_installed
-    is_opencolorio_installed
     REQUIREMENTS_TO_CALLABLE
     required
     is_string

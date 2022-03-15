@@ -2,8 +2,8 @@
   SPDX-License-Identifier: CC-BY-4.0
   Copyright Contributors to the OpenColorIO Project.
 
-Reference
-=========
+API Reference
+=============
 
 .. toctree::
     :titlesonly:

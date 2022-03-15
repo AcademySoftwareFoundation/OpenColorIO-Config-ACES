@@ -1,14 +1,14 @@
-name: Continuous Integration
+name: Continuous Integration - Quality & Unit Tests
 
 on: [push, pull_request]
 
 jobs:
-  continuous-integration:
+  continuous-integration-quality-unit-tests:
     name: ${{ matrix.os }} - Python ${{ matrix.python-version }}
     strategy:
       matrix:
-        os: [macOS-latest, ubuntu-18.04, windows-latest]
-        python-version: [3.7, 3.8]
+        os: [macOS-latest, ubuntu-20.04, windows-latest]
+        python-version: [3.8, 3.9, '3.10']
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -20,7 +20,6 @@ jobs:
         echo "CI_PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
         echo "CI_PACKAGE=opencolorio_config_aces" >> $GITHUB_ENV
         echo "CI_SHA=${{ github.sha }}" >> $GITHUB_ENV
-        echo "CI_FLAKE8_EXCLUDED=aces-dev" >> $GITHUB_ENV
         echo "COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }}" >> $GITHUB_ENV
       shell: bash
     - name: Set up Python ${{ matrix.python-version }}
@@ -30,20 +29,25 @@ jobs:
     - name: Install Poetry
       run: |
         curl -L https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py -o get-poetry.py
-        python get-poetry.py --version 1.0.10
+        python get-poetry.py
         echo "$HOME/.poetry/bin" >> $GITHUB_PATH
       shell: bash
     - name: Install Package Dependencies
       run: |
+        poetry run python -m pip install --upgrade pip
         poetry install --extras "optional"
       shell: bash
-    - name: Lint with flake8
+    - name: Pre-Commit (All Files)
       run: |
-        poetry run flake8 $CI_PACKAGE --count --show-source --statistics --exclude=$CI_FLAKE8_EXCLUDED
+        poetry run pre-commit run --all-files
       shell: bash
-    - name: Test with nosetests
+    - name: Test Optimised Python Execution
       run: |
-        poetry run python -W ignore -m nose -q -v --with-doctest --doctest-options=+ELLIPSIS --with-coverage --traverse-namespace --cover-package=$CI_PACKAGE $CI_PACKAGE
+        poetry run python -OO -c "import $CI_PACKAGE"
+      shell: bash
+    - name: Test with Pytest
+      run: |
+        poetry run python -W ignore -m py.test --disable-warnings --doctest-modules --ignore=$CI_PACKAGE/config/reference/aces-dev --cov=$CI_PACKAGE $CI_PACKAGE
       shell: bash
 #    - name: Upload Coverage to coveralls.io
 #      run: |

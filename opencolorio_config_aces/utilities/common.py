@@ -13,23 +13,48 @@ import re
 import subprocess
 from collections import defaultdict
 from itertools import chain
+from pprint import PrettyPrinter
 from textwrap import TextWrapper
 
-__author__ = 'OpenColorIO Contributors'
-__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
-__license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO Contributors'
-__email__ = 'ocio-dev@lists.aswf.io'
-__status__ = 'Production'
+__author__ = "OpenColorIO Contributors"
+__copyright__ = "Copyright Contributors to the OpenColorIO Project."
+__license__ = "New BSD License - https://opensource.org/licenses/BSD-3-Clause"
+__maintainer__ = "OpenColorIO Contributors"
+__email__ = "ocio-dev@lists.aswf.io"
+__status__ = "Production"
 
 __all__ = [
-    'DocstringDict', 'first_item', 'common_ancestor', 'paths_common_ancestor',
-    'vivification', 'vivified_to_dict', 'message_box', 'is_colour_installed',
-    'is_jsonpickle_installed', 'is_networkx_installed',
-    'is_opencolorio_installed', 'REQUIREMENTS_TO_CALLABLE', 'required',
-    'is_string', 'is_iterable', 'git_describe', 'matrix_3x3_to_4x4',
-    'multi_replace'
+    "DocstringDict",
+    "first_item",
+    "common_ancestor",
+    "paths_common_ancestor",
+    "vivification",
+    "vivified_to_dict",
+    "message_box",
+    "is_colour_installed",
+    "is_jsonpickle_installed",
+    "is_networkx_installed",
+    "REQUIREMENTS_TO_CALLABLE",
+    "required",
+    "is_string",
+    "is_iterable",
+    "git_describe",
+    "matrix_3x3_to_4x4",
+    "multi_replace",
 ]
+
+
+# Monkey-patching the "PrettyPrinter" mapping to handle the "TypeError"
+# exception raised with "instancemethod": https://bugs.python.org/issue33395
+class _dispatch(dict):
+    def get(self, key, default=None):
+        try:
+            return self.__get__(key, default)
+        except Exception:
+            pass
+
+
+PrettyPrinter._dispatch = _dispatch()
 
 
 class DocstringDict(dict):
@@ -43,7 +68,7 @@ class DocstringDict(dict):
 
 def first_item(iterable, default=None):
     """
-    Returns the first item of given iterable.
+    Return the first item of given iterable.
 
     Parameters
     ----------
@@ -51,6 +76,7 @@ def first_item(iterable, default=None):
         Iterable
     default : object
          Default value if the iterable is empty.
+
     Returns
     -------
     object
@@ -66,7 +92,7 @@ def first_item(iterable, default=None):
 
 def common_ancestor(*args):
     """
-    Returns the common ancestor of given iterables.
+    Return the common ancestor of given iterables.
 
     Other Parameters
     ----------------
@@ -90,7 +116,7 @@ def common_ancestor(*args):
     divergence = list(filter(lambda i: len(i) > 1, array))
 
     if divergence:
-        ancestor = first_item(args)[:array.index(first_item(divergence))]
+        ancestor = first_item(args)[: array.index(first_item(divergence))]
     else:
         ancestor = min(args)
 
@@ -99,7 +125,7 @@ def common_ancestor(*args):
 
 def paths_common_ancestor(*args):
     """
-    Returns the common ancestor path from given paths.
+    Return the common ancestor path from given paths.
 
     Parameters
     ----------
@@ -119,14 +145,15 @@ def paths_common_ancestor(*args):
     """
 
     path_ancestor = os.sep.join(
-        common_ancestor(*[path.split(os.sep) for path in args]))
+        common_ancestor(*[path.split(os.sep) for path in args])
+    )
 
     return path_ancestor
 
 
 def vivification():
     """
-    Implements supports for vivification of the underlying dict like
+    Implement supports for vivification of the underlying dict like
     data-structure, magical!
 
     Returns
@@ -148,7 +175,7 @@ def vivification():
 
 def vivified_to_dict(vivified):
     """
-    Converts given vivified data-structure to dictionary.
+    Convert given vivified data-structure to dictionary.
 
     Parameters
     ----------
@@ -169,15 +196,14 @@ def vivified_to_dict(vivified):
 
     if isinstance(vivified, defaultdict):
         vivified = {
-            key: vivified_to_dict(value)
-            for key, value in vivified.items()
+            key: vivified_to_dict(value) for key, value in vivified.items()
         }
     return vivified
 
 
 def message_box(message, width=79, padding=3, print_callable=print):
     """
-    Prints a message inside a box.
+    Print a message inside a box.
 
     Parameters
     ----------
@@ -232,33 +258,33 @@ def message_box(message, width=79, padding=3, print_callable=print):
     ideal_width = width - padding * 2 - 2
 
     def inner(text):
-        """
-        Formats and pads inner text for the message box.
-        """
+        """Format and pads inner text for the message box."""
 
-        return '*{0}{1}{2}{0}*'.format(
-            ' ' * padding, text, (' ' * (width - len(text) - padding * 2 - 2)))
+        return "*{0}{1}{2}{0}*".format(
+            " " * padding, text, (" " * (width - len(text) - padding * 2 - 2))
+        )
 
-    print_callable('=' * width)
-    print_callable(inner(''))
+    print_callable("=" * width)
+    print_callable(inner(""))
 
     wrapper = TextWrapper(
-        width=ideal_width, break_long_words=False, replace_whitespace=False)
+        width=ideal_width, break_long_words=False, replace_whitespace=False
+    )
 
     lines = [wrapper.wrap(line) for line in message.split("\n")]
-    lines = [' ' if len(line) == 0 else line for line in lines]
+    lines = [" " if len(line) == 0 else line for line in lines]
     for line in chain(*lines):
         print_callable(inner(line.expandtabs()))
 
-    print_callable(inner(''))
-    print_callable('=' * width)
+    print_callable(inner(""))
+    print_callable("=" * width)
 
     return True
 
 
 def is_colour_installed(raise_exception=False):
     """
-    Returns if *Colour* is installed and available.
+    Return if *Colour* is installed and available.
 
     Parameters
     ----------
@@ -282,14 +308,17 @@ def is_colour_installed(raise_exception=False):
         return True
     except ImportError as error:  # pragma: no cover
         if raise_exception:
-            raise ImportError(('"Colour" related API features '
-                               'are not available: "{0}".').format(error))
+            raise ImportError(
+                (
+                    '"Colour" related API features ' 'are not available: "{}".'
+                ).format(error)
+            )
         return False
 
 
 def is_jsonpickle_installed(raise_exception=False):
     """
-    Returns if *jsonpickle* is installed and available.
+    Return if *jsonpickle* is installed and available.
 
     Parameters
     ----------
@@ -314,14 +343,17 @@ def is_jsonpickle_installed(raise_exception=False):
     except ImportError as error:  # pragma: no cover
         if raise_exception:
             raise ImportError(
-                ('"jsonpickle" related API features, e.g. serialization, '
-                 'are not available: "{0}".').format(error))
+                (
+                    '"jsonpickle" related API features, e.g. serialization, '
+                    'are not available: "{}".'
+                ).format(error)
+            )
         return False
 
 
 def is_networkx_installed(raise_exception=False):
     """
-    Returns if *NetworkX* is installed and available.
+    Return if *NetworkX* is installed and available.
 
     Parameters
     ----------
@@ -346,52 +378,22 @@ def is_networkx_installed(raise_exception=False):
         return True
     except ImportError as error:  # pragma: no cover
         if raise_exception:
-            raise ImportError(('"NetworkX" related API features '
-                               'are not available: "{0}".').format(error))
+            raise ImportError(
+                (
+                    '"NetworkX" related API features '
+                    'are not available: "{}".'
+                ).format(error)
+            )
         return False
 
 
-def is_opencolorio_installed(raise_exception=False):
-    """
-    Returns if *OpenColorIO* is installed and available.
-
-    Parameters
-    ----------
-    raise_exception : bool
-        Raise exception if *OpenColorIO* is unavailable.
-
-    Returns
-    -------
-    bool
-        Is *OpenColorIO* installed.
-
-    Raises
-    ------
-    ImportError
-        If *OpenColorIO* is not installed.
-    """
-
-    try:  # pragma: no cover
-        import PyOpenColorIO  # noqa
-
-        return True
-    except ImportError as error:  # pragma: no cover
-        if raise_exception:
-            raise ImportError(('"OpenColorIO" related API features '
-                               'are not available: "{0}".').format(error))
-        return False
-
-
-REQUIREMENTS_TO_CALLABLE = DocstringDict({
-    'Colour':
-    is_colour_installed,
-    'jsonpickle':
-    is_jsonpickle_installed,
-    'NetworkX':
-    is_networkx_installed,
-    'OpenColorIO':
-    is_opencolorio_installed,
-})
+REQUIREMENTS_TO_CALLABLE = DocstringDict(
+    {
+        "Colour": is_colour_installed,
+        "jsonpickle": is_jsonpickle_installed,
+        "NetworkX": is_networkx_installed,
+    }
+)
 REQUIREMENTS_TO_CALLABLE.__doc__ = """
 Mapping of requirements to their respective callables.
 
@@ -402,7 +404,8 @@ _REQUIREMENTS_TO_CALLABLE : CaseInsensitiveMapping
 
 def required(*requirements):
     """
-    A decorator checking if various requirements are satisfied.
+    Decorate a function to check whether various ancillary package requirements
+    are satisfied.
 
     Other Parameters
     ----------------
@@ -415,15 +418,11 @@ def required(*requirements):
     """
 
     def wrapper(function):
-        """
-        Wrapper for given function.
-        """
+        """Wrap given function wrapper."""
 
         @functools.wraps(function)
         def wrapped(*args, **kwargs):
-            """
-            Wrapped function.
-            """
+            """Wrap given function."""
 
             for requirement in requirements:
                 REQUIREMENTS_TO_CALLABLE[requirement](raise_exception=True)
@@ -437,7 +436,7 @@ def required(*requirements):
 
 def is_string(a):
     """
-    Returns if given :math:`a` variable is a *string* like variable.
+    Return if given :math:`a` variable is a *string* like variable.
 
     Parameters
     ----------
@@ -462,7 +461,7 @@ def is_string(a):
 
 def is_iterable(a):
     """
-    Returns if given :math:`a` variable is iterable.
+    Return if given :math:`a` variable is iterable.
 
     Parameters
     ----------
@@ -482,12 +481,12 @@ def is_iterable(a):
     False
     """
 
-    return is_string(a) or (True if getattr(a, '__iter__', False) else False)
+    return is_string(a) or (True if getattr(a, "__iter__", False) else False)
 
 
 def git_describe():
     """
-    Describes the current *OpenColorIO Configuration for ACES* *git* version.
+    Describe the current *OpenColorIO Configuration for ACES* *git* version.
 
     Returns
     -------
@@ -499,10 +498,11 @@ def git_describe():
 
     try:  # pragma: no cover
         version = subprocess.check_output(
-            ['git', 'describe'],
+            ["git", "describe"],
             cwd=opencolorio_config_aces.__path__[0],
-            stderr=subprocess.STDOUT).strip()
-        version = version.decode('utf-8')
+            stderr=subprocess.STDOUT,
+        ).strip()
+        version = version.decode("utf-8")
     except Exception:  # pragma: no cover
         version = opencolorio_config_aces.__version__
 
@@ -511,10 +511,10 @@ def git_describe():
 
 # TODO: Numpy currently comes via "Colour", we might want that to be an
 # explicit dependency in the future.
-@required('Colour')
+@required("Colour")
 def matrix_3x3_to_4x4(M):
     """
-    Converts given 3x3 matrix :math:`M` to a raveled 4x4 matrix.
+    Convert given 3x3 matrix :math:`M` to a raveled 4x4 matrix.
 
     Parameters
     ----------
@@ -537,7 +537,7 @@ def matrix_3x3_to_4x4(M):
 
 def multi_replace(name, patterns):
     """
-    Updates given name by applying in succession the given patterns and
+    Update given name by applying in succession the given patterns and
     substitutions.
 
     Parameters

@@ -18,7 +18,7 @@ It is freely available under the
 
 .. contents:: **Table of Contents**
     :backlinks: none
-    :depth: 3
+    :depth: 2
 
 .. sectnum::
 
@@ -37,46 +37,14 @@ The following features are available:
     configurations.
 -   Included *CLF* transforms along with generator and discovery support.
 
-Components Status
-^^^^^^^^^^^^^^^^^
-
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Component                     | Status         | Notes                                                                            |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *aces-dev* Discovery          | Complete       | Minor updates might be required when *aces-dev* is updated.                      |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Common Config Generator       | Quasi-Complete | Support for *NamedTransform* must be implemented.                                |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *Reference* Config Generation | Complete       |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *CG* Config Generation        | In-Progress    | Relies on *NamedTransform* support and shipped *CLF* transforms completion.      |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Custom Config Generation      | In-Progress    | We are designing the components so that one can generate a custom *ACES* config. |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *Studio* Config Generation    | In-Progress    |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *CLF* Transforms Discovery    | Complete       | Minor updates will be required if classification changes.                        |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *CLF* Transforms Generation   | In-Progress    |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Public API Surfacing          | In-Progress    | What is part of the Public API is not well defined currently.                    |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Unit Tests                    | In-Progress    |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| API Documentation             | In-Progress    |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Continuous Integration        | Complete       |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| CLI                           | In-Progress    |                                                                                  |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Containerisation              | Complete       | Minor updates will be required as the CLI evolves.                               |
-+-------------------------------+----------------+----------------------------------------------------------------------------------+
+User Guide
+----------
 
 Installation
-------------
+^^^^^^^^^^^^
 
 Cloning the Repository
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 The *OpenColorIO Configuration for ACES* repository uses `Git submodules <https://git-scm.com/book/en/v2/Git-Tools-Submodules>`__
 thus cloning the repository requires initializing them::
@@ -89,13 +57,13 @@ argument, it is possible to initialize the submodules as follows::
     git submodule update --init --recursive
 
 Poetry
-^^^^^^
+~~~~~~
 
 The *OpenColorIO Configuration for ACES* repository adopts `Poetry <https://poetry.eustace.io>`__
 to help managing its dependencies, this is the recommended way to get started
 with development.
 
-Assuming `python>=3.7 <https://www.python.org/download/releases/>`__ is
+Assuming `python >= 3.8 <https://www.python.org/download/releases/>`__ is
 available on your system along with `OpenColorIO <https://opencolorio.org/>`__,
 the development dependencies are installed with `Poetry <https://poetry.eustace.io>`__
 as follows::
@@ -111,7 +79,7 @@ python package::
     poetry install --extras "optional graphviz"
 
 Docker
-^^^^^^
+~~~~~~
 
 Installing the dependencies for the `previous config generator <https://github.com/imageworks/OpenColorIO-Configs>`__
 was not a trivial task. For ease of use an `aswf-docker <https://github.com/AcademySoftwareFoundation/aswf-docker>`__
@@ -132,7 +100,7 @@ Then, to run *bash* in the container::
     docker run -it -v ${PWD}:/home/aswf/OpenColorIO-Config-ACES aswf/opencolorio-config-aces:latest /bin/bash
 
 Pypi
-^^^^
+~~~~
 
 The **OpenColorIO Configuration for ACES** package requires various
 dependencies in order to run and be able to generate the *OCIO* configurations:
@@ -140,7 +108,7 @@ dependencies in order to run and be able to generate the *OCIO* configurations:
 Primary Dependencies
 ********************
 
--   `python>=3.7 <https://www.python.org/download/releases/>`__
+-   `python >= 3.8, < 3.11 <https://www.python.org/download/releases/>`__
 -   `OpenColorIO <https://opencolorio.org/>`__
 
 Optional Dependencies
@@ -155,18 +123,20 @@ Optional Dependencies
 Development Dependencies
 ************************
 
+-   `black <https://pypi.org/project/black/>`__
 -   `coverage <https://pypi.org/project/coverage/>`__
 -   `coveralls <https://pypi.org/project/coveralls/>`__
 -   `flake8 <https://pypi.org/project/flake8/>`__
 -   `invoke <https://pypi.org/project/invoke/>`__
--   `nose <https://pypi.org/project/nose/>`__
+-   `mypy <https://pypi.org/project/mypy/>`__
 -   `pre-commit <https://pypi.org/project/pre-commit/>`__
+-   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme/>`__
+-   `pydocstyle <https://pypi.org/project/pydocstyle/>`__
 -   `pytest <https://pypi.org/project/pytest/>`__
+-   `pyupgrade <https://pypi.org/project/pyupgrade/>`__
 -   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint/>`__
--   `sphinx <https://pypi.org/project/Sphinx/>`__
--   `sphinx-rtd-theme <https://pypi.org/project/sphinx-rtd-theme/>`__
+-   `sphinx >= 4, < 5 <https://pypi.org/project/Sphinx/>`__
 -   `twine <https://pypi.org/project/twine/>`__
--   `yapf==0.23.0 <https://pypi.org/project/yapf/>`__
 
 Once the dependencies are satisfied, the **OpenColorIO Configuration for ACES**
 package can be installed from the `Python Package Index <http://pypi.python.org/pypi/opencolorio-config-aces>`__
@@ -174,11 +144,46 @@ by issuing this command in a shell::
 
     pip install --user opencolorio-config-aces
 
+Components Status
+^^^^^^^^^^^^^^^^^
+
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Component                     | Status         | Notes                                                                            |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *aces-dev* Discovery          | Complete       | Minor updates might be required when *aces-dev* is updated.                      |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Common Config Generator       | Complete       |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *Reference* Config Generation | Complete       |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *CG* Config Generation        | Complete       |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Custom Config Generation      | In-Progress    | We are designing the components so that one can generate a custom *ACES* config. |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *Studio* Config Generation    | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *CLF* Transforms Discovery    | Complete       | Minor updates will be required if classification changes.                        |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| *CLF* Transforms Generation   | In-Progress    | The *CG* Config *CLF* transforms are implemented                                 |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Public API Surfacing          | In-Progress    | What is part of the Public API is not well defined currently.                    |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Unit Tests                    | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| API Documentation             | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Continuous Integration        | Complete       |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| CLI                           | In-Progress    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Containerisation              | Complete       | Minor updates will be required as the CLI evolves.                               |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
+
 Usage
------
+^^^^^
 
 Tasks
-^^^^^
+~~~~~
 
 Various tasks are currently exposed via `invoke <https://pypi.org/project/invoke/>`__.
 
@@ -206,13 +211,11 @@ Or::
 
     invoke docker-run-build-config-cg
 
-API
-^^^
+API Reference
+-------------
 
-The main reference for `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__
-is the `manual <https://opencolorio-config-aces.readthedocs.io/>`__.
-
-.. {MANUAL-URL}
+The main technical reference for `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__
+is the `API Reference <https://opencolorio-config-aces.readthedocs.io/>`__.
 
 About
 -----

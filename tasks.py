@@ -5,29 +5,51 @@ Invoke - Tasks
 ==============
 """
 
-from __future__ import unicode_literals
+from __future__ import annotations
 
-import os
-from invoke import task
+from invoke import Context, task
 from invoke.exceptions import Failure
 
 import opencolorio_config_aces
 from opencolorio_config_aces.utilities import message_box
 
-__author__ = 'OpenColorIO Contributors'
-__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
-__license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO Contributors'
-__email__ = 'ocio-dev@lists.aswf.io'
-__status__ = 'Production'
+__author__ = "OpenColorIO Contributors"
+__copyright__ = "Copyright Contributors to the OpenColorIO Project."
+__license__ = "New BSD License - https://opensource.org/licenses/BSD-3-Clause"
+__maintainer__ = "OpenColorIO Contributors"
+__email__ = "ocio-dev@lists.aswf.io"
+__status__ = "Production"
 
 __all__ = [
-    'APPLICATION_NAME', 'APPLICATION_VERSION', 'PYTHON_PACKAGE_NAME',
-    'GITHUB_REPOSITORY_NAME', 'PYPI_PACKAGE_NAME', 'ORG', 'CONTAINER', 'clean',
-    'formatting', 'tests', 'quality', 'preflight', 'docs',
-    'build_config_reference', 'build_config_cg', 'requirements',
-    'docker_build', 'docker_remove', 'run_in_container', 'docker_run_docs',
-    'docker_run_build_config_reference', 'docker_run_build_config_cg'
+    "APPLICATION_NAME",
+    "APPLICATION_VERSION",
+    "PYTHON_PACKAGE_NAME",
+    "GITHUB_REPOSITORY_NAME",
+    "PYPI_PACKAGE_NAME",
+    "ORG",
+    "CONTAINER",
+    "clean",
+    "precommit",
+    "tests",
+    "preflight",
+    "docs",
+    "build_clf_utility",
+    "build_aces_conversion_graph",
+    "build_config_common_tests",
+    "build_config_reference_analytical",
+    "build_config_reference",
+    "build_config_cg",
+    "requirements",
+    "docker_build",
+    "docker_remove",
+    "run_in_container",
+    "docker_run_docs",
+    "docker_run_build_clf_utility",
+    "docker_run_build_aces_conversion_graph",
+    "docker_run_build_config_common_tests",
+    "docker_run_build_config_reference_analytical",
+    "docker_run_build_config_reference",
+    "docker_run_build_config_cg",
 ]
 
 APPLICATION_NAME = opencolorio_config_aces.__application_name__
@@ -36,397 +58,450 @@ APPLICATION_VERSION = opencolorio_config_aces.__version__
 
 PYTHON_PACKAGE_NAME = opencolorio_config_aces.__name__
 
-GITHUB_REPOSITORY_NAME = 'OpenColorIO-Config-ACES'
+GITHUB_REPOSITORY_NAME = "OpenColorIO-Config-ACES"
 
-PYPI_PACKAGE_NAME = 'opencolorio-config-aces'
+PYPI_PACKAGE_NAME = "opencolorio-config-aces"
 
-ORG = 'aswf'
+ORG = "aswf"
 
 CONTAINER = PYPI_PACKAGE_NAME
 
 
+def _patch_invoke_annotations_support():
+    """See https://github.com/pyinvoke/invoke/issues/357."""
+
+    import invoke
+    from unittest.mock import patch
+    from inspect import getfullargspec, ArgSpec
+
+    def patched_inspect_getargspec(function):
+        spec = getfullargspec(function)
+        return ArgSpec(*spec[0:4])
+
+    org_task_argspec = invoke.tasks.Task.argspec
+
+    def patched_task_argspec(*args, **kwargs):
+        with patch(
+            target="inspect.getargspec", new=patched_inspect_getargspec
+        ):
+            return org_task_argspec(*args, **kwargs)
+
+    invoke.tasks.Task.argspec = patched_task_argspec
+
+
+_patch_invoke_annotations_support()
+
+
 @task
-def clean(ctx, docs=True, bytecode=False):
+def clean(
+    ctx: Context,
+    docs: bool = True,
+    bytecode: bool = False,
+    mypy: bool = True,
+    pytest: bool = True,
+):
     """
-    Cleans the project.
+    Clean the project.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    docs : bool, optional
+    docs
         Whether to clean the *docs* directory.
-    bytecode : bool, optional
+    bytecode
         Whether to clean the bytecode files, e.g. *.pyc* files.
-
-    Returns
-    -------
-    bool
-        Task success.
+    mypy
+        Whether to clean the *Mypy* cache directory.
+    pytest
+        Whether to clean the *Pytest* cache directory.
     """
-    message_box('Cleaning project...')
 
-    patterns = ['build', '*.egg-info', 'dist']
+    message_box("Cleaning project...")
+
+    patterns = ["build", "*.egg-info", "dist"]
 
     if docs:
-        patterns.append('docs/_build')
-        patterns.append('docs/generated')
+        patterns.append("docs/_build")
+        patterns.append("docs/generated")
 
     if bytecode:
-        patterns.append('**/*.pyc')
+        patterns.append("**/__pycache__")
+        patterns.append("**/*.pyc")
+
+    if mypy:
+        patterns.append(".mypy_cache")
+
+    if pytest:
+        patterns.append(".pytest_cache")
 
     for pattern in patterns:
-        ctx.run(f'rm -rf {pattern}')
+        ctx.run(f"rm -rf {pattern}")
 
 
 @task
-def formatting(ctx, yapf=True):
+def precommit(ctx: Context):
     """
-    Formats the codebase with *Yapf*.
+    Run the "pre-commit" hooks on the codebase.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    yapf : bool, optional
-        Whether to format the codebase with *Yapf*.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    if yapf:
-        message_box('Formatting codebase with "Yapf"...')
-        ctx.run(
-            'yapf -p -i -r '
-            '--exclude \'.git\' '
-            '--exclude \'opencolorio_config_aces/config/reference/aces-dev\' .'
-        )
+    message_box('Running "pre-commit" hooks on the codebase...')
+    ctx.run("pre-commit run --all-files")
 
 
 @task
-def tests(ctx, nose=True):
+def tests(ctx: Context):
     """
-    Runs the unit tests with *Nose* or *Pytest*.
+    Run the unit tests with *Pytest*.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    nose : bool, optional
-        Whether to use *Nose* or *Pytest*.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    if nose:
-        message_box('Running "Nosetests"...')
-        ctx.run(f'nosetests --with-doctest --with-coverage '
-                f'--cover-package={PYTHON_PACKAGE_NAME} {PYTHON_PACKAGE_NAME}')
-    else:
-        message_box('Running "Pytest"...')
-        ctx.run(f'py.test --disable-warnings --doctest-modules '
-                f'{PYTHON_PACKAGE_NAME}')
+    message_box('Running "Pytest"...')
+    ctx.run(
+        "py.test "
+        "--disable-warnings "
+        "--doctest-modules "
+        f"--ignore={PYTHON_PACKAGE_NAME}/config/reference/aces-dev "
+        f"{PYTHON_PACKAGE_NAME}",
+    )
 
 
-@task
-def quality(ctx, flake8=True):
+@task(precommit, tests)
+def preflight(ctx: Context):
     """
-    Checks the codebase with *Flake8*.
+    Perform the preflight tasks, i.e. *formatting* and *quality*.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    flake8 : bool, optional
-        Whether to check the codebase with *Flake8*.
-
-    Returns
-    -------
-    bool
-        Task success.
-    """
-
-    if flake8:
-        message_box('Checking codebase with "Flake8"...')
-        ctx.run('flake8 opencolorio_config_aces --exclude=aces-dev')
-
-
-@task(formatting, tests, quality)
-def preflight(ctx):
-    """
-    Performs the preflight tasks, i.e. *formatting* and *quality*.
-
-    Parameters
-    ----------
-    ctx : invoke.context.Context
-        Context.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
     message_box('Finishing "Preflight"...')
 
 
 @task
-def docs(ctx, html=True, pdf=True):
+def docs(ctx: Context, html: bool = True, pdf: bool = True):
     """
-    Builds the documentation.
+    Build the documentation.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    html : bool, optional
+    html
         Whether to build the *HTML* documentation.
-    pdf : bool, optional
+    pdf
         Whether to build the *PDF* documentation.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    with ctx.cd('.'):
-        message_box('Updating "index.rst" file...')
-        readme_file_path = os.path.join(ctx.cwd, 'README.rst')
-        with open(readme_file_path, 'r') as readme_file:
-            readme_file_content = readme_file.read()
-
-        readme_file_content = readme_file_content.replace(
-            '.. {MANUAL-URL}', """
-.. toctree::
-    :maxdepth: 3
-
-    manual
-""" [1:-1])
-
-        index_file_path = os.path.join(ctx.cwd, 'docs', 'index.rst')
-        with open(index_file_path, 'w') as index_file:
-            index_file.write(readme_file_content)
-
-    with ctx.cd('docs'):
+    with ctx.cd("docs"):
         if html:
             message_box('Building "HTML" documentation...')
-            ctx.run('make html')
+            ctx.run("make html")
 
         if pdf:
             message_box('Building "PDF" documentation...')
-            ctx.run('make latexpdf')
+            ctx.run("make latexpdf")
 
 
 @task
-def build_config_reference(ctx):
+def build_clf_utility(ctx: Context):
     """
-    Builds the *aces-dev* reference *OpenColorIO* Config.
+    Build the *CLF* utility transforms.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    message_box(f'Building the "aces-dev" reference "OpenColorIO" config...')
-    with ctx.cd('opencolorio_config_aces/config/reference/generate'):
-        ctx.run('python config.py')
+    message_box('Building the "CLF" utility transforms...')
+    with ctx.cd("opencolorio_config_aces/clf/transforms"):
+        ctx.run("python utility.py")
 
 
 @task
-def build_config_cg(ctx):
+def build_aces_conversion_graph(ctx: Context):
     """
-    Builds the *ACES* Computer Graphics (CG) *OpenColorIO* Config.
+    Build the *aces-dev* conversion graph.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
+    """
 
-    Returns
-    -------
-    bool
-        Task success.
+    message_box('Building the ""aces-dev" conversion graph...')
+    with ctx.cd("opencolorio_config_aces/config/reference/discover"):
+        ctx.run("python graph.py")
+
+
+@task
+def build_config_common_tests(ctx: Context):
+    """
+    Build the common tests *OpenColorIO* Config(s).
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box('Building the common tests "OpenColorIO" Config(s)...')
+    with ctx.cd("opencolorio_config_aces/config/generation"):
+        ctx.run("python common.py")
+
+
+@task
+def build_config_reference_analytical(ctx: Context):
+    """
+    Build the *aces-dev* reference analytical *OpenColorIO* Config.
+
+    Parameters
+    ----------
+    ctx
+        Context.
     """
 
     message_box(
-        f'Building the "ACES" Computer Graphics (CG) "OpenColorIO" config...')
-    with ctx.cd('opencolorio_config_aces/config/cg/generate'):
-        ctx.run('python config.py')
+        'Building the "aces-dev" reference analytical "OpenColorIO" Config...'
+    )
+    with ctx.cd("opencolorio_config_aces/config/reference/generate"):
+        ctx.run("python analytical.py")
 
 
 @task
-def requirements(ctx):
+def build_config_reference(ctx: Context):
     """
-    Exports the *requirements.txt* file.
+    Build the *aces-dev* reference *OpenColorIO* Config.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
+    """
 
-    Returns
-    -------
-    bool
-        Task success.
+    message_box('Building the "aces-dev" reference "OpenColorIO" Config...')
+    with ctx.cd("opencolorio_config_aces/config/reference/generate"):
+        ctx.run("python config.py")
+
+
+@task
+def build_config_cg(ctx: Context):
+    """
+    Build the *ACES* Computer Graphics (CG) *OpenColorIO* Config.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box(
+        'Building the "ACES" Computer Graphics (CG) "OpenColorIO" config...'
+    )
+    with ctx.cd("opencolorio_config_aces/config/cg/generate"):
+        ctx.run("python config.py")
+
+
+@task
+def requirements(ctx: Context):
+    """
+    Export the *requirements.txt* file.
+
+    Parameters
+    ----------
+    ctx
+        Context.
     """
 
     message_box('Exporting "requirements.txt" file...')
-    ctx.run('poetry run pip list --format=freeze | '
-            'egrep -v "opencolorio-config-aces" '
-            '> requirements.txt')
+    ctx.run(
+        "poetry run pip list --format=freeze | "
+        'egrep -v "opencolorio-config-aces" '
+        "> requirements.txt"
+    )
 
 
 @task(requirements)
-def docker_build(ctx):
+def docker_build(ctx: Context):
     """
-    Builds the *docker* image.
+    Build the *docker* image.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
     message_box('Building "docker" image...')
-    ctx.run(f'docker build -t {ORG}/{CONTAINER}:latest '
-            f'-t {ORG}/{CONTAINER}:v{APPLICATION_VERSION} .')
+    ctx.run(
+        f"docker build -t {ORG}/{CONTAINER}:latest "
+        f"-t {ORG}/{CONTAINER}:v{APPLICATION_VERSION} ."
+    )
 
 
 @task
-def docker_remove(ctx):
+def docker_remove(ctx: Context):
     """
-    Stops and remove the *docker* container.
+    Stop and remove the *docker* container.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
     message_box('Stopping "docker" container...')
     try:
-        ctx.run(f'docker stop {CONTAINER}')
+        ctx.run(f"docker stop {CONTAINER}")
     except Failure:
         pass
 
     message_box('Removing "docker" container...')
     try:
-        ctx.run(f'docker rm {CONTAINER}')
+        ctx.run(f"docker rm {CONTAINER}")
     except Failure:
         pass
 
 
-def run_in_container(ctx, command):
+def run_in_container(ctx: Context, command: str):
     """
-    Runs given command in *docker* container.
+    Run given command in *docker* container.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    command : unicode
+    command
         Command to run in the *docker* container.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
     message_box(f'Running "docker" container with "{command}" command...')
-    ctx.run(f'docker run -v ${{PWD}}:/home/{ORG}/{GITHUB_REPOSITORY_NAME} '
-            f'{ORG}/{CONTAINER}:latest {command}')
+    ctx.run(
+        f"docker run -v ${{PWD}}:/home/{ORG}/{GITHUB_REPOSITORY_NAME} "
+        f"{ORG}/{CONTAINER}:latest {command}"
+    )
 
 
 @task
-def docker_run_docs(ctx, html=True, pdf=True):
+def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
     """
-    Builds the documentation in the *docker* container.
+    Build the documentation in the *docker* container.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-    html : bool, optional
+    html
         Whether to build the *HTML* documentation.
-    pdf : bool, optional
+    pdf
         Whether to build the *PDF* documentation.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    command = 'invoke docs'
+    command = "invoke docs"
 
     if html is False:
-        command += ' --no-html'
+        command += " --no-html"
 
     if pdf is False:
-        command += ' --no-pdf'
+        command += " --no-pdf"
 
     run_in_container(ctx, command)
 
 
 @task
-def docker_run_build_config_reference(ctx):
+def docker_run_build_clf_utility(ctx: Context):
     """
-    Builds the *aces-dev* reference *OpenColorIO* Config in the *docker*
-    container.
+    Build the *CLF* utility transforms in the *docker* container.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    run_in_container(ctx, 'invoke build-config-reference')
+    run_in_container(ctx, "invoke build-clf-utility")
 
 
 @task
-def docker_run_build_config_cg(ctx):
+def docker_run_build_aces_conversion_graph(ctx: Context):
     """
-    Builds the *ACES* Computer Graphics (CG) *OpenColorIO* Config in the
+    Build the *aces-dev* conversion graph in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-aces-conversion-graph")
+
+
+@task
+def docker_run_build_config_common_tests(ctx: Context):
+    """
+    Build the common tests *OpenColorIO* Config(s) in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-config-common")
+
+
+@task
+def docker_run_build_config_reference_analytical(ctx: Context):
+    """
+    Build the *aces-dev* reference analytical *OpenColorIO* Config in the
     *docker* container.
 
     Parameters
     ----------
-    ctx : invoke.context.Context
+    ctx
         Context.
-
-    Returns
-    -------
-    bool
-        Task success.
     """
 
-    run_in_container(ctx, 'invoke build-config-cg')
+    run_in_container(ctx, "invoke build-config-reference-analytical")
+
+
+@task
+def docker_run_build_config_reference(ctx: Context):
+    """
+    Build the *aces-dev* reference *OpenColorIO* Config in the *docker*
+    container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-config-reference")
+
+
+@task
+def docker_run_build_config_cg(ctx: Context):
+    """
+    Build the *ACES* Computer Graphics (CG) *OpenColorIO* Config in the
+    *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-config-cg")

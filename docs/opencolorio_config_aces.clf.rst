@@ -13,9 +13,9 @@ Common LUT Format Discovery
     :toctree: generated/
 
     classify_clf_transforms
-    discover_clf_transforms,
+    discover_clf_transforms
     filter_clf_transforms
-    print_clf_taxonomy,
+    print_clf_taxonomy
     unclassify_clf_transforms
 
 Common LUT Format Generation

@@ -20,24 +20,33 @@ import logging
 import pickle
 
 from opencolorio_config_aces.config.reference.discover.classify import (
-    classify_aces_ctl_transforms, discover_aces_ctl_transforms,
-    filter_ctl_transforms, unclassify_ctl_transforms)
+    classify_aces_ctl_transforms,
+    discover_aces_ctl_transforms,
+    filter_ctl_transforms,
+    unclassify_ctl_transforms,
+)
 from opencolorio_config_aces.utilities import required
 
-__author__ = 'OpenColorIO Contributors'
-__copyright__ = 'Copyright Contributors to the OpenColorIO Project.'
-__license__ = 'New BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__maintainer__ = 'OpenColorIO Contributors'
-__email__ = 'ocio-dev@lists.aswf.io'
-__status__ = 'Production'
+__author__ = "OpenColorIO Contributors"
+__copyright__ = "Copyright Contributors to the OpenColorIO Project."
+__license__ = "New BSD License - https://opensource.org/licenses/BSD-3-Clause"
+__maintainer__ = "OpenColorIO Contributors"
+__email__ = "ocio-dev@lists.aswf.io"
+__status__ = "Production"
 
 __all__ = [
-    'SEPARATOR_NODE_NAME_CTL', 'build_aces_conversion_graph',
-    'node_to_ctl_transform', 'ctl_transform_to_node', 'filter_nodes',
-    'conversion_path', 'plot_aces_conversion_graph'
+    "SEPARATOR_NODE_NAME_CTL",
+    "build_aces_conversion_graph",
+    "node_to_ctl_transform",
+    "ctl_transform_to_node",
+    "filter_nodes",
+    "conversion_path",
+    "plot_aces_conversion_graph",
 ]
 
-SEPARATOR_NODE_NAME_CTL = '/'
+logger = logging.getLogger(__name__)
+
+SEPARATOR_NODE_NAME_CTL = "/"
 """
 *aces-dev* conversion graph node name separator.
 
@@ -45,10 +54,10 @@ SEPARATOR_NODE_NAME_CTL : unicode
 """
 
 
-@required('NetworkX')
+@required("NetworkX")
 def build_aces_conversion_graph(ctl_transforms):
     """
-    Builds the *aces-dev* conversion graph from given *ACES* *CTL* transforms.
+    Build the *aces-dev* conversion graph from given *ACES* *CTL* transforms.
 
     Parameters
     ----------
@@ -87,9 +96,11 @@ def build_aces_conversion_graph(ctl_transforms):
         type_ = ctl_transform.type
 
         if source is None or target is None:
-            logging.debug(f'"{ctl_transform}" has either a missing source '
-                          f'or target colourspace and won\'t be included in '
-                          f'the "aces-dev" conversion graph!')
+            logger.debug(
+                f'"{ctl_transform}" has either a missing source '
+                f"or target colourspace and won't be included in "
+                f'the "aces-dev" conversion graph!'
+            )
             continue
 
         # Without enforcing a preferred source and target colourspaces, the
@@ -97,36 +108,49 @@ def build_aces_conversion_graph(ctl_transforms):
         # colourspaces which might be confusing, e.g. a node for an
         # "Output Transform" might have an "RGBmonitor_100nits_dim" source and
         # a "OCES" target.
-        if family in ('csc', 'input_transform', 'lmt'):
-            if source == 'ACES2065-1':
-                logging.debug(f'"{ctl_transform}" ctl transform from the '
-                              f'"{family}" family uses "{source}" as source, '
-                              f'skipping!')
+        if family in ("csc", "input_transform", "lmt"):
+            if source == "ACES2065-1":
+                logger.debug(
+                    f'"{ctl_transform}" ctl transform from the '
+                    f'"{family}" family uses "{source}" as source, '
+                    f"skipping!"
+                )
                 continue
-        elif family == 'output_transform':
-            if target in ('ACES2065-1', 'OCES'):
-                logging.debug(f'"{ctl_transform}" ctl transform from the '
-                              f'"{family}" family uses "{target}" as target, '
-                              f'skipping!')
+        elif family == "output_transform":
+            if target in ("ACES2065-1", "OCES"):
+                logger.debug(
+                    f'"{ctl_transform}" ctl transform from the '
+                    f'"{family}" family uses "{target}" as target, '
+                    f"skipping!"
+                )
                 continue
 
-        source = (source if source in ('ACES2065-1', 'OCES') else
-                  f'{type_}{SEPARATOR_NODE_NAME_CTL}{source}')
-        target = (target if target in ('ACES2065-1', 'OCES') else
-                  f'{type_}{SEPARATOR_NODE_NAME_CTL}{target}')
+        source = (
+            source
+            if source in ("ACES2065-1", "OCES")
+            else f"{type_}{SEPARATOR_NODE_NAME_CTL}{source}"
+        )
+        target = (
+            target
+            if target in ("ACES2065-1", "OCES")
+            else f"{type_}{SEPARATOR_NODE_NAME_CTL}{target}"
+        )
 
         # Serializing the data for "Graphviz AGraph".
-        serialized = codecs.encode(pickle.dumps(ctl_transform, 4),
-                                   'base64').decode()
+        serialized = codecs.encode(
+            pickle.dumps(ctl_transform, 4), "base64"
+        ).decode()
 
         for node in (source, target):
             if node not in graph.nodes():
                 graph.add_node(node, data=ctl_transform, serialized=serialized)
             else:
-                logging.debug(f'"{node}" node was already added to '
-                              f'the "aces-dev" conversion graph '
-                              f'by the "{node_to_ctl_transform(graph, node)}" '
-                              f'"CTL" transform, skipping!')
+                logger.debug(
+                    f'"{node}" node was already added to '
+                    f'the "aces-dev" conversion graph '
+                    f'by the "{node_to_ctl_transform(graph, node)}" '
+                    f'"CTL" transform, skipping!'
+                )
 
         graph.add_edge(source, target)
 
@@ -135,7 +159,7 @@ def build_aces_conversion_graph(ctl_transforms):
 
 def node_to_ctl_transform(graph, node):
     """
-    Returns the *ACES* *CTL* transform from given node name.
+    Return the *ACES* *CTL* transform from given node name.
 
     Parameters
     ----------
@@ -158,12 +182,12 @@ def node_to_ctl_transform(graph, node):
     CTLTransform('odt...p3...ODT.Academy.P3D60_48nits.ctl')
     """
 
-    return graph.nodes[node]['data']
+    return graph.nodes[node]["data"]
 
 
 def ctl_transform_to_node(graph, ctl_transform):
     """
-    Returns the node name from given *ACES* *CTL* transform.
+    Return the node name from given *ACES* *CTL* transform.
 
     Parameters
     ----------
@@ -194,7 +218,7 @@ def ctl_transform_to_node(graph, ctl_transform):
 
 def filter_nodes(graph, filterers=None):
     """
-    Filters given *aces-dev* conversion graph nodes with given filterers.
+    Filter given *aces-dev* conversion graph nodes with given filterers.
 
     Parameters
     ----------
@@ -234,10 +258,10 @@ def filter_nodes(graph, filterers=None):
     return filtered_nodes
 
 
-@required('NetworkX')
+@required("NetworkX")
 def conversion_path(graph, source, target):
     """
-    Returns the conversion path from the source node to the target node in the
+    Return the conversion path from the source node to the target node in the
     *aces-dev* conversion graph.
 
     Parameters
@@ -271,10 +295,10 @@ def conversion_path(graph, source, target):
     return [(a, b) for a, b in zip(path[:-1], path[1:])]
 
 
-@required('NetworkX')
-def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
+@required("NetworkX")
+def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
     """
-    Plots given *aces-dev* conversion graph using
+    Plot given *aces-dev* conversion graph using
     `Graphviz <https://www.graphviz.org/>`__ and
     `pyraphviz <https://pygraphviz.github.io>`__.
 
@@ -301,7 +325,8 @@ def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
     agraph = nx.nx_agraph.to_agraph(graph)
 
     agraph.node_attr.update(
-        style='filled', shape='circle', fontname='Helvetica', fontsize=20)
+        style="filled", shape="circle", fontname="Helvetica", fontsize=20
+    )
 
     ctl_transforms_csc = []
     ctl_transforms_idt = []
@@ -311,53 +336,59 @@ def plot_aces_conversion_graph(graph, filename, prog='dot', args=''):
 
     for node in agraph.nodes():
         unserialized = pickle.loads(
-            codecs.decode(node.attr['serialized'].encode(), 'base64'))
+            codecs.decode(node.attr["serialized"].encode(), "base64")
+        )
 
         ctl_transform_type = unserialized.type
-        if node in ('ACES2065-1', 'OCES'):
+        if node in ("ACES2065-1", "OCES"):
             node.attr.update(
-                shape='doublecircle',
-                color='#673AB7FF',
-                fillcolor='#673AB770',
-                fontsize=30)
-        elif ctl_transform_type == 'ACEScsc':
-            node.attr.update(color='#00BCD4FF', fillcolor='#00BCD470')
+                shape="doublecircle",
+                color="#673AB7FF",
+                fillcolor="#673AB770",
+                fontsize=30,
+            )
+        elif ctl_transform_type == "ACEScsc":
+            node.attr.update(color="#00BCD4FF", fillcolor="#00BCD470")
             ctl_transforms_csc.append(node)
-        elif ctl_transform_type == 'IDT':
-            node.attr.update(color='#B3BC6D', fillcolor='#E6EE9C')
+        elif ctl_transform_type == "IDT":
+            node.attr.update(color="#B3BC6D", fillcolor="#E6EE9C")
             ctl_transforms_idt.append(node)
-        elif ctl_transform_type in ('ODT', 'InvODT'):
-            node.attr.update(color='#CA9B52', fillcolor='#FFCC80')
+        elif ctl_transform_type in ("ODT", "InvODT"):
+            node.attr.update(color="#CA9B52", fillcolor="#FFCC80")
             ctl_transforms_odt.append(node)
-        elif ctl_transform_type in ('RRTODT', 'InvRRTODT'):
-            node.attr.update(color='#C88719', fillcolor='#FFB74D')
+        elif ctl_transform_type in ("RRTODT", "InvRRTODT"):
+            node.attr.update(color="#C88719", fillcolor="#FFB74D")
             ctl_transforms_output_transform.append(node)
-        elif ctl_transform_type == 'LMT':
-            node.attr.update(color='#4BA3C7', fillcolor='#81D4FA')
+        elif ctl_transform_type == "LMT":
+            node.attr.update(color="#4BA3C7", fillcolor="#81D4FA")
             ctl_transforms_lmt.append(node)
 
     agraph.add_subgraph(
-        ctl_transforms_csc, name='cluster_ACEScsc', color='#00BCD4FF')
+        ctl_transforms_csc, name="cluster_ACEScsc", color="#00BCD4FF"
+    )
     agraph.add_subgraph(
-        ctl_transforms_idt, name='cluster_IDT', color='#B3BC6D')
+        ctl_transforms_idt, name="cluster_IDT", color="#B3BC6D"
+    )
     agraph.add_subgraph(
-        ctl_transforms_odt, name='cluster_ODT', color='#CA9B52')
+        ctl_transforms_odt, name="cluster_ODT", color="#CA9B52"
+    )
     agraph.add_subgraph(
         ctl_transforms_output_transform,
-        name='cluster_OutputTransform',
-        color='#C88719')
+        name="cluster_OutputTransform",
+        color="#C88719",
+    )
     agraph.add_subgraph(
-        ctl_transforms_lmt, name='cluster_LMT', color='#4BA3C7')
+        ctl_transforms_lmt, name="cluster_LMT", color="#4BA3C7"
+    )
 
-    agraph.edge_attr.update(color='#26323870')
+    agraph.edge_attr.update(color="#26323870")
     agraph.draw(filename, prog=prog, args=args)
 
     return agraph
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import os
-    import subprocess
     import opencolorio_config_aces
     from pprint import pprint
     from opencolorio_config_aces.utilities import message_box
@@ -365,13 +396,16 @@ if __name__ == '__main__':
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(opencolorio_config_aces.__path__[0], '..',
-                                   'build')
+    build_directory = os.path.join(
+        opencolorio_config_aces.__path__[0], "..", "build", "aces", "graph"
+    )
+
+    logger.info(f'Using "{build_directory}" build directory...')
 
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 
-    filename = os.path.join(build_directory, 'aces_conversion_graph.png')
+    filename = os.path.join(build_directory, "aces_conversion_graph.png")
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
@@ -381,26 +415,24 @@ if __name__ == '__main__':
     print(graph.nodes)
 
     message_box('Retrieving a "CTL" Transform from a Node')
-    print(node_to_ctl_transform(graph, 'ODT/P3D60_48nits'))
+    print(node_to_ctl_transform(graph, "ODT/P3D60_48nits"))
 
     message_box('Retrieving a Node from a "CTL" Transform')
     print(
-        ctl_transform_to_node(graph,
-                              node_to_ctl_transform(graph,
-                                                    'ODT/P3D60_48nits')))
+        ctl_transform_to_node(
+            graph, node_to_ctl_transform(graph, "ODT/P3D60_48nits")
+        )
+    )
 
     message_box('Filtering "output_transform" Family')
     pprint(
         filter_nodes(
             graph,
-            [lambda x: True if x.family == 'output_transform' else False]))
+            [lambda x: True if x.family == "output_transform" else False],
+        )
+    )
 
     message_box('Filtering "p3" Genus')
-    pprint(filter_nodes(graph, [lambda x: True if x.genus == 'p3' else False]))
+    pprint(filter_nodes(graph, [lambda x: True if x.genus == "p3" else False]))
 
     plot_aces_conversion_graph(graph, filename)
-
-    try:
-        os.startfile(filename, 'open')
-    except AttributeError:
-        subprocess.call(['open', filename])
