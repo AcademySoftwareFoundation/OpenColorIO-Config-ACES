@@ -63,7 +63,7 @@ The *OpenColorIO Configuration for ACES* repository adopts `Poetry <https://poet
 to help managing its dependencies, this is the recommended way to get started
 with development.
 
-Assuming `python>=3.7 <https://www.python.org/download/releases/>`__ is
+Assuming `python >= 3.8 <https://www.python.org/download/releases/>`__ is
 available on your system along with `OpenColorIO <https://opencolorio.org/>`__,
 the development dependencies are installed with `Poetry <https://poetry.eustace.io>`__
 as follows::
@@ -109,7 +109,6 @@ Primary Dependencies
 ********************
 
 -   `python >= 3.8, < 3.11 <https://www.python.org/download/releases/>`__
--   `black <https://pypi.org/project/black/>`__
 -   `OpenColorIO <https://opencolorio.org/>`__
 
 Optional Dependencies
@@ -153,11 +152,11 @@ Components Status
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | *aces-dev* Discovery          | Complete       | Minor updates might be required when *aces-dev* is updated.                      |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
-| Common Config Generator       | Quasi-Complete | Support for *NamedTransform* must be implemented.                                |
+| Common Config Generator       | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | *Reference* Config Generation | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *CG* Config Generation        | In-Progress    | Relies on *NamedTransform* support and shipped *CLF* transforms completion.      |
+| *CG* Config Generation        | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Custom Config Generation      | In-Progress    | We are designing the components so that one can generate a custom *ACES* config. |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
@@ -165,7 +164,7 @@ Components Status
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | *CLF* Transforms Discovery    | Complete       | Minor updates will be required if classification changes.                        |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *CLF* Transforms Generation   | In-Progress    |                                                                                  |
+| *CLF* Transforms Generation   | In-Progress    | The *CG* Config *CLF* transforms are implemented                                 |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Public API Surfacing          | In-Progress    | What is part of the Public API is not well defined currently.                    |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+

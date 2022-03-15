@@ -25,8 +25,8 @@ The *OpenColorIO Configuration for ACES* repository adopts `Poetry <https://poet
 to help managing its dependencies, this is the recommended way to get started
 with development.
 
-Assuming `python>=3.7 <https://www.python.org/download/releases/>`__ is
-available on your system along with `OpenColorIO <https://opencolorio.org/>`__,
+Assuming `python >= 3.8 <https://www.python.org/download/releases/>`__ is
+available on your system along with `OpenColorIO >= 2 <https://opencolorio.org/>`__,
 the development dependencies are installed with `Poetry <https://poetry.eustace.io>`__
 as follows::
 

@@ -23,7 +23,7 @@ python = ">= 3.8, < 3.11"
 opencolorio = ">= 2, < 3"
 # scipy = ">= 1.5, < 2"
 
-colour-science = ">= 0.4.0"
+colour-science = { version = ">= 0.4.0", optional = true }
 jsonpickle = { version = "^2.0.0", optional = true }
 networkx = { version = "*", optional = true }
 pygraphviz = { version = "*", optional = true }

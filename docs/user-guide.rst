@@ -10,4 +10,3 @@ and explains important concepts and features, details can be found in the
 
     Installation <installation>
     usage
-    status
