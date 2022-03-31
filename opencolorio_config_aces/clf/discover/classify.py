@@ -1095,9 +1095,9 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     Examples
     --------
     >>> clf_transforms = discover_clf_transforms()
-    >>> key = sorted(clf_transforms.keys())[0]
+    >>> key = sorted(clf_transforms.keys())[1]
     >>> os.path.basename(key)
-    'input'
+    'utility'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
     ['OCIO.Utility.AP0_to_AP1-Gamma2.2.clf', \
 'OCIO.Utility.AP0_to_P3-D65-Linear.clf']
@@ -1157,9 +1157,9 @@ def classify_clf_transforms(unclassified_clf_transforms):
     --------
     >>> clf_transforms = classify_clf_transforms(
     ...     discover_clf_transforms())
-    >>> family = sorted(clf_transforms.keys())[0]
+    >>> family = sorted(clf_transforms.keys())[1]
     >>> str(family)
-    'Input'
+    'Utility'
     >>> genera = sorted(clf_transforms[family])
     >>> print(genera)
     ['undefined']
