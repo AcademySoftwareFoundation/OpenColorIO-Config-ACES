@@ -12,7 +12,7 @@ from .transforms import (
     create_matrix,
     create_conversion_matrix,
     create_gamma,
-    generate_clf
+    generate_clf,
 )
 
 __all__ = [

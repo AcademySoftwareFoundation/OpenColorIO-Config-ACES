@@ -14,7 +14,7 @@ from pathlib import Path
 from opencolorio_config_aces.clf import (
     create_conversion_matrix,
     create_gamma,
-    generate_clf
+    generate_clf,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -126,7 +126,8 @@ def generate_clf_utility():
         ),
         TF_ID_PREFIX + "Utility:AP0_to_Rec709-Gamma1.8" + TF_ID_SUFFIX,
         "AP0 to Rec.709 - Gamma 1.8",
-        dest_dir / (CLF_PREFIX + "Utility.AP0_to_Rec709-Gamma1.8" + CLF_SUFFIX),
+        dest_dir
+        / (CLF_PREFIX + "Utility.AP0_to_Rec709-Gamma1.8" + CLF_SUFFIX),
         "ACES2065-1",
         "1.8 gamma-corrected Rec.709 primaries, D65 white point",
     )
@@ -140,7 +141,8 @@ def generate_clf_utility():
         ),
         TF_ID_PREFIX + "Utility:AP0_to_Rec709-Gamma2.2" + TF_ID_SUFFIX,
         "AP0 to Rec.709 - Gamma 2.2",
-        dest_dir / (CLF_PREFIX + "Utility.AP0_to_Rec709-Gamma2.2" + CLF_SUFFIX),
+        dest_dir
+        / (CLF_PREFIX + "Utility.AP0_to_Rec709-Gamma2.2" + CLF_SUFFIX),
         "ACES2065-1",
         "2.2 gamma-corrected Rec.709 primaries, D65 white point",
     )
@@ -154,7 +156,8 @@ def generate_clf_utility():
         ),
         TF_ID_PREFIX + "Utility:AP0_to_Rec709-Gamma2.4" + TF_ID_SUFFIX,
         "AP0 to Rec.709 - Gamma 2.4",
-        dest_dir / (CLF_PREFIX + "Utility.AP0_to_Rec709-Gamma2.4" + CLF_SUFFIX),
+        dest_dir
+        / (CLF_PREFIX + "Utility.AP0_to_Rec709-Gamma2.4" + CLF_SUFFIX),
         "ACES2065-1",
         "2.4 gamma-corrected Rec.709 primaries, D65 white point",
     )

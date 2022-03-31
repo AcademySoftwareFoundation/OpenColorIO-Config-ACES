@@ -3,16 +3,16 @@ repos:
     rev: v2.31.0
     hooks:
     -   id: pyupgrade
-        args: [--py38-plus]
+        args: [--py39-plus]
 -   repo: https://github.com/ikamensh/flynt/
     rev: '0.76'
     hooks:
     -   id: flynt
 -   repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.3.0
     hooks:
     - id: black
-      language_version: python3.8
+      language_version: python3.9
 -   repo: https://github.com/PyCQA/flake8
     rev: 4.0.1
     hooks:
