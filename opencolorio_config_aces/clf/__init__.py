@@ -8,8 +8,12 @@ from .discover import (
     filter_clf_transforms,
     print_clf_taxonomy,
 )
-
-from .transforms import generate_clf
+from .transforms import (
+    create_matrix,
+    create_conversion_matrix,
+    create_gamma,
+    generate_clf
+)
 
 __all__ = [
     "discover_clf_transforms",
@@ -18,4 +22,9 @@ __all__ = [
     "filter_clf_transforms",
     "print_clf_taxonomy",
 ]
-__all__ += ["generate_clf"]
+__all__ += [
+    "create_matrix",
+    "create_conversion_matrix",
+    "create_gamma",
+    "generate_clf",
+]

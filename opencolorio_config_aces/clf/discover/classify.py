@@ -95,16 +95,14 @@ Namespace for the *OCIO* *CLF* transforms.
 NAMESPACE_CLF : unicode
 """
 
-TRANSFORM_TYPES_CLF = [
-    "Utility",
-]
+TRANSFORM_TYPES_CLF = ["Input", "Utility"]
 """
 *CLF* transform types.
 
 TRANSFORM_TYPES_CLF : list
 """
 
-TRANSFORM_FAMILIES_CLF = {"utility": "Utility"}
+TRANSFORM_FAMILIES_CLF = {"input": "Input", "utility": "Utility"}
 """
 *CLF* transform families mapping the *CLF* transform directories to family
 names.

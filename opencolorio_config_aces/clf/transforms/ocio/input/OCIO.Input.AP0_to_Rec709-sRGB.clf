@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-sRGB:1.0" name="AP0 to Rec.709 - sRGB">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Input:AP0_to_Rec709-sRGB:1.0" name="AP0 to Rec.709 - sRGB">
     <InputDescriptor>ACES2065-1</InputDescriptor>
     <OutputDescriptor>sRGB</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">
