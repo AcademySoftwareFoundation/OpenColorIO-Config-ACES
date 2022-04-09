@@ -54,6 +54,7 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
+    version_aces_dev
     classify_aces_ctl_transforms
     discover_aces_ctl_transforms
     filter_ctl_transforms

@@ -52,6 +52,7 @@ from .config import (
     plot_aces_conversion_graph,
     print_aces_taxonomy,
     unclassify_ctl_transforms,
+    version_aces_dev,
 )
 from .config import (
     ColorspaceDescriptionStyle,
@@ -106,6 +107,7 @@ __all__ += [
     "plot_aces_conversion_graph",
     "print_aces_taxonomy",
     "unclassify_ctl_transforms",
+    "version_aces_dev",
 ]
 __all__ += [
     "ColorspaceDescriptionStyle",
