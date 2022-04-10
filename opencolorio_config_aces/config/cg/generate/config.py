@@ -481,7 +481,7 @@ def generate_config_cg(
 
             assert (
                 clf_transform
-            ), f'"{clf_transform_id}" "CTL" transform does not exist!'
+            ), f'"{clf_transform_id}" "CLF" transform does not exist!'
 
             interface = transform_data["interface"]
 
