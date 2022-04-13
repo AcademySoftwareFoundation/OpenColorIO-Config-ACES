@@ -95,16 +95,14 @@ Namespace for the *OCIO* *CLF* transforms.
 NAMESPACE_CLF : unicode
 """
 
-TRANSFORM_TYPES_CLF = [
-    "Utility",
-]
+TRANSFORM_TYPES_CLF = ["Input", "Utility"]
 """
 *CLF* transform types.
 
 TRANSFORM_TYPES_CLF : list
 """
 
-TRANSFORM_FAMILIES_CLF = {"utility": "Utility"}
+TRANSFORM_FAMILIES_CLF = {"input": "Input", "utility": "Utility"}
 """
 *CLF* transform families mapping the *CLF* transform directories to family
 names.
@@ -1097,7 +1095,7 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     Examples
     --------
     >>> clf_transforms = discover_clf_transforms()
-    >>> key = sorted(clf_transforms.keys())[0]
+    >>> key = sorted(clf_transforms.keys())[1]
     >>> os.path.basename(key)
     'utility'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
@@ -1159,7 +1157,7 @@ def classify_clf_transforms(unclassified_clf_transforms):
     --------
     >>> clf_transforms = classify_clf_transforms(
     ...     discover_clf_transforms())
-    >>> family = sorted(clf_transforms.keys())[0]
+    >>> family = sorted(clf_transforms.keys())[1]
     >>> str(family)
     'Utility'
     >>> genera = sorted(clf_transforms[family])
@@ -1249,7 +1247,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform('utility...OCIO.Utility.AP0_to_AP1-Gamma2.2.clf')
+    CLFTransform('input...OCIO.Input.AP0_to_Rec709-sRGB.clf')
     """
 
     unclassified_clf_transforms = []

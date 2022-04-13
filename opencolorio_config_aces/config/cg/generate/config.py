@@ -146,6 +146,7 @@ def clf_transform_to_colorspace(
 
     signature = {
         "name": clf_transform.user_name,
+        "family": clf_transform.family,
         "description": clf_transform_to_description(clf_transform, describe),
         "from_reference": {
             "transform_type": "FileTransform",
@@ -196,6 +197,7 @@ def clf_transform_to_named_transform(
 
     signature = {
         "name": clf_transform.user_name,
+        "family": clf_transform.family,
         "description": clf_transform_to_description(clf_transform, describe),
         "forward_transform": {
             "transform_type": "FileTransform",
