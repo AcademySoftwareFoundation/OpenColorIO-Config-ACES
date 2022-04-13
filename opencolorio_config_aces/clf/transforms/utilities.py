@@ -62,16 +62,16 @@ def create_matrix(matrix, offset=None):
 
 
 @required("Colour")
-def create_conversion_matrix(input_prims, output_prims):
+def create_conversion_matrix(input_primaries, output_primaries):
     """
     Calculate the RGB to RGB matrix for a pair of primaries as an OCIO
     MatrixTransform.
 
     Parameters
     ----------
-    input_prims : str
+    input_primaries : str
         Input RGB colourspace name, as defined by colour-science.
-    output_prims : str
+    output_primaries : str
         Output RGB colourspace name, as defined by colour-science.
 
     Returns
@@ -84,8 +84,8 @@ def create_conversion_matrix(input_prims, output_prims):
 
     return create_matrix(
         colour.matrix_RGB_to_RGB(
-            colour.RGB_COLOURSPACES[input_prims],
-            colour.RGB_COLOURSPACES[output_prims],
+            colour.RGB_COLOURSPACES[input_primaries],
+            colour.RGB_COLOURSPACES[output_primaries],
             chromatic_adaptation_transform="Bradford",
         )
     )
