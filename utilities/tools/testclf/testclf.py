@@ -9,6 +9,9 @@ to test its accuracy.
 
 This module can also be imported and the function ``test_clf`` called
 to use the tool programmatically.
+
+In addition to CLF, this tool will work with any other LUT format
+supported by OpenColorIO, including CTF.
 """
 
 import argparse
@@ -59,7 +62,8 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
     if "," in input_data[0]:
         # Interpret as RGB array
         src_rgb = np.array(
-            [list(map(float, c.split(","))) for c in input_data], dtype=np.float32
+            [list(map(float, c.split(","))) for c in input_data],
+            dtype=np.float32,
         )
         if not src_rgb.shape == (len(input_data), 3):
             raise RuntimeError(
@@ -84,7 +88,9 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
     file_tf = ocio.FileTransform(
         src=clf_path,
         interpolation=ocio.INTERP_BEST,
-        direction=ocio.TRANSFORM_DIR_INVERSE if inverse else ocio.TRANSFORM_DIR_FORWARD,
+        direction=ocio.TRANSFORM_DIR_INVERSE
+        if inverse
+        else ocio.TRANSFORM_DIR_FORWARD,
     )
     proc = config.getProcessor(file_tf)
     cpu_proc = proc.getDefaultCPUProcessor()
