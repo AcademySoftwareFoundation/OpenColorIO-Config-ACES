@@ -32,6 +32,7 @@ from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms,
     discover_aces_ctl_transforms,
     unclassify_ctl_transforms,
+    version_aces_dev,
 )
 from opencolorio_config_aces.utilities import git_describe, multi_replace
 
@@ -56,6 +57,7 @@ __all__ = [
     "PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE",
     "PATTERNS_DISPLAY_NAME_REFERENCE",
     "ColorspaceDescriptionStyle",
+    "version_config_mapping_file",
     "beautify_name",
     "beautify_colorspace_name",
     "beautify_look_name",
@@ -70,22 +72,25 @@ __all__ = [
     "ctl_transform_to_look",
     "style_to_view_transform",
     "style_to_display_colorspace",
+    "config_basename_aces",
+    "config_description_aces",
     "generate_config_aces",
 ]
 
 logger = logging.getLogger(__name__)
 
-PATH_TRANSFORMS_MAPPING_FILE_REFERENCE = (
-    Path(__file__).parents[0]
-    / "resources"
-    / "OpenColorIO-Config-ACES _Reference_ Transforms - "
-    "Reference Config - Mapping.csv"
+PATH_TRANSFORMS_MAPPING_FILE_REFERENCE = next(
+    (Path(__file__).parents[0] / "resources").glob(
+        "OpenColorIO-Config-ACES Reference Transforms - * - "
+        "Reference Config - Mapping.csv"
+    )
 )
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 
 CONFIG_MAPPING_FILE_PATH : unicode
 """
+
 
 COLORSPACE_SCENE_ENCODING_REFERENCE = "ACES2065-1"
 """
@@ -257,6 +262,46 @@ class ColorspaceDescriptionStyle(Flag):
     LONG = auto()
     SHORT_UNION = ACES | OPENCOLORIO | SHORT
     LONG_UNION = ACES | OPENCOLORIO | LONG
+
+
+def version_config_mapping_file(path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE):
+    """
+    Return the current version of given *CSV* mapping file.
+
+    No parsing of the file content is perform, a simple regex is used to
+    extract the version of the file name.
+
+    Parameters
+    ----------
+    path : Path or str, optional
+         Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    str
+        *CSV* mapping file version.
+
+    Examples
+    --------
+    >>> path = (
+    ...     "/tmp/OpenColorIO-Config-ACES Reference Transforms - v0.1.0 - "
+    ...     "Reference Config - Mapping.csv"
+    ... )
+    >>> version_config_mapping_file(path)
+    'v0.1.0'
+    >>> path = (
+    ...     "/tmp/OpenColorIO-Config-ACES Reference Transforms - "
+    ...     "Reference Config - Mapping.csv"
+    ... )
+    >>> version_config_mapping_file(path)
+    ''
+    """
+
+    search = re.search(r"- (v\d\.\d\.\d) -", Path(path).stem)
+    if search:
+        return search.group(1)
+    else:
+        return ""
 
 
 def beautify_name(name, patterns):
@@ -968,6 +1013,87 @@ def style_to_display_colorspace(
         return colorspace
 
 
+def config_basename_aces(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
+):
+    """
+    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    basename.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    str
+        *aces-dev* reference implementation *OpenColorIO* Config basename.
+    """
+
+    return (
+        f"reference-config_aces-{version_aces_dev()}_"
+        f"ocio-{ocio.__version__}_"
+        f"colorspaces-{version_config_mapping_file(config_mapping_file_path)}"
+        f".ocio"
+    )
+
+
+def config_name_aces(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
+):
+    """
+    Generate the *aces-dev* reference implementation *OpenColorIO* Config name.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    str
+        *aces-dev* reference implementation *OpenColorIO* Config name.
+    """
+
+    return (
+        f"Academy Color Encoding System - Reference Config "
+        f"[ACES {version_aces_dev()}] "
+        f"[OCIO {ocio.__version__}] "
+        f"[COLORSPACES {version_config_mapping_file(config_mapping_file_path)}]"
+    )
+
+
+def config_description_aces():
+    """
+    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    description.
+
+    Returns
+    -------
+    str
+        *aces-dev* reference implementation *OpenColorIO* Config description.
+    """
+
+    header = (
+        f'The "Academy Color Encoding System" (ACES {version_aces_dev()}) '
+        f'"Reference Config"'
+    )
+    underline = "-" * len(header)
+    description = (
+        'This "OpenColorIO" config is a strict and quasi-analytical '
+        'implementation of "aces-dev" and is designed as a reference for '
+        "software developers. It is not a replacement for the previous "
+        '"ACES" configs nor the "ACES Studio Config".'
+    )
+    timestamp = (
+        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
+        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
+    )
+
+    return "\n".join([header, underline, "", description, "", timestamp])
+
+
 def generate_config_aces(
     config_name=None,
     validate=True,
@@ -1213,19 +1339,8 @@ def generate_config_aces(
         )
 
     data = ConfigData(
-        description=(
-            f'The "Academy Color Encoding System" (ACES) "Reference Config"'
-            f"\n"
-            f"-------------------------------------------------------------"
-            f"\n\n"
-            f'This "OpenColorIO" config is a strict and quasi-analytical '
-            f'implementation of "aces-dev" and is designed as a reference for '
-            f"software developers. It is not a replacement for the previous "
-            f'"ACES" configs nor the "ACES Studio Config".'
-            f"\n\n"
-            f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-            f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
-        ),
+        name=config_name_aces(config_mapping_file_path),
+        description=config_description_aces(),
         roles={
             ocio.ROLE_COLOR_TIMING: f"{aces_family_prefix} - ACEScct",
             ocio.ROLE_COMPOSITING_LOG: f"{aces_family_prefix} - ACEScct",
@@ -1291,10 +1406,9 @@ if __name__ == "__main__":
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 
+    config_basename = config_basename_aces()
     config, data = generate_config_aces(
-        config_name=os.path.join(
-            build_directory, "config-aces-reference.ocio"
-        ),
+        config_name=os.path.join(build_directory, config_basename),
         analytical=False,
         additional_data=True,
     )
@@ -1303,7 +1417,10 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data, os.path.join(build_directory, "config-aces-reference.json")
+            data,
+            os.path.join(
+                build_directory, config_basename.replace("ocio", "json")
+            ),
         )
     except TypeError as error:
         logger.critical(error)

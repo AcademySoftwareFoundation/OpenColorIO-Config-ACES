@@ -16,6 +16,8 @@ transforms discovery and classification:
 
 import itertools
 import logging
+
+# TODO: Use "pathlib".
 import os
 import re
 import subprocess

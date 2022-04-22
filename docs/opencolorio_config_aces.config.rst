@@ -89,6 +89,7 @@ Reference Configuration
     :toctree: generated/
 
     ColorspaceDescriptionStyle
+    version_config_mapping_file
     generate_config_aces
 
 *ACES* Computer Graphics (CG) Config Generator

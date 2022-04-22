@@ -53,6 +53,7 @@ from .config import (
     print_aces_taxonomy,
     unclassify_ctl_transforms,
     version_aces_dev,
+    version_config_mapping_file,
 )
 from .config import (
     ColorspaceDescriptionStyle,
@@ -108,6 +109,7 @@ __all__ += [
     "print_aces_taxonomy",
     "unclassify_ctl_transforms",
     "version_aces_dev",
+    "version_config_mapping_file",
 ]
 __all__ += [
     "ColorspaceDescriptionStyle",
