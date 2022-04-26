@@ -34,7 +34,11 @@ from opencolorio_config_aces.config.reference import (
     unclassify_ctl_transforms,
     version_aces_dev,
 )
-from opencolorio_config_aces.utilities import git_describe, multi_replace
+from opencolorio_config_aces.utilities import (
+    git_describe,
+    multi_replace,
+    regularise_version,
+)
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -72,6 +76,7 @@ __all__ = [
     "ctl_transform_to_look",
     "style_to_view_transform",
     "style_to_display_colorspace",
+    "dependency_versions",
     "config_basename_aces",
     "config_description_aces",
     "generate_config_aces",
@@ -1013,12 +1018,46 @@ def style_to_display_colorspace(
         return colorspace
 
 
+def dependency_versions(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
+):
+    """
+    Return the dependency versions of the *aces-dev* reference implementation
+    *OpenColorIO* Config.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    dict
+        Dependency versions.
+
+    Examples
+    --------
+    >>> dependency_versions()  # doctest: +SKIP
+    {'aces': 'v1.3', 'ocio': 'v2.1.2dev', 'colorspaces': 'v0.1.0'}
+    """
+
+    versions = {
+        "aces": regularise_version(version_aces_dev()),
+        "ocio": regularise_version(ocio.__version__),
+        "colorspaces": regularise_version(
+            version_config_mapping_file(config_mapping_file_path)
+        ),
+    }
+
+    return versions
+
+
 def config_basename_aces(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
 ):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* Config
-    basename.
+    basename, i.e. the filename devoid of directory prefix.
 
     Parameters
     ----------
@@ -1029,14 +1068,16 @@ def config_basename_aces(
     -------
     str
         *aces-dev* reference implementation *OpenColorIO* Config basename.
+
+    Examples
+    --------
+    >>> config_basename_aces()  # doctest: +SKIP
+    'reference-config_aces-v1.3_ocio-v2.1.2dev_colorspaces-v0.1.0.ocio'
     """
 
     return (
-        f"reference-config_aces-{version_aces_dev()}_"
-        f"ocio-{ocio.__version__}_"
-        f"colorspaces-{version_config_mapping_file(config_mapping_file_path)}"
-        f".ocio"
-    )
+        "reference-config_aces-{aces}_ocio-{ocio}_colorspaces-{colorspaces}.ocio"
+    ).format(**dependency_versions(config_mapping_file_path))
 
 
 def config_name_aces(
@@ -1054,14 +1095,20 @@ def config_name_aces(
     -------
     str
         *aces-dev* reference implementation *OpenColorIO* Config name.
+
+    Examples
+    --------
+    >>> config_name_aces()  # doctest: +SKIP
+    'Academy Color Encoding System - Reference Config [ACES v1.3] \
+[OCIO v2.1.2dev] [COLORSPACES v0.1.0]'
     """
 
     return (
-        f"Academy Color Encoding System - Reference Config "
-        f"[ACES {version_aces_dev()}] "
-        f"[OCIO {ocio.__version__}] "
-        f"[COLORSPACES {version_config_mapping_file(config_mapping_file_path)}]"
-    )
+        "Academy Color Encoding System - Reference Config "
+        "[ACES {aces}] "
+        "[OCIO {ocio}] "
+        "[COLORSPACES {colorspaces}]"
+    ).format(**dependency_versions(config_mapping_file_path))
 
 
 def config_description_aces():
@@ -1082,8 +1129,9 @@ def config_description_aces():
     underline = "-" * len(header)
     description = (
         'This "OpenColorIO" config is a strict and quasi-analytical '
-        'implementation of "aces-dev" and is designed as a reference for '
-        "software developers. It is not a replacement for the previous "
+        'implementation of "aces-dev" and is designed as a reference to '
+        'validate the implementation of the "ampas/aces-dev" "GitHub" "CTL" '
+        "transforms in OpenColorIO. It is not a replacement for the previous "
         '"ACES" configs nor the "ACES Studio Config".'
     )
     timestamp = (

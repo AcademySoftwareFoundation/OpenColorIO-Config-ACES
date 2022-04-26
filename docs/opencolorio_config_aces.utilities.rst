@@ -32,3 +32,4 @@ Common
     git_describe
     matrix_3x3_to_4x4
     multi_replace
+    regularise_version
