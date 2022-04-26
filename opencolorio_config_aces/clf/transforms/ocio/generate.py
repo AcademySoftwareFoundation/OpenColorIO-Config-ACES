@@ -73,6 +73,7 @@ def generate_clf_vendor_input():
         dest_dir / ("RED.Log3G10_RWG_to_ACES2065-1" + CLF_SUFFIX),
         "RED Log3G10 REDWideGamutRGB",
         "ACES2065-1",
+        "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_RWG.a1.v1",
     )
 
 def generate_clf_utility():
