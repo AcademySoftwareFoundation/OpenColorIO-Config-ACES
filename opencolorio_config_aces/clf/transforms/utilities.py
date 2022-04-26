@@ -142,7 +142,9 @@ def create_gamma(gamma):
     return exp_tf
 
 
-def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc, aces_id=None):
+def generate_clf(
+    group_tf, tf_id, tf_name, filename, input_desc, output_desc, aces_id=None
+):
     """
     Take a GroupTransform and some metadata and write a CLF file.
 
@@ -170,9 +172,9 @@ def generate_clf(group_tf, tf_id, tf_name, filename, input_desc, output_desc, ac
     metadata.addChildElement("InputDescriptor", input_desc)
     metadata.addChildElement("OutputDescriptor", output_desc)
     if aces_id is not None:
-        metadata.addChildElement('Info', '')
+        metadata.addChildElement("Info", "")
         info = metadata.getChildElements()[2]
-        info.addChildElement('ACEStransformID', aces_id)
+        info.addChildElement("ACEStransformID", aces_id)
 
     group_tf.write(
         formatName="Academy/ASC Common LUT Format",

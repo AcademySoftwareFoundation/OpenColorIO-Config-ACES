@@ -24,7 +24,11 @@ __maintainer__ = "OpenColorIO Contributors"
 __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
-__all__ = ["generate_clf_ocio_input", "generate_clf_vendor_input", "generate_clf_utility"]
+__all__ = [
+    "generate_clf_ocio_input",
+    "generate_clf_vendor_input",
+    "generate_clf_utility",
+]
 
 THIS_DIR = Path(__file__).parent.resolve()
 
@@ -55,6 +59,7 @@ def generate_clf_ocio_input():
         "sRGB",
     )
 
+
 def generate_clf_vendor_input():
     """Generate Vendor Input CLF transforms."""
 
@@ -67,7 +72,7 @@ def generate_clf_vendor_input():
     generate_clf(
         config.getProcessor(
             ocio.BuiltinTransform(style="RED_LOG3G10-RWG_to_ACES2065-1")
-            ).createGroupTransform(),
+        ).createGroupTransform(),
         TF_ID_PREFIX + "RED::Log3G10_RWG_to_ACES2065-1" + TF_ID_SUFFIX,
         "RED Log3G10 REDWideGamutRGB to ACES2065-1",
         dest_dir / ("RED.Log3G10_RWG_to_ACES2065-1" + CLF_SUFFIX),
@@ -75,6 +80,7 @@ def generate_clf_vendor_input():
         "ACES2065-1",
         "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_RWG.a1.v1",
     )
+
 
 def generate_clf_utility():
     """Generate OCIO Utility CLF transforms."""
@@ -145,8 +151,7 @@ def generate_clf_utility():
         ),
         TF_ID_PREFIX + "OCIO:Utility:AP0_to_Rec709-Gamma1.8" + TF_ID_SUFFIX,
         "AP0 to Rec.709 - Gamma 1.8",
-        dest_dir
-        / ("OCIO.Utility.AP0_to_Rec709-Gamma1.8" + CLF_SUFFIX),
+        dest_dir / ("OCIO.Utility.AP0_to_Rec709-Gamma1.8" + CLF_SUFFIX),
         "ACES2065-1",
         "1.8 gamma-corrected Rec.709 primaries, D65 white point",
     )
@@ -160,8 +165,7 @@ def generate_clf_utility():
         ),
         TF_ID_PREFIX + "OCIO:Utility:AP0_to_Rec709-Gamma2.2" + TF_ID_SUFFIX,
         "AP0 to Rec.709 - Gamma 2.2",
-        dest_dir
-        / ("OCIO.Utility.AP0_to_Rec709-Gamma2.2" + CLF_SUFFIX),
+        dest_dir / ("OCIO.Utility.AP0_to_Rec709-Gamma2.2" + CLF_SUFFIX),
         "ACES2065-1",
         "2.2 gamma-corrected Rec.709 primaries, D65 white point",
     )
@@ -175,8 +179,7 @@ def generate_clf_utility():
         ),
         TF_ID_PREFIX + "OCIO:Utility:AP0_to_Rec709-Gamma2.4" + TF_ID_SUFFIX,
         "AP0 to Rec.709 - Gamma 2.4",
-        dest_dir
-        / ("OCIO.Utility.AP0_to_Rec709-Gamma2.4" + CLF_SUFFIX),
+        dest_dir / ("OCIO.Utility.AP0_to_Rec709-Gamma2.4" + CLF_SUFFIX),
         "ACES2065-1",
         "2.4 gamma-corrected Rec.709 primaries, D65 white point",
     )
