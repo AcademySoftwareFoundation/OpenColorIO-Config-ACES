@@ -1072,11 +1072,11 @@ def config_basename_aces(
     Examples
     --------
     >>> config_basename_aces()  # doctest: +SKIP
-    'reference-config_aces-v1.3_ocio-v2.1.2dev_colorspaces-v0.1.0.ocio'
+    'reference-config-v0.1.0_aces-v1.3_ocio-v2.1.2dev.ocio'
     """
 
     return (
-        "reference-config_aces-{aces}_ocio-{ocio}_colorspaces-{colorspaces}.ocio"
+        "reference-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio"
     ).format(**dependency_versions(config_mapping_file_path))
 
 
@@ -1099,15 +1099,15 @@ def config_name_aces(
     Examples
     --------
     >>> config_name_aces()  # doctest: +SKIP
-    'Academy Color Encoding System - Reference Config [ACES v1.3] \
-[OCIO v2.1.2dev] [COLORSPACES v0.1.0]'
+    'Academy Color Encoding System - Reference Config [COLORSPACES v0.1.0] \
+[ACES v1.3] [OCIO v2.1.2dev]'
     """
 
     return (
         "Academy Color Encoding System - Reference Config "
+        "[COLORSPACES {colorspaces}] "
         "[ACES {aces}] "
-        "[OCIO {ocio}] "
-        "[COLORSPACES {colorspaces}]"
+        "[OCIO {ocio}]"
     ).format(**dependency_versions(config_mapping_file_path))
 
 

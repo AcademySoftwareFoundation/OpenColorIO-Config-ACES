@@ -276,12 +276,12 @@ def config_basename_cg(
     Examples
     --------
     >>> config_basename_cg()  # doctest: +SKIP
-    'cg-config_aces-v1.3_ocio-v2.1.2dev_colorspaces-v0.1.0.ocio'
+    'cg-config-v0.1.0_aces-v1.3_ocio-v2.1.2dev.ocio'
     """
 
-    return (
-        "cg-config_aces-{aces}_ocio-{ocio}_colorspaces-{colorspaces}.ocio"
-    ).format(**dependency_versions(config_mapping_file_path))
+    return ("cg-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
+        **dependency_versions(config_mapping_file_path)
+    )
 
 
 def config_name_cg(config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG):
@@ -301,15 +301,15 @@ def config_name_cg(config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG):
     Examples
     --------
     >>> config_name_cg()  # doctest: +SKIP
-    'Academy Color Encoding System - CG Config [ACES v1.3] [OCIO v2.1.2dev] \
-[COLORSPACES v0.1.0]'
+    'Academy Color Encoding System - CG Config [COLORSPACES v0.1.0] \
+[ACES v1.3] [OCIO v2.1.2dev]'
     """
 
     return (
         "Academy Color Encoding System - CG Config "
+        "[COLORSPACES {colorspaces}] "
         "[ACES {aces}] "
-        "[OCIO {ocio}] "
-        "[COLORSPACES {colorspaces}]"
+        "[OCIO {ocio}]"
     ).format(**dependency_versions(config_mapping_file_path))
 
 
