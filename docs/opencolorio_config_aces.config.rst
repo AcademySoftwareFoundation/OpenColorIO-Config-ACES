@@ -54,6 +54,7 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
+    version_aces_dev
     classify_aces_ctl_transforms
     discover_aces_ctl_transforms
     filter_ctl_transforms
@@ -88,6 +89,7 @@ Reference Configuration
     :toctree: generated/
 
     ColorspaceDescriptionStyle
+    version_config_mapping_file
     generate_config_aces
 
 *ACES* Computer Graphics (CG) Config Generator

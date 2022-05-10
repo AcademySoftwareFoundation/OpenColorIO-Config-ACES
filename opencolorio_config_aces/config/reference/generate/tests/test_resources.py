@@ -7,9 +7,11 @@ Defines the unit tests for the
 
 
 import unittest
-import urllib.request
+import requests
 
-from pathlib import Path
+from opencolorio_config_aces.config.reference.generate.config import (
+    PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
+)
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -32,13 +34,7 @@ class TestConfigResources(unittest.TestCase):
     def test_csv_mapping_file(self):
         """Test the *CSV* mapping file."""
 
-        csv_local_path = (
-            Path(__file__).parents[0]
-            / ".."
-            / "resources"
-            / "OpenColorIO-Config-ACES _Reference_ Transforms - "
-            "Reference Config - Mapping.csv"
-        )
+        csv_local_path = PATH_TRANSFORMS_MAPPING_FILE_REFERENCE
 
         with open(str(csv_local_path)) as csv_local_file:
             csv_local_content = csv_local_file.read()
@@ -49,9 +45,7 @@ class TestConfigResources(unittest.TestCase):
             "export?format=csv&gid=273921464"
         )
 
-        csv_remote_content = (
-            urllib.request.urlopen(csv_remote_url).read().decode("utf-8")
-        )
+        csv_remote_content = requests.get(csv_remote_url).text
 
         self.assertMultiLineEqual(
             "\n".join(csv_remote_content.splitlines()),

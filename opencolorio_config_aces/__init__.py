@@ -52,6 +52,8 @@ from .config import (
     plot_aces_conversion_graph,
     print_aces_taxonomy,
     unclassify_ctl_transforms,
+    version_aces_dev,
+    version_config_mapping_file,
 )
 from .config import (
     ColorspaceDescriptionStyle,
@@ -106,6 +108,8 @@ __all__ += [
     "plot_aces_conversion_graph",
     "print_aces_taxonomy",
     "unclassify_ctl_transforms",
+    "version_aces_dev",
+    "version_config_mapping_file",
 ]
 __all__ += [
     "ColorspaceDescriptionStyle",
@@ -124,8 +128,8 @@ __all__ += ["generate_clf"]
 __application_name__ = "OpenColorIO Configuration for ACES"
 
 __major_version__ = "0"
-__minor_version__ = "1"
-__change_version__ = "1"
+__minor_version__ = "2"
+__change_version__ = "0"
 __version__ = ".".join(
     (__major_version__, __minor_version__, __change_version__)
 )  # yapf: disable
