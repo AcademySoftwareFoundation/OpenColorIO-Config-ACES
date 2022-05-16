@@ -95,7 +95,7 @@ Namespace for the *OCIO* *CLF* transforms.
 NAMESPACE_CLF : unicode
 """
 
-TRANSFORM_TYPES_CLF = ["Input", "Utility"]
+TRANSFORM_TYPES_CLF = ["", "Input", "Utility"]
 """
 *CLF* transform types.
 

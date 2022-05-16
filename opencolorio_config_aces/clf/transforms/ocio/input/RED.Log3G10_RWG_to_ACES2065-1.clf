@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:RED::Log3G10_RWG_to_ACES2065-1:1.0" name="RED Log3G10 REDWideGamutRGB to ACES2065-1">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:RED:Input:Log3G10_RWG_to_ACES2065-1:1.0" name="RED Log3G10 REDWideGamutRGB to ACES2065-1">
     <InputDescriptor>RED Log3G10 REDWideGamutRGB</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>

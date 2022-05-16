@@ -73,7 +73,7 @@ def generate_clf_vendor_input():
         config.getProcessor(
             ocio.BuiltinTransform(style="RED_LOG3G10-RWG_to_ACES2065-1")
         ).createGroupTransform(),
-        TF_ID_PREFIX + "RED::Log3G10_RWG_to_ACES2065-1" + TF_ID_SUFFIX,
+        TF_ID_PREFIX + "RED:Input:Log3G10_RWG_to_ACES2065-1" + TF_ID_SUFFIX,
         "RED Log3G10 REDWideGamutRGB to ACES2065-1",
         dest_dir / ("RED.Log3G10_RWG_to_ACES2065-1" + CLF_SUFFIX),
         "RED Log3G10 REDWideGamutRGB",
