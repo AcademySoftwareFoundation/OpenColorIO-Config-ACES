@@ -33,7 +33,7 @@ __all__ = [
     "tests",
     "preflight",
     "docs",
-    "build_clf_utility",
+    "build_clfs",
     "build_aces_conversion_graph",
     "build_config_common_tests",
     "build_config_reference_analytical",
@@ -44,7 +44,7 @@ __all__ = [
     "docker_remove",
     "run_in_container",
     "docker_run_docs",
-    "docker_run_build_clf_utility",
+    "docker_run_build_clfs",
     "docker_run_build_aces_conversion_graph",
     "docker_run_build_config_common_tests",
     "docker_run_build_config_reference_analytical",
@@ -215,9 +215,9 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
 
 
 @task
-def build_clf_utility(ctx: Context):
+def build_clfs(ctx: Context):
     """
-    Build the *CLF* utility transforms.
+    Build the *CLF* transforms.
 
     Parameters
     ----------
@@ -225,9 +225,9 @@ def build_clf_utility(ctx: Context):
         Context.
     """
 
-    message_box('Building the "CLF" utility transforms...')
-    with ctx.cd("opencolorio_config_aces/clf/transforms"):
-        ctx.run("python utility.py")
+    message_box('Building the "CLF" transform files...')
+    with ctx.cd("opencolorio_config_aces/clf/transforms/ocio"):
+        ctx.run("python generate.py")
 
 
 @task
@@ -421,9 +421,9 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
 
 
 @task
-def docker_run_build_clf_utility(ctx: Context):
+def docker_run_build_clfs(ctx: Context):
     """
-    Build the *CLF* utility transforms in the *docker* container.
+    Build the *CLF* transforms in the *docker* container.
 
     Parameters
     ----------
@@ -431,7 +431,7 @@ def docker_run_build_clf_utility(ctx: Context):
         Context.
     """
 
-    run_in_container(ctx, "invoke build-clf-utility")
+    run_in_container(ctx, "invoke build-clfs")
 
 
 @task
