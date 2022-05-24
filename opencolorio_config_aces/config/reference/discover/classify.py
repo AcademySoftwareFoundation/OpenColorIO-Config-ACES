@@ -16,8 +16,11 @@ transforms discovery and classification:
 
 import itertools
 import logging
+
+# TODO: Use "pathlib".
 import os
 import re
+import subprocess
 from collections.abc import Mapping
 from collections import defaultdict
 
@@ -46,6 +49,7 @@ __all__ = [
     "PATTERNS_DESCRIPTION_CTL",
     "patch_invalid_aces_transform_id",
     "ROOT_TRANSFORMS_CTL",
+    "version_aces_dev",
     "ctl_transform_relative_path",
     "ACESTransformID",
     "CTLTransform",
@@ -270,6 +274,38 @@ the local 'aces-dev/transforms/ctl' directory.
 
 ROOT_TRANSFORMS_CTL : unicode
 """
+
+
+def version_aces_dev():
+    """
+    Return the current *aces-dev* version, trying first with *git*, then by
+    parsing the *CHANGELOG.md* file.
+
+    Returns
+    -------
+    str
+        *aces-dev* version.
+    """
+
+    try:  # pragma: no cover
+        version = subprocess.check_output(
+            ["git", "describe"],
+            cwd=ROOT_TRANSFORMS_CTL,
+            stderr=subprocess.STDOUT,
+        ).strip()
+        return version.decode("utf-8")
+    except Exception:  # pragma: no cover
+        changelog_path = os.path.join(
+            ROOT_TRANSFORMS_CTL, "..", "..", "CHANGELOG.md"
+        )
+        if os.path.exists(changelog_path):
+            with open(changelog_path) as changelog_file:
+                for line in changelog_file.readlines():
+                    search = re.search(r"Version\s+(\d\.\d(\.\d)?)", line)
+                    if search:
+                        return search.group(1)
+        else:
+            return "Undefined"
 
 
 def ctl_transform_relative_path(path, root_directory=ROOT_TRANSFORMS_CTL):
@@ -1506,4 +1542,5 @@ if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
+    logging.info(f'"aces-dev" version : {version_aces_dev()}')
     print_aces_taxonomy()

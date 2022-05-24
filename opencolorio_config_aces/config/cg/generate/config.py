@@ -12,6 +12,7 @@ Graphics (CG) *OpenColorIO* config:
 
 import csv
 import logging
+
 import PyOpenColorIO as ocio
 from collections import defaultdict
 from datetime import datetime
@@ -29,9 +30,11 @@ from opencolorio_config_aces.config.generation import (
 )
 from opencolorio_config_aces.config.reference import (
     ColorspaceDescriptionStyle,
+    version_aces_dev,
+    version_config_mapping_file,
     generate_config_aces,
 )
-from opencolorio_config_aces.utilities import git_describe
+from opencolorio_config_aces.utilities import git_describe, regularise_version
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -44,13 +47,17 @@ __all__ = [
     "PATH_TRANSFORMS_MAPPING_FILE_CG",
     "clf_transform_to_description",
     "clf_transform_to_colorspace",
+    "dependency_versions",
+    "config_basename_cg",
+    "config_name_cg",
+    "config_description_cg",
     "generate_config_cg",
 ]
 
-PATH_TRANSFORMS_MAPPING_FILE_CG = (
-    Path(__file__).parents[0]
-    / "resources"
-    / "OpenColorIO-Config-ACES _CG_ Transforms - CG Config - Mapping.csv"
+PATH_TRANSFORMS_MAPPING_FILE_CG = next(
+    (Path(__file__).parents[0] / "resources").glob(
+        "OpenColorIO-Config-ACES CG Transforms - * - CG Config - Mapping.csv"
+    )
 )
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
@@ -215,6 +222,126 @@ def clf_transform_to_named_transform(
         return named_transform
 
 
+def dependency_versions(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
+):
+    """
+    Return the dependency versions of the ACES* Computer Graphics (CG)
+    *OpenColorIO* config.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    dict
+        Dependency versions.
+
+    Examples
+    --------
+    >>> dependency_versions()  # doctest: +SKIP
+    {'aces': 'v1.3', 'ocio': 'v2.1.2dev', 'colorspaces': 'v0.1.0'}
+    """
+
+    versions = {
+        "aces": regularise_version(version_aces_dev()),
+        "ocio": regularise_version(ocio.__version__),
+        "colorspaces": regularise_version(
+            version_config_mapping_file(config_mapping_file_path)
+        ),
+    }
+
+    return versions
+
+
+def config_basename_cg(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
+):
+    """
+    Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
+    basename, i.e. the filename devoid of directory prefix.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    str
+        ACES* Computer Graphics (CG) *OpenColorIO* config basename.
+
+    Examples
+    --------
+    >>> config_basename_cg()  # doctest: +SKIP
+    'cg-config-v0.1.0_aces-v1.3_ocio-v2.1.2dev.ocio'
+    """
+
+    return ("cg-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
+        **dependency_versions(config_mapping_file_path)
+    )
+
+
+def config_name_cg(config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG):
+    """
+    Generate the ACES* Computer Graphics (CG) *OpenColorIO* config name.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
+
+    Returns
+    -------
+    str
+        ACES* Computer Graphics (CG) *OpenColorIO* config name.
+
+    Examples
+    --------
+    >>> config_name_cg()  # doctest: +SKIP
+    'Academy Color Encoding System - CG Config [COLORSPACES v0.1.0] \
+[ACES v1.3] [OCIO v2.1.2dev]'
+    """
+
+    return (
+        "Academy Color Encoding System - CG Config "
+        "[COLORSPACES {colorspaces}] "
+        "[ACES {aces}] "
+        "[OCIO {ocio}]"
+    ).format(**dependency_versions(config_mapping_file_path))
+
+
+def config_description_cg():
+    """
+    Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
+    description.
+
+    Returns
+    -------
+    str
+        ACES* Computer Graphics (CG) *OpenColorIO* config description.
+    """
+
+    header = (
+        f'The "Academy Color Encoding System" (ACES {version_aces_dev()}) '
+        f'"CG Config"'
+    )
+    underline = "-" * len(header)
+    description = (
+        'This minimalistic "OpenColorIO" config is geared toward computer '
+        "graphics artists requiring a lean config that does not include "
+        "camera colorspaces and the less common displays and looks."
+    )
+    timestamp = (
+        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
+        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
+    )
+
+    return "\n".join([header, underline, "", description, "", timestamp])
+
+
 def generate_config_cg(
     data=None,
     config_name=None,
@@ -285,18 +412,8 @@ def generate_config_cg(
                 transform_data
             )
 
-    data.description = (
-        f'The "Academy Color Encoding System" (ACES) "CG Config"'
-        f"\n"
-        f"------------------------------------------------------"
-        f"\n\n"
-        f'This minimalistic "OpenColorIO" config is geared toward computer '
-        f"graphics artists requiring a lean config that does not include "
-        f"typical VFX colorspaces, displays and looks."
-        f"\n\n"
-        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
-    )
+    data.name = config_name_cg(config_mapping_file_path)
+    data.description = config_description_cg()
 
     def multi_filters(array, filterers):
         """Apply given filterers on given array."""
@@ -407,7 +524,7 @@ def generate_config_cg(
 
             assert (
                 clf_transform
-            ), f'"{clf_transform_id}" "CTL" transform does not exist!'
+            ), f'"{clf_transform_id}" "CLF" transform does not exist!'
 
             interface = transform_data["interface"]
 
@@ -474,8 +591,9 @@ if __name__ == "__main__":
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 
+    config_basename = config_basename_cg()
     config, data = generate_config_cg(
-        config_name=os.path.join(build_directory, "config-aces-cg.ocio"),
+        config_name=os.path.join(build_directory, config_basename),
         additional_data=True,
     )
 
@@ -483,7 +601,10 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data, os.path.join(build_directory, "config-aces-cg.json")
+            data,
+            os.path.join(
+                build_directory, config_basename.replace("ocio", "json")
+            ),
         )
     except TypeError as error:
         logging.critical(error)

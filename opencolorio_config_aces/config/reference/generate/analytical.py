@@ -11,6 +11,7 @@ reference *OpenColorIO* config.
 import itertools
 import logging
 import PyOpenColorIO as ocio
+from datetime import datetime
 
 from opencolorio_config_aces.config.generation import (
     VersionData,
@@ -39,8 +40,9 @@ from opencolorio_config_aces.config.reference.generate.config import (
     beautify_display_name,
     beautify_name,
     ctl_transform_to_colorspace,
+    version_aces_dev,
 )
-from opencolorio_config_aces.utilities import required
+from opencolorio_config_aces.utilities import git_describe, required
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -55,6 +57,9 @@ __all__ = [
     "create_builtin_transform",
     "node_to_builtin_transform",
     "node_to_colorspace",
+    "config_basename_aces",
+    "config_name_aces",
+    "config_description_aces",
     "generate_config_aces",
 ]
 
@@ -230,6 +235,74 @@ def node_to_colorspace(
     return colorspace
 
 
+def config_basename_aces():
+    """
+    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    using the analytical *Graph* method basename.
+
+    Returns
+    -------
+    str
+        *aces-dev* reference implementation *OpenColorIO* Config using the
+        analytical *Graph* method basename.
+    """
+
+    return (
+        f"reference-analytical-config_aces-{version_aces_dev()}_"
+        f"ocio-{ocio.__version__}.ocio"
+    )
+
+
+def config_name_aces():
+    """
+    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    using the analytical *Graph*  name.
+
+    Returns
+    -------
+    str
+        *aces-dev* reference implementation *OpenColorIO* Config using the
+        analytical *Graph* method name.
+    """
+
+    return (
+        f"Academy Color Encoding System - Reference Config "
+        f"[ACES {version_aces_dev()}] "
+        f"[OCIO {ocio.__version__}]"
+    )
+
+
+def config_description_aces():
+    """
+    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    using the analytical *Graph* method description.
+
+    Returns
+    -------
+    str
+        *aces-dev* reference implementation *OpenColorIO* Config using the
+        analytical *Graph* method description.
+    """
+
+    header = (
+        f'The "Academy Color Encoding System" (ACES {version_aces_dev()}) '
+        f'"Reference (Analytical) Config"'
+    )
+    underline = "-" * len(header)
+    description = (
+        'This "OpenColorIO" config is an analytical implementation of '
+        '"aces-dev" and is designed to check whether the discovery process '
+        "produces the expected output. It is not usable as it does not "
+        'map to existing "OpenColorIO" builtin transforms.'
+    )
+    timestamp = (
+        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
+        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
+    )
+
+    return "\n".join([header, underline, "", description, "", timestamp])
+
+
 def generate_config_aces(
     config_name=None,
     validate=True,
@@ -365,7 +438,8 @@ def generate_config_aces(
         )
 
     data = ConfigData(
-        description='The "Academy Color Encoding System" reference config.',
+        name=config_name_aces(),
+        description=config_description_aces(),
         roles={
             ocio.ROLE_SCENE_LINEAR: "CSC - ACEScg",
         },
@@ -407,10 +481,9 @@ if __name__ == "__main__":
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 
+    config_basename = config_basename_aces()
     config, data, colorspaces = generate_config_aces(
-        config_name=os.path.join(
-            build_directory, "config-aces-reference-analytical.ocio"
-        ),
+        config_name=os.path.join(build_directory, config_basename),
         additional_data=True,
     )
 
@@ -423,7 +496,7 @@ if __name__ == "__main__":
         serialize_config_data(
             data,
             os.path.join(
-                build_directory, "config-aces-reference-analytical.json"
+                build_directory, config_basename.replace("ocio", "json")
             ),
         )
     except TypeError as error:

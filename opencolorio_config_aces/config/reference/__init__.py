@@ -2,6 +2,7 @@
 # Copyright Contributors to the OpenColorIO Project.
 
 from .discover import (
+    version_aces_dev,
     discover_aces_ctl_transforms,
     classify_aces_ctl_transforms,
     unclassify_ctl_transforms,
@@ -14,9 +15,14 @@ from .discover import (
     conversion_path,
     plot_aces_conversion_graph,
 )
-from .generate import ColorspaceDescriptionStyle, generate_config_aces
+from .generate import (
+    ColorspaceDescriptionStyle,
+    version_config_mapping_file,
+    generate_config_aces,
+)
 
 __all__ = [
+    "version_aces_dev",
     "discover_aces_ctl_transforms",
     "classify_aces_ctl_transforms",
     "unclassify_ctl_transforms",
@@ -29,4 +35,8 @@ __all__ = [
     "conversion_path",
     "plot_aces_conversion_graph",
 ]
-__all__ += ["ColorspaceDescriptionStyle", "generate_config_aces"]
+__all__ += [
+    "ColorspaceDescriptionStyle",
+    "version_config_mapping_file",
+    "generate_config_aces",
+]
