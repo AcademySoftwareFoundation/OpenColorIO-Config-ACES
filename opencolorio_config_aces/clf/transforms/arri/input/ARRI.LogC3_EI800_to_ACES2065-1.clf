@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_EI800_to_ACES2065-1:1.0">
+    <Description>ARRI LogC3 (EI800) to ACES2065-1</Description>
+    <InputDescriptor>ARRI LogC3 (EI800)</InputDescriptor>
+    <OutputDescriptor>ACES2065-1</OutputDescriptor>
+    <Info>
+        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI800.a1.v2</ACEStransformID>
+    </Info>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="5.55555555555556" linSideOffset="0.0522722750251688" logSideSlope="0.247189638318671" logSideOffset="0.385536998692443" linSideBreak="0.0105909904954696" />
+    </Log>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+           0.680206            0.236137            0.083658
+           0.085415            1.017471           -0.102886
+           0.002057           -0.062563            1.060506
+        </Array>
+    </Matrix>
+</ProcessList>

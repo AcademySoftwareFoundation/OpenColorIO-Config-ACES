@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0">
+    <Description>ARRI LogC4 to ACES2065-1</Description>
+    <InputDescriptor>ARRI LogC4</InputDescriptor>
+    <OutputDescriptor>ACES2065-1</OutputDescriptor>
+    <Info>
+        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.ARRI.LogC4.a1.v1</ACEStransformID>
+    </Info>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="2" linSideSlope="2231.82630906769" linSideOffset="64" logSideSlope="0.0647954196341293" logSideOffset="-0.295908392682586" linSideBreak="-0.0180569961199113" />
+    </Log>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+       0.7509573628        0.1444227867        0.1046198505
+       0.0008218371        1.0073975849        -0.008219422
+      -0.0004999521       -0.0008541772        1.0013541294
+        </Array>
+    </Matrix>
+</ProcessList>
