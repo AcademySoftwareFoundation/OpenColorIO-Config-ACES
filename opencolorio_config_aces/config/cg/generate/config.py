@@ -12,6 +12,7 @@ Graphics (CG) *OpenColorIO* config:
 
 import csv
 import logging
+import re
 
 import PyOpenColorIO as ocio
 from collections import defaultdict
@@ -313,10 +314,17 @@ def config_name_cg(config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG):
     ).format(**dependency_versions(config_mapping_file_path))
 
 
-def config_description_cg():
+def config_description_cg(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
+):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
     description.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
 
     Returns
     -------
@@ -324,11 +332,8 @@ def config_description_cg():
         ACES* Computer Graphics (CG) *OpenColorIO* config description.
     """
 
-    header = (
-        f'The "Academy Color Encoding System" (ACES {version_aces_dev()}) '
-        f'"CG Config"'
-    )
-    underline = "-" * len(header)
+    name = config_name_cg(config_mapping_file_path)
+    underline = "-" * len(name)
     description = (
         'This minimalistic "OpenColorIO" config is geared toward computer '
         "graphics artists requiring a lean config that does not include "
@@ -339,7 +344,7 @@ def config_description_cg():
         f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
     )
 
-    return "\n".join([header, underline, "", description, "", timestamp])
+    return "\n".join([name, underline, "", description, "", timestamp])
 
 
 def generate_config_cg(
@@ -412,8 +417,10 @@ def generate_config_cg(
                 transform_data
             )
 
-    data.name = config_name_cg(config_mapping_file_path)
-    data.description = config_description_cg()
+    data.name = re.sub(
+        r"\.ocio$", "", config_basename_cg(config_mapping_file_path)
+    )
+    data.description = config_description_cg(config_mapping_file_path)
 
     def multi_filters(array, filterers):
         """Apply given filterers on given array."""

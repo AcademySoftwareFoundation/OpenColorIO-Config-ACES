@@ -1111,10 +1111,17 @@ def config_name_aces(
     ).format(**dependency_versions(config_mapping_file_path))
 
 
-def config_description_aces():
+def config_description_aces(
+    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
+):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* Config
     description.
+
+    Parameters
+    ----------
+    config_mapping_file_path : str, optional
+        Path to the *CSV* mapping file.
 
     Returns
     -------
@@ -1122,11 +1129,8 @@ def config_description_aces():
         *aces-dev* reference implementation *OpenColorIO* Config description.
     """
 
-    header = (
-        f'The "Academy Color Encoding System" (ACES {version_aces_dev()}) '
-        f'"Reference Config"'
-    )
-    underline = "-" * len(header)
+    name = config_name_aces(config_mapping_file_path)
+    underline = "-" * len(name)
     description = (
         'This "OpenColorIO" config is a strict and quasi-analytical '
         'implementation of "aces-dev" and is designed as a reference to '
@@ -1139,7 +1143,7 @@ def config_description_aces():
         f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
     )
 
-    return "\n".join([header, underline, "", description, "", timestamp])
+    return "\n".join([name, underline, "", description, "", timestamp])
 
 
 def generate_config_aces(
@@ -1387,8 +1391,10 @@ def generate_config_aces(
         )
 
     data = ConfigData(
-        name=config_name_aces(config_mapping_file_path),
-        description=config_description_aces(),
+        name=re.sub(
+            r"\.ocio$", "", config_basename_aces(config_mapping_file_path)
+        ),
+        description=config_description_aces(config_mapping_file_path),
         roles={
             ocio.ROLE_COLOR_TIMING: f"{aces_family_prefix} - ACEScct",
             ocio.ROLE_COMPOSITING_LOG: f"{aces_family_prefix} - ACEScct",
