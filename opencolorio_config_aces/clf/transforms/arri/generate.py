@@ -42,12 +42,12 @@ def generate_logc3(ei=800, clipping=True, debug=False):
     "v3_IDT_maker" code and the "ALEXA Log C Curve Usage in VFX 09-Mar-17" White Paper
     parameters, which also conform to the required CLF cameraLogToLin parameters.
 
-    Currently only EI values 1280 and below are supported.
+    Currently only EI values between 160 and 1280 are supported.
 
     Parameters
     ----------
     ei : int
-        EI value to generate, e.g. 800.
+        EI value to generate, must be 160 <= EI < 1280.
 
     clipping : bool
         Clip input domain to [0.0, 1.0] to match IDT 1D LUT behavior. Required
@@ -63,7 +63,9 @@ def generate_logc3(ei=800, clipping=True, debug=False):
 
     if not (160 <= ei <= 1280):
         print(
-            f"Error: Unsupported EI{ei:d} requested, must be 160 <= EI < 1600"
+            f"Error: Unsupported EI{ei:d} requested, must be 160 <= EI < 1280".format(
+                ei
+            )
         )
         return False
 
@@ -92,15 +94,16 @@ def generate_logc3(ei=800, clipping=True, debug=False):
     c = encGain
     d = encOffset
 
-    # unused
-    e = c * (
-        a / ((a * cut + b) * log(10))
-    )  # follows CLF 6.6 Log specification
-    f = (
-        c * log10(a * cut + b) + d
-    ) - e * cut  # follows CLF 6.6 Log specification
-
     if debug:
+
+        # unused variables for completeness
+        e = c * (
+            a / ((a * cut + b) * log(10))
+        )  # follows CLF 6.6 Log specification
+        f = (
+            c * log10(a * cut + b) + d
+        ) - e * cut  # follows CLF 6.6 Log specification
+
         print(f"White Paper Values for EI{ei:d}")
         print(f"cut: {cut:.6f} :: {cut:.15f}")
         print(f"a:   {a:.6f} :: {a:.15f}")
@@ -150,14 +153,18 @@ def generate_logc3(ei=800, clipping=True, debug=False):
     # Write file compliant with new naming convention
     clf_id = (
         TF_ID_PREFIX
-        + "ARRI:Input:ARRI_LogC3_EI800_to_ACES2065-1"
+        + f"ARRI:Input:ARRI_LogC3_EI{ei:d}_to_ACES2065-1".format(ei)
         + TF_ID_SUFFIX
     )
 
     fmdg = gt.getFormatMetadata()
     fmdg.setID(clf_id)
-    fmdg.addChildElement("Description", "ARRI LogC3 (EI800) to ACES2065-1")
-    fmdg.addChildElement("InputDescriptor", "ARRI LogC3 (EI800)")
+    fmdg.addChildElement(
+        "Description", f"ARRI LogC3 (EI{ei:d}) to ACES2065-1".format(ei)
+    )
+    fmdg.addChildElement(
+        "InputDescriptor", f"ARRI LogC3 (EI{ei:d})".format(ei)
+    )
     fmdg.addChildElement("OutputDescriptor", "ACES2065-1")
     fmdg.addChildElement("Info", "")
     info = fmdg.getChildElements()[3]
@@ -167,7 +174,9 @@ def generate_logc3(ei=800, clipping=True, debug=False):
     if not dest_dir.exists():
         dest_dir.mkdir()
 
-    fname = dest_dir / (f"ARRI.LogC3_EI{ei:d}_to_ACES2065-1" + CLF_SUFFIX)
+    fname = dest_dir / (
+        f"ARRI.LogC3_EI{ei:d}_to_ACES2065-1".format(ei) + CLF_SUFFIX
+    )
     gt.write("Academy/ASC Common LUT Format", str(fname), config)
 
     return True
