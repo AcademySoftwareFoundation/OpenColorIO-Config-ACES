@@ -20,6 +20,7 @@ from .common import (
     matrix_3x3_to_4x4,
     multi_replace,
     regularise_version,
+    validate_method,
 )
 
 __all__ = [
@@ -41,4 +42,5 @@ __all__ = [
     "matrix_3x3_to_4x4",
     "multi_replace",
     "regularise_version",
+    "validate_method",
 ]

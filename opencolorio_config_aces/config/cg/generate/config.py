@@ -35,7 +35,11 @@ from opencolorio_config_aces.config.reference import (
     version_config_mapping_file,
     generate_config_aces,
 )
-from opencolorio_config_aces.utilities import git_describe, regularise_version
+from opencolorio_config_aces.utilities import (
+    git_describe,
+    regularise_version,
+    validate_method,
+)
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -55,15 +59,15 @@ __all__ = [
     "generate_config_cg",
 ]
 
+logger = logging.getLogger(__name__)
+
 PATH_TRANSFORMS_MAPPING_FILE_CG = next(
-    (Path(__file__).parents[0] / "resources").glob(
-        "OpenColorIO-Config-ACES CG Transforms - * - CG Config - Mapping.csv"
-    )
+    (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
 )
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 
-CONFIG_MAPPING_FILE_PATH : unicode
+PATH_TRANSFORMS_MAPPING_FILE_CG : unicode
 """
 
 
@@ -262,7 +266,7 @@ def config_basename_cg(
 ):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
-    basename, i.e. the filename devoid of directory prefix.
+    basename, i.e. the filename devoid of directory affixe.
 
     Parameters
     ----------
@@ -353,10 +357,34 @@ def generate_config_cg(
     validate=True,
     describe=ColorspaceDescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
+    scheme="Modern 1",
     additional_data=False,
 ):
     """
     Generate the *ACES* Computer Graphics (CG) *OpenColorIO* config.
+
+    The default process is as follows:
+
+    -   The *ACES* CG *OpenColorIO* config generator invokes the *aces-dev*
+        reference implementation *OpenColorIO* config generator via the
+        :func:`opencolorio_config_aces.generate_config_aces` definition and the
+        default reference config mapping file.
+    -   The *ACES* CG *OpenColorIO* config generator filters and and extend
+        the data from the *aces-dev* reference implementation *OpenColorIO*
+        config with the given CG config mapping file:
+
+        -   The builtin *CLF* transforms are discovered and classified.
+        -   The CG config mapping file is parsed.
+        -   The list of implicit colorspaces is built, e.g. *ACES2065-1*,
+            *Raw*, etc...
+        -   The colorspaces, looks and view transforms are filtered according
+            to the parsed CG config mapping file data.
+        -   The displays, views, and shared views are filtered similarly.
+        -   The active displays and views are also filtered.
+        -   The builtin *CLF* transforms are filtered according to the parsed
+            CG config mapping file data and converted to colorspaces (or named
+            transforms).
+        -   Finally, the roles and aliases are updated.
 
     Parameters
     ----------
@@ -373,6 +401,9 @@ def generate_config_cg(
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
     config_mapping_file_path : unicode, optional
         Path to the *CSV* mapping file used to describe the transforms mapping.
+    scheme : str, optional
+        {"Legacy", "Modern 1"},
+        Naming convention scheme to use.
     additional_data : bool, optional
         Whether to return additional data.
 
@@ -383,14 +414,59 @@ def generate_config_cg(
         :class:`opencolorio_config_aces.ConfigData` class instance.
     """
 
+    logger.info(
+        f'Generating "{config_name_cg(config_mapping_file_path)}" config...'
+    )
+
+    scheme = validate_method(scheme, ["Legacy", "Modern 1"])
+
     if data is None:
         _config, data = generate_config_aces(
-            describe=describe, additional_data=True, analytical=False
+            describe=describe,
+            analytical=False,
+            scheme=scheme,
+            additional_data=True,
         )
 
     clf_transforms = unclassify_clf_transforms(
         classify_clf_transforms(discover_clf_transforms())
     )
+
+    logger.debug(f'Using {clf_transforms} "CLF" transforms...')
+
+    def transform_name(transform_data):
+        """Return the name from given transform."""
+
+        return transform_data[
+            "legacy_name" if scheme == "legacy" else "modern_name"
+        ]
+
+    def transform_aliases(transform_data):
+        """Return the aliases from given transform."""
+
+        return [transform_data["legacy_name"]] + transform_data.get(
+            "aliases", ""
+        ).split(",")
+
+    def clf_transform_from_id(clf_transform_id):
+        """Filter the "CLFTransform" instances matching given "CLFtransformID"."""
+
+        filtered_clf_transforms = [
+            clf_transform
+            for clf_transform in clf_transforms
+            if clf_transform.clf_transform_id.clf_transform_id
+            == clf_transform_id
+        ]
+
+        clf_transform = next(iter(filtered_clf_transforms), None)
+
+        logger.debug(
+            f'Filtered "CLF" transform with "{clf_transform_id}": {clf_transform}.'
+        )
+
+        return clf_transform
+
+    logger.info(f'Parsing "{config_mapping_file_path}" config mapping file...')
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -399,11 +475,12 @@ def generate_config_cg(
             delimiter=",",
             fieldnames=[
                 "ordering",
-                "transform_name",
+                "modern_name",
+                "legacy_name",
                 "aces_transform_id",
                 "clf_transform_id",
-                "linked_display_colorspace_style",
                 "interface",
+                "aliases",
                 "encoding",
                 "categories",
             ],
@@ -413,81 +490,98 @@ def generate_config_cg(
         next(dict_reader)
 
         for transform_data in dict_reader:
-            config_mapping[transform_data["transform_name"]].append(
+            config_mapping[transform_name(transform_data)].append(
                 transform_data
             )
+
+    def yield_from_config_mapping():
+        """Yield the transform data stored in the *CSV* mapping file."""
+        for transforms_data in config_mapping.values():
+            yield from transforms_data
 
     data.name = re.sub(
         r"\.ocio$", "", config_basename_cg(config_mapping_file_path)
     )
     data.description = config_description_cg(config_mapping_file_path)
 
-    def multi_filters(array, filterers):
-        """Apply given filterers on given array."""
-
-        return [
-            element
-            for element in array
-            if all(filterer(element) for filterer in filterers)
-        ]
-
     # Colorspaces, Looks and View Transforms Filtering
+    transforms = data.colorspaces + data.view_transforms
     implicit_transforms = [
-        transform["name"]
-        for transform in data.colorspaces + data.view_transforms
-        if transform.get("transforms_data") is None
+        a["name"] for a in transforms if a.get("transforms_data") is None
     ]
 
+    logger.info(f"Implicit transforms: {implicit_transforms}.")
+
+    def implicit_filterer(transform):
+        """Return whether given transform is an implicit transform."""
+
+        return transform.get("name") in implicit_transforms
+
     def transform_filterer(transform):
-        """
-        Filter the transforms, i.e. colorspaces, looks and view transforms
-        present in the transforms mapping file.
-        """
+        """Return whether given transform must be included."""
 
-        if transform["name"] in implicit_transforms:
-            return True
+        for transform_data in yield_from_config_mapping():
+            for data in transform["transforms_data"]:
+                aces_transform_id = transform_data["aces_transform_id"]
+                if not aces_transform_id:
+                    continue
 
-        for transforms_data in config_mapping.values():
-            for transform_data in transforms_data:
-                for data in transform["transforms_data"]:
-                    aces_transform_id = transform_data["aces_transform_id"]
-                    if not aces_transform_id:
-                        continue
-
-                    if aces_transform_id == data.get("aces_transform_id"):
-                        return True
+                if aces_transform_id == data.get("aces_transform_id"):
+                    return True
 
         return False
 
-    colorspace_filterers = [transform_filterer]
+    def multi_filters(array, filterers):
+        """Apply given filterers on given array."""
+
+        filtered = [
+            a for a in array if any(filterer(a) for filterer in filterers)
+        ]
+
+        return filtered
+
+    colorspace_filterers = [implicit_filterer, transform_filterer]
     data.colorspaces = multi_filters(data.colorspaces, colorspace_filterers)
+    logger.info(
+        'Filtered "Colorspace" transforms: '
+        f'{[a["name"] for a in data.colorspaces]} '
+    )
 
-    look_filterers = [transform_filterer]
+    look_filterers = [implicit_filterer, transform_filterer]
     data.looks = multi_filters(data.looks, look_filterers)
+    logger.info(
+        'Filtered "Look" transforms: ' f'{[a["name"] for a in data.looks]} '
+    )
 
-    view_transform_filterers = [transform_filterer]
+    view_transform_filterers = [implicit_filterer, transform_filterer]
     data.view_transforms = multi_filters(
         data.view_transforms, view_transform_filterers
     )
+    logger.info(
+        'Filtered "View" transforms: '
+        f'{[a["name"] for a in data.view_transforms]} '
+    )
 
     # Views Filtering
-    display_colorspaces = [
-        colorspace["name"]
-        for colorspace in data.colorspaces
-        if colorspace.get("family") == "Display"
+    display_names = [
+        a["name"] for a in data.colorspaces if a.get("family") == "Display"
     ]
 
+    def implicit_filterer(transform):
+        """Return whether given transform is an implicit transform."""
+
+        return all(
+            [
+                transform.get("view") in implicit_transforms,
+                transform.get("display") in display_names,
+            ]
+        )
+
     def view_filterer(transform):
-        """Filter the views supported by a colorspace."""
+        """Return whether given view transform must be included."""
 
-        if transform["display"] not in display_colorspaces:
+        if transform["display"] not in display_names:
             return False
-
-        if (
-            transform["view"] in implicit_transforms
-            or transform.get("colorspace") in implicit_transforms
-        ):
-            return True
 
         for view_transform in data.view_transforms:
             if view_transform["name"] == transform["view"]:
@@ -495,80 +589,95 @@ def generate_config_cg(
 
         return False
 
-    view_filterers = [view_filterer]
+    shared_view_filterers = [implicit_filterer, view_filterer]
+    data.shared_views = multi_filters(data.shared_views, shared_view_filterers)
+    logger.info(
+        f'Filtered shared "View(s)": {[a["view"] for a in data.shared_views]} '
+    )
+
+    view_filterers = [implicit_filterer, view_filterer]
     data.views = multi_filters(data.views, view_filterers)
-    data.shared_views = multi_filters(data.shared_views, view_filterers)
+    logger.info('Filtered "View(s)": ' f'{[a["view"] for a in data.views]} ')
 
     # Active Displays Filtering
     data.active_displays = [
-        display
-        for display in data.active_displays
-        if display in display_colorspaces
+        a for a in data.active_displays if a in display_names
     ]
+    logger.info(f"Filtered active displays: {data.active_displays}")
 
     # Active Views Filtering
     views = [view["view"] for view in data.views]
     data.active_views = [view for view in data.active_views if view in views]
+    logger.info(f"Filtered active views: {data.active_views}")
 
-    # CLF Transforms
-    for transforms_data in config_mapping.values():
-        for transform_data in transforms_data:
-            # Finding the "CLFTransform" class instance that matches given
-            # "CLFtransformID", if it does not exist, there is a critical
-            # mismatch in the mapping file.
-            clf_transform_id = transform_data["clf_transform_id"]
-            if not clf_transform_id:
-                continue
+    # CLF Transforms Filtering
+    for transform_data in yield_from_config_mapping():
+        clf_transform_id = transform_data["clf_transform_id"]
+        if not clf_transform_id:
+            continue
 
-            filtered_clf_transforms = [
-                clf_transform
-                for clf_transform in clf_transforms
-                if clf_transform.clf_transform_id.clf_transform_id
-                == clf_transform_id
-            ]
+        clf_transform = clf_transform_from_id(clf_transform_id)
 
-            clf_transform = next(iter(filtered_clf_transforms), None)
+        assert (
+            clf_transform
+        ), f'"{clf_transform_id}" "CLF" transform does not exist!'
 
-            assert (
-                clf_transform
-            ), f'"{clf_transform_id}" "CLF" transform does not exist!'
+        kwargs = {
+            "clf_transform": clf_transform,
+            "describe": describe,
+            "signature_only": True,
+            "name": transform_name(transform_data),
+            "aliases": transform_aliases(transform_data),
+            "encoding": transform_data.get("encoding"),
+            "categories": transform_data.get("categories"),
+        }
 
-            interface = transform_data["interface"]
+        if transform_data["interface"] == "NamedTransform":
+            logger.info(
+                f'Adding "{clf_transform_id}" "CLF" transform as a '
+                f'"Named" transform.'
+            )
 
-            if interface == "NamedTransform":
-                data.named_transforms.append(
-                    clf_transform_to_named_transform(
-                        clf_transform,
-                        describe=describe,
-                        signature_only=True,
-                        name=transform_data["transform_name"],
-                        encoding=transform_data.get("encoding"),
-                        categories=transform_data.get("categories"),
-                    )
-                )
+            data.named_transforms.append(
+                clf_transform_to_named_transform(**kwargs)
+            )
+        else:
+            logger.info(
+                f'Adding "{clf_transform_id}" "CLF" transform as a '
+                f'"Colorspace" transform.'
+            )
 
-            else:
-                data.colorspaces.append(
-                    clf_transform_to_colorspace(
-                        clf_transform,
-                        describe=describe,
-                        signature_only=True,
-                        name=transform_data["transform_name"],
-                        encoding=transform_data.get("encoding"),
-                        categories=transform_data.get("categories"),
-                    )
-                )
+            data.colorspaces.append(clf_transform_to_colorspace(**kwargs))
 
     # Roles Filtering
     for role in (
-        # Config contains multiple possible rendering color spaces
+        # A config contains multiple possible "Rendering" color spaces.
         ocio.ROLE_RENDERING,
-        # Reference role is deprecated
+        # The "Reference" role is deprecated.
         ocio.ROLE_REFERENCE,
     ):
+        logger.info(f'Removing "{role}" role.')
+
         data.roles.pop(role)
 
+    # Aliases Update
+    for transform_data in yield_from_config_mapping():
+        if transform_data["clf_transform_id"]:
+            continue
+
+        for colorspace in data.colorspaces:
+            if colorspace["name"] != transform_name(transform_data):
+                continue
+
+            logger.info(f'Updating "{colorspace["name"]}" aliases.')
+
+            colorspace["aliases"] = transform_aliases(transform_data)
+
     config = generate_config(data, config_name, validate)
+
+    logger.info(
+        f'"{config_name_cg(config_mapping_file_path)}" config generation complete!'
+    )
 
     if additional_data:
         return config, data
