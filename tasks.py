@@ -257,7 +257,7 @@ def build_aces_conversion_graph(ctx: Context):
 @task
 def build_config_common_tests(ctx: Context):
     """
-    Build the common tests *OpenColorIO* Config(s).
+    Build the common tests *OpenColorIO* config(s).
 
     Parameters
     ----------
@@ -265,7 +265,7 @@ def build_config_common_tests(ctx: Context):
         Context.
     """
 
-    message_box('Building the common tests "OpenColorIO" Config(s)...')
+    message_box('Building the common tests "OpenColorIO" config(s)...')
     with ctx.cd("opencolorio_config_aces/config/generation"):
         ctx.run("python common.py")
 
@@ -273,7 +273,7 @@ def build_config_common_tests(ctx: Context):
 @task
 def build_config_reference_analytical(ctx: Context):
     """
-    Build the *aces-dev* reference analytical *OpenColorIO* Config.
+    Build the *aces-dev* reference analytical *OpenColorIO* config.
 
     Parameters
     ----------
@@ -282,7 +282,7 @@ def build_config_reference_analytical(ctx: Context):
     """
 
     message_box(
-        'Building the "aces-dev" reference analytical "OpenColorIO" Config...'
+        'Building the "aces-dev" reference analytical "OpenColorIO" config...'
     )
     with ctx.cd("opencolorio_config_aces/config/reference/generate"):
         ctx.run("python analytical.py")
@@ -291,7 +291,7 @@ def build_config_reference_analytical(ctx: Context):
 @task
 def build_config_reference(ctx: Context):
     """
-    Build the *aces-dev* reference *OpenColorIO* Config.
+    Build the *aces-dev* reference *OpenColorIO* config.
 
     Parameters
     ----------
@@ -299,7 +299,7 @@ def build_config_reference(ctx: Context):
         Context.
     """
 
-    message_box('Building the "aces-dev" reference "OpenColorIO" Config...')
+    message_box('Building the "aces-dev" reference "OpenColorIO" config...')
     with ctx.cd("opencolorio_config_aces/config/reference/generate"):
         ctx.run("python config.py")
 
@@ -307,7 +307,7 @@ def build_config_reference(ctx: Context):
 @task
 def build_config_cg(ctx: Context):
     """
-    Build the *ACES* Computer Graphics (CG) *OpenColorIO* Config.
+    Build the *ACES* Computer Graphics (CG) *OpenColorIO* config.
 
     Parameters
     ----------
@@ -459,7 +459,7 @@ def docker_run_build_aces_conversion_graph(ctx: Context):
 @task
 def docker_run_build_config_common_tests(ctx: Context):
     """
-    Build the common tests *OpenColorIO* Config(s) in the *docker* container.
+    Build the common tests *OpenColorIO* config(s) in the *docker* container.
 
     Parameters
     ----------
@@ -473,7 +473,7 @@ def docker_run_build_config_common_tests(ctx: Context):
 @task
 def docker_run_build_config_reference_analytical(ctx: Context):
     """
-    Build the *aces-dev* reference analytical *OpenColorIO* Config in the
+    Build the *aces-dev* reference analytical *OpenColorIO* config in the
     *docker* container.
 
     Parameters
@@ -488,7 +488,7 @@ def docker_run_build_config_reference_analytical(ctx: Context):
 @task
 def docker_run_build_config_reference(ctx: Context):
     """
-    Build the *aces-dev* reference *OpenColorIO* Config in the *docker*
+    Build the *aces-dev* reference *OpenColorIO* config in the *docker*
     container.
 
     Parameters
@@ -503,7 +503,7 @@ def docker_run_build_config_reference(ctx: Context):
 @task
 def docker_run_build_config_cg(ctx: Context):
     """
-    Build the *ACES* Computer Graphics (CG) *OpenColorIO* Config in the
+    Build the *ACES* Computer Graphics (CG) *OpenColorIO* config in the
     *docker* container.
 
     Parameters

@@ -1110,7 +1110,7 @@ def dependency_versions(
 ):
     """
     Return the dependency versions of the *aces-dev* reference implementation
-    *OpenColorIO* Config.
+    *OpenColorIO* config.
 
     Parameters
     ----------
@@ -1143,7 +1143,7 @@ def config_basename_aces(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
 ):
     """
-    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    Generate the *aces-dev* reference implementation *OpenColorIO* config
     basename, i.e. the filename devoid of directory affixe.
 
     Parameters
@@ -1154,7 +1154,7 @@ def config_basename_aces(
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config basename.
+        *aces-dev* reference implementation *OpenColorIO* config basename.
 
     Examples
     --------
@@ -1171,7 +1171,7 @@ def config_name_aces(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
 ):
     """
-    Generate the *aces-dev* reference implementation *OpenColorIO* Config name.
+    Generate the *aces-dev* reference implementation *OpenColorIO* config name.
 
     Parameters
     ----------
@@ -1181,7 +1181,7 @@ def config_name_aces(
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config name.
+        *aces-dev* reference implementation *OpenColorIO* config name.
 
     Examples
     --------
@@ -1202,7 +1202,7 @@ def config_description_aces(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
 ):
     """
-    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    Generate the *aces-dev* reference implementation *OpenColorIO* config
     description.
 
     Parameters
@@ -1213,7 +1213,7 @@ def config_description_aces(
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config description.
+        *aces-dev* reference implementation *OpenColorIO* config description.
     """
 
     name = config_name_aces(config_mapping_file_path)
@@ -1243,16 +1243,16 @@ def generate_config_aces(
     additional_data=False,
 ):
     """
-    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    Generate the *aces-dev* reference implementation *OpenColorIO* config
     using the *Mapping* method.
 
-    The Config generation is constrained by a *CSV* file exported from the
+    The config generation is constrained by a *CSV* file exported from the
     *Reference Config - Mapping* sheet from a
     `Google Sheets file <https://docs.google.com/spreadsheets/d/\
     1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg>`__. The *Google Sheets* file
     was originally authored using the output of the *aces-dev* conversion graph
     to support the discussions of the *OpenColorIO* *Working Group* on the
-    design of the  *aces-dev* reference implementation *OpenColorIO* Config.
+    design of the  *aces-dev* reference implementation *OpenColorIO* config.
     The resulting mapping is the outcome of those discussions and leverages the
     new *OpenColorIO 2* display architecture while factoring many transforms.
 

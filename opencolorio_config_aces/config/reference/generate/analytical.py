@@ -240,13 +240,13 @@ def node_to_colorspace(
 
 def config_basename_aces():
     """
-    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method basename.
 
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config using the
+        *aces-dev* reference implementation *OpenColorIO* config using the
         analytical *Graph* method basename.
     """
 
@@ -258,13 +258,13 @@ def config_basename_aces():
 
 def config_name_aces():
     """
-    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph*  name.
 
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config using the
+        *aces-dev* reference implementation *OpenColorIO* config using the
         analytical *Graph* method name.
     """
 
@@ -277,13 +277,13 @@ def config_name_aces():
 
 def config_description_aces():
     """
-    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method description.
 
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config using the
+        *aces-dev* reference implementation *OpenColorIO* config using the
         analytical *Graph* method description.
     """
 
@@ -314,10 +314,10 @@ def generate_config_aces(
     additional_data=False,
 ):
     """
-    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    Generate the *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method.
 
-    The Config generation is driven entirely from the *aces-dev* conversion
+    The config generation is driven entirely from the *aces-dev* conversion
     graph. The config generated, while not usable because of the missing
     *OpenColorIO* *BuiltinTransforms*, provides an exact mapping with the
     *aces-dev* *CTL* transforms, and, for example, uses the
