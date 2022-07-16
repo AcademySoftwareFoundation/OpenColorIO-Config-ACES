@@ -39,6 +39,7 @@ __all__ = [
     "build_config_reference_analytical",
     "build_config_reference",
     "build_config_cg",
+    "build_config_studio",
     "requirements",
     "docker_build",
     "docker_remove",
@@ -50,6 +51,7 @@ __all__ = [
     "docker_run_build_config_reference_analytical",
     "docker_run_build_config_reference",
     "docker_run_build_config_cg",
+    "docker_run_build_config_studio",
 ]
 
 APPLICATION_NAME = opencolorio_config_aces.__application_name__
@@ -323,6 +325,22 @@ def build_config_cg(ctx: Context):
 
 
 @task
+def build_config_studio(ctx: Context):
+    """
+    Build the *ACES* Studio *OpenColorIO* config.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box('Building the "ACES" Studio (CG) "OpenColorIO" config...')
+    with ctx.cd("opencolorio_config_aces/config/studio/generate"):
+        ctx.run("python config.py")
+
+
+@task
 def requirements(ctx: Context):
     """
     Export the *requirements.txt* file.
@@ -513,3 +531,17 @@ def docker_run_build_config_cg(ctx: Context):
     """
 
     run_in_container(ctx, "invoke build-config-cg")
+
+
+@task
+def docker_run_build_config_studio(ctx: Context):
+    """
+    Build the *ACES* Studio *OpenColorIO* config in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke build-config-studio")

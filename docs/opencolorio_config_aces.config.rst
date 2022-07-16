@@ -113,3 +113,5 @@ Reference Configuration
 
 .. autosummary::
     :toctree: generated/
+
+    generate_config_studio

@@ -59,7 +59,7 @@ from .config import (
     ColorspaceDescriptionStyle,
     generate_config_aces,
 )
-from .config import generate_config_cg
+from .config import generate_config_cg, generate_config_studio
 from .clf import (
     discover_clf_transforms,
     classify_clf_transforms,
@@ -115,7 +115,7 @@ __all__ += [
     "ColorspaceDescriptionStyle",
     "generate_config_aces",
 ]
-__all__ += ["generate_config_cg"]
+__all__ += ["generate_config_cg", "generate_config_studio"]
 __all__ += [
     "discover_clf_transforms",
     "classify_clf_transforms",

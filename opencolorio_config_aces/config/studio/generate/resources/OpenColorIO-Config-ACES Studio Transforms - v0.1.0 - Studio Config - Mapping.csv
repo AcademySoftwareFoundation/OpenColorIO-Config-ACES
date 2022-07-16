@@ -1,0 +1,50 @@
+Ordering,Modern Name,Legacy Name,ACEStransformID,CLFtransformID,Interface,Aliases,Encoding,Categories
+100,ACEScc,ACES - ACEScc,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScc_to_ACES.a1.0.3,,ColorSpace,,log,ACES
+100,ACEScct,ACES - ACEScct,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScct_to_ACES.a1.0.3,,ColorSpace,,log,ACES
+100,ACEScg,ACES - ACEScg,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,ColorSpace,,scene-linear,ACES
+200,,Input - ADX - ADX10,,,ColorSpace,,log,ACES
+200,,Input - ADX - ADX16,,,ColorSpace,,log,ACES
+220,,Input - Generic - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Input:AP0_to_Rec709-sRGB:1.0,ColorSpace,,sdr-video,
+300,,Output - P3-D60,urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D60_48nits.a1.0.3,,ViewTransform,,sdr-video,ACES
+300,,Output - P3-D65 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_1000nits_15nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - P3-D65 ST2084 (2000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_2000nits_15nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - P3-D65 ST2084 (4000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_4000nits_15nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - P3-DCI (D60 simulation),urn:ampas:aces:transformId:v1.5:ODT.Academy.P3DCI_48nits.a1.0.3,,ViewTransform,,sdr-video,ACES
+300,,Output - P3-DCI (D65 simulation),urn:ampas:aces:transformId:v1.5:ODT.Academy.P3DCI_D65sim_48nits.a1.1.0,,ViewTransform,,sdr-video,ACES
+300,,Output - P3D65,urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_48nits.a1.1.0,,ViewTransform,,sdr-video,ACES
+300,,Output - P3D65 (D60 simulation),urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_D60sim_48nits.a1.1.0,,ViewTransform,,sdr-video,ACES
+300,,Output - P3D65 (Rec.709 Limited),urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_Rec709limited_48nits.a1.1.0,,ViewTransform,,sdr-video,ACES
+300,,Output - P3D65 ST2084 (108 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_108nits_7point2nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - Rec.2020,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec2020_100nits_dim.a1.0.3,,ViewTransform,,sdr-video,ACES
+300,,Output - Rec.2020 (P3D65 Limited),urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec2020_P3D65limited_100nits_dim.a1.1.0,,ViewTransform,,sdr-video,ACES
+300,,Output - Rec.2020 (Rec.709 Limited),urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec2020_Rec709limited_100nits_dim.a1.1.0,,ViewTransform,,sdr-video,ACES
+300,,Output - Rec.2020 HLG (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_HLG.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - Rec.2020 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - Rec.2020 ST2084 (2000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_2000nits_15nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - Rec.2020 ST2084 (4000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_4000nits_15nits_ST2084.a1.1.0,,ViewTransform,,hdr-video,ACES
+300,,Output - Rec.709,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_100nits_dim.a1.0.3,,ViewTransform,,sdr-video,ACES
+300,,Output - Rec.709 (D60 sim.),urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_D60sim_100nits_dim.a1.0.3,,ViewTransform,,sdr-video,ACES
+300,,Output - sRGB,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,,ViewTransform,,sdr-video,ACES
+300,,Output - sRGB (D60 sim.),urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_D60sim_100nits_dim.a1.0.3,,ViewTransform,,sdr-video,ACES
+400,,Utility - Curve - Rec.2020,,,NamedTransform,,sdr-video,
+400,,Utility - Curve - Rec.709,,,NamedTransform,,sdr-video,
+400,,Utility - Curve - ST2084,,,NamedTransform,,log,
+400,Rec.1886 - Curve,Utility - Curve - Rec.1886,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886:1.0,NamedTransform,,sdr-video,
+400,sRGB - Curve,Utility - Curve - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB:1.0,NamedTransform,,sdr-video,
+410,,Utility - Linear - Adobe RGB,,,ColorSpace,,scene-linear,
+410,,Utility - Linear - Adobe Wide Gamut RGB,,,ColorSpace,,scene-linear,
+410,,Utility - Linear - P3-D60,,,ColorSpace,,scene-linear,
+410,,Utility - Linear - P3-DCI,,,ColorSpace,,scene-linear,
+410,,Utility - Linear - RIMM ROMM (ProPhoto),,,ColorSpace,,scene-linear,
+410,P3-D65 - Linear,Utility - Linear - P3-D65,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_P3-D65-Linear:1.0,ColorSpace,,scene-linear,
+410,Rec.2020 - Linear,Utility - Linear - Rec.2020,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec2020-Linear:1.0,ColorSpace,,scene-linear,
+410,Rec.709 - Linear,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0,ColorSpace,,scene-linear,
+410,sRGB - Linear,Utility - Linear - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0,ColorSpace,,scene-linear,
+420,Gamma 1.8 - Rec.709 - Texture,Utility - Gamma 1.8 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma1.8:1.0,ColorSpace,,sdr-video,
+420,Gamma 2.2 - Rec.709 - Texture,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.2:1.0,ColorSpace,,sdr-video,
+430,,Utility - Rec.2020 - Camera,,,ColorSpace,,sdr-video,
+430,,Utility - Rec.2020 - Display,,,ViewTransform,,sdr-video,
+430,,Utility - Rec.709 - Camera,,,ColorSpace,,sdr-video,
+430,,Utility - Rec.709 - Display,,,ViewTransform,,sdr-video,
+440,,Utility - Raw,,,ColorSpace,,data,
+500,,Utility - Look - Blue Light Artifact Fix,,,Look,,-,-

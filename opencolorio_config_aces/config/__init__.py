@@ -41,6 +41,7 @@ from .reference import (
     generate_config_aces,
 )
 from .cg import generate_config_cg
+from .studio import generate_config_studio
 
 __all__ = [
     "TRANSFORM_FACTORIES",
@@ -82,3 +83,4 @@ __all__ += [
     "generate_config_aces",
 ]
 __all__ += ["generate_config_cg"]
+__all__ += ["generate_config_studio"]
