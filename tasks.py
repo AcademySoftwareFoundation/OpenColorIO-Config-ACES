@@ -228,6 +228,8 @@ def build_clfs(ctx: Context):
     message_box('Building the "CLF" transform files...')
     with ctx.cd("opencolorio_config_aces/clf/transforms/ocio"):
         ctx.run("python generate.py")
+    with ctx.cd("opencolorio_config_aces/clf/transforms/blackmagic"):
+        ctx.run("python generate.py")
 
 
 @task

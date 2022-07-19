@@ -62,7 +62,9 @@ def create_matrix(matrix, offset=None):
 
 
 @required("Colour")
-def create_conversion_matrix(input_primaries, output_primaries):
+def create_conversion_matrix(
+    input_primaries, output_primaries, adaptation="Bradford"
+):
     """
     Calculate the RGB to RGB matrix for a pair of primaries as an OCIO
     MatrixTransform.
@@ -73,6 +75,9 @@ def create_conversion_matrix(input_primaries, output_primaries):
         Input RGB colourspace name, as defined by colour-science.
     output_primaries : str
         Output RGB colourspace name, as defined by colour-science.
+    adaptation : str
+        Chromatic adaptation method to use, as defined by colour-science.  Defaults to
+        "Bradford" to match what is most commonly used in ACES.
 
     Returns
     -------
@@ -82,11 +87,15 @@ def create_conversion_matrix(input_primaries, output_primaries):
 
     import colour
 
+    input_space = colour.RGB_COLOURSPACES[input_primaries]
+    input_space.use_derived_transformation_matrices(True)
+    output_space = colour.RGB_COLOURSPACES[output_primaries]
+    output_space.use_derived_transformation_matrices(True)
     return create_matrix(
         colour.matrix_RGB_to_RGB(
-            colour.RGB_COLOURSPACES[input_primaries],
-            colour.RGB_COLOURSPACES[output_primaries],
-            chromatic_adaptation_transform="Bradford",
+            input_space,
+            output_space,
+            chromatic_adaptation_transform=adaptation,
         )
     )
 
