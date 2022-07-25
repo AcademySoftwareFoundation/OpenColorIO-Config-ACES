@@ -42,6 +42,7 @@ __all__ = [
     "matrix_3x3_to_4x4",
     "multi_replace",
     "regularise_version",
+    "validate_method",
 ]
 
 
@@ -570,14 +571,14 @@ def multi_replace(name, patterns):
 
 def regularise_version(version, add_v_prefix=True):
     """
-    Regularise given version name by either adding or removing a *v* prefix.
+    Regularise given version name by either adding or removing a *v* affixe.
 
     Parameters
     ----------
     version : str
         Version name to regularise.
     add_v_prefix : bool, optional
-        Whether to add the *v* prefix.
+        Whether to add the *v* affixe.
 
     Returns
     -------
@@ -602,3 +603,48 @@ def regularise_version(version, add_v_prefix=True):
         version = f"v{version}"
 
     return version
+
+
+def validate_method(
+    method,
+    valid_methods,
+    message='"{0}" method is invalid, it must be one of {1}!',
+):
+    """
+    Validate whether given method exists in the given valid methods and
+    returns the method lower cased.
+
+    Parameters
+    ----------
+    method : str
+        Method to validate.
+    valid_methods : Union[Sequence, Mapping]
+        Valid methods.
+    message : str
+        Message for the exception.
+
+    Returns
+    -------
+    :class:`str`
+        Method lower cased.
+
+    Raises
+    ------
+    :class:`ValueError`
+         If the method does not exist.
+
+    Examples
+    --------
+    >>> validate_method('Valid', ['Valid', 'Yes', 'Ok'])
+    'valid'
+    """
+
+    valid_methods = [str(valid_method) for valid_method in valid_methods]
+
+    method_lower = method.lower()
+    if method_lower not in [
+        valid_method.lower() for valid_method in valid_methods
+    ]:
+        raise ValueError(message.format(method, valid_methods))
+
+    return method_lower
