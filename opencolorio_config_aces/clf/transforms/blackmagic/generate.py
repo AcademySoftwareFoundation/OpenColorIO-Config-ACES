@@ -93,6 +93,8 @@ def generate_clf_bmdfilm():
     if not dest_dir.exists():
         dest_dir.mkdir()
 
+    # Generate full transform.
+
     generate_clf(
         ocio.GroupTransform(
             transforms=[
@@ -108,6 +110,34 @@ def generate_clf_bmdfilm():
         "Blackmagic Film Wide Gamut (Gen 5)",
         "ACES2065-1",
         aces_transform_id,
+    )
+
+    # Generate transform for primaries only.
+
+    generate_clf(
+        ocio.GroupTransform([mtx]),
+        TF_ID_PREFIX
+        + "BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1"
+        + TF_ID_SUFFIX,
+        "Linear Blackmagic Wide Gamut (Gen 5) to ACES2065-1",
+        dest_dir / ("Linear-BMD-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
+        "Linear Blackmagic Wide Gamut (Gen 5)",
+        "ACES2065-1",
+        None,
+    )
+
+    # Generate named transform for log curve only.
+
+    generate_clf(
+        ocio.GroupTransform([lct]),
+        TF_ID_PREFIX
+        + "BlackmagicDesign:Input:BMDFilm_Gen5_Log_to_Linear"
+        + TF_ID_SUFFIX,
+        "Blackmagic Film (Gen 5) Log to Linear Curve",
+        dest_dir / ("BMDFilm-WideGamut-Gen5-Curve" + CLF_SUFFIX),
+        "Blackmagic Film (Gen 5) Log",
+        "Blackmagic Film (Gen 5) Linear",
+        None,
     )
 
 
@@ -175,6 +205,34 @@ def generate_clf_davinci():
         "DaVinci Intermediate Wide Gamut",
         "ACES2065-1",
         aces_transform_id,
+    )
+
+    # Generate transform for primaries only.
+
+    generate_clf(
+        ocio.GroupTransform([mtx]),
+        TF_ID_PREFIX
+        + "BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1"
+        + TF_ID_SUFFIX,
+        "Linear DaVinci Wide Gamut to ACES2065-1",
+        dest_dir / ("Linear-DaVinci-WideGamut_to_ACES2065-1" + CLF_SUFFIX),
+        "Linear DaVinci Wide Gamut",
+        "ACES2065-1",
+        None,
+    )
+
+    # Generate named transform for log curve only.
+
+    generate_clf(
+        ocio.GroupTransform([lct]),
+        TF_ID_PREFIX
+        + "BlackmagicDesign:Input:DaVinci_Intermediate_Log_to_Linear"
+        + TF_ID_SUFFIX,
+        "DaVinci Intermediate Log to Linear Curve",
+        dest_dir / ("DaVinci-Intermediate-Curve" + CLF_SUFFIX),
+        "DaVinci Intermediate Log",
+        "DaVinci Intermediate Linear",
+        None,
     )
 
 
