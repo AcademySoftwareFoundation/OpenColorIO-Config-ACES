@@ -266,7 +266,7 @@ def config_basename_cg(
 ):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
-    basename, i.e. the filename devoid of directory affixe.
+    basename, i.e. the filename devoid of directory affix.
 
     Parameters
     ----------
@@ -369,7 +369,7 @@ def generate_config_cg(
         reference implementation *OpenColorIO* config generator via the
         :func:`opencolorio_config_aces.generate_config_aces` definition and the
         default reference config mapping file.
-    -   The *ACES* CG *OpenColorIO* config generator filters and and extend
+    -   The *ACES* CG *OpenColorIO* config generator filters and and extends
         the data from the *aces-dev* reference implementation *OpenColorIO*
         config with the given CG config mapping file:
 
