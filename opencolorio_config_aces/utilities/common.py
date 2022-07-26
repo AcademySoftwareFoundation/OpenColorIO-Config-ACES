@@ -10,8 +10,10 @@ Defines common utilities objects that don't fall in any specific category.
 import functools
 import os
 import re
+import requests
 import subprocess
 from collections import defaultdict
+from html.parser import HTMLParser
 from itertools import chain
 from pprint import PrettyPrinter
 from textwrap import TextWrapper
@@ -43,6 +45,7 @@ __all__ = [
     "multi_replace",
     "regularise_version",
     "validate_method",
+    "google_sheet_title",
 ]
 
 
@@ -648,3 +651,55 @@ def validate_method(
         raise ValueError(message.format(method, valid_methods))
 
     return method_lower
+
+
+def google_sheet_title(url):
+    """
+    Return the title from given *Google Sheet* url.
+
+    Parameters
+    ----------
+    url : str
+        *Google Sheet* url to return the title of.
+
+    Returns
+    -------
+    :class:`str`
+        *Google Sheet* title.
+
+    Examples
+    --------
+    >>> url = (
+    ...     "https://docs.google.com/spreadsheets/d/"
+    ...     "1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg/"
+    ...     "export?format=csv&gid=273921464"
+    ... )
+    >>> google_sheet_title(url)  # doctest: +ELLIPSIS
+    'OpenColorIO-Config-ACES "Reference" Transforms - v...'
+    """
+
+    class Parser(HTMLParser):
+        def __init__(self):
+            HTMLParser.__init__(self)
+            self.in_title = []
+            self.title = None
+
+        def handle_starttag(self, tag, attrs):
+            if tag == "title":
+                self.in_title.append(tag)
+
+        def handle_endtag(self, tag):
+            if tag == "title":
+                self.in_title.pop()
+
+        def handle_data(self, data):
+            if self.in_title:
+                self.title = data
+
+    if "export" in url:
+        url = url.split("export")[0]
+
+    parser = Parser()
+    parser.feed(requests.get(url).text)
+
+    return parser.title.rsplit("-", 1)[0].strip()

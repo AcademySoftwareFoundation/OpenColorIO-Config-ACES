@@ -49,6 +49,7 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
+    "URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE",
     "PATH_TRANSFORMS_MAPPING_FILE_REFERENCE",
     "COLORSPACE_SCENE_ENCODING_REFERENCE",
     "COLORSPACE_OUTPUT_ENCODING_REFERENCE",
@@ -86,6 +87,17 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE = (
+    "https://docs.google.com/spreadsheets/d/"
+    "1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg/"
+    "export?format=csv&gid=273921464"
+)
+"""
+URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
+
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE : unicode
+"""
 
 PATH_TRANSFORMS_MAPPING_FILE_REFERENCE = next(
     (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")

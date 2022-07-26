@@ -21,6 +21,7 @@ from .common import (
     multi_replace,
     regularise_version,
     validate_method,
+    google_sheet_title,
 )
 
 __all__ = [
@@ -43,4 +44,5 @@ __all__ = [
     "multi_replace",
     "regularise_version",
     "validate_method",
+    "google_sheet_title",
 ]

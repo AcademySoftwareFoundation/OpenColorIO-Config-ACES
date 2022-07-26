@@ -7,11 +7,23 @@ Invoke - Tasks
 
 from __future__ import annotations
 
+import os
+
+import requests
 from invoke import Context, task
 from invoke.exceptions import Failure
-
+from pathlib import Path
 import opencolorio_config_aces
-from opencolorio_config_aces.utilities import message_box
+from opencolorio_config_aces.config.reference.generate.config import (
+    URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE,
+)
+from opencolorio_config_aces.config.cg.generate.config import (
+    URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG,
+)
+from opencolorio_config_aces.config.studio.generate.config import (
+    URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO,
+)
+from opencolorio_config_aces.utilities import google_sheet_title, message_box
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -37,7 +49,9 @@ __all__ = [
     "build_aces_conversion_graph",
     "build_config_common_tests",
     "build_config_reference_analytical",
+    "update_mapping_file_reference",
     "build_config_reference",
+    "update_mapping_file_cg",
     "build_config_cg",
     "build_config_studio",
     "requirements",
@@ -49,8 +63,11 @@ __all__ = [
     "docker_run_build_aces_conversion_graph",
     "docker_run_build_config_common_tests",
     "docker_run_build_config_reference_analytical",
+    "docker_run_update_mapping_file_reference",
     "docker_run_build_config_reference",
+    "docker_run_update_mapping_file_cg",
     "docker_run_build_config_cg",
+    "docker_run_update_mapping_file_studio",
     "docker_run_build_config_studio",
 ]
 
@@ -291,6 +308,40 @@ def build_config_reference_analytical(ctx: Context):
 
 
 @task
+def update_mapping_file_reference(ctx: Context):
+    """
+    Update the *aces-dev* reference *OpenColorIO* config mapping file.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box(
+        'Updating the "aces-dev" reference "OpenColorIO" config mapping file...'
+    )
+
+    title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE)
+
+    directory = Path(
+        "opencolorio_config_aces/config/reference/generate/resources/"
+    ).absolute()
+
+    for csv_file in directory.glob("*Mapping.csv"):
+        os.remove(csv_file)
+
+    filename = str(
+        directory / f"{title} - Reference Config - Mapping.csv"
+    ).replace('"', "")
+
+    with open(filename, "w") as csv_file:
+        csv_file.write(
+            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE).text
+        )
+
+
+@task
 def build_config_reference(ctx: Context):
     """
     Build the *aces-dev* reference *OpenColorIO* config.
@@ -304,6 +355,41 @@ def build_config_reference(ctx: Context):
     message_box('Building the "aces-dev" reference "OpenColorIO" config...')
     with ctx.cd("opencolorio_config_aces/config/reference/generate"):
         ctx.run("python config.py")
+
+
+@task
+def update_mapping_file_cg(ctx: Context):
+    """
+    Update the *ACES* Computer Graphics (CG) *OpenColorIO* mapping file.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box(
+        'Updating the "ACES" Computer Graphics (CG) "OpenColorIO" config '
+        "mapping file..."
+    )
+
+    title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG)
+
+    directory = Path(
+        "opencolorio_config_aces/config/cg/generate/resources/"
+    ).absolute()
+
+    for csv_file in directory.glob("*Mapping.csv"):
+        os.remove(csv_file)
+
+    filename = str(directory / f"{title} - CG Config - Mapping.csv").replace(
+        '"', ""
+    )
+
+    with open(filename, "w") as csv_file:
+        csv_file.write(
+            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG).text
+        )
 
 
 @task
@@ -322,6 +408,40 @@ def build_config_cg(ctx: Context):
     )
     with ctx.cd("opencolorio_config_aces/config/cg/generate"):
         ctx.run("python config.py")
+
+
+@task
+def update_mapping_file_studio(ctx: Context):
+    """
+    Update the *ACES* Studio *OpenColorIO* mapping file.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    message_box(
+        'Updating the "ACES" Studio "OpenColorIO" config ' "mapping file..."
+    )
+
+    title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO)
+
+    directory = Path(
+        "opencolorio_config_aces/config/studio/generate/resources/"
+    ).absolute()
+
+    for csv_file in directory.glob("*Mapping.csv"):
+        os.remove(csv_file)
+
+    filename = str(
+        directory / f"{title} - Studio Config - Mapping.csv"
+    ).replace('"', "")
+
+    with open(filename, "w") as csv_file:
+        csv_file.write(
+            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO).text
+        )
 
 
 @task
@@ -503,6 +623,20 @@ def docker_run_build_config_reference_analytical(ctx: Context):
     run_in_container(ctx, "invoke build-config-reference-analytical")
 
 
+def docker_run_update_mapping_file_reference(ctx: Context):
+    """
+    Update the *aces-dev* reference *OpenColorIO* config mapping file in the
+    *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke update-mapping-file-reference")
+
+
 @task
 def docker_run_build_config_reference(ctx: Context):
     """
@@ -518,6 +652,20 @@ def docker_run_build_config_reference(ctx: Context):
     run_in_container(ctx, "invoke build-config-reference")
 
 
+def docker_run_update_mapping_file_cg(ctx: Context):
+    """
+    Update the *ACES* Computer Graphics (CG) *OpenColorIO* config mapping file
+    in the *docker* container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke update-mapping-file-cg")
+
+
 @task
 def docker_run_build_config_cg(ctx: Context):
     """
@@ -531,6 +679,20 @@ def docker_run_build_config_cg(ctx: Context):
     """
 
     run_in_container(ctx, "invoke build-config-cg")
+
+
+def docker_run_update_mapping_file_studio(ctx: Context):
+    """
+    Update the *ACES* Studio *OpenColorIO* config mapping file in the *docker*
+    container.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    """
+
+    run_in_container(ctx, "invoke update-mapping-file-studio")
 
 
 @task

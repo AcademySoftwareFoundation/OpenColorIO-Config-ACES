@@ -10,6 +10,7 @@ import unittest
 import requests
 
 from opencolorio_config_aces.config.reference.generate.config import (
+    URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE,
     PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
 )
 
@@ -39,13 +40,9 @@ class TestConfigResources(unittest.TestCase):
         with open(str(csv_local_path)) as csv_local_file:
             csv_local_content = csv_local_file.read()
 
-        csv_remote_url = (
-            "https://docs.google.com/spreadsheets/d/"
-            "1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg/"
-            "export?format=csv&gid=273921464"
-        )
-
-        csv_remote_content = requests.get(csv_remote_url).text
+        csv_remote_content = requests.get(
+            URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE
+        ).text
 
         self.assertMultiLineEqual(
             "\n".join(csv_remote_content.splitlines()),
