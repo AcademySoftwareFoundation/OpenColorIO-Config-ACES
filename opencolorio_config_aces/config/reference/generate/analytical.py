@@ -32,6 +32,9 @@ from opencolorio_config_aces.config.reference import (
     filter_ctl_transforms,
     node_to_ctl_transform,
 )
+from opencolorio_config_aces.config.reference.discover import (
+    version_aces_dev,
+)
 from opencolorio_config_aces.config.reference.generate.config import (
     SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE,
     SEPARATOR_COLORSPACE_NAME_REFERENCE,
@@ -40,7 +43,6 @@ from opencolorio_config_aces.config.reference.generate.config import (
     beautify_display_name,
     beautify_name,
     ctl_transform_to_colorspace,
-    version_aces_dev,
 )
 from opencolorio_config_aces.utilities import git_describe, required
 
@@ -228,6 +230,7 @@ def node_to_colorspace(
     colorspace = ctl_transform_to_colorspace(
         ctl_transform,
         describe=describe,
+        scheme="Legacy",
         to_reference=node_to_builtin_transform(graph, node),
         from_reference=node_to_builtin_transform(graph, node, "Reverse"),
     )
@@ -347,6 +350,8 @@ def generate_config_aces(
         instances.
     """
 
+    logger.info(f'Generating "{config_name_aces()}" config...')
+
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
     filtered_ctl_transforms = filter_ctl_transforms(
@@ -357,7 +362,7 @@ def generate_config_aces(
 
     colorspaces_to_ctl_transforms = {}
     colorspaces = []
-    displays = set()
+    display_names = set()
     views = []
 
     scene_reference_colorspace = colorspace_factory(
@@ -388,6 +393,10 @@ def generate_config_aces(
         raw_colorspace,
     ]
 
+    logger.info(
+        f'Implicit colorspaces: "{list(a.getName() for a in colorspaces)}"'
+    )
+
     for family in ("csc", "input_transform", "lmt", "output_transform"):
         family_colourspaces = []
         for node in filter_nodes(graph, [lambda x: x.family == family]):
@@ -397,15 +406,18 @@ def generate_config_aces(
             ):
                 continue
 
+            logger.info(f'Creating a colorspace for "{node}" node...')
             colorspace = node_to_colorspace(graph, node, describe)
 
             family_colourspaces.append(colorspace)
 
             if family == "output_transform":
-                display = beautify_display_name(
-                    node_to_ctl_transform(graph, node).genus
+                display = (
+                    f"Display"
+                    f"{SEPARATOR_COLORSPACE_NAME_REFERENCE}"
+                    f"{beautify_display_name(node_to_ctl_transform(graph, node).genus)}"
                 )
-                displays.add(display)
+                display_names.add(display)
                 view = beautify_view_name(colorspace.getName())
                 views.append(
                     {
@@ -423,15 +435,16 @@ def generate_config_aces(
         colorspaces += family_colourspaces
 
     views = sorted(views, key=lambda x: (x["display"], x["view"]))
-    displays = sorted(list(displays))
-    if "sRGB" in displays:
-        displays.insert(0, displays.pop(displays.index("sRGB")))
+    display_names = sorted(list(display_names))
+    if "sRGB" in display_names:
+        display_names.insert(0, display_names.pop(display_names.index("sRGB")))
 
-    for display in displays:
+    for display_name in display_names:
         view = beautify_view_name(raw_colorspace.getName())
+        logger.info(f'Adding "{view}" view to "{display_name}" display.')
         views.append(
             {
-                "display": display,
+                "display": display_name,
                 "view": view,
                 "colorspace": raw_colorspace.getName(),
             }
@@ -445,13 +458,15 @@ def generate_config_aces(
         },
         colorspaces=colorspaces,
         views=views,
-        active_displays=displays,
+        active_displays=display_names,
         active_views=list(dict.fromkeys([view["view"] for view in views])),
         file_rules=[{"name": "Default", "colorspace": "CSC - ACEScg"}],
         profile_version=VersionData(2, 0),
     )
 
     config = generate_config(data, config_name, validate)
+
+    logger.info(f'"{config_name_aces()}" config generation complete!')
 
     if additional_data:
         return config, data, colorspaces_to_ctl_transforms
