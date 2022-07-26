@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright Contributors to the OpenColorIO Project.
 
-from .generate import generate_clf_bmdfilm, generate_clf_davinci
+from .generate import main
 
 __all__ = [
-    "generate_clf_bmdfilm",
-    "generate_clf_davinci",
+    "main",
 ]

@@ -25,11 +25,10 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "generate_clf_bmdfilm",
-    "generate_clf_davinci",
+    "main",
 ]
 
-THIS_DIR = Path(__file__).parent.resolve()
+DEST_DIR = Path(__file__).parent.resolve() / "input"
 
 TF_ID_PREFIX = "urn:aswf:ocio:transformId:1.0:"
 TF_ID_SUFFIX = ":1.0"
@@ -37,8 +36,8 @@ TF_ID_SUFFIX = ":1.0"
 CLF_SUFFIX = ".clf"
 
 
-def generate_clf_bmdfilm():
-    """Make the CLF file for BMDFilm_WideGamut_Gen5."""
+def _generate_clf_bmdfilm():
+    """Make the CLF file for BMDFilm_WideGamut_Gen5 plus matrix/curve CLFs."""
 
     # Based on the document "Blackmagic Generation 5 Color Technical Reference.pdf"
     # dated May 2021.  The resulting CLF was reviewed by Blackmagic.
@@ -70,11 +69,11 @@ def generate_clf_bmdfilm():
 
     lct = ocio.LogCameraTransform(
         base=BASE,
-        linSideBreak=[LIN_SB, LIN_SB, LIN_SB],
-        logSideSlope=[LOG_SLP, LOG_SLP, LOG_SLP],
-        logSideOffset=[LOG_OFF, LOG_OFF, LOG_OFF],
-        linSideSlope=[LIN_SLP, LIN_SLP, LIN_SLP],
-        linSideOffset=[LIN_OFF, LIN_OFF, LIN_OFF],
+        linSideBreak=[LIN_SB] * 3,
+        logSideSlope=[LOG_SLP] * 3,
+        logSideOffset=[LOG_OFF] * 3,
+        linSideSlope=[LIN_SLP] * 3,
+        linSideOffset=[LIN_OFF] * 3,
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
@@ -86,12 +85,8 @@ def generate_clf_bmdfilm():
     #   https://github.com/ampas/aces-dev/pull/126/files
     aces_transform_id = (
         "urn:ampas:aces:transformId:v1.5:"
-        + "IDT.BlackmagicDesign.BMDFilm_WideGamut_Gen5.a1.v1"
+        "IDT.BlackmagicDesign.BMDFilm_WideGamut_Gen5.a1.v1"
     )
-
-    dest_dir = THIS_DIR / "input"
-    if not dest_dir.exists():
-        dest_dir.mkdir()
 
     # Generate full transform.
 
@@ -106,7 +101,7 @@ def generate_clf_bmdfilm():
         + "BlackmagicDesign:Input:BMDFilm_WideGamut_Gen5_to_ACES2065-1"
         + TF_ID_SUFFIX,
         "Blackmagic Film Wide Gamut (Gen 5) to ACES2065-1",
-        dest_dir / ("BMDFilm-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
+        DEST_DIR / ("BMDFilm-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
         "Blackmagic Film Wide Gamut (Gen 5)",
         "ACES2065-1",
         aces_transform_id,
@@ -120,7 +115,7 @@ def generate_clf_bmdfilm():
         + "BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1"
         + TF_ID_SUFFIX,
         "Linear Blackmagic Wide Gamut (Gen 5) to ACES2065-1",
-        dest_dir / ("Linear-BMD-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
+        DEST_DIR / ("Linear-BMD-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
         "Linear Blackmagic Wide Gamut (Gen 5)",
         "ACES2065-1",
         None,
@@ -134,15 +129,15 @@ def generate_clf_bmdfilm():
         + "BlackmagicDesign:Input:BMDFilm_Gen5_Log_to_Linear"
         + TF_ID_SUFFIX,
         "Blackmagic Film (Gen 5) Log to Linear Curve",
-        dest_dir / ("BMDFilm-WideGamut-Gen5-Curve" + CLF_SUFFIX),
+        DEST_DIR / ("BMDFilm-WideGamut-Gen5-Curve" + CLF_SUFFIX),
         "Blackmagic Film (Gen 5) Log",
         "Blackmagic Film (Gen 5) Linear",
         None,
     )
 
 
-def generate_clf_davinci():
-    """Make the CLF file for DaVinci Intermediate Wide Gamut."""
+def _generate_clf_davinci():
+    """Make the CLF file for DaVinci Intermediate Wide Gamut plus matrix/curve CLFs."""
 
     # Based on the document "DaVinci_Resolve_17_Wide_Gamut_Intermediate.pdf"
     # dated 2021-07-31.  The resulting CLF was reviewed by Blackmagic.
@@ -167,12 +162,12 @@ def generate_clf_davinci():
 
     lct = ocio.LogCameraTransform(
         base=BASE,
-        linSideBreak=[LIN_SB, LIN_SB, LIN_SB],
-        logSideSlope=[LOG_SLP, LOG_SLP, LOG_SLP],
-        logSideOffset=[LOG_OFF, LOG_OFF, LOG_OFF],
-        linSideSlope=[LIN_SLP, LIN_SLP, LIN_SLP],
-        linSideOffset=[LIN_OFF, LIN_OFF, LIN_OFF],
-        linearSlope=[LINEAR_SLOPE, LINEAR_SLOPE, LINEAR_SLOPE],
+        linSideBreak=[LIN_SB] * 3,
+        logSideSlope=[LOG_SLP] * 3,
+        logSideOffset=[LOG_OFF] * 3,
+        linSideSlope=[LIN_SLP] * 3,
+        linSideOffset=[LIN_OFF] * 3,
+        linearSlope=[LINEAR_SLOPE] * 3,
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
@@ -182,12 +177,10 @@ def generate_clf_davinci():
     # Proposing the following ID:
     aces_transform_id = (
         "urn:ampas:aces:transformId:v1.5:"
-        + "ACEScsc.Academy.DaVinci_Intermediate_WideGamut_to_ACES.a1.v1"
+        "ACEScsc.Academy.DaVinci_Intermediate_WideGamut_to_ACES.a1.v1"
     )
 
-    dest_dir = THIS_DIR / "input"
-    if not dest_dir.exists():
-        dest_dir.mkdir()
+    # Generate full transform.
 
     generate_clf(
         ocio.GroupTransform(
@@ -200,7 +193,7 @@ def generate_clf_davinci():
         + "BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1"
         + TF_ID_SUFFIX,
         "DaVinci Intermediate Wide Gamut to ACES2065-1",
-        dest_dir
+        DEST_DIR
         / ("DaVinci-Intermediate-WideGamut_to_ACES2065-1" + CLF_SUFFIX),
         "DaVinci Intermediate Wide Gamut",
         "ACES2065-1",
@@ -215,7 +208,7 @@ def generate_clf_davinci():
         + "BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1"
         + TF_ID_SUFFIX,
         "Linear DaVinci Wide Gamut to ACES2065-1",
-        dest_dir / ("Linear-DaVinci-WideGamut_to_ACES2065-1" + CLF_SUFFIX),
+        DEST_DIR / ("Linear-DaVinci-WideGamut_to_ACES2065-1" + CLF_SUFFIX),
         "Linear DaVinci Wide Gamut",
         "ACES2065-1",
         None,
@@ -229,7 +222,7 @@ def generate_clf_davinci():
         + "BlackmagicDesign:Input:DaVinci_Intermediate_Log_to_Linear"
         + TF_ID_SUFFIX,
         "DaVinci Intermediate Log to Linear Curve",
-        dest_dir / ("DaVinci-Intermediate-Curve" + CLF_SUFFIX),
+        DEST_DIR / ("DaVinci-Intermediate-Curve" + CLF_SUFFIX),
         "DaVinci Intermediate Log",
         "DaVinci Intermediate Linear",
         None,
@@ -237,8 +230,14 @@ def generate_clf_davinci():
 
 
 def main():
-    generate_clf_bmdfilm()
-    generate_clf_davinci()
+    """Make all the Blackmagic CLFs."""
+
+    if not DEST_DIR.exists():
+        DEST_DIR.mkdir()
+
+    _generate_clf_bmdfilm()
+    _generate_clf_davinci()
+
     return 0
 
 
