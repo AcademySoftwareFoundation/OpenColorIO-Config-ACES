@@ -36,14 +36,14 @@ CLF_SUFFIX = ".clf"
 
 
 def _build_slog3_curve():
-    """ Build the Log transform for the S-Log3 curve. """
-    linSideSlope  = 1. / (0.18 + 0.01)
+    """Build the Log transform for the S-Log3 curve."""
+    linSideSlope = 1.0 / (0.18 + 0.01)
     linSideOffset = 0.01 / (0.18 + 0.01)
-    logSideSlope  = 261.5 / 1023.
-    logSideOffset = 420. / 1023.
-    linSideBreak  = 0.01125000
-    linearSlope   = ( (171.2102946929 - 95.) / 0.01125000) / 1023.
-    base          = 10.
+    logSideSlope = 261.5 / 1023.0
+    logSideOffset = 420.0 / 1023.0
+    linSideBreak = 0.01125000
+    linearSlope = ((171.2102946929 - 95.0) / 0.01125000) / 1023.0
+    base = 10.0
 
     lct = ocio.LogCameraTransform(
         base=base,
@@ -57,33 +57,32 @@ def _build_slog3_curve():
     )
     return lct
 
+
 def _build_sgamut3_mtx():
-    """ Build the Matrix transform for the S-Gamut3 primaries. """
-    mtx = create_conversion_matrix(
-        "S-Gamut3", "ACES2065-1", "CAT02"
-    )
+    """Build the Matrix transform for the S-Gamut3 primaries."""
+    mtx = create_conversion_matrix("S-Gamut3", "ACES2065-1", "CAT02")
     return mtx
+
 
 def _build_sgamut3_cine_mtx():
-    """ Build the Matrix transform for the S-Gamut3.Cine primaries. """
-    mtx = create_conversion_matrix(
-        "S-Gamut3.Cine", "ACES2065-1", "CAT02"
-    )
+    """Build the Matrix transform for the S-Gamut3.Cine primaries."""
+    mtx = create_conversion_matrix("S-Gamut3.Cine", "ACES2065-1", "CAT02")
     return mtx
+
 
 def _build_venice_sgamut3_mtx():
-    """ Build the Matrix transform for the Venice S-Gamut3 primaries. """
-    mtx = create_conversion_matrix(
-        "Venice S-Gamut3", "ACES2065-1", "CAT02"
-    )
+    """Build the Matrix transform for the Venice S-Gamut3 primaries."""
+    mtx = create_conversion_matrix("Venice S-Gamut3", "ACES2065-1", "CAT02")
     return mtx
 
+
 def _build_venice_sgamut3_cine_mtx():
-    """ Build the Matrix transform for the Venice S-Gamut3.Cine primaries. """
+    """Build the Matrix transform for the Venice S-Gamut3.Cine primaries."""
     mtx = create_conversion_matrix(
         "Venice S-Gamut3.Cine", "ACES2065-1", "CAT02"
     )
     return mtx
+
 
 def generate_sony():
     """Make all the Sony CLFs."""
@@ -91,7 +90,7 @@ def generate_sony():
     if not DEST_DIR.exists():
         DEST_DIR.mkdir()
 
-    # Note: The full transforms generated here were developed in collaboration with Sony.
+    # The full transforms generated here were developed in collaboration with Sony.
 
     # Generate full S-Log3 - S-Gamut3 transform.
 
@@ -102,9 +101,7 @@ def generate_sony():
                 _build_sgamut3_mtx(),
             ]
         ),
-        TF_ID_PREFIX
-        + "Sony:Input:SLog3_SGamut3_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        TF_ID_PREFIX + "Sony:Input:SLog3_SGamut3_to_ACES2065-1" + TF_ID_SUFFIX,
         "Sony S-Log3 S-Gamut3 to ACES2065-1",
         DEST_DIR / ("SLog3-SGamut3_to_ACES2065-1" + CLF_SUFFIX),
         "Sony S-Log3 S-Gamut3",
@@ -229,9 +226,7 @@ def generate_sony():
 
     generate_clf(
         ocio.GroupTransform([_build_slog3_curve()]),
-        TF_ID_PREFIX
-        + "Sony:Input:SLog3_Log_to_Linear"
-        + TF_ID_SUFFIX,
+        TF_ID_PREFIX + "Sony:Input:SLog3_Log_to_Linear" + TF_ID_SUFFIX,
         "S-Log3 Log to Linear Curve",
         DEST_DIR / ("SLog3-Curve" + CLF_SUFFIX),
         "S-Log3 Log (arbitrary primaries)",
