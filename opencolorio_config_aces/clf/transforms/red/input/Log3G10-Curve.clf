@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:RED:Input:Log3G10_Log_to_Linear:1.0" name="RED Log3G10 Log to Linear Curve">
+    <InputDescriptor>RED Log3G10 (SUP v3) Log (arbitrary primaries)</InputDescriptor>
+    <OutputDescriptor>RED Log3G10 (SUP v3) Linear (arbitrary primaries)</OutputDescriptor>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="155.975327" linSideOffset="2.55975327" logSideSlope="0.224282" logSideOffset="0" linSideBreak="-0.01" />
+    </Log>
+</ProcessList>

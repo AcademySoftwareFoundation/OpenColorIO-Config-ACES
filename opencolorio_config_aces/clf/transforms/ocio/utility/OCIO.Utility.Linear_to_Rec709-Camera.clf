@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec709-Camera:1.0" name="Linear to Rec709-Camera">
+    <InputDescriptor>generic linear RGB</InputDescriptor>
+    <OutputDescriptor>generic gamma-corrected RGB</OutputDescriptor>
+    <Exponent inBitDepth="32f" outBitDepth="32f" style="monCurveRev">
+        <ExponentParams exponent="2.22222222222222" offset="0.099" />
+    </Exponent>
+</ProcessList>
