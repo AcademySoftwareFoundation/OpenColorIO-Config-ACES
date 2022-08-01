@@ -10,7 +10,6 @@ transforms for the OpenColorIO project.
 
 import PyOpenColorIO as ocio
 from pathlib import Path
-import math
 
 from opencolorio_config_aces.clf import (
     create_conversion_matrix,
@@ -50,12 +49,12 @@ def generate_panasonic():
     c = 0.241514
     d = 0.598206
 
-    LIN_SLP = 1.
+    LIN_SLP = 1.0
     LIN_OFF = b
     LOG_SLP = c
     LOG_OFF = d
     LIN_SB = cut1
-    BASE = 10.
+    BASE = 10.0
 
     lct = ocio.LogCameraTransform(
         base=BASE,
@@ -67,9 +66,7 @@ def generate_panasonic():
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
-    mtx = create_conversion_matrix(
-        "V-Gamut", "ACES2065-1", "Bradford"
-    )
+    mtx = create_conversion_matrix("V-Gamut", "ACES2065-1", "Bradford")
 
     # Using the CSC ID here because there is a slight discrepancy between the matrix
     # coefficients of the CSC and IDT CTL and the CLF matches the CSC transform.
@@ -115,9 +112,7 @@ def generate_panasonic():
 
     generate_clf(
         ocio.GroupTransform([lct]),
-        TF_ID_PREFIX
-        + "Panasonic:Input:VLog_Log_to_Linear"
-        + TF_ID_SUFFIX,
+        TF_ID_PREFIX + "Panasonic:Input:VLog_Log_to_Linear" + TF_ID_SUFFIX,
         "Panasonic V-Log (SUP v3) Log to Linear Curve",
         DEST_DIR / ("VLog-Curve" + CLF_SUFFIX),
         "Panasonic V-Log (SUP v3) Log (arbitrary primaries)",
