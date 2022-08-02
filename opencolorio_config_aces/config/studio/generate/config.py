@@ -228,6 +228,7 @@ def generate_config_studio(
         _config, data = generate_config_cg(
             describe=describe,
             scheme=scheme,
+            config_mapping_file_path=config_mapping_file_path,
             additional_data=True,
         )
 

@@ -939,7 +939,7 @@ def style_to_view_transform(
     ----------------
     \\**kwargs : dict, optional
         Keywords arguments for the
-        :func:`opencolorio_config_aces.colorspace_factory` definition.
+        :func:`opencolorio_config_aces.view_transform_factory` definition.
 
     Returns
     -------
