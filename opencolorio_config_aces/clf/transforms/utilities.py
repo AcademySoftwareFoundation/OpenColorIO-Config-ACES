@@ -138,6 +138,21 @@ def create_gamma(gamma):
             direction=direction,
         )
 
+    elif gamma == "Rec709":
+        value = np.zeros(4)
+        value[0:3] = 1.0 / 0.45
+        value[3] = 1.0
+
+        offset = np.zeros(4)
+        offset[0:3] = 0.099
+
+        exp_tf = ocio.ExponentWithLinearTransform(
+            gamma=value,
+            offset=offset,
+            negativeStyle=ocio.NEGATIVE_LINEAR,
+            direction=direction,
+        )
+
     else:
         value = np.ones(4)
         value[0:3] = gamma

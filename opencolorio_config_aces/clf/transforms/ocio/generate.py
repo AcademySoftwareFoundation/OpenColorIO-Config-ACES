@@ -26,7 +26,6 @@ __status__ = "Production"
 
 __all__ = [
     "generate_clf_ocio_input",
-    "generate_clf_vendor_input",
     "generate_clf_utility",
 ]
 
@@ -60,28 +59,6 @@ def generate_clf_ocio_input():
     )
 
 
-def generate_clf_vendor_input():
-    """Generate Vendor Input CLF transforms."""
-
-    dest_dir = THIS_DIR / "input"
-    if not dest_dir.exists():
-        dest_dir.mkdir()
-
-    config = ocio.Config.CreateRaw()
-
-    generate_clf(
-        config.getProcessor(
-            ocio.BuiltinTransform(style="RED_LOG3G10-RWG_to_ACES2065-1")
-        ).createGroupTransform(),
-        TF_ID_PREFIX + "RED:Input:Log3G10_RWG_to_ACES2065-1" + TF_ID_SUFFIX,
-        "RED Log3G10 REDWideGamutRGB to ACES2065-1",
-        dest_dir / ("RED.Log3G10_RWG_to_ACES2065-1" + CLF_SUFFIX),
-        "RED Log3G10 REDWideGamutRGB",
-        "ACES2065-1",
-        "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_RWG.a1.v1",
-    )
-
-
 def generate_clf_utility():
     """Generate OCIO Utility CLF transforms."""
 
@@ -105,6 +82,28 @@ def generate_clf_utility():
         dest_dir / ("OCIO.Utility.Linear_to_sRGB" + CLF_SUFFIX),
         "generic linear RGB",
         "generic gamma-corrected RGB",
+    )
+
+    generate_clf(
+        ocio.GroupTransform(transforms=[create_gamma("Rec709")]),
+        TF_ID_PREFIX + "OCIO:Utility:Linear_to_Rec709-Camera" + TF_ID_SUFFIX,
+        "Linear to Rec709-Camera",
+        dest_dir / ("OCIO.Utility.Linear_to_Rec709-Camera" + CLF_SUFFIX),
+        "generic linear RGB",
+        "generic gamma-corrected RGB",
+    )
+
+    generate_clf(
+        ocio.GroupTransform(
+            transforms=[
+                ocio.BuiltinTransform(style="CURVE - LINEAR_to_ST-2084")
+            ]
+        ),
+        TF_ID_PREFIX + "OCIO:Utility:Linear_to_ST2084" + TF_ID_SUFFIX,
+        "Linear to ST2084",
+        dest_dir / ("OCIO.Utility.Linear_to_ST2084" + CLF_SUFFIX),
+        "generic linear RGB",
+        "generic ST2084 (PQ) encoded RGB",
     )
 
     generate_clf(
@@ -187,6 +186,20 @@ def generate_clf_utility():
     generate_clf(
         ocio.GroupTransform(
             transforms=[
+                create_conversion_matrix("ACES2065-1", "ITU-R BT.709"),
+                create_gamma("Rec709"),
+            ]
+        ),
+        TF_ID_PREFIX + "OCIO:Utility:AP0_to_Rec709-Camera" + TF_ID_SUFFIX,
+        "AP0 to Rec.709 - Camera",
+        dest_dir / ("OCIO.Utility.AP0_to_Rec709-Camera" + CLF_SUFFIX),
+        "ACES2065-1",
+        "Rec.709 camera OETF Rec.709 primaries, D65 white point",
+    )
+
+    generate_clf(
+        ocio.GroupTransform(
+            transforms=[
                 create_conversion_matrix("ACES2065-1", "ACEScg"),
                 create_gamma(2.2),
             ]
@@ -201,5 +214,4 @@ def generate_clf_utility():
 
 if __name__ == "__main__":
     generate_clf_ocio_input()
-    generate_clf_vendor_input()
     generate_clf_utility()
