@@ -10,6 +10,10 @@ Defines various utility functions for generating *Common LUT Format*
 
 import PyOpenColorIO as ocio
 
+from opencolorio_config_aces.clf.discover.classify import (
+    SEPARATOR_ID_CLF,
+    URN_CLF,
+)
 from opencolorio_config_aces.utilities import required
 
 __author__ = "OpenColorIO Contributors"
@@ -23,7 +27,8 @@ __all__ = [
     "create_matrix",
     "create_conversion_matrix",
     "create_gamma",
-    "generate_clf",
+    "generate_clf_transform",
+    "format_clf_transform_id",
 ]
 
 
@@ -166,7 +171,7 @@ def create_gamma(gamma):
     return exp_tf
 
 
-def generate_clf(
+def generate_clf_transform(
     group_tf, tf_id, tf_name, filename, input_desc, output_desc, aces_id=None
 ):
     """
@@ -188,6 +193,11 @@ def generate_clf(
         CLF output descriptor.
     aces_id : str
         ACES TransformID (default is None).
+
+    Returns
+    -------
+    ocio.GroupTransform
+        Updated group transform.
     """
 
     metadata = group_tf.getFormatMetadata()
@@ -205,3 +215,30 @@ def generate_clf(
         config=ocio.Config.CreateRaw(),
         fileName=str(filename),
     )
+
+    return group_tf
+
+
+def format_clf_transform_id(transform_attributes, version):
+    """
+    Format given *CLF* transform attributes to produce a *CLFtransformID*.
+
+    Parameters
+    ----------
+    transform_attributes : unicode
+        *CLF* transform attributes.
+    version : unicode
+        *CLF* transform version.
+
+    Returns
+    -------
+    unicode
+        *CLFtransformID*.
+
+    Examples
+    --------
+    >>> format_clf_transform_id("OCIO:Input:AP0_to_Rec709-sRGB", "1.0")
+    'urn:aswf:ocio:transformId:1.0:OCIO:Input:AP0_to_Rec709-sRGB:1.0'
+    """
+
+    return SEPARATOR_ID_CLF.join([URN_CLF, transform_attributes, version])

@@ -5,15 +5,21 @@
 =====================================
 
 Defines procedures for generating Panasonic *Common LUT Format* (CLF)
-transforms for the OpenColorIO project.
+transforms for the OpenColorIO project:
+
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_panasonic`
 """
 
 import PyOpenColorIO as ocio
 from pathlib import Path
 
-from opencolorio_config_aces.clf import (
+from opencolorio_config_aces.clf.discover.classify import (
+    EXTENSION_CLF,
+)
+from opencolorio_config_aces.clf.transforms import (
     create_conversion_matrix,
-    generate_clf,
+    format_clf_transform_id,
+    generate_clf_transform,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -24,25 +30,41 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "generate_panasonic",
+    "VERSION_CLF",
+    "generate_clf_transforms_panasonic",
 ]
 
-DEST_DIR = Path(__file__).parent.resolve() / "input"
+VERSION_CLF = "1.0"
+"""
+*CLF* transforms version.
 
-TF_ID_PREFIX = "urn:aswf:ocio:transformId:1.0:"
-TF_ID_SUFFIX = ":1.0"
-
-CLF_SUFFIX = ".clf"
+VERSION_CLF : unicode
+"""
 
 
-def generate_panasonic():
-    """Make the CLF file for V-Log - V-Gamut plus matrix/curve CLFs."""
+def generate_clf_transforms_panasonic(output_directory):
+    """
+    Make the CLF file for V-Log - V-Gamut plus matrix/curve CLFs.
 
-    # Based on the document "VARICAM_V-Log_V-Gamut.pdf" dated November 28, 2014.
-    # The resulting CLF was reviewed by Panasonic.
+    Returns
+    -------
+    dict
+        Dictionary of *CLF* transforms and *OpenColorIO* group transform.
 
-    if not DEST_DIR.exists():
-        DEST_DIR.mkdir()
+    References
+    ----------
+    -   Panasonic. (2014). VARICAM V-Log/V-Gamut (pp. 1–7).
+        http://pro-av.panasonic.net/en/varicam/common/pdf/\
+VARICAM_V-Log_V-Gamut.pdf
+
+    Notes
+    -----
+    -   The resulting *CLF* transforms were reviewed by *Panasonic*.
+    """
+
+    output_directory.mkdir(exist_ok=True)
+
+    clf_transforms = {}
 
     cut1 = 0.01
     b = 0.00873
@@ -77,18 +99,19 @@ def generate_panasonic():
 
     # Generate full transform.
 
-    generate_clf(
+    filename = output_directory / f"VLog-VGamut_to_ACES2065-1{EXTENSION_CLF}"
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform(
             transforms=[
                 lct,
                 mtx,
             ]
         ),
-        TF_ID_PREFIX
-        + "Panasonic:Input:VLog-VGamut_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "Panasonic:Input:VLog-VGamut_to_ACES2065-1", VERSION_CLF
+        ),
         "Panasonic V-Log - V-Gamut (SUP v3) to ACES2065-1",
-        DEST_DIR / ("VLog-VGamut_to_ACES2065-1" + CLF_SUFFIX),
+        filename,
         "Panasonic V-Log - V-Gamut (SUP v3)",
         "ACES2065-1",
         aces_transform_id,
@@ -96,13 +119,14 @@ def generate_panasonic():
 
     # Generate transform for primaries only.
 
-    generate_clf(
+    filename = output_directory / f"Linear-VGamut_to_ACES2065-1{EXTENSION_CLF}"
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform([mtx]),
-        TF_ID_PREFIX
-        + "Panasonic:Input:Linear-VGamut_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "Panasonic:Input:Linear-VGamut_to_ACES2065-1", VERSION_CLF
+        ),
         "Linear Panasonic V-Gamut (SUP v3) to ACES2065-1",
-        DEST_DIR / ("Linear-VGamut_to_ACES2065-1" + CLF_SUFFIX),
+        filename,
         "Linear Panasonic V-Gamut (SUP v3)",
         "ACES2065-1",
         None,
@@ -110,20 +134,23 @@ def generate_panasonic():
 
     # Generate named transform for log curve only.
 
-    generate_clf(
+    filename = output_directory / f"VLog-Curve{EXTENSION_CLF}"
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform([lct]),
-        TF_ID_PREFIX + "Panasonic:Input:VLog_Log_to_Linear" + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "Panasonic:Input:VLog_Log_to_Linear", VERSION_CLF
+        ),
         "Panasonic V-Log (SUP v3) Log to Linear Curve",
-        DEST_DIR / ("VLog-Curve" + CLF_SUFFIX),
+        filename,
         "Panasonic V-Log (SUP v3) Log (arbitrary primaries)",
         "Panasonic V-Log (SUP v3) Linear (arbitrary primaries)",
         None,
     )
 
-    return 0
+    return clf_transforms
 
 
 if __name__ == "__main__":
-    import sys
+    output_directory = Path(__file__).parent.resolve() / "input"
 
-    sys.exit(generate_panasonic())
+    generate_clf_transforms_panasonic(output_directory)

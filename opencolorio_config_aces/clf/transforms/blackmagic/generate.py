@@ -5,16 +5,23 @@
 =======================================
 
 Defines procedures for generating Blackmagic *Common LUT Format* (CLF)
-transforms for the OpenColorIO project.
+transforms for the OpenColorIO project:
+
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_bmdfilm`
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_davinci`
 """
 
 import PyOpenColorIO as ocio
 from pathlib import Path
 import math
 
-from opencolorio_config_aces.clf import (
+from opencolorio_config_aces.clf.discover.classify import (
+    EXTENSION_CLF,
+)
+from opencolorio_config_aces.clf.transforms import (
     create_conversion_matrix,
-    generate_clf,
+    format_clf_transform_id,
+    generate_clf_transform,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -25,22 +32,40 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "main",
+    "VERSION_CLF",
+    "generate_clf_transforms_bmdfilm",
+    "generate_clf_transforms_davinci",
 ]
 
-DEST_DIR = Path(__file__).parent.resolve() / "input"
+VERSION_CLF = "1.0"
+"""
+*CLF* transforms version.
 
-TF_ID_PREFIX = "urn:aswf:ocio:transformId:1.0:"
-TF_ID_SUFFIX = ":1.0"
-
-CLF_SUFFIX = ".clf"
+VERSION_CLF : unicode
+"""
 
 
-def _generate_clf_bmdfilm():
-    """Make the CLF file for BMDFilm_WideGamut_Gen5 plus matrix/curve CLFs."""
+def generate_clf_transforms_bmdfilm(output_directory):
+    """
+    Make the CLF file for BMDFilm_WideGamut_Gen5 plus matrix/curve CLFs.
 
-    # Based on the document "Blackmagic Generation 5 Color Technical Reference.pdf"
-    # dated May 2021.  The resulting CLF was reviewed by Blackmagic.
+    Returns
+    -------
+    dict
+        Dictionary of *CLF* transforms and *OpenColorIO* group transform.
+
+    References
+    ----------
+    -   Blackmagic Design. (2021). Blackmagic Generation 5 Color Science.
+
+    Notes
+    -----
+    -   The resulting *CLF* transforms were reviewed by *Blackmagic*.
+    """
+
+    output_directory.mkdir(exist_ok=True)
+
+    clf_transforms = {}
 
     cut = 0.005
     a = 0.08692876065491224
@@ -90,57 +115,75 @@ def _generate_clf_bmdfilm():
 
     # Generate full transform.
 
-    generate_clf(
+    filename = (
+        output_directory
+        / f"BMDFilm-WideGamut-Gen5_to_ACES2065-1{EXTENSION_CLF}"
+    )
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform(
             transforms=[
                 lct,
                 mtx,
             ]
         ),
-        TF_ID_PREFIX
-        + "BlackmagicDesign:Input:BMDFilm_WideGamut_Gen5_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "BlackmagicDesign:Input:BMDFilm_WideGamut_Gen5_to_ACES2065-1",
+            VERSION_CLF,
+        ),
         "Blackmagic Film Wide Gamut (Gen 5) to ACES2065-1",
-        DEST_DIR / ("BMDFilm-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
+        filename,
         "Blackmagic Film Wide Gamut (Gen 5)",
         "ACES2065-1",
         aces_transform_id,
     )
 
     # Generate transform for primaries only.
-
-    generate_clf(
+    filename = (
+        output_directory
+        / f"Linear-BMD-WideGamut-Gen5_to_ACES2065-1{EXTENSION_CLF}"
+    )
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform([mtx]),
-        TF_ID_PREFIX
-        + "BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1",
+            VERSION_CLF,
+        ),
         "Linear Blackmagic Wide Gamut (Gen 5) to ACES2065-1",
-        DEST_DIR / ("Linear-BMD-WideGamut-Gen5_to_ACES2065-1" + CLF_SUFFIX),
+        filename,
         "Linear Blackmagic Wide Gamut (Gen 5)",
         "ACES2065-1",
         None,
     )
 
     # Generate named transform for log curve only.
-
-    generate_clf(
+    filename = (
+        output_directory / f"BMDFilm-WideGamut-Gen5-Curve{EXTENSION_CLF}"
+    )
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform([lct]),
-        TF_ID_PREFIX
-        + "BlackmagicDesign:Input:BMDFilm_Gen5_Log_to_Linear"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "BlackmagicDesign:Input:BMDFilm_Gen5_Log_to_Linear",
+            VERSION_CLF,
+        ),
         "Blackmagic Film (Gen 5) Log to Linear Curve",
-        DEST_DIR / ("BMDFilm-WideGamut-Gen5-Curve" + CLF_SUFFIX),
+        filename,
         "Blackmagic Film (Gen 5) Log",
         "Blackmagic Film (Gen 5) Linear",
         None,
     )
 
+    return clf_transforms
 
-def _generate_clf_davinci():
+
+def generate_clf_transforms_davinci(output_directory):
     """Make the CLF file for DaVinci Intermediate Wide Gamut plus matrix/curve CLFs."""
 
     # Based on the document "DaVinci_Resolve_17_Wide_Gamut_Intermediate.pdf"
     # dated 2021-07-31.  The resulting CLF was reviewed by Blackmagic.
+
+    output_directory.mkdir(exist_ok=True)
+
+    clf_transforms = {}
 
     cut = 0.00262409
     a = 0.0075
@@ -182,19 +225,23 @@ def _generate_clf_davinci():
 
     # Generate full transform.
 
-    generate_clf(
+    filename = (
+        output_directory
+        / f"DaVinci-Intermediate-WideGamut_to_ACES2065-1{EXTENSION_CLF}"
+    )
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform(
             transforms=[
                 lct,
                 mtx,
             ]
         ),
-        TF_ID_PREFIX
-        + "BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1",
+            VERSION_CLF,
+        ),
         "DaVinci Intermediate Wide Gamut to ACES2065-1",
-        DEST_DIR
-        / ("DaVinci-Intermediate-WideGamut_to_ACES2065-1" + CLF_SUFFIX),
+        filename,
         "DaVinci Intermediate Wide Gamut",
         "ACES2065-1",
         aces_transform_id,
@@ -202,13 +249,18 @@ def _generate_clf_davinci():
 
     # Generate transform for primaries only.
 
-    generate_clf(
+    filename = (
+        output_directory
+        / f"Linear-DaVinci-WideGamut_to_ACES2065-1{EXTENSION_CLF}"
+    )
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform([mtx]),
-        TF_ID_PREFIX
-        + "BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1",
+            VERSION_CLF,
+        ),
         "Linear DaVinci Wide Gamut to ACES2065-1",
-        DEST_DIR / ("Linear-DaVinci-WideGamut_to_ACES2065-1" + CLF_SUFFIX),
+        filename,
         "Linear DaVinci Wide Gamut",
         "ACES2065-1",
         None,
@@ -216,32 +268,25 @@ def _generate_clf_davinci():
 
     # Generate named transform for log curve only.
 
-    generate_clf(
+    filename = output_directory / f"DaVinci-Intermediate-Curve{EXTENSION_CLF}"
+    clf_transforms[filename] = generate_clf_transform(
         ocio.GroupTransform([lct]),
-        TF_ID_PREFIX
-        + "BlackmagicDesign:Input:DaVinci_Intermediate_Log_to_Linear"
-        + TF_ID_SUFFIX,
+        format_clf_transform_id(
+            "BlackmagicDesign:Input:DaVinci_Intermediate_Log_to_Linear",
+            VERSION_CLF,
+        ),
         "DaVinci Intermediate Log to Linear Curve",
-        DEST_DIR / ("DaVinci-Intermediate-Curve" + CLF_SUFFIX),
+        filename,
         "DaVinci Intermediate Log",
         "DaVinci Intermediate Linear",
         None,
     )
 
-
-def main():
-    """Make all the Blackmagic CLFs."""
-
-    if not DEST_DIR.exists():
-        DEST_DIR.mkdir()
-
-    _generate_clf_bmdfilm()
-    _generate_clf_davinci()
-
-    return 0
+    return clf_transforms
 
 
 if __name__ == "__main__":
-    import sys
+    output_directory = Path(__file__).parent.resolve() / "input"
 
-    sys.exit(main())
+    generate_clf_transforms_bmdfilm(output_directory)
+    generate_clf_transforms_davinci(output_directory)

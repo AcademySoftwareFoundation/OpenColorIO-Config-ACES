@@ -45,7 +45,7 @@ __all__ = [
     "tests",
     "preflight",
     "docs",
-    "build_clfs",
+    "build_clf_transforms",
     "build_aces_conversion_graph",
     "build_config_common_tests",
     "build_config_reference_analytical",
@@ -59,7 +59,7 @@ __all__ = [
     "docker_remove",
     "run_in_container",
     "docker_run_docs",
-    "docker_run_build_clfs",
+    "docker_run_build_clf_transforms",
     "docker_run_build_aces_conversion_graph",
     "docker_run_build_config_common_tests",
     "docker_run_build_config_reference_analytical",
@@ -234,7 +234,7 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
 
 
 @task
-def build_clfs(ctx: Context):
+def build_clf_transforms(ctx: Context):
     """
     Build the *CLF* transforms.
 
@@ -245,16 +245,9 @@ def build_clfs(ctx: Context):
     """
 
     message_box('Building the "CLF" transform files...')
-    with ctx.cd("opencolorio_config_aces/clf/transforms/ocio"):
-        ctx.run("python generate.py")
-    with ctx.cd("opencolorio_config_aces/clf/transforms/blackmagic"):
-        ctx.run("python generate.py")
-    with ctx.cd("opencolorio_config_aces/clf/transforms/panasonic"):
-        ctx.run("python generate.py")
-    with ctx.cd("opencolorio_config_aces/clf/transforms/red"):
-        ctx.run("python generate.py")
-    with ctx.cd("opencolorio_config_aces/clf/transforms/sony"):
-        ctx.run("python generate.py")
+    for family in ["ocio", "blackmagic", "panasonic", "red", "sony"]:
+        with ctx.cd(f"opencolorio_config_aces/clf/transforms/{family}"):
+            ctx.run("python generate.py")
 
 
 @task
@@ -567,7 +560,7 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
 
 
 @task
-def docker_run_build_clfs(ctx: Context):
+def docker_run_build_clf_transforms(ctx: Context):
     """
     Build the *CLF* transforms in the *docker* container.
 

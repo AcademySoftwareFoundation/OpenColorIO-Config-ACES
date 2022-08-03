@@ -67,7 +67,7 @@ from .clf import (
     filter_clf_transforms,
     print_clf_taxonomy,
 )
-from .clf import generate_clf
+from .clf import generate_clf_transform
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -123,7 +123,7 @@ __all__ += [
     "filter_clf_transforms",
     "print_clf_taxonomy",
 ]
-__all__ += ["generate_clf"]
+__all__ += ["generate_clf_transform"]
 
 __application_name__ = "OpenColorIO Configuration for ACES"
 
