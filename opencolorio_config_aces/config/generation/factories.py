@@ -189,16 +189,22 @@ def colorspace_factory(
 
     if aliases is not None:
         if isinstance(aliases, str):
-            aliases = [aliases]
+            aliases = re.split("[,;]+", aliases)
 
         for alias in aliases:
+            if not alias:
+                continue
+
             colorspace.addAlias(alias)
 
     if categories is not None:
         if isinstance(categories, str):
-            categories = re.split("[,;\\s]+", categories)
+            categories = re.split("[,;]+", categories)
 
         for category in categories:
+            if not category:
+                continue
+
             colorspace.addCategory(category)
 
     if description is not None:
@@ -305,7 +311,7 @@ def named_transform_factory(
 
     if categories is not None:
         if isinstance(categories, str):
-            categories = re.split("[,;\\s]+", categories)
+            categories = re.split("[,;]+", categories)
 
         for category in categories:
             named_transform.addCategory(category)

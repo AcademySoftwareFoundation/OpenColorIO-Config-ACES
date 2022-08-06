@@ -233,6 +233,7 @@ def node_to_colorspace(
         scheme="Legacy",
         to_reference=node_to_builtin_transform(graph, node),
         from_reference=node_to_builtin_transform(graph, node, "Reverse"),
+        aliases="",
     )
 
     return colorspace

@@ -39,6 +39,7 @@ from opencolorio_config_aces.config.reference import (
 from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     SEPARATOR_COLORSPACE_FAMILY_REFERENCE,
+    beautify_alias,
     beautify_colorspace_name,
     format_optional_prefix,
     format_swapped_affix,
@@ -222,6 +223,12 @@ def clf_transform_to_colorspace(
     }
     signature.update(kwargs)
 
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
+
     if signature_only:
         return signature
     else:
@@ -276,6 +283,12 @@ def clf_transform_to_named_transform(
         },
     }
     signature.update(kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
 
     if signature_only:
         return signature
@@ -352,6 +365,12 @@ def style_to_colorspace(
         }
     )
     signature.update(**kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
 
     if signature_only:
         signature["to_reference"] = {
@@ -433,6 +452,12 @@ def style_to_named_transform(
         }
     )
     signature.update(**kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
 
     if signature_only:
         signature["forward_transform"] = {
@@ -662,9 +687,9 @@ def generate_config_cg(
     def transform_aliases(transform_data):
         """Return the aliases from given transform."""
 
-        return [transform_data["legacy_name"]] + transform_data.get(
-            "aliases", ""
-        ).split(",")
+        return [transform_data["legacy_name"]] + re.split(
+            "[,;]+", transform_data.get("aliases", "")
+        )
 
     def clf_transform_from_id(clf_transform_id):
         """Filter the "CLFTransform" instances matching given "CLFtransformID"."""

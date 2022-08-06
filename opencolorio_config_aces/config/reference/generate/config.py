@@ -38,6 +38,7 @@ from opencolorio_config_aces.utilities import (
     git_describe,
     multi_replace,
     regularise_version,
+    slugify,
     validate_method,
 )
 
@@ -62,6 +63,7 @@ __all__ = [
     "PATTERNS_TRANSFORM_FAMILY_REFERENCE",
     "PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE",
     "PATTERNS_DISPLAY_NAME_REFERENCE",
+    "PATTERNS_ALIAS_REFERENCE",
     "ColorspaceDescriptionStyle",
     "version_config_mapping_file",
     "beautify_name",
@@ -277,6 +279,23 @@ Notes
 - The substitutions are evaluated in order.
 
 PATTERNS_DISPLAY_NAME_REFERENCE : dict
+"""
+
+PATTERNS_ALIAS_REFERENCE = {
+    "Curve": "crv",
+    "Gamma ": "g",
+    "Texture": "",
+    "-Gamut": "gamut",
+    "-Log": "log",
+}
+"""
+*OpenColorIO* alias substitution patterns.
+
+Notes
+-----
+- The substitutions are evaluated in order.
+
+PATTERNS_ALIAS_REFERENCE : dict
 """
 
 
@@ -506,6 +525,38 @@ def beautify_display_name(name):
     name = beautify_name(basename, PATTERNS_DISPLAY_NAME_REFERENCE)
 
     return name
+
+
+def beautify_alias(name):
+    """
+    Beautify given *OpenColorIO* alias by applying in succession the relevant
+    patterns.
+
+    Parameters
+    ----------
+    name : unicode
+        *OpenColorIO* alias to beautify.
+
+    Returns
+    -------
+    unicode
+        Beautified *OpenColorIO* alias.
+
+    Examples
+    --------
+    >>> beautify_alias('Rec.1886 / Rec.709 Video - Display')
+    'rec1886_rec709_video_display'
+    >>> beautify_alias('Rec.2100-PQ - Display')
+    'rec2100_pq_display'
+    >>> beautify_alias('V-Log - Curve')
+    'vlog_crv'
+    >>> beautify_alias('Gamma 1.8 Rec.709 - Texture')
+    'g18_rec709'
+    """
+
+    name = beautify_name(name, PATTERNS_ALIAS_REFERENCE)
+
+    return slugify(name).replace("-", "_")
 
 
 def format_optional_prefix(name, prefix, scheme="Modern 1"):
@@ -848,6 +899,13 @@ def ctl_transform_to_colorspace(
     }
     signature.update(kwargs)
 
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])]
+            + re.split("[,;]+", signature["aliases"])
+        )
+    )
+
     if signature_only:
         return signature
     else:
@@ -1116,6 +1174,13 @@ def style_to_display_colorspace(
         "reference_space": "REFERENCE_SPACE_DISPLAY",
     }
     signature.update(kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])]
+            + re.split("[,;]+", signature["aliases"])
+        )
+    )
 
     if signature_only:
         signature["from_reference"] = {
@@ -1404,14 +1469,20 @@ def generate_config_aces(
         "family": "ACES",
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
-        "aliases": ["lin_ap0"],
     }
+    scene_reference_colorspace["aliases"] = [
+        beautify_alias(scene_reference_colorspace["name"]),
+        "lin_ap0",
+    ]
 
     display_reference_colorspace = {
         "name": "CIE-XYZ-D65",
         "description": 'The "CIE XYZ (D65)" display connection colorspace.',
         "reference_space": "REFERENCE_SPACE_DISPLAY",
     }
+    display_reference_colorspace["aliases"] = [
+        beautify_alias(display_reference_colorspace["name"])
+    ]
 
     raw_colorspace = {
         "name": format_optional_prefix("Raw", "Utility", scheme),
@@ -1420,6 +1491,7 @@ def generate_config_aces(
         "is_data": True,
         "categories": ["file-io"],
     }
+    raw_colorspace["aliases"] = [beautify_alias(raw_colorspace["name"])]
 
     colorspaces += [
         scene_reference_colorspace,
@@ -1460,6 +1532,7 @@ def generate_config_aces(
                     scheme=scheme,
                     encoding=transform_data.get("encoding"),
                     categories=transform_data.get("categories"),
+                    aliases=transform_data.get("aliases", ""),
                 )
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
@@ -1517,7 +1590,7 @@ def generate_config_aces(
                         },
                         encoding=transform_data.get("encoding"),
                         categories=transform_data.get("categories"),
-                        aliases=transform_data.get("aliases", "").split(","),
+                        aliases=transform_data.get("aliases", ""),
                     )
                     colorspace["transforms_data"] = [transform_data]
                     colorspaces.append(colorspace)
