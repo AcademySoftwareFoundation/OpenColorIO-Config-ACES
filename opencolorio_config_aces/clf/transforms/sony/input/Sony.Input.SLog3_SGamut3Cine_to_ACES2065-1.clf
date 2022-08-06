@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_SGamut3Cine_to_ACES2065-1:1.0" name="Sony S-Log3 S-Gamut3.Cine to ACES2065-1">
+    <InputDescriptor>Sony S-Log3 S-Gamut3.Cine</InputDescriptor>
+    <OutputDescriptor>ACES2065-1</OutputDescriptor>
+    <Info>
+        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3Cine.a1.v1</ACEStransformID>
+    </Info>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="5.26315789473684" linSideOffset="0.0526315789473684" logSideSlope="0.255620723362659" logSideOffset="0.410557184750733" linSideBreak="0.01125" linearSlope="6.62194371177582" />
+    </Log>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+  0.638788667185978   0.272351433711262  0.0888598991027595
+-0.00391590602528224      1.0880732308974  -0.0841573248721177
+ -0.0299072021239151  -0.0264325799101947     1.05633978203411
+        </Array>
+    </Matrix>
+</ProcessList>

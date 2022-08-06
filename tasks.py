@@ -245,7 +245,7 @@ def build_clf_transforms(ctx: Context):
     """
 
     message_box('Building the "CLF" transform files...')
-    for family in ["ocio", "blackmagic", "panasonic", "red", "sony"]:
+    for family in ["blackmagic", "itu", "ocio", "panasonic", "red", "sony"]:
         with ctx.cd(f"opencolorio_config_aces/clf/transforms/{family}"):
             ctx.run("python generate.py")
 

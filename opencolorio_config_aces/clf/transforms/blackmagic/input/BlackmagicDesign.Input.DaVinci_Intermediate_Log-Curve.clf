@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_Log-Curve_to_Linear:1.0" name="DaVinci Intermediate Log to Linear Curve">
+    <InputDescriptor>DaVinci Intermediate Log</InputDescriptor>
+    <OutputDescriptor>DaVinci Intermediate Linear</OutputDescriptor>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="2" linSideSlope="1" linSideOffset="0.0075" logSideSlope="0.07329248" logSideOffset="0.51304736" linSideBreak="0.00262409" linearSlope="10.44426855" />
+    </Log>
+</ProcessList>

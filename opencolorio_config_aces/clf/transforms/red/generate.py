@@ -5,7 +5,7 @@
 ===============================
 
 Defines procedures for generating RED *Common LUT Format* (CLF)
-transforms for the OpenColorIO project:
+transforms:
 
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_red`
 """
@@ -13,14 +13,13 @@ transforms for the OpenColorIO project:
 import PyOpenColorIO as ocio
 from pathlib import Path
 
-from opencolorio_config_aces.clf.discover.classify import (
-    EXTENSION_CLF,
-)
 from opencolorio_config_aces.clf.transforms import (
-    create_conversion_matrix,
+    clf_basename,
     format_clf_transform_id,
     generate_clf_transform,
+    matrix_RGB_to_RGB_transform,
 )
+from opencolorio_config_aces.config import transform_factory
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -30,15 +29,25 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "VERSION_CLF",
+    "FAMILY",
+    "GENUS",
+    "VERSION",
     "generate_clf_transforms_red",
 ]
 
-VERSION_CLF = "1.0"
+FAMILY = "RED"
+"""
+*CLF* transforms family.
+"""
+
+GENUS = "Input"
+"""
+*CLF* transforms genus.
+"""
+
+VERSION = "1.0"
 """
 *CLF* transforms version.
-
-VERSION_CLF : unicode
 """
 
 
@@ -49,7 +58,8 @@ def generate_clf_transforms_red(output_directory):
     Returns
     -------
     dict
-        Dictionary of *CLF* transforms and *OpenColorIO* group transform.
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
 
     References
     ----------
@@ -62,7 +72,7 @@ white-paper-on-redwidegamutrgb-and-log3g10
     -   The resulting *CLF* transforms were reviewed by *RED*.
     """
 
-    output_directory.mkdir(exist_ok=True)
+    output_directory.mkdir(parents=True, exist_ok=True)
 
     clf_transforms = {}
 
@@ -73,7 +83,9 @@ white-paper-on-redwidegamutrgb-and-log3g10
     linSideBreak = -0.01
     base = 10.0
 
-    lct = ocio.LogCameraTransform(
+    lct = transform_factory(
+        transform_type="LogCameraTransform",
+        transform_factory="Constructor",
         base=base,
         linSideBreak=[linSideBreak] * 3,
         logSideSlope=[logSideSlope] * 3,
@@ -83,65 +95,73 @@ white-paper-on-redwidegamutrgb-and-log3g10
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
-    mtx = create_conversion_matrix("REDWideGamutRGB", "ACES2065-1", "Bradford")
+    mtx = matrix_RGB_to_RGB_transform(
+        "REDWideGamutRGB", "ACES2065-1", "Bradford"
+    )
+
+    aces_transform_id = (
+        "urn:ampas:aces:transformId:v1.5:"
+        "IDT.RED.Log3G10_REDWideGamutRGB.a1.v1"
+    )
 
     # Generate full transform.
 
-    filename = output_directory / f"Log3G10-RWG_to_ACES2065-1{EXTENSION_CLF}"
+    name = "Log3G10_REDWideGamutRGB_to_ACES2065-1"
+    input_descriptor = "RED Log3G10 REDWideGamutRGB"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                lct,
-                mtx,
-            ]
-        ),
-        format_clf_transform_id(
-            "RED:Input:Log3G10-RWG_to_ACES2065-1", VERSION_CLF
-        ),
-        "RED Log3G10 REDWideGamutRGB to ACES2065-1",
         filename,
-        "RED Log3G10 REDWideGamutRGB",
-        "ACES2065-1",
-        "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_RWG.a1.v1",
+        [lct, mtx],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
+        aces_transform_id,
     )
 
     # Generate transform for primaries only.
 
-    filename = (
-        output_directory
-        / f"Linear-REDWideGamutRGB_to_ACES2065-1{EXTENSION_CLF}"
-    )
+    name = "Linear_REDWideGamutRGB_to_ACES2065-1"
+    input_descriptor = "Linear REDWideGamutRGB"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform([mtx]),
-        format_clf_transform_id(
-            "RED:Input:Linear-REDWideGamutRGB_to_ACES2065-1", VERSION_CLF
-        ),
-        "Linear REDWideGamutRGB to ACES2065-1",
         filename,
-        "Linear REDWideGamutRGB",
-        "ACES2065-1",
-        None,
+        [mtx],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
     )
 
-    # Generate named transform for log curve only.
+    # Generate `NamedTransform` for log curve only.
 
-    filename = output_directory / f"Log3G10-Curve{EXTENSION_CLF}"
+    name = "Log3G10-Curve_to_Linear"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    input_descriptor = "RED Log3G10 (SUP v3) Log (arbitrary primaries)"
+    output_descriptor = "RED Log3G10 (SUP v3) Linear (arbitrary primaries)"
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform([lct]),
-        format_clf_transform_id(
-            "RED:Input:Log3G10_Log_to_Linear", VERSION_CLF
-        ),
-        "RED Log3G10 Log to Linear Curve",
         filename,
-        "RED Log3G10 (SUP v3) Log (arbitrary primaries)",
-        "RED Log3G10 (SUP v3) Linear (arbitrary primaries)",
-        None,
+        [lct],
+        clf_transform_id,
+        f'{input_descriptor.replace(" (arbitrary primaries)", "")} to Linear Curve',
+        input_descriptor,
+        output_descriptor,
     )
 
     return clf_transforms
 
 
 if __name__ == "__main__":
+    import logging
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
     output_directory = Path(__file__).parent.resolve() / "input"
 
     generate_clf_transforms_red(output_directory)

@@ -85,14 +85,14 @@ class ConfigData:
     search_path : list, optional
         Config search path.
     roles : dict
-        Config roles, a dict of role and colorspace name.
+        Config roles, a dict of role and `Colorspace` name.
     colorspaces : array_like
         Config colorspaces, an iterable of
         :attr:`PyOpenColorIO.ColorSpace` class instances or mappings to create
         them with :func:`opencolorio_config_aces.colorspace_factory`
         definition.
     named_transforms : array_like
-        Config named transforms, an iterable of
+        Config `NamedTransform`s, an iterable of
         :attr:`PyOpenColorIO.NamedTransfom` class instances or mappings to
         create them with
         :func:`opencolorio_config_aces.named_transform_factory` definition.
@@ -106,11 +106,11 @@ class ConfigData:
         instances or mappings to create them with
         :func:`opencolorio_config_aces.look_factory` definition.
     shared_views : array_like, optional
-        Config shared views, an iterable of dicts of view, view transform,
-        colorspace and rule names, iterable of looks and description.
+        Config shared views, an iterable of dicts of view, `ViewTransform`,
+        `Colorspace` and rule names, iterable of looks and description.
     views : array_like, optional
         Config views, an iterable of dicts of display, view
-        and colorspace names.
+        and `Colorspace` names.
     active_displays : array_like, optional
         Config active displays, an iterable of display names.
     active_views : array_like, optional
@@ -120,7 +120,7 @@ class ConfigData:
     viewing_rules : array_like, optional
         Config viewing rules, a dict of viewing rules.
     inactive_colorspaces : array_like, optional
-        Config inactive colorspaces an iterable of colorspace names.
+        Config inactive colorspaces, an iterable of `Colorspace` names.
     default_view_transform : unicode, optional
         Name of the default view transform.
 

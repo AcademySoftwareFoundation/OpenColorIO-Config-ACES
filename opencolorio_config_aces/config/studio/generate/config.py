@@ -250,30 +250,29 @@ def generate_config_studio(
 
 
 if __name__ == "__main__":
-    import os
     import opencolorio_config_aces
     from opencolorio_config_aces import serialize_config_data
+    from pathlib import Path
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0],
-        "..",
-        "build",
-        "config",
-        "aces",
-        "studio",
-    )
+    build_directory = (
+        Path(opencolorio_config_aces.__path__[0])
+        / ".."
+        / "build"
+        / "config"
+        / "aces"
+        / "studio"
+    ).resolve()
 
     logging.info(f'Using "{build_directory}" build directory...')
 
-    if not os.path.exists(build_directory):
-        os.makedirs(build_directory)
+    build_directory.mkdir(parents=True, exist_ok=True)
 
     config_basename = config_basename_studio()
     config, data = generate_config_studio(
-        config_name=os.path.join(build_directory, config_basename),
+        config_name=build_directory / config_basename,
         additional_data=True,
     )
 
@@ -281,10 +280,7 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data,
-            os.path.join(
-                build_directory, config_basename.replace("ocio", "json")
-            ),
+            data, build_directory / config_basename.replace("ocio", "json")
         )
     except TypeError as error:
         logging.critical(error)

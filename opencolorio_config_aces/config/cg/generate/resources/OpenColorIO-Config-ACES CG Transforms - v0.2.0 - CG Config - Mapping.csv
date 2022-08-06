@@ -1,20 +1,20 @@
-Ordering,Modern Name,Legacy Name,ACEStransformID,CLFtransformID,Interface,BuiltinTransform Style,Aliases,Encoding,Categories
-100,ACEScc,ACES - ACEScc,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScc_to_ACES.a1.0.3,,ColorSpace,,"acescc,acescc_ap1,Role - color_timing,role_color_timing,Role - texture_paint,role_texture_paint",,
-100,ACEScct,ACES - ACEScct,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScct_to_ACES.a1.0.3,,ColorSpace,,"acescct,acescct_ap1",,
-100,ACEScg,ACES - ACEScg,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,ColorSpace,,"acescg,lin_ap1,Role - scene_linear,role_scene_linear,Role - compositing_linear,role_compositing_linear,Role - rendering,role_rendering",,
-220,sRGB - Texture,Input - Generic - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Input:AP0_to_Rec709-sRGB:1.0,ColorSpace,,"Utility - sRGB - Texture,srgb_texture,Role - matte_paint,role_matte_paint",sdr-video,file-io
-300,,Output - P3-D65 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_1000nits_15nits_ST2084.a1.1.0,,ViewTransform,,out_p3d65st20841000nits,,
-300,,Output - P3D65,urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_48nits.a1.1.0,,ViewTransform,,out_p3d65,,
-300,,Output - Rec.2020 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_ST2084.a1.1.0,,ViewTransform,,out_rec2020st20841000nits,,
-300,,Output - Rec.709,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_100nits_dim.a1.0.3,,ViewTransform,,out_rec709,,
-300,,Output - sRGB,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,,ViewTransform,,"out_srgb,Role - color_picking,role_color_picking",,
-400,Rec.1886 - Curve,Utility - Curve - Rec.1886,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886:1.0,NamedTransform,,crv_rec1886,sdr-video,file-io
-400,sRGB - Curve,Utility - Curve - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB:1.0,NamedTransform,,crv_srgb,sdr-video,file-io
-410,P3-D65 - Linear,Utility - Linear - P3-D65,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_P3-D65-Linear:1.0,ColorSpace,,lin_p3d65,scene-linear,file-io
-410,Rec.2020 - Linear,Utility - Linear - Rec.2020,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec2020-Linear:1.0,ColorSpace,,lin_rec2020,scene-linear,file-io
-410,Rec.709 - Linear,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0,ColorSpace,,lin_rec709,scene-linear,"file-io,working-space"
-410,sRGB - Linear,Utility - Linear - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Linear:1.0,ColorSpace,,lin_srgb,scene-linear,"file-io,working-space"
-420,Gamma 1.8 - Rec.709 - Texture,Utility - Gamma 1.8 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma1.8:1.0,ColorSpace,,g18_rec709,sdr-video,file-io
-420,Gamma 2.2 - AP1 - Texture,Utility - Gamma 2.2 - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_AP1-Gamma2.2:1.0,ColorSpace,,g22_ap1,sdr-video,file-io
-420,Gamma 2.2 - Rec.709 - Texture,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.2:1.0,ColorSpace,,g22_rec709,sdr-video,file-io
-420,Gamma 2.4 - Rec.709 - Texture,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Rec709-Gamma2.4:1.0,ColorSpace,,g24_rec709,sdr-video,file-io
+Ordering,Legacy Name,ACEStransformID,CLFtransformID,Interface,BuiltinTransform Style,Aliases,Encoding,Categories
+100,ACES - ACEScc,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScc_to_ACES.a1.0.3,,ColorSpace,,"acescc,acescc_ap1",,file-io
+100,ACES - ACEScct,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScct_to_ACES.a1.0.3,,ColorSpace,,"acescct,acescct_ap1",,file-io
+100,ACES - ACEScg,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,ColorSpace,,"acescg,lin_ap1",,file-io
+300,Output - P3-D65 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.P3D65_1000nits_15nits_ST2084.a1.1.0,,ViewTransform,,,,
+300,Output - P3D65,urn:ampas:aces:transformId:v1.5:ODT.Academy.P3D65_48nits.a1.1.0,,ViewTransform,,,,
+300,Output - Rec.2020 ST2084 (1000 nits),urn:ampas:aces:transformId:v1.5:RRTODT.Academy.Rec2020_1000nits_15nits_ST2084.a1.1.0,,ViewTransform,,,,
+300,Output - Rec.709,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_100nits_dim.a1.0.3,,ViewTransform,,,,
+300,Output - sRGB,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,,ViewTransform,,,,
+400,Utility - Curve - Rec.1886,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886-Curve:1.0,NamedTransform,,crv_rec1886,sdr-video,file-io
+400,Utility - Curve - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB-Curve:1.0,NamedTransform,,crv_srgb,sdr-video,file-io
+410,Utility - Linear - P3-D65,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_P3-D65:1.0,ColorSpace,,lin_p3d65,scene-linear,file-io
+410,Utility - Linear - Rec.2020,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec2020:1.0,ColorSpace,,lin_rec2020,scene-linear,file-io
+410,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec709:1.0,ColorSpace,,"lin_rec709,lin_srgb,Linear sRGB",scene-linear,"file-io,working-space"
+410,Utility - Linear - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec709:1.0,ColorSpace,,lin_srgb,scene-linear,"file-io,working-space"
+420,Utility - Gamma 1.8 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma1.8_Rec709-Texture:1.0,ColorSpace,,g18_rec709,sdr-video,
+420,Utility - Gamma 2.2 - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_AP1-Texture:1.0,ColorSpace,,g22_ap1,sdr-video,file-io
+420,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_Rec709-Texture:1.0,ColorSpace,,g22_rec709,sdr-video,
+420,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Texture:1.0,ColorSpace,,g24_rec709,sdr-video,file-io
+420,Utility - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB-Texture:1.0,ColorSpace,,"srgb,Input - Generic - sRGB - Texture",,

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Panasonic:Input:VLog_Log_to_Linear:1.0" name="Panasonic V-Log (SUP v3) Log to Linear Curve">
-    <InputDescriptor>Panasonic V-Log (SUP v3) Log (arbitrary primaries)</InputDescriptor>
-    <OutputDescriptor>Panasonic V-Log (SUP v3) Linear (arbitrary primaries)</OutputDescriptor>
-    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
-        <LogParams base="10" linSideSlope="1" linSideOffset="0.00873" logSideSlope="0.241514" logSideOffset="0.598206" linSideBreak="0.01" />
-    </Log>
-</ProcessList>

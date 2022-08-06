@@ -163,8 +163,17 @@ PATTERNS_COLORSPACE_NAME_REFERENCE = {
     "\\b(\\w+)limited\\b": "(\\1 Limited)",
     "\\b(\\d+)nits\\b": "(\\1 nits)",
     "RGBmonitor": "sRGB",
-    "Rec709": "Rec. 709",
-    "Rec2020": "Rec. 2020",
+    "\\bP3 D": "P3-D",
+    "Gamma1": "Gamma 1",
+    "Gamma2": "Gamma 2",
+    "Rec709": "Rec.709",
+    "Rec2020": "Rec.2020",
+    "ST2084": "ST-2084",
+    "Curve\\b": "- Curve",
+    "Texture\\b": "- Texture",
+    "\\b(\\w)Log": "\\1-Log",
+    "\\b(\\w)Gamut": "\\1-Gamut",
+    "Cine\\b": ".Cine",
 }
 """
 *OpenColorIO* colorspace name substitution patterns.
@@ -184,7 +193,9 @@ PATTERNS_COLORSPACE_NAME_REFERENCE.update(
             f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}v\\d+"
             f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}.*"
         ): "",
-        f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}": SEPARATOR_COLORSPACE_NAME_REFERENCE,
+        f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}": (
+            SEPARATOR_COLORSPACE_NAME_REFERENCE
+        ),
     }
 )
 
@@ -270,7 +281,9 @@ PATTERNS_DISPLAY_NAME_REFERENCE : dict
 
 
 class ColorspaceDescriptionStyle(Flag):
-    """Enum storing the various *OpenColorIO* colorspace description styles."""
+    """
+    Enum storing the various *OpenColorIO* `Colorspace` description styles.
+    """
 
     NONE = auto()
     ACES = auto()
@@ -343,7 +356,7 @@ def beautify_name(name, patterns):
     >>> beautify_name(
     ...     'Rec709_100nits_dim',
     ...     PATTERNS_COLORSPACE_NAME_REFERENCE)
-    'Rec. 709 (100 nits) dim'
+    'Rec.709 (100 nits) dim'
     """
 
     return multi_replace(name, patterns).strip()
@@ -351,23 +364,23 @@ def beautify_name(name, patterns):
 
 def beautify_colorspace_name(name):
     """
-    Beautify given *OpenColorIO* colorspace name by applying in succession
+    Beautify given *OpenColorIO* `Colorspace` name by applying in succession
     the relevant patterns.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* colorspace name to beautify.
+        *OpenColorIO* `Colorspace` name to beautify.
 
     Returns
     -------
     unicode
-        Beautified *OpenColorIO* colorspace name.
+        Beautified *OpenColorIO* `Colorspace` name.
 
     Examples
     --------
     >>> beautify_colorspace_name('Rec709_100nits_dim')
-    'Rec. 709 (100 nits) dim'
+    'Rec.709 (100 nits) dim'
     """
 
     return beautify_name(name, PATTERNS_COLORSPACE_NAME_REFERENCE)
@@ -375,18 +388,18 @@ def beautify_colorspace_name(name):
 
 def beautify_look_name(name):
     """
-    Beautify given *OpenColorIO* look name by applying in succession the
+    Beautify given *OpenColorIO* `Look` name by applying in succession the
     relevant patterns.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* look name to beautify.
+        *OpenColorIO* `Look` name to beautify.
 
     Returns
     -------
     unicode
-        Beautified *OpenColorIO* look name.
+        Beautified *OpenColorIO* `Look` name.
 
     Examples
     --------
@@ -399,18 +412,18 @@ def beautify_look_name(name):
 
 def beautify_transform_family(name):
     """
-    Beautify given *OpenColorIO* colorspace family by applying in succession
+    Beautify given *OpenColorIO* `Colorspace` family by applying in succession
     the relevant patterns.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* colorspace family to beautify.
+        *OpenColorIO* `Colorspace` family to beautify.
 
     Returns
     -------
     unicode
-        Beautified *OpenColorIO* colorspace family.
+        Beautified *OpenColorIO* `Colorspace` family.
 
     Examples
     --------
@@ -423,18 +436,18 @@ def beautify_transform_family(name):
 
 def beautify_view_transform_name(name):
     """
-    Beautify given *OpenColorIO* view transform name by applying in
+    Beautify given *OpenColorIO* `ViewTransform` name by applying in
     succession the relevant patterns.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* view transform name to beautify.
+        *OpenColorIO* `ViewTransform` name to beautify.
 
     Returns
     -------
     unicode
-        Beautified *OpenColorIO* view transform name.
+        Beautified *OpenColorIO* `ViewTransform` name.
 
     Examples
     --------
@@ -569,19 +582,19 @@ def format_swapped_affix(name, affix, scheme="Modern 1"):
 
 def ctl_transform_to_colorspace_name(ctl_transform):
     """
-    Generate the *OpenColorIO* colorspace name for given *ACES* *CTL*
+    Generate the *OpenColorIO* `Colorspace` name for given *ACES* *CTL*
     transform.
 
     Parameters
     ----------
     ctl_transform : CTLTransform
-        *ACES* *CTL* transform to generate the *OpenColorIO* colorspace name
+        *ACES* *CTL* transform to generate the *OpenColorIO* `Colorspace` name
         for.
 
     Returns
     -------
     unicode
-        *OpenColorIO* colorspace name.
+        *OpenColorIO* `Colorspace` name.
     """
 
     if ctl_transform.source in (
@@ -597,18 +610,18 @@ def ctl_transform_to_colorspace_name(ctl_transform):
 
 def ctl_transform_to_look_name(ctl_transform):
     """
-    Generate the *OpenColorIO* look name for given *ACES* *CTL*
+    Generate the *OpenColorIO* `Look` name for given *ACES* *CTL*
     transform.
 
     Parameters
     ----------
     ctl_transform : CTLTransform
-        *ACES* *CTL* transform to generate the *OpenColorIO* look name for.
+        *ACES* *CTL* transform to generate the *OpenColorIO* `Look` name for.
 
     Returns
     -------
     unicode
-        *OpenColorIO* look name.
+        *OpenColorIO* `Look` name.
     """
 
     if ctl_transform.source in (
@@ -690,19 +703,19 @@ def ctl_transform_to_description(
     **kwargs,
 ):
     """
-    Generate the *OpenColorIO* colorspace or look description for given
+    Generate the *OpenColorIO* `Colorspace` or `Look` description for given
     *ACES* *CTL* transform.
 
     Parameters
     ----------
     ctl_transform : CTLTransform
-        *ACES* *CTL* transform to generate the *OpenColorIO* colorspace for.
+        *ACES* *CTL* transform to generate the *OpenColorIO* `Colorspace` for.
     describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
     factory : callable, optional
         Factory used to adjust the code paths because of slight difference
-        of signature between the *OpenColorIO* colorspace and look.
+        of signature between the *OpenColorIO* `Colorspace` and `Look`.
 
     Other Parameters
     ----------------
@@ -713,7 +726,7 @@ def ctl_transform_to_description(
     Returns
     -------
     unicode
-        *OpenColorIO* colorspace or look description.
+        *OpenColorIO* `Colorspace` or `Look` description.
     """
 
     description = None
@@ -787,13 +800,13 @@ def ctl_transform_to_colorspace(
     **kwargs,
 ):
     """
-    Generate the *OpenColorIO* colorspace or its signature for given *ACES*
+    Generate the *OpenColorIO* `Colorspace` or its signature for given *ACES*
     *CTL* transform.
 
     Parameters
     ----------
     ctl_transform : CTLTransform
-        *ACES* *CTL* transform to generate the *OpenColorIO* colorspace for.
+        *ACES* *CTL* transform to generate the *OpenColorIO* `Colorspace` for.
     describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
@@ -802,8 +815,8 @@ def ctl_transform_to_colorspace(
         analytically matches the given *ACES* *CTL* transform, i.e. true to
         the *aces-dev* reference but not necessarily user friendly.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* colorspace signature only, i.e. the
-        arguments for its instantiation.
+        Whether to return the *OpenColorIO* `Colorspace` signature only, i.e.
+        the arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
@@ -816,8 +829,8 @@ def ctl_transform_to_colorspace(
 
     Returns
     -------
-    ColorSpace or dict
-        *OpenColorIO* colorspace or its signature.
+    ocio.ColorSpace or dict
+        *OpenColorIO* `Colorspace` or its signature.
     """
 
     name = ctl_transform_to_colorspace_name(ctl_transform)
@@ -852,13 +865,13 @@ def ctl_transform_to_look(
     **kwargs,
 ):
     """
-    Generate the *OpenColorIO* look or its signature for given *ACES* *CTL*
+    Generate the *OpenColorIO* `Look` or its signature for given *ACES* *CTL*
     transform.
 
     Parameters
     ----------
     ctl_transform : CTLTransform
-        *ACES* *CTL* transform to generate the *OpenColorIO* look for.
+        *ACES* *CTL* transform to generate the *OpenColorIO* `Look` for.
     describe : bool, optional
         Whether to use the full *ACES* *CTL* transform description or just the
         first line.
@@ -867,7 +880,7 @@ def ctl_transform_to_look(
         analytically matches the given *ACES* *CTL* transform, i.e. true to
         the *aces-dev* reference but not necessarily user friendly.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* look signature only, i.e. the
+        Whether to return the *OpenColorIO* `Look` signature only, i.e. the
         arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
@@ -881,8 +894,8 @@ def ctl_transform_to_look(
 
     Returns
     -------
-    ColorSpace or dict
-        *OpenColorIO* look or its signature.
+    ocio.ColorSpace or dict
+        *OpenColorIO* `Look` or its signature.
     """
 
     name = ctl_transform_to_look_name(ctl_transform)
@@ -916,7 +929,7 @@ def style_to_view_transform(
     **kwargs,
 ):
     """
-    Create an *OpenColorIO* view transform or its signature for given style.
+    Create an *OpenColorIO* `ViewTransform` or its signature for given style.
 
     Parameters
     ----------
@@ -929,7 +942,7 @@ def style_to_view_transform(
         Any value from the
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* view colorspace signature only,
+        Whether to return the *OpenColorIO* `ViewTransform` signature only,
         i.e. the arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
@@ -943,8 +956,8 @@ def style_to_view_transform(
 
     Returns
     -------
-    ViewTransform or dict
-        *OpenColorIO* view transform or its signature for given style.
+    ocio.ViewTransform or dict
+        *OpenColorIO* `ViewTransform` or its signature for given style.
     """
 
     name = beautify_view_transform_name(style)
@@ -1048,7 +1061,7 @@ def style_to_display_colorspace(
     **kwargs,
 ):
     """
-    Create an *OpenColorIO* display colorspace or its signature for given
+    Create an *OpenColorIO* display `Colorspace` or its signature for given
     style.
 
     Parameters
@@ -1059,7 +1072,7 @@ def style_to_display_colorspace(
         Any value from the
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* display colorspace signature only,
+        Whether to return the *OpenColorIO* display `Colorspace` signature only,
         i.e. the arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
@@ -1073,8 +1086,8 @@ def style_to_display_colorspace(
 
     Returns
     -------
-    ColorSpace or dict
-        *OpenColorIO* display colorspace or its signature for given style.
+    ocio.ColorSpace or dict
+        *OpenColorIO* display `Colorspace` or its signature for given style.
     """
 
     kwargs.setdefault("family", FAMILY_DISPLAY_REFERENCE)
@@ -1328,6 +1341,7 @@ def generate_config_aces(
                 "interface",
                 "encoding",
                 "categories",
+                "aliases",
             ],
         )
 
@@ -1390,6 +1404,7 @@ def generate_config_aces(
         "family": "ACES",
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
+        "aliases": ["lin_ap0"],
     }
 
     display_reference_colorspace = {
@@ -1502,6 +1517,7 @@ def generate_config_aces(
                         },
                         encoding=transform_data.get("encoding"),
                         categories=transform_data.get("categories"),
+                        aliases=transform_data.get("aliases", "").split(","),
                     )
                     colorspace["transforms_data"] = [transform_data]
                     colorspaces.append(colorspace)
@@ -1593,30 +1609,29 @@ def generate_config_aces(
 
 
 if __name__ == "__main__":
-    import os
     import opencolorio_config_aces
     from opencolorio_config_aces import serialize_config_data
+    from pathlib import Path
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0],
-        "..",
-        "build",
-        "config",
-        "aces",
-        "reference",
-    )
+    build_directory = (
+        Path(opencolorio_config_aces.__path__[0])
+        / ".."
+        / "build"
+        / "config"
+        / "aces"
+        / "reference"
+    ).resolve()
 
     logger.info(f'Using "{build_directory}" build directory...')
 
-    if not os.path.exists(build_directory):
-        os.makedirs(build_directory)
+    build_directory.mkdir(parents=True, exist_ok=True)
 
     config_basename = config_basename_aces()
     config, data = generate_config_aces(
-        config_name=os.path.join(build_directory, config_basename),
+        config_name=build_directory / config_basename,
         analytical=False,
         additional_data=True,
     )
@@ -1625,10 +1640,7 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data,
-            os.path.join(
-                build_directory, config_basename.replace("ocio", "json")
-            ),
+            data, build_directory / config_basename.replace("ocio", "json")
         )
     except TypeError as error:
         logger.critical(error)

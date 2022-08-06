@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3-Curve_to_Linear:1.0" name="S-Log3 Log to Linear Curve">
+    <InputDescriptor>S-Log3 Log (arbitrary primaries)</InputDescriptor>
+    <OutputDescriptor>S-Log3 Linear (arbitrary primaries)</OutputDescriptor>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="5.26315789473684" linSideOffset="0.0526315789473684" logSideSlope="0.255620723362659" logSideOffset="0.410557184750733" linSideBreak="0.01125" linearSlope="6.62194371177582" />
+    </Log>
+</ProcessList>

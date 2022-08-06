@@ -28,8 +28,6 @@ from .config import (
     named_transform_factory,
     produce_transform,
     transform_factory,
-    transform_factory_clf_transform_to_group_transform,
-    transform_factory_default,
     view_transform_factory,
 )
 from .config import (
@@ -84,8 +82,6 @@ __all__ = [
     "named_transform_factory",
     "produce_transform",
     "transform_factory",
-    "transform_factory_clf_transform_to_group_transform",
-    "transform_factory_default",
     "view_transform_factory",
 ]
 __all__ += [

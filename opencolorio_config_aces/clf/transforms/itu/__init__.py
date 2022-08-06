@@ -2,9 +2,9 @@
 # Copyright Contributors to the OpenColorIO Project.
 
 from .generate import (
-    generate_clf_transforms_ocio,
+    generate_clf_transforms_itu,
 )
 
 __all__ = [
-    "generate_clf_transforms_ocio",
+    "generate_clf_transforms_itu",
 ]

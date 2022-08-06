@@ -5,7 +5,7 @@
 =====================================
 
 Defines procedures for generating Panasonic *Common LUT Format* (CLF)
-transforms for the OpenColorIO project:
+transforms:
 
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_panasonic`
 """
@@ -13,14 +13,13 @@ transforms for the OpenColorIO project:
 import PyOpenColorIO as ocio
 from pathlib import Path
 
-from opencolorio_config_aces.clf.discover.classify import (
-    EXTENSION_CLF,
-)
 from opencolorio_config_aces.clf.transforms import (
-    create_conversion_matrix,
+    clf_basename,
     format_clf_transform_id,
     generate_clf_transform,
+    matrix_RGB_to_RGB_transform,
 )
+from opencolorio_config_aces.config import transform_factory
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -30,15 +29,25 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "VERSION_CLF",
+    "FAMILY",
+    "GENUS",
+    "VERSION",
     "generate_clf_transforms_panasonic",
 ]
 
-VERSION_CLF = "1.0"
+FAMILY = "Panasonic"
+"""
+*CLF* transforms family.
+"""
+
+GENUS = "Input"
+"""
+*CLF* transforms genus.
+"""
+
+VERSION = "1.0"
 """
 *CLF* transforms version.
-
-VERSION_CLF : unicode
 """
 
 
@@ -49,7 +58,8 @@ def generate_clf_transforms_panasonic(output_directory):
     Returns
     -------
     dict
-        Dictionary of *CLF* transforms and *OpenColorIO* group transform.
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
 
     References
     ----------
@@ -62,7 +72,7 @@ VARICAM_V-Log_V-Gamut.pdf
     -   The resulting *CLF* transforms were reviewed by *Panasonic*.
     """
 
-    output_directory.mkdir(exist_ok=True)
+    output_directory.mkdir(parents=True, exist_ok=True)
 
     clf_transforms = {}
 
@@ -78,7 +88,9 @@ VARICAM_V-Log_V-Gamut.pdf
     LIN_SB = cut1
     BASE = 10.0
 
-    lct = ocio.LogCameraTransform(
+    lct = transform_factory(
+        transform_type="LogCameraTransform",
+        transform_factory="Constructor",
         base=BASE,
         linSideBreak=[LIN_SB] * 3,
         logSideSlope=[LOG_SLP] * 3,
@@ -88,7 +100,7 @@ VARICAM_V-Log_V-Gamut.pdf
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
-    mtx = create_conversion_matrix("V-Gamut", "ACES2065-1", "Bradford")
+    mtx = matrix_RGB_to_RGB_transform("V-Gamut", "ACES2065-1", "Bradford")
 
     # Using the CSC ID here because there is a slight discrepancy between the matrix
     # coefficients of the CSC and IDT CTL and the CLF matches the CSC transform.
@@ -99,58 +111,61 @@ VARICAM_V-Log_V-Gamut.pdf
 
     # Generate full transform.
 
-    filename = output_directory / f"VLog-VGamut_to_ACES2065-1{EXTENSION_CLF}"
+    name = "VLog_VGamut_to_ACES2065-1"
+    input_descriptor = "Panasonic V-Log - V-Gamut (SUP v3)"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                lct,
-                mtx,
-            ]
-        ),
-        format_clf_transform_id(
-            "Panasonic:Input:VLog-VGamut_to_ACES2065-1", VERSION_CLF
-        ),
-        "Panasonic V-Log - V-Gamut (SUP v3) to ACES2065-1",
         filename,
-        "Panasonic V-Log - V-Gamut (SUP v3)",
-        "ACES2065-1",
+        [lct, mtx],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
         aces_transform_id,
     )
 
     # Generate transform for primaries only.
 
-    filename = output_directory / f"Linear-VGamut_to_ACES2065-1{EXTENSION_CLF}"
+    name = "Linear_VGamut_to_ACES2065-1"
+    input_descriptor = "Linear Panasonic V-Gamut (SUP v3)"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform([mtx]),
-        format_clf_transform_id(
-            "Panasonic:Input:Linear-VGamut_to_ACES2065-1", VERSION_CLF
-        ),
-        "Linear Panasonic V-Gamut (SUP v3) to ACES2065-1",
         filename,
-        "Linear Panasonic V-Gamut (SUP v3)",
-        "ACES2065-1",
-        None,
+        [mtx],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
     )
 
-    # Generate named transform for log curve only.
-
-    filename = output_directory / f"VLog-Curve{EXTENSION_CLF}"
+    # Generate `NamedTransform` for log curve only.
+    name = "VLog-Curve_to_Linear"
+    input_descriptor = "Panasonic V-Log (SUP v3) Log (arbitrary primaries)"
+    output_descriptor = "Panasonic V-Log (SUP v3) Linear (arbitrary primaries)"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform([lct]),
-        format_clf_transform_id(
-            "Panasonic:Input:VLog_Log_to_Linear", VERSION_CLF
-        ),
-        "Panasonic V-Log (SUP v3) Log to Linear Curve",
         filename,
-        "Panasonic V-Log (SUP v3) Log (arbitrary primaries)",
-        "Panasonic V-Log (SUP v3) Linear (arbitrary primaries)",
-        None,
+        [lct],
+        clf_transform_id,
+        f'{input_descriptor.replace(" (arbitrary primaries)", "")} to Linear Curve',
+        input_descriptor,
+        output_descriptor,
     )
 
     return clf_transforms
 
 
 if __name__ == "__main__":
+    import logging
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
     output_directory = Path(__file__).parent.resolve() / "input"
 
     generate_clf_transforms_panasonic(output_directory)

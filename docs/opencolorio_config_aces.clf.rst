@@ -41,7 +41,8 @@ Common LUT Format Generation
 
     generate_clf_transforms_bmdfilm
     generate_clf_transforms_davinci
-    generate_clf_transforms_ocio_input
+    generate_clf_transforms_itu
+    generate_clf_transforms_ocio
     generate_clf_transforms_utility
     generate_clf_transforms_panasonic
     generate_clf_transforms_red

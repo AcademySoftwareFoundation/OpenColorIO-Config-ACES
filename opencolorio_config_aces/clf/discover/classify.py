@@ -75,7 +75,7 @@ SEPARATOR_VERSION_CLF = "."
 urn:aswf:ocio:transformId:1.0:OCIO:ACES:AP0_to_AP1-Gamma2pnt2:1.0
                          |---|                               |---|
 
-SEPARATOR_ID_CLF : unicode
+SEPARATOR_VERSION_CLF : unicode
 """
 
 SEPARATOR_ID_CLF = ":"
@@ -535,6 +535,7 @@ class CLFTransform:
     description
     input_descriptor
     output_descriptor
+    information
     family
     genus
 
@@ -555,6 +556,7 @@ class CLFTransform:
         self._description = ""
         self._input_descriptor = ""
         self._output_descriptor = ""
+        self._information = {}
 
         self._family = family
         self._genus = genus
@@ -722,6 +724,29 @@ class CLFTransform:
         return self._output_descriptor
 
     @property
+    def information(self):
+        """
+        Getter and setter property for the *CLF* transform information
+        extracted from parsing the file content header.
+
+        Parameters
+        ----------
+        value : dict
+            Attribute value.
+
+        Returns
+        -------
+        dict
+            *CLF* transform information.
+
+        Notes
+        -----
+        -   This property is read only.
+        """
+
+        return self._information
+
+    @property
     def family(self):
         """
         Getter and setter property for the *CLF* transform family, e.g.
@@ -879,6 +904,20 @@ CLFTransform` class are tried on the underlying
         )
         if output_descriptor is not None:
             self._output_descriptor = output_descriptor.text
+
+        information = next(iter(root.findall("./Info")), None)
+        if information is not None:
+            aces_transform_id = next(
+                iter(information.findall("./ACEStransformID")), None
+            )
+            if aces_transform_id is not None:
+                self._information["ACEStransformID"] = aces_transform_id.text
+
+            builtin_transform = next(
+                iter(information.findall("./BuiltinTransform")), None
+            )
+            if builtin_transform is not None:
+                self._information["BuiltinTransform"] = builtin_transform.text
 
 
 class CLFTransformPair:
@@ -1107,8 +1146,8 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> os.path.basename(key)
     'input'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
-    ['BMDFilm-WideGamut-Gen5-Curve.clf', \
-'BMDFilm-WideGamut-Gen5_to_ACES2065-1.clf']
+    ['BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf', \
+'BlackmagicDesign.Input.BMDFilm_WideGamut_Gen5_to_ACES2065-1.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1173,10 +1212,13 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ['Input']
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
-    [('BMDFilm-WideGamut-Gen5-Curve', \
-CLFTransform('blackmagic/input/BMDFilm-WideGamut-Gen5-Curve.clf')), \
-('BMDFilm-WideGamut-Gen5_to_ACES2065-1', \
-CLFTransform('blackmagic/input/BMDFilm-WideGamut-Gen5_to_ACES2065-1.clf'))]
+    [('BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve', \
+CLFTransform(\
+'blackmagic...input...BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf')), \
+('BlackmagicDesign.Input.BMDFilm_WideGamut_Gen5_to_ACES2065-1', \
+CLFTransform(\
+'blackmagic...input...BlackmagicDesign.Input\
+.BMDFilm_WideGamut_Gen5_to_ACES2065-1.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1255,7 +1297,8 @@ def unclassify_clf_transforms(classified_clf_transforms):
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform('blackmagic/input/BMDFilm-WideGamut-Gen5-Curve.clf')
+    CLFTransform(\
+'blackmagic...input...BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf')
     """
 
     unclassified_clf_transforms = []
@@ -1312,7 +1355,8 @@ def filter_clf_transforms(clf_transforms, filterers=None):
     ...         clf_transforms,
     ...         [lambda x: x.family == 'blackmagic']),
     ...     key=lambda x: x.path)[0]
-    CLFTransform('blackmagic/input/BMDFilm-WideGamut-Gen5-Curve.clf')
+    CLFTransform(\
+'blackmagic...input...BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf')
     """
 
     if filterers is None:

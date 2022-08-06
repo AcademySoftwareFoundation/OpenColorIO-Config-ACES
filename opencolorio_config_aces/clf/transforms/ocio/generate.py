@@ -5,24 +5,21 @@
 =======================================
 
 Defines procedures for generating specific *Common LUT Format* (CLF)
-transforms from the OpenColorIO project:
+transforms:
 
--   :func:`opencolorio_config_aces.clf.generate_clf_transforms_ocio_input`
--   :func:`opencolorio_config_aces.clf.generate_clf_transforms_utility`
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_ocio`
 """
 
-import PyOpenColorIO as ocio
 from pathlib import Path
 
-from opencolorio_config_aces.clf.discover.classify import (
-    EXTENSION_CLF,
-)
 from opencolorio_config_aces.clf.transforms import (
-    create_conversion_matrix,
-    create_gamma,
+    clf_basename,
     format_clf_transform_id,
+    gamma_transform,
     generate_clf_transform,
+    matrix_RGB_to_RGB_transform,
 )
+
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -32,257 +29,192 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "VERSION_CLF",
-    "generate_clf_transforms_ocio_input",
-    "generate_clf_transforms_utility",
+    "FAMILY",
+    "GENUS",
+    "VERSION",
+    "generate_clf_transforms_ocio",
 ]
 
-VERSION_CLF = "1.0"
+FAMILY = "OCIO"
+"""
+*CLF* transforms family.
+"""
+
+GENUS = "Utility"
+"""
+*CLF* transforms genus.
+"""
+
+VERSION = "1.0"
 """
 *CLF* transforms version.
-
-VERSION_CLF : unicode
 """
 
 
-def generate_clf_transforms_ocio_input(output_directory):
-    """
-    Generate the *OpenColorIO* *Input* *CLF* transforms.
-
-    Returns
-    -------
-    dict
-        Dictionary of *CLF* transforms and *OpenColorIO* group transform.
-    """
-
-    output_directory.mkdir(exist_ok=True)
-
-    clf_transforms = {}
-
-    filename = (
-        output_directory / f"OCIO.Input.AP0_to_Rec709-sRGB{EXTENSION_CLF}"
-    )
-    clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "sRGB"),
-                create_gamma("sRGB"),
-            ]
-        ),
-        format_clf_transform_id("OCIO:Input:AP0_to_Rec709-sRGB", VERSION_CLF),
-        "AP0 to Rec.709 - sRGB",
-        filename,
-        "ACES2065-1",
-        "sRGB",
-    )
-
-    return clf_transforms
-
-
-def generate_clf_transforms_utility(output_directory):
+def generate_clf_transforms_ocio(output_directory):
     """Generate OCIO Utility CLF transforms."""
 
-    output_directory.mkdir(exist_ok=True)
+    output_directory.mkdir(parents=True, exist_ok=True)
 
     clf_transforms = {}
 
-    filename = (
-        output_directory / f"OCIO.Utility.Linear_to_Rec1886{EXTENSION_CLF}"
-    )
+    name = "Linear_to_Rec1886-Curve"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(transforms=[create_gamma(2.4)]),
-        format_clf_transform_id("OCIO:Utility:Linear_to_Rec1886", VERSION_CLF),
+        filename,
+        [gamma_transform(2.4)],
+        clf_transform_id,
         "Linear to Rec.1886",
-        filename,
         "generic linear RGB",
         "generic gamma-corrected RGB",
     )
 
-    filename = output_directory / f"OCIO.Utility.Linear_to_sRGB{EXTENSION_CLF}"
+    name = "Linear_to_sRGB-Curve"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(transforms=[create_gamma("sRGB")]),
-        format_clf_transform_id("OCIO:Utility:Linear_to_sRGB", VERSION_CLF),
+        filename,
+        [gamma_transform("sRGB")],
+        clf_transform_id,
         "Linear to sRGB",
-        filename,
         "generic linear RGB",
         "generic gamma-corrected RGB",
     )
 
-    filename = (
-        output_directory
-        / f"OCIO.Utility.Linear_to_Rec709-Camera{EXTENSION_CLF}"
-    )
+    name = "Linear_to_Rec709-Curve"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(transforms=[create_gamma("Rec709")]),
-        format_clf_transform_id(
-            "OCIO:Utility:Linear_to_Rec709-Camera", VERSION_CLF
-        ),
-        "Linear to Rec709-Camera",
         filename,
+        [gamma_transform("Rec709")],
+        clf_transform_id,
+        "Linear to Rec.709",
         "generic linear RGB",
         "generic gamma-corrected RGB",
     )
 
-    filename = (
-        output_directory / f"OCIO.Utility.Linear_to_ST2084{EXTENSION_CLF}"
-    )
+    name = "Linear_to_ST2084-Curve"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    style = "CURVE - LINEAR_to_ST-2084"
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                ocio.BuiltinTransform(style="CURVE - LINEAR_to_ST-2084")
-            ]
-        ),
-        format_clf_transform_id("OCIO:Utility:Linear_to_ST2084", VERSION_CLF),
-        "Linear to ST2084",
         filename,
+        [{"transform_type": "BuiltinTransform", "style": style}],
+        clf_transform_id,
+        "Linear to ST.2084",
         "generic linear RGB",
-        "generic ST2084 (PQ) encoded RGB",
+        "generic ST.2084 (PQ) encoded RGB",
+        style=style,
     )
 
-    filename = (
-        output_directory / f"OCIO.Utility.AP0_to_P3-D65-Linear{EXTENSION_CLF}"
-    )
+    name = "AP0_to_Linear_P3-D65"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[create_conversion_matrix("ACES2065-1", "P3-D65")]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_P3-D65-Linear", VERSION_CLF
-        ),
-        "AP0 to P3-D65 - Linear",
         filename,
+        [matrix_RGB_to_RGB_transform("ACES2065-1", "P3-D65")],
+        clf_transform_id,
+        "AP0 to Linear P3-D65",
         "ACES2065-1",
         "linear P3 primaries, D65 white point",
     )
 
-    filename = (
-        output_directory / f"OCIO.Utility.AP0_to_Rec2020-Linear{EXTENSION_CLF}"
-    )
+    name = "AP0_to_Linear_Rec2020"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "ITU-R BT.2020")
-            ]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_Rec2020-Linear", VERSION_CLF
-        ),
-        "AP0 to Rec.2020 - Linear",
         filename,
+        [matrix_RGB_to_RGB_transform("ACES2065-1", "ITU-R BT.2020")],
+        clf_transform_id,
+        "AP0 to Linear Rec.2020",
         "ACES2065-1",
         "linear Rec.2020 primaries, D65 white point",
     )
 
-    filename = (
-        output_directory / f"OCIO.Utility.AP0_to_Rec709-Linear{EXTENSION_CLF}"
-    )
+    name = "AP0_to_Linear_Rec709"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[create_conversion_matrix("ACES2065-1", "ITU-R BT.709")]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_Rec709-Linear", VERSION_CLF
-        ),
-        "AP0 to Rec.709 - Linear",
         filename,
+        [matrix_RGB_to_RGB_transform("ACES2065-1", "ITU-R BT.709")],
+        clf_transform_id,
+        "AP0 to Linear Rec.709",
         "ACES2065-1",
         "linear Rec.709 primaries, D65 white point",
     )
 
-    filename = (
-        output_directory
-        / f"OCIO.Utility.AP0_to_Rec709-Gamma1.8{EXTENSION_CLF}"
-    )
+    name = "AP0_to_sRGB-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "ITU-R BT.709"),
-                create_gamma(1.8),
-            ]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_Rec709-Gamma1.8", VERSION_CLF
-        ),
-        "AP0 to Rec.709 - Gamma 1.8",
         filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "sRGB"),
+            gamma_transform("sRGB"),
+        ],
+        clf_transform_id,
+        "AP0 to sRGB Rec.709",
+        "ACES2065-1",
+        "sRGB",
+    )
+
+    name = "AP0_to_Gamma1.8_Rec709-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "ITU-R BT.709"),
+            gamma_transform(1.8),
+        ],
+        clf_transform_id,
+        "AP0 to Gamma 1.8 Rec.709 - Texture",
         "ACES2065-1",
         "1.8 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    filename = (
-        output_directory
-        / f"OCIO.Utility.AP0_to_Rec709-Gamma2.2{EXTENSION_CLF}"
-    )
+    name = "AP0_to_Gamma2.2_Rec709-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "ITU-R BT.709"),
-                create_gamma(2.2),
-            ]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_Rec709-Gamma2.2", VERSION_CLF
-        ),
-        "AP0 to Rec.709 - Gamma 2.2",
         filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "ITU-R BT.709"),
+            gamma_transform(2.2),
+        ],
+        clf_transform_id,
+        "AP0 to Gamma 2.2 Rec.709 - Texture",
         "ACES2065-1",
         "2.2 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    filename = (
-        output_directory
-        / f"OCIO.Utility.AP0_to_Rec709-Gamma2.4{EXTENSION_CLF}"
-    )
+    name = "AP0_to_Gamma2.4_Rec709-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "ITU-R BT.709"),
-                create_gamma(2.4),
-            ]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_Rec709-Gamma2.4", VERSION_CLF
-        ),
-        "AP0 to Rec.709 - Gamma 2.4",
         filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "ITU-R BT.709"),
+            gamma_transform(2.4),
+        ],
+        clf_transform_id,
+        "AP0 to Gamma 2.4 Rec.709 - Texture",
         "ACES2065-1",
         "2.4 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    filename = (
-        output_directory / f"OCIO.Utility.AP0_to_Rec709-Camera{EXTENSION_CLF}"
-    )
+    name = "AP0_to_Gamma2.2_AP1-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "ITU-R BT.709"),
-                create_gamma("Rec709"),
-            ]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_Rec709-Camera", VERSION_CLF
-        ),
-        "AP0 to Rec.709 - Camera",
         filename,
-        "ACES2065-1",
-        "Rec.709 camera OETF Rec.709 primaries, D65 white point",
-    )
-
-    filename = (
-        output_directory / f"OCIO.Utility.AP0_to_AP1-Gamma2.2{EXTENSION_CLF}"
-    )
-    clf_transforms[filename] = generate_clf_transform(
-        ocio.GroupTransform(
-            transforms=[
-                create_conversion_matrix("ACES2065-1", "ACEScg"),
-                create_gamma(2.2),
-            ]
-        ),
-        format_clf_transform_id(
-            "OCIO:Utility:AP0_to_AP1-Gamma2.2", VERSION_CLF
-        ),
-        "AP0 to AP1 - Gamma 2.2",
-        filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "ACEScg"),
+            gamma_transform(2.2),
+        ],
+        clf_transform_id,
+        "AP0 to Gamma 2.2 AP1 - Texture",
         "ACES2065-1",
         "2.2 gamma-corrected AP1 primaries, D60 white point",
     )
@@ -291,7 +223,11 @@ def generate_clf_transforms_utility(output_directory):
 
 
 if __name__ == "__main__":
+    import logging
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
     output_directory = Path(__file__).parent.resolve()
 
-    generate_clf_transforms_ocio_input(output_directory / "input")
-    generate_clf_transforms_utility(output_directory / "utility")
+    generate_clf_transforms_ocio(output_directory / "utility")

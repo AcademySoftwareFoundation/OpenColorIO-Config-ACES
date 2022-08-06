@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:BMDFilm_Gen5_Log-Curve_to_Linear:1.0" name="Blackmagic Film (Gen 5) Log to Linear Curve">
+    <InputDescriptor>Blackmagic Film (Gen 5) Log</InputDescriptor>
+    <OutputDescriptor>Blackmagic Film (Gen 5) Linear</OutputDescriptor>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="2.71828182845905" linSideSlope="1" linSideOffset="0.00549407243225781" logSideSlope="0.0869287606549122" logSideOffset="0.530013339229194" linSideBreak="0.005" />
+    </Log>
+</ProcessList>

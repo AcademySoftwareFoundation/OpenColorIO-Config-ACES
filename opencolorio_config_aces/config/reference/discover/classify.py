@@ -173,7 +173,7 @@ def _exclusion_filterer_ARRIIDT(ctl_transform):
     if "Alexa" not in path:
         return True
 
-    if "Alexa-v3-raw-EI800" in path and "ND1pt3" not in path:
+    if "Alexa-v3-logC" in path:
         return True
 
     return False
