@@ -5,8 +5,6 @@
 OpenColorIO Configuration for ACES
 ==================================
 
-..  image:: https://via.placeholder.com/720x320.png?text=WARNING: This+repository+is+under+construction!
-
 The `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/>`__
 is an open-source `Python <https://www.python.org/>`__ package implementing
 support for the generation of the *OCIO* configurations for the
@@ -29,8 +27,7 @@ The following features are available:
     - Discovery of *aces-dev* *CTL* transforms.
     - Generation of the *CTL* transforms graph.
 
--   Configurable generator producing the *OCIO* **CG** and **Studio**
-    configurations.
+-   Generators producing the *OCIO* **CG** and **Studio** configurations.
 -   Included *CLF* transforms along with generator and discovery support.
 
 User Guide

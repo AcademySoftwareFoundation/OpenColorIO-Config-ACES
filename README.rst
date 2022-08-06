@@ -5,7 +5,19 @@
 OpenColorIO Configuration for ACES
 ==================================
 
-..  image:: https://via.placeholder.com/720x320.png?text=WARNING: This+repository+is+under+construction!
+.. start-badges
+
+|actions| |artefacts|
+
+.. |actions| image:: https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/actions/workflows/continuous-integration-quality-unit-tests.yml/badge.svg
+    :target: https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/actions/workflows/continuous-integration-quality-unit-tests.yml
+    :alt: Continuous Integration - Quality & Unit Tests
+
+.. |artefacts| image:: https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/actions/workflows/configuration-artifacts.yml/badge.svg
+    :target: https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/actions/workflows/configuration-artifacts.yml
+    :alt: Configuration Artifacts
+
+.. end-badges
 
 The `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/>`__
 is an open-source `Python <https://www.python.org/>`__ package implementing
@@ -33,8 +45,7 @@ The following features are available:
     - Discovery of *aces-dev* *CTL* transforms.
     - Generation of the *CTL* transforms graph.
 
--   Configurable generator producing the *OCIO* **CG** and **Studio**
-    configurations.
+-   Generators producing the *OCIO* **CG** and **Studio** configurations.
 -   Included *CLF* transforms along with generator and discovery support.
 
 User Guide
@@ -194,22 +205,44 @@ Listing the tasks is done as follows::
 
     invoke --list
 
-Assuming the dependencies are satisfied, the task to build the **Reference**
-configuration is::
+Reference Config
+****************
 
-    invoke build-config-reference
++-----------------------+--------------------------------------------+
+| Task                  | Command                                    |
++-----------------------+--------------------------------------------+
+| Build                 | `invoke build-config-reference`            |
++-----------------------+--------------------------------------------+
+| Build (Docker)        | `invoke docker-run-build-config-reference` |
++-----------------------+--------------------------------------------+
+| Updating Mapping File | `invoke update-mapping-file-reference`     |
++-----------------------+--------------------------------------------+
 
-Alternatively, with the docker container built::
+CG Config
+*********
 
-    invoke docker-run-build-config-reference
++-----------------------+-------------------------------------+
+| Task                  | Command                             |
++-----------------------+-------------------------------------+
+| Build                 | `invoke build-config-cg`            |
++-----------------------+-------------------------------------+
+| Build (Docker)        | `invoke docker-run-build-config-cg` |
++-----------------------+-------------------------------------+
+| Updating Mapping File | `invoke update-mapping-file-cg`     |
++-----------------------+-------------------------------------+
 
-Likewise, for the **CG** configuration::
+Reference Config
+****************
 
-    invoke build-config-cg
-
-Or::
-
-    invoke docker-run-build-config-cg
++-----------------------+-----------------------------------------+
+| Task                  | Command                                 |
++-----------------------+-----------------------------------------+
+| Build                 | `invoke build-config-studio`            |
++-----------------------+-----------------------------------------+
+| Build (Docker)        | `invoke docker-run-build-config-studio` |
++-----------------------+-----------------------------------------+
+| Updating Mapping File | `invoke update-mapping-file-studio`     |
++-----------------------+-----------------------------------------+
 
 API Reference
 -------------
