@@ -84,6 +84,11 @@ development = [
 ]
 optional = [ "colour-science", "jsonpickle", "networkx" ]
 graphviz = [ "pygraphviz" ]
+read-the-docs = [
+    "networkx",
+    "pydata-sphinx-theme",
+    "pygraphviz",
+]
 
 [tool.black]
 line-length = 79
