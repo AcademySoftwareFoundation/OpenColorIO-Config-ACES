@@ -41,6 +41,7 @@ __all__ = [
     "URN_CTL",
     "SEPARATOR_URN_CTL",
     "SEPARATOR_ID_CTL",
+    "EXTENSION_CTL",
     "NAMESPACE_CTL",
     "TRANSFORM_TYPES_CTL",
     "TRANSFORM_FAMILIES_CTL",
@@ -63,6 +64,7 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+
 
 URN_CTL = "urn:ampas:aces:transformId:v1.5"
 """
@@ -88,6 +90,13 @@ urn:ampas:aces:transformId:v1.5:ODT.Academy.DCDM.a1.0.3
 |-------------URN-------------|:|----------ID---------|
 
 SEPARATOR_ID_CTL : unicode
+"""
+
+EXTENSION_CTL = ".ctl"
+"""
+*CTL* transform extension.
+
+EXTENSION_CTL : unicode
 """
 
 NAMESPACE_CTL = "Academy"
@@ -164,7 +173,7 @@ def _exclusion_filterer_ARRIIDT(ctl_transform):
     if "Alexa" not in path:
         return True
 
-    if "Alexa-v3-raw-EI800" in path and "ND1pt3" not in path:
+    if "Alexa-v3-logC" in path:
         return True
 
     return False
@@ -1288,7 +1297,7 @@ def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
             continue
 
         for filename in filenames:
-            if not filename.lower().endswith("ctl"):
+            if not filename.lower().endswith(EXTENSION_CTL):
                 continue
 
             ctl_transform = os.path.join(directory, filename)

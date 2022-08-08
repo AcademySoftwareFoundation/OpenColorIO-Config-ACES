@@ -9,7 +9,15 @@ Defines various utility functions for generating *Common LUT Format*
 """
 
 import PyOpenColorIO as ocio
+import logging
+import re
 
+from opencolorio_config_aces.config import produce_transform, transform_factory
+from opencolorio_config_aces.clf.discover.classify import (
+    EXTENSION_CLF,
+    SEPARATOR_ID_CLF,
+    URN_CLF,
+)
 from opencolorio_config_aces.utilities import required
 
 __author__ = "OpenColorIO Contributors"
@@ -20,17 +28,21 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "create_matrix",
-    "create_conversion_matrix",
-    "create_gamma",
-    "generate_clf",
+    "matrix_transform",
+    "matrix_RGB_to_RGB_transform",
+    "gamma_transform",
+    "generate_clf_transform",
+    "format_clf_transform_id",
+    "clf_basename",
 ]
+
+logger = logging.getLogger(__name__)
 
 
 @required("Colour")
-def create_matrix(matrix, offset=None):
+def matrix_transform(matrix, offset=None):
     """
-    Convert an NumPy array into an OCIO MatrixTransform.
+    Convert given *NumPy* array into an *OpenColorIO* `MatrixTransform`.
 
     Parameters
     ----------
@@ -42,7 +54,7 @@ def create_matrix(matrix, offset=None):
     Returns
     -------
     ocio.MatrixTransform
-        MatrixTransform representation of provided array(s).
+        `MatrixTransform` representation of provided array(s).
     """
 
     import numpy as np
@@ -56,18 +68,20 @@ def create_matrix(matrix, offset=None):
     if offset is not None:
         offset4[0:3] = offset
 
-    return ocio.MatrixTransform(
-        matrix=list(matrix44.ravel()), offset=list(offset4)
+    return transform_factory(
+        transform_type="MatrixTransform",
+        matrix=list(matrix44.ravel()),
+        offset=list(offset4),
     )
 
 
 @required("Colour")
-def create_conversion_matrix(
+def matrix_RGB_to_RGB_transform(
     input_primaries, output_primaries, adaptation="Bradford"
 ):
     """
-    Calculate the RGB to RGB matrix for a pair of primaries as an OCIO
-    MatrixTransform.
+    Calculate the *RGB* to *RGB* matrix for a pair of primaries and produce an
+    *OpenColorIO* `MatrixTransform`.
 
     Parameters
     ----------
@@ -76,13 +90,13 @@ def create_conversion_matrix(
     output_primaries : str
         Output RGB colourspace name, as defined by colour-science.
     adaptation : str
-        Chromatic adaptation method to use, as defined by colour-science.  Defaults to
-        "Bradford" to match what is most commonly used in ACES.
+        Chromatic adaptation method to use, as defined by colour-science.
+        Defaults to "Bradford" to match what is most commonly used in ACES.
 
     Returns
     -------
     ocio.MatrixTransform
-        Conversion MatrixTransform.
+        *OpenColorIO* `MatrixTransform`.
     """
 
     import colour
@@ -91,7 +105,8 @@ def create_conversion_matrix(
     input_space.use_derived_transformation_matrices(True)
     output_space = colour.RGB_COLOURSPACES[output_primaries]
     output_space.use_derived_transformation_matrices(True)
-    return create_matrix(
+
+    return matrix_transform(
         colour.matrix_RGB_to_RGB(
             input_space,
             output_space,
@@ -100,11 +115,10 @@ def create_conversion_matrix(
     )
 
 
-@required("Colour")
-def create_gamma(gamma):
+def gamma_transform(gamma):
     """
-    Convert an gamma value into an OCIO ExponentTransform or
-    ExponentWithLinearTransform.
+    Convert a gamma value into an *OpenColorIO* `ExponentTransform` or
+    `ExponentWithLinearTransform`.
 
     Parameters
     ----------
@@ -114,8 +128,8 @@ def create_gamma(gamma):
 
     Returns
     -------
-    ocio.Transform
-        ExponentTransform or ExponentWithLinearTransform.
+    ocio.ExponentTransform or ocio.ExponentWithLinearTransform
+         *OpenColorIO* `ExponentTransform` or `ExponentWithLinearTransform`.
     """
 
     import numpy as np
@@ -131,7 +145,8 @@ def create_gamma(gamma):
         offset = np.zeros(4)
         offset[0:3] = 0.055
 
-        exp_tf = ocio.ExponentWithLinearTransform(
+        exp_tf = transform_factory(
+            transform_type="ExponentWithLinearTransform",
             gamma=value,
             offset=offset,
             negativeStyle=ocio.NEGATIVE_LINEAR,
@@ -146,7 +161,8 @@ def create_gamma(gamma):
         offset = np.zeros(4)
         offset[0:3] = 0.099
 
-        exp_tf = ocio.ExponentWithLinearTransform(
+        exp_tf = transform_factory(
+            transform_type="ExponentWithLinearTransform",
             gamma=value,
             offset=offset,
             negativeStyle=ocio.NEGATIVE_LINEAR,
@@ -157,7 +173,8 @@ def create_gamma(gamma):
         value = np.ones(4)
         value[0:3] = gamma
 
-        exp_tf = ocio.ExponentTransform(
+        exp_tf = transform_factory(
+            transform_type="ExponentTransform",
             value=value,
             negativeStyle=ocio.NEGATIVE_PASS_THRU,
             direction=direction,
@@ -166,42 +183,134 @@ def create_gamma(gamma):
     return exp_tf
 
 
-def generate_clf(
-    group_tf, tf_id, tf_name, filename, input_desc, output_desc, aces_id=None
+def generate_clf_transform(
+    filename,
+    transforms,
+    clf_transform_id,
+    name,
+    input_desc,
+    output_desc,
+    aces_transform_id=None,
+    style=None,
 ):
     """
-    Take a GroupTransform and some metadata and write a CLF file.
+    Take a list of transforms and some metadata and write a *CLF* transform
+    file.
 
     Parameters
     ----------
-    group_tf : ocio.GroupTransform
-        GroupTransform to build CLF operators from.
-    tf_id : str
-        CLF transform ID.
-    tf_name : str
-        CLF transform name.
     filename : str
-        CLF filename.
+        *CLF* filename.
+    transforms : list
+        Transforms to generate the *CLF* transform file for.
+    clf_transform_id : str
+        *CLFtransformID*.
+    name : str
+        *CLF* transform name.
     input_desc : str
-        CLF input descriptor.
+        *CLF* input descriptor.
     output_desc : str
-        CLF output descriptor.
-    aces_id : str
-        ACES TransformID (default is None).
+        *CLF* output descriptor.
+    aces_transform_id : str, optional
+        *ACEStransformID*.
+    style : str, optional
+        *OpenColorIO* builtin transform style.
+
+    Returns
+    -------
+    ocio.GroupTransform
+        Updated `GroupTransform`.
     """
 
+    logger.info(f'Creating "{clf_transform_id}" "CLF" transform...')
+
+    group_tf = produce_transform(transforms)
+
     metadata = group_tf.getFormatMetadata()
-    metadata.setID(tf_id)
-    metadata.setName(tf_name)
+    metadata.setID(clf_transform_id)
+    metadata.setName(name)
     metadata.addChildElement("InputDescriptor", input_desc)
     metadata.addChildElement("OutputDescriptor", output_desc)
-    if aces_id is not None:
+
+    if aces_transform_id is not None or style is not None:
         metadata.addChildElement("Info", "")
         info = metadata.getChildElements()[2]
-        info.addChildElement("ACEStransformID", aces_id)
+
+        if aces_transform_id:
+            info.addChildElement("ACEStransformID", aces_transform_id)
+
+        if style:
+            info.addChildElement("BuiltinTransform", style)
+
+    logger.info(
+        f'Writing "{clf_transform_id}" "CLF" transform to "{filename}.'
+    )
 
     group_tf.write(
         formatName="Academy/ASC Common LUT Format",
         config=ocio.Config.CreateRaw(),
         fileName=str(filename),
     )
+
+    return group_tf
+
+
+def format_clf_transform_id(family, genus, name, version):
+    """
+    Format given *CLF* transform attributes to produce a *CLFtransformID*.
+
+    Parameters
+    ----------
+    family : unicode
+        *CLF* transform family.
+    genus : unicode
+        *CLF* transform genus.
+    name : unicode
+        *CLF* transform name.
+    version : unicode
+        *CLF* transform version.
+
+    Returns
+    -------
+    unicode
+        *CLFtransformID*.
+
+    Examples
+    --------
+    >>> format_clf_transform_id("OCIO", "Input", "AP0_to_sRGB-Rec709", "1.0")
+    'urn:aswf:ocio:transformId:1.0:OCIO:Input:AP0_to_sRGB-Rec709:1.0'
+    """
+
+    return SEPARATOR_ID_CLF.join([URN_CLF, family, genus, name, version])
+
+
+def clf_basename(clf_transform_id):
+    """
+    Generate a *CLF* basename from given *CLFtransformID*.
+
+    Parameters
+    ----------
+    clf_transform_id : unicode
+        *CLFtransformID*
+
+    Returns
+    -------
+    unicode
+        *CLF* transform filename.
+
+    Examples
+    --------
+    >>> clf_basename(
+    ...     "urn:aswf:ocio:transformId:1.0:OCIO:Input:AP0_to_sRGB-Rec709:1.0")
+    'OCIO.Input.AP0_to_sRGB-Rec709.clf'
+    """
+
+    tokens = clf_transform_id.replace(
+        f"{URN_CLF}{SEPARATOR_ID_CLF}", ""
+    ).split(SEPARATOR_ID_CLF)
+
+    stem = ".".join(tokens[:-1])
+    stem = re.sub(r"\.Linear_to_", ".", stem)
+    stem = re.sub("_to_Linear$", "", stem)
+
+    return f"{stem}{EXTENSION_CLF}"

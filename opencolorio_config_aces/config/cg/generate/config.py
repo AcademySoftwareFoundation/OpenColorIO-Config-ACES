@@ -25,6 +25,7 @@ from opencolorio_config_aces.clf import (
     unclassify_clf_transforms,
 )
 from opencolorio_config_aces.config.generation import (
+    VersionData,
     colorspace_factory,
     named_transform_factory,
     generate_config,
@@ -34,6 +35,14 @@ from opencolorio_config_aces.config.reference import (
     version_aces_dev,
     version_config_mapping_file,
     generate_config_aces,
+)
+from opencolorio_config_aces.config.reference.generate.config import (
+    COLORSPACE_SCENE_ENCODING_REFERENCE,
+    SEPARATOR_COLORSPACE_FAMILY_REFERENCE,
+    beautify_alias,
+    beautify_colorspace_name,
+    format_optional_prefix,
+    format_swapped_affix,
 )
 from opencolorio_config_aces.utilities import (
     git_describe,
@@ -49,9 +58,13 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
+    "URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG",
     "PATH_TRANSFORMS_MAPPING_FILE_CG",
     "clf_transform_to_description",
     "clf_transform_to_colorspace",
+    "clf_transform_to_named_transform",
+    "style_to_colorspace",
+    "style_to_named_transform",
     "dependency_versions",
     "config_basename_cg",
     "config_name_cg",
@@ -60,6 +73,17 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG = (
+    "https://docs.google.com/spreadsheets/d/"
+    "1DqxmtZpnhL_9N1wayvcW0y3bZoHRom7A1c58YLlr89g/"
+    "export?format=csv&gid=609660164"
+)
+"""
+URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
+
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG : unicode
+"""
 
 PATH_TRANSFORMS_MAPPING_FILE_CG = next(
     (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
@@ -71,11 +95,38 @@ PATH_TRANSFORMS_MAPPING_FILE_CG : unicode
 """
 
 
+def clf_transform_to_colorspace_name(clf_transform):
+    """
+    Generate the *OpenColorIO* `Colorspace` name for given *CLF* transform.
+
+    Parameters
+    ----------
+    clf_transform : CLFTransform
+        *CLF* transform to generate the *OpenColorIO* `Colorspace` name for.
+
+    Returns
+    -------
+    unicode
+        *OpenColorIO* `Colorspace` name.
+    """
+
+    if clf_transform.source in (
+        COLORSPACE_SCENE_ENCODING_REFERENCE,
+        "AP0",
+        "Linear",
+    ):
+        name = clf_transform.target
+    else:
+        name = clf_transform.source
+
+    return beautify_colorspace_name(name)
+
+
 def clf_transform_to_description(
     clf_transform, describe=ColorspaceDescriptionStyle.LONG_UNION
 ):
     """
-    Generate the *OpenColorIO* colorspace or named transform description for
+    Generate the *OpenColorIO* `Colorspace` or `NamedTransform` description for
     given *CLF* transform.
 
     Parameters
@@ -89,7 +140,7 @@ def clf_transform_to_description(
     Returns
     -------
     unicode
-        *OpenColorIO* colorspace or named transform description.
+        *OpenColorIO* `Colorspace` or `NamedTransform` description.
     """
 
     description = None
@@ -132,7 +183,7 @@ def clf_transform_to_colorspace(
     **kwargs,
 ):
     """
-    Generate the *OpenColorIO* colorspace for given *CLF* transform.
+    Generate the *OpenColorIO* `Colorspace` for given *CLF* transform.
 
     Parameters
     ----------
@@ -141,7 +192,7 @@ def clf_transform_to_colorspace(
     describe : bool, optional
         Whether to use the full *CLF* transform description or just its ID.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* colorspace signature only, i.e. the
+        Whether to return the *OpenColorIO* `Colorspace` signature only, i.e. the
         arguments for its instantiation.
 
     Other Parameters
@@ -157,8 +208,12 @@ def clf_transform_to_colorspace(
     """
 
     signature = {
-        "name": clf_transform.user_name,
-        "family": clf_transform.family,
+        "name": clf_transform_to_colorspace_name(clf_transform),
+        "family": (
+            f"{clf_transform.clf_transform_id.type}"
+            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
+            f"{clf_transform.clf_transform_id.namespace}"
+        ),
         "description": clf_transform_to_description(clf_transform, describe),
         "from_reference": {
             "transform_type": "FileTransform",
@@ -167,6 +222,12 @@ def clf_transform_to_colorspace(
         },
     }
     signature.update(kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
 
     if signature_only:
         return signature
@@ -183,7 +244,7 @@ def clf_transform_to_named_transform(
     **kwargs,
 ):
     """
-    Generate the *OpenColorIO* named transform for given *CLF* transform.
+    Generate the *OpenColorIO* `NamedTransform` for given *CLF* transform.
 
     Parameters
     ----------
@@ -192,7 +253,7 @@ def clf_transform_to_named_transform(
     describe : bool, optional
         Whether to use the full *CLF* transform description or just its ID.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* named transform signature only,
+        Whether to return the *OpenColorIO* `NamedTransform` signature only,
         i.e. the arguments for its instantiation.
 
     Other Parameters
@@ -204,12 +265,16 @@ def clf_transform_to_named_transform(
     Returns
     -------
     Object
-        *OpenColorIO* named transform.
+        *OpenColorIO* `NamedTransform`.
     """
 
     signature = {
-        "name": clf_transform.user_name,
-        "family": clf_transform.family,
+        "name": clf_transform_to_colorspace_name(clf_transform),
+        "family": (
+            f"{clf_transform.clf_transform_id.type}"
+            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
+            f"{clf_transform.clf_transform_id.namespace}"
+        ),
         "description": clf_transform_to_description(clf_transform, describe),
         "forward_transform": {
             "transform_type": "FileTransform",
@@ -219,12 +284,191 @@ def clf_transform_to_named_transform(
     }
     signature.update(kwargs)
 
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
+
     if signature_only:
         return signature
     else:
         named_transform = named_transform_factory(**signature)
 
         return named_transform
+
+
+def style_to_colorspace(
+    style,
+    describe=ColorspaceDescriptionStyle.LONG_UNION,
+    signature_only=False,
+    scheme="Modern 1",
+    **kwargs,
+):
+    """
+    Create an *OpenColorIO* `Colorspace` or its signature for given style.
+
+    Parameters
+    ----------
+    style : unicode
+        *OpenColorIO* builtin transform style.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+    signature_only : bool, optional
+        Whether to return the *OpenColorIO* view `Colorspace` signature only,
+        i.e. the arguments for its instantiation.
+    scheme : str, optional
+        {"Legacy", "Modern 1"},
+        Naming convention scheme to use.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.colorspace_factory` definition.
+
+    Returns
+    -------
+    ocio.ViewTransform or dict
+        *OpenColorIO* `Colorspace` or its signature for given style.
+    """
+
+    builtin_transform = ocio.BuiltinTransform(style)
+
+    description = None
+    if describe != ColorspaceDescriptionStyle.NONE:
+        description = []
+
+        if describe in (
+            ColorspaceDescriptionStyle.OPENCOLORIO,
+            ColorspaceDescriptionStyle.SHORT_UNION,
+            ColorspaceDescriptionStyle.LONG_UNION,
+        ):
+            description.append(builtin_transform.getDescription())
+
+        description = "\n".join(description)
+
+    signature = {}
+    clf_transform = kwargs.pop("clf_transform", None)
+    if clf_transform:
+        signature.update(
+            clf_transform_to_colorspace(
+                clf_transform, signature_only=True, **kwargs
+            )
+        )
+
+    signature.update(
+        {
+            "to_reference": builtin_transform,
+            "description": description,
+        }
+    )
+    signature.update(**kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
+
+    if signature_only:
+        signature["to_reference"] = {
+            "transform_type": "BuiltinTransform",
+            "style": style,
+        }
+        return signature
+    else:
+        colorspace = colorspace_factory(**signature)
+
+        return colorspace
+
+
+def style_to_named_transform(
+    style,
+    describe=ColorspaceDescriptionStyle.LONG_UNION,
+    signature_only=False,
+    scheme="Modern 1",
+    **kwargs,
+):
+    """
+    Create an *OpenColorIO* `NamedTransform` or its signature for given style.
+
+    Parameters
+    ----------
+    style : unicode
+        *OpenColorIO* builtin transform style.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+    signature_only : bool, optional
+        Whether to return the *OpenColorIO* view `Colorspace` signature only,
+        i.e. the arguments for its instantiation.
+    scheme : str, optional
+        {"Legacy", "Modern 1"},
+        Naming convention scheme to use.
+
+    Other Parameters
+    ----------------
+    \\**kwargs : dict, optional
+        Keywords arguments for the
+        :func:`opencolorio_config_aces.named_transform_factory` definition.
+
+    Returns
+    -------
+    ocio.ViewTransform or dict
+        *OpenColorIO* `NamedTransform` or its signature for given style.
+    """
+
+    builtin_transform = ocio.BuiltinTransform(style)
+
+    description = None
+    if describe != ColorspaceDescriptionStyle.NONE:
+        description = []
+
+        if describe in (
+            ColorspaceDescriptionStyle.OPENCOLORIO,
+            ColorspaceDescriptionStyle.SHORT_UNION,
+            ColorspaceDescriptionStyle.LONG_UNION,
+        ):
+            description.append(builtin_transform.getDescription())
+
+        description = "\n".join(description)
+
+    signature = {}
+    clf_transform = kwargs.pop("clf_transform", None)
+    if clf_transform:
+        signature.update(
+            clf_transform_to_colorspace(
+                clf_transform, signature_only=True, **kwargs
+            )
+        )
+        signature.pop("from_reference", None)
+
+    signature.update(
+        {
+            "forward_transform": builtin_transform,
+            "description": description,
+        }
+    )
+    signature.update(**kwargs)
+
+    signature["aliases"] = list(
+        dict.fromkeys(
+            [beautify_alias(signature["name"])] + signature["aliases"]
+        )
+    )
+
+    if signature_only:
+        signature["forward_transform"] = {
+            "transform_type": "BuiltinTransform",
+            "style": style,
+        }
+        return signature
+    else:
+        colorspace = named_transform_factory(**signature)
+
+        return colorspace
 
 
 def dependency_versions(
@@ -369,7 +613,7 @@ def generate_config_cg(
         reference implementation *OpenColorIO* config generator via the
         :func:`opencolorio_config_aces.generate_config_aces` definition and the
         default reference config mapping file.
-    -   The *ACES* CG *OpenColorIO* config generator filters and and extends
+    -   The *ACES* CG *OpenColorIO* config generator filters and extends
         the data from the *aces-dev* reference implementation *OpenColorIO*
         config with the given CG config mapping file:
 
@@ -434,19 +678,18 @@ def generate_config_cg(
 
     logger.debug(f'Using {clf_transforms} "CLF" transforms...')
 
-    def transform_name(transform_data):
-        """Return the name from given transform."""
+    builtin_transforms = [
+        builtin for builtin in ocio.BuiltinTransformRegistry()
+    ]
 
-        return transform_data[
-            "legacy_name" if scheme == "legacy" else "modern_name"
-        ]
+    logger.debug(f'Using {builtin_transforms} "Builtin" transforms...')
 
     def transform_aliases(transform_data):
         """Return the aliases from given transform."""
 
-        return [transform_data["legacy_name"]] + transform_data.get(
-            "aliases", ""
-        ).split(",")
+        return [transform_data["legacy_name"]] + re.split(
+            "[,;]+", transform_data.get("aliases", "")
+        )
 
     def clf_transform_from_id(clf_transform_id):
         """Filter the "CLFTransform" instances matching given "CLFtransformID"."""
@@ -461,7 +704,25 @@ def generate_config_cg(
         clf_transform = next(iter(filtered_clf_transforms), None)
 
         logger.debug(
-            f'Filtered "CLF" transform with "{clf_transform_id}": {clf_transform}.'
+            f'Filtered "CLF" transform with "{clf_transform_id}" '
+            f'"CLFtransformID": {clf_transform}.'
+        )
+
+        return clf_transform
+
+    def clf_transform_from_style(style):
+        """Filter the "CLFTransform" instances matching given style."""
+
+        filtered_clf_transforms = [
+            clf_transform
+            for clf_transform in clf_transforms
+            if clf_transform.information.get("BuiltinTransform") == style
+        ]
+
+        clf_transform = next(iter(filtered_clf_transforms), None)
+
+        logger.debug(
+            f'Filtered "CLF" transform with "{style}" style: {clf_transform}.'
         )
 
         return clf_transform
@@ -475,11 +736,11 @@ def generate_config_cg(
             delimiter=",",
             fieldnames=[
                 "ordering",
-                "modern_name",
                 "legacy_name",
                 "aces_transform_id",
                 "clf_transform_id",
                 "interface",
+                "builtin_transform_style",
                 "aliases",
                 "encoding",
                 "categories",
@@ -490,7 +751,38 @@ def generate_config_cg(
         next(dict_reader)
 
         for transform_data in dict_reader:
-            config_mapping[transform_name(transform_data)].append(
+            # Checking whether the "BuiltinTransform" style exists.
+            style = transform_data["builtin_transform_style"]
+            if style:
+                assert (
+                    style in builtin_transforms
+                ), f'"{style}" "BuiltinTransform" style does not exist!'
+
+            # Finding the "CLFTransform" class instance that matches given
+            # "CLFtransformID", if it does not exist, there is a critical
+            # mismatch in the config mapping file.
+            clf_transform_id = transform_data["clf_transform_id"]
+            # NOTE: Contrary to the "aces-dev" "Reference" config, only a
+            # subset of the transforms are represented with a "CLF" file.
+            if clf_transform_id:
+                filtered_clf_transforms = [
+                    clf_transform
+                    for clf_transform in clf_transforms
+                    if clf_transform.clf_transform_id.clf_transform_id
+                    == clf_transform_id
+                ]
+
+                clf_transform = next(iter(filtered_clf_transforms), None)
+
+                assert clf_transform is not None, (
+                    f'"OpenColorIO-Config-ACES" has no transform with '
+                    f'"{clf_transform_id}" ACEStransformID, please cross-check '
+                    f'the "{config_mapping_file_path}" config mapping file!'
+                )
+
+                transform_data["clf_transform"] = clf_transform
+
+            config_mapping[transform_data["legacy_name"]].append(
                 transform_data
             )
 
@@ -610,46 +902,80 @@ def generate_config_cg(
     data.active_views = [view for view in data.active_views if view in views]
     logger.info(f"Filtered active views: {data.active_views}")
 
-    # CLF Transforms Filtering
+    # CLF Transforms & BuiltinTransform Creation
     for transform_data in yield_from_config_mapping():
-        clf_transform_id = transform_data["clf_transform_id"]
-        if not clf_transform_id:
-            continue
-
-        clf_transform = clf_transform_from_id(clf_transform_id)
-
-        assert (
-            clf_transform
-        ), f'"{clf_transform_id}" "CLF" transform does not exist!'
-
         kwargs = {
-            "clf_transform": clf_transform,
             "describe": describe,
             "signature_only": True,
-            "name": transform_name(transform_data),
             "aliases": transform_aliases(transform_data),
             "encoding": transform_data.get("encoding"),
             "categories": transform_data.get("categories"),
         }
 
-        if transform_data["interface"] == "NamedTransform":
-            logger.info(
-                f'Adding "{clf_transform_id}" "CLF" transform as a '
-                f'"Named" transform.'
+        style = transform_data["builtin_transform_style"]
+        clf_transform_id = transform_data["clf_transform_id"]
+
+        if style:
+            kwargs.update(
+                {
+                    "style": style,
+                    "clf_transform": clf_transform_from_style(style),
+                }
             )
 
-            data.named_transforms.append(
-                clf_transform_to_named_transform(**kwargs)
-            )
-        else:
-            logger.info(
-                f'Adding "{clf_transform_id}" "CLF" transform as a '
-                f'"Colorspace" transform.'
-            )
+            if transform_data["interface"] == "ColorSpace":
+                logger.info(
+                    f'Creating a "Colorspace" transform for "{style}" style...'
+                )
 
-            data.colorspaces.append(clf_transform_to_colorspace(**kwargs))
+                colorspace = style_to_colorspace(**kwargs)
+                colorspace["transforms_data"] = [transform_data]
+                data.colorspaces.append(colorspace)
+            elif transform_data["interface"] == "NamedTransform":
+                logger.info(
+                    f'Creating a "NamedTransform" transform for "{style}" style...'
+                )
 
-    # Roles Filtering
+                colorspace = style_to_named_transform(**kwargs)
+                colorspace["transforms_data"] = [transform_data]
+                data.named_transforms.append(colorspace)
+
+            if style and clf_transform_id:
+                logger.warning(
+                    '"{style}" was defined along side a "CTLtransformID", '
+                    "hybrid transform generation was used!"
+                )
+                continue
+
+        if clf_transform_id:
+            clf_transform = clf_transform_from_id(clf_transform_id)
+
+            assert (
+                clf_transform
+            ), f'"{clf_transform_id}" "CLF" transform does not exist!'
+
+            kwargs["clf_transform"] = clf_transform
+
+            if transform_data["interface"] == "NamedTransform":
+                logger.info(
+                    f'Adding "{clf_transform_id}" "CLF" transform as a '
+                    f'"Named" transform.'
+                )
+
+                named_transform = clf_transform_to_named_transform(**kwargs)
+                named_transform["transforms_data"] = [transform_data]
+                data.named_transforms.append(named_transform)
+            else:
+                logger.info(
+                    f'Adding "{clf_transform_id}" "CLF" transform as a '
+                    f'"Colorspace" transform.'
+                )
+
+                colorspace = clf_transform_to_colorspace(**kwargs)
+                colorspace["transforms_data"] = [transform_data]
+                data.colorspaces.append(colorspace)
+
+    # Roles Filtering & Update
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
         ocio.ROLE_RENDERING,
@@ -660,18 +986,34 @@ def generate_config_cg(
 
         data.roles.pop(role)
 
-    # Aliases Update
-    for transform_data in yield_from_config_mapping():
-        if transform_data["clf_transform_id"]:
-            continue
+    data.roles.update(
+        {
+            ocio.ROLE_COLOR_PICKING: format_swapped_affix(
+                "sRGB", "Display", scheme
+            ),
+            ocio.ROLE_COLOR_TIMING: format_optional_prefix(
+                "ACEScct", "ACES", scheme
+            ),
+            ocio.ROLE_COMPOSITING_LOG: format_optional_prefix(
+                "ACEScct", "ACES", scheme
+            ),
+            ocio.ROLE_DATA: "Raw",
+            ocio.ROLE_DEFAULT: "sRGB - Texture",
+            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65",
+            ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
+                "ACES2065-1", "ACES", scheme
+            ),
+            ocio.ROLE_MATTE_PAINT: format_optional_prefix(
+                "ACEScct", "ACES", scheme
+            ),
+            ocio.ROLE_SCENE_LINEAR: format_optional_prefix(
+                "ACEScg", "ACES", scheme
+            ),
+            ocio.ROLE_TEXTURE_PAINT: "sRGB - Texture",
+        }
+    )
 
-        for colorspace in data.colorspaces:
-            if colorspace["name"] != transform_name(transform_data):
-                continue
-
-            logger.info(f'Updating "{colorspace["name"]}" aliases.')
-
-            colorspace["aliases"] = transform_aliases(transform_data)
+    data.profile_version = VersionData(2, 0)
 
     config = generate_config(data, config_name, validate)
 
@@ -686,30 +1028,29 @@ def generate_config_cg(
 
 
 if __name__ == "__main__":
-    import os
     import opencolorio_config_aces
     from opencolorio_config_aces import serialize_config_data
+    from pathlib import Path
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0],
-        "..",
-        "build",
-        "config",
-        "aces",
-        "cg",
-    )
+    build_directory = (
+        Path(opencolorio_config_aces.__path__[0])
+        / ".."
+        / "build"
+        / "config"
+        / "aces"
+        / "cg"
+    ).resolve()
 
     logging.info(f'Using "{build_directory}" build directory...')
 
-    if not os.path.exists(build_directory):
-        os.makedirs(build_directory)
+    build_directory.mkdir(parents=True, exist_ok=True)
 
     config_basename = config_basename_cg()
     config, data = generate_config_cg(
-        config_name=os.path.join(build_directory, config_basename),
+        config_name=build_directory / config_basename,
         additional_data=True,
     )
 
@@ -717,10 +1058,7 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data,
-            os.path.join(
-                build_directory, config_basename.replace("ocio", "json")
-            ),
+            data, build_directory / config_basename.replace("ocio", "json")
         )
     except TypeError as error:
         logging.critical(error)

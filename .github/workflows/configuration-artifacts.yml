@@ -84,3 +84,12 @@ jobs:
         name: config-cg
         path: |
           build/config/aces/cg/
+    - name: Generation - Config - ACES Studio
+      run: |
+        poetry run invoke build-config-studio
+      shell: bash
+    - uses: actions/upload-artifact@v2
+      with:
+        name: config-studio
+        path: |
+          build/config/aces/studio/

@@ -9,10 +9,13 @@ from .discover import (
     print_clf_taxonomy,
 )
 from .transforms import (
-    create_matrix,
-    create_conversion_matrix,
-    create_gamma,
-    generate_clf,
+    generate_clf_transform,
+    generate_clf_transforms_bmdfilm,
+    generate_clf_transforms_davinci,
+    generate_clf_transforms_itu,
+    generate_clf_transforms_ocio,
+    generate_clf_transforms_panasonic,
+    generate_clf_transforms_red,
 )
 
 __all__ = [
@@ -23,8 +26,11 @@ __all__ = [
     "print_clf_taxonomy",
 ]
 __all__ += [
-    "create_matrix",
-    "create_conversion_matrix",
-    "create_gamma",
-    "generate_clf",
+    "generate_clf_transform",
+    "generate_clf_transforms_bmdfilm",
+    "generate_clf_transforms_davinci",
+    "generate_clf_transforms_itu",
+    "generate_clf_transforms_ocio",
+    "generate_clf_transforms_panasonic",
+    "generate_clf_transforms_red",
 ]

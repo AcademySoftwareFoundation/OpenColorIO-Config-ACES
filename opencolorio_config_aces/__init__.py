@@ -28,8 +28,6 @@ from .config import (
     named_transform_factory,
     produce_transform,
     transform_factory,
-    transform_factory_clf_transform_to_group_transform,
-    transform_factory_default,
     view_transform_factory,
 )
 from .config import (
@@ -59,7 +57,7 @@ from .config import (
     ColorspaceDescriptionStyle,
     generate_config_aces,
 )
-from .config import generate_config_cg
+from .config import generate_config_cg, generate_config_studio
 from .clf import (
     discover_clf_transforms,
     classify_clf_transforms,
@@ -67,7 +65,7 @@ from .clf import (
     filter_clf_transforms,
     print_clf_taxonomy,
 )
-from .clf import generate_clf
+from .clf import generate_clf_transform
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -84,8 +82,6 @@ __all__ = [
     "named_transform_factory",
     "produce_transform",
     "transform_factory",
-    "transform_factory_clf_transform_to_group_transform",
-    "transform_factory_default",
     "view_transform_factory",
 ]
 __all__ += [
@@ -115,7 +111,7 @@ __all__ += [
     "ColorspaceDescriptionStyle",
     "generate_config_aces",
 ]
-__all__ += ["generate_config_cg"]
+__all__ += ["generate_config_cg", "generate_config_studio"]
 __all__ += [
     "discover_clf_transforms",
     "classify_clf_transforms",
@@ -123,12 +119,12 @@ __all__ += [
     "filter_clf_transforms",
     "print_clf_taxonomy",
 ]
-__all__ += ["generate_clf"]
+__all__ += ["generate_clf_transform"]
 
 __application_name__ = "OpenColorIO Configuration for ACES"
 
 __major_version__ = "0"
-__minor_version__ = "2"
+__minor_version__ = "3"
 __change_version__ = "0"
 __version__ = ".".join(
     (__major_version__, __minor_version__, __change_version__)

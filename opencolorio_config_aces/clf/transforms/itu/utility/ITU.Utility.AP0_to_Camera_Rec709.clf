@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ITU:Utility:AP0_to_Camera_Rec709:1.0" name="AP0 to Camera Rec.709">
+    <InputDescriptor>ACES2065-1</InputDescriptor>
+    <OutputDescriptor>Rec.709 camera OETF Rec.709 primaries, D65 white point</OutputDescriptor>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+   2.52168618674388   -1.13413098823972  -0.387555198504164
+ -0.276479914229922    1.37271908766826  -0.096239173438334
+-0.0153780649660342  -0.152975335867399    1.16835340083343
+        </Array>
+    </Matrix>
+    <Exponent inBitDepth="32f" outBitDepth="32f" style="monCurveRev">
+        <ExponentParams exponent="2.22222222222222" offset="0.099" />
+    </Exponent>
+</ProcessList>

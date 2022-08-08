@@ -17,19 +17,41 @@ Listing the tasks is done as follows::
 
     invoke --list
 
-Assuming the dependencies are satisfied, the task to build the **Reference**
-configuration is::
+Reference Config
+****************
 
-    invoke build-config-reference
++-----------------------+--------------------------------------------+
+| Task                  | Command                                    |
++-----------------------+--------------------------------------------+
+| Build                 | `invoke build-config-reference`            |
++-----------------------+--------------------------------------------+
+| Build (Docker)        | `invoke docker-run-build-config-reference` |
++-----------------------+--------------------------------------------+
+| Updating Mapping File | `invoke update-mapping-file-reference`     |
++-----------------------+--------------------------------------------+
 
-Alternatively, with the docker container built::
+CG Config
+*********
 
-    invoke docker-run-build-config-reference
++-----------------------+-------------------------------------+
+| Task                  | Command                             |
++-----------------------+-------------------------------------+
+| Build                 | `invoke build-config-cg`            |
++-----------------------+-------------------------------------+
+| Build (Docker)        | `invoke docker-run-build-config-cg` |
++-----------------------+-------------------------------------+
+| Updating Mapping File | `invoke update-mapping-file-cg`     |
++-----------------------+-------------------------------------+
 
-Likewise, for the **CG** configuration::
+Reference Config
+****************
 
-    invoke build-config-cg
-
-Or::
-
-    invoke docker-run-build-config-cg
++-----------------------+-----------------------------------------+
+| Task                  | Command                                 |
++-----------------------+-----------------------------------------+
+| Build                 | `invoke build-config-studio`            |
++-----------------------+-----------------------------------------+
+| Build (Docker)        | `invoke docker-run-build-config-studio` |
++-----------------------+-----------------------------------------+
+| Updating Mapping File | `invoke update-mapping-file-studio`     |
++-----------------------+-----------------------------------------+

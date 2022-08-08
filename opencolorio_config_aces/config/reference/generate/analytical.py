@@ -206,7 +206,7 @@ def node_to_colorspace(
     graph, node, describe=ColorspaceDescriptionStyle.LONG_UNION
 ):
     """
-    Generate the *OpenColorIO* colorspace for given *aces-dev* conversion
+    Generate the *OpenColorIO* `Colorspace` for given *aces-dev* conversion
     graph node.
 
     Parameters
@@ -214,14 +214,14 @@ def node_to_colorspace(
     graph : DiGraph
         *aces-dev* conversion graph.
     node : unicode
-        Node name to generate the *OpenColorIO* colorspace for.
+        Node name to generate the *OpenColorIO* `Colorspace` for.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
 
     Returns
     -------
-    ColorSpace
+    ocio.ColorSpace
         *OpenColorIO* colorspace.
     """
 
@@ -233,6 +233,7 @@ def node_to_colorspace(
         scheme="Legacy",
         to_reference=node_to_builtin_transform(graph, node),
         from_reference=node_to_builtin_transform(graph, node, "Reverse"),
+        aliases="",
     )
 
     return colorspace
@@ -240,13 +241,13 @@ def node_to_colorspace(
 
 def config_basename_aces():
     """
-    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method basename.
 
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config using the
+        *aces-dev* reference implementation *OpenColorIO* config using the
         analytical *Graph* method basename.
     """
 
@@ -258,13 +259,13 @@ def config_basename_aces():
 
 def config_name_aces():
     """
-    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph*  name.
 
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config using the
+        *aces-dev* reference implementation *OpenColorIO* config using the
         analytical *Graph* method name.
     """
 
@@ -277,13 +278,13 @@ def config_name_aces():
 
 def config_description_aces():
     """
-    Generate *aces-dev* reference implementation *OpenColorIO* Config
+    Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method description.
 
     Returns
     -------
     str
-        *aces-dev* reference implementation *OpenColorIO* Config using the
+        *aces-dev* reference implementation *OpenColorIO* config using the
         analytical *Graph* method description.
     """
 
@@ -314,10 +315,10 @@ def generate_config_aces(
     additional_data=False,
 ):
     """
-    Generate the *aces-dev* reference implementation *OpenColorIO* Config
+    Generate the *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method.
 
-    The Config generation is driven entirely from the *aces-dev* conversion
+    The config generation is driven entirely from the *aces-dev* conversion
     graph. The config generated, while not usable because of the missing
     *OpenColorIO* *BuiltinTransforms*, provides an exact mapping with the
     *aces-dev* *CTL* transforms, and, for example, uses the
@@ -461,7 +462,7 @@ def generate_config_aces(
         active_displays=display_names,
         active_views=list(dict.fromkeys([view["view"] for view in views])),
         file_rules=[{"name": "Default", "colorspace": "CSC - ACEScg"}],
-        profile_version=VersionData(2, 0),
+        profile_version=VersionData(2, 1),
     )
 
     config = generate_config(data, config_name, validate)
@@ -475,30 +476,29 @@ def generate_config_aces(
 
 
 if __name__ == "__main__":
-    import os
     import opencolorio_config_aces
     from opencolorio_config_aces import serialize_config_data
+    from pathlib import Path
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0],
-        "..",
-        "build",
-        "config",
-        "aces",
-        "analytical",
-    )
+    build_directory = (
+        Path(opencolorio_config_aces.__path__[0])
+        / ".."
+        / "build"
+        / "config"
+        / "aces"
+        / "analytical"
+    ).resolve()
 
     logger.info(f'Using "{build_directory}" build directory...')
 
-    if not os.path.exists(build_directory):
-        os.makedirs(build_directory)
+    build_directory.mkdir(parents=True, exist_ok=True)
 
     config_basename = config_basename_aces()
     config, data, colorspaces = generate_config_aces(
-        config_name=os.path.join(build_directory, config_basename),
+        config_name=build_directory / config_basename,
         additional_data=True,
     )
 
@@ -509,10 +509,7 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data,
-            os.path.join(
-                build_directory, config_basename.replace("ocio", "json")
-            ),
+            data, build_directory / config_basename.replace("ocio", "json")
         )
     except TypeError as error:
         logger.critical(error)

@@ -34,3 +34,5 @@ Common
     multi_replace
     regularise_version
     validate_method
+    google_sheet_title
+    slugify

@@ -5,16 +5,21 @@
 ================================
 
 Defines procedures for generating Sony *Common LUT Format* (CLF)
-transforms for the OpenColorIO project.
+transforms:
+
+-   :func:`opencolorio_config_aces.clf.generate_clf_sony`
 """
 
 import PyOpenColorIO as ocio
 from pathlib import Path
 
-from opencolorio_config_aces.clf import (
-    create_conversion_matrix,
-    generate_clf,
+from opencolorio_config_aces.clf.transforms import (
+    clf_basename,
+    format_clf_transform_id,
+    generate_clf_transform,
+    matrix_RGB_to_RGB_transform,
 )
+from opencolorio_config_aces.config import transform_factory
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -24,15 +29,26 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "generate_sony",
+    "FAMILY",
+    "GENUS",
+    "VERSION",
+    "generate_clf_sony",
 ]
 
-DEST_DIR = Path(__file__).parent.resolve() / "input"
+FAMILY = "Sony"
+"""
+*CLF* transforms family.
+"""
 
-TF_ID_PREFIX = "urn:aswf:ocio:transformId:1.0:"
-TF_ID_SUFFIX = ":1.0"
+GENUS = "Input"
+"""
+*CLF* transforms genus.
+"""
 
-CLF_SUFFIX = ".clf"
+VERSION = "1.0"
+"""
+*CLF* transforms version.
+"""
 
 
 def _build_slog3_curve():
@@ -45,7 +61,9 @@ def _build_slog3_curve():
     linearSlope = ((171.2102946929 - 95.0) / 0.01125000) / 1023.0
     base = 10.0
 
-    lct = ocio.LogCameraTransform(
+    lct = transform_factory(
+        transform_type="LogCameraTransform",
+        transform_factory="Constructor",
         base=base,
         linSideBreak=[linSideBreak] * 3,
         logSideSlope=[logSideSlope] * 3,
@@ -59,185 +77,208 @@ def _build_slog3_curve():
 
 
 def _build_sgamut3_mtx():
-    """Build the Matrix transform for the S-Gamut3 primaries."""
-    mtx = create_conversion_matrix("S-Gamut3", "ACES2065-1", "CAT02")
+    """Build the `MatrixTransform` for the S-Gamut3 primaries."""
+    mtx = matrix_RGB_to_RGB_transform("S-Gamut3", "ACES2065-1", "CAT02")
     return mtx
 
 
 def _build_sgamut3_cine_mtx():
-    """Build the Matrix transform for the S-Gamut3.Cine primaries."""
-    mtx = create_conversion_matrix("S-Gamut3.Cine", "ACES2065-1", "CAT02")
+    """Build the `MatrixTransform` for the S-Gamut3.Cine primaries."""
+    mtx = matrix_RGB_to_RGB_transform("S-Gamut3.Cine", "ACES2065-1", "CAT02")
     return mtx
 
 
 def _build_venice_sgamut3_mtx():
-    """Build the Matrix transform for the Venice S-Gamut3 primaries."""
-    mtx = create_conversion_matrix("Venice S-Gamut3", "ACES2065-1", "CAT02")
+    """Build the `MatrixTransform` for the Venice S-Gamut3 primaries."""
+    mtx = matrix_RGB_to_RGB_transform("Venice S-Gamut3", "ACES2065-1", "CAT02")
     return mtx
 
 
 def _build_venice_sgamut3_cine_mtx():
-    """Build the Matrix transform for the Venice S-Gamut3.Cine primaries."""
-    mtx = create_conversion_matrix(
+    """Build the `MatrixTransform` for the Venice S-Gamut3.Cine primaries."""
+    mtx = matrix_RGB_to_RGB_transform(
         "Venice S-Gamut3.Cine", "ACES2065-1", "CAT02"
     )
     return mtx
 
 
-def generate_sony():
-    """Make all the Sony CLFs."""
+def generate_clf_sony(output_directory):
+    """
+    Make all the Sony CLFs.
 
-    if not DEST_DIR.exists():
-        DEST_DIR.mkdir()
+    Returns
+    -------
+    dict
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
 
-    # The full transforms generated here were developed in collaboration with Sony.
+    Notes
+    -----
+    -   The full transforms generated here were developed in collaboration with
+        Sony.
+    """
+
+    output_directory.mkdir(parents=True, exist_ok=True)
+
+    clf_transforms = {}
 
     # Generate full S-Log3 - S-Gamut3 transform.
 
-    generate_clf(
-        ocio.GroupTransform(
-            transforms=[
-                _build_slog3_curve(),
-                _build_sgamut3_mtx(),
-            ]
-        ),
-        TF_ID_PREFIX + "Sony:Input:SLog3_SGamut3_to_ACES2065-1" + TF_ID_SUFFIX,
-        "Sony S-Log3 S-Gamut3 to ACES2065-1",
-        DEST_DIR / ("SLog3-SGamut3_to_ACES2065-1" + CLF_SUFFIX),
-        "Sony S-Log3 S-Gamut3",
-        "ACES2065-1",
+    name = "SLog3_SGamut3_to_ACES2065-1"
+    input_descriptor = "Sony S-Log3 S-Gamut3"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_slog3_curve(), _build_sgamut3_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
         "urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3.a1.v1",
     )
 
     # Generate the Linear S-Gamut3 transform.
 
-    generate_clf(
-        ocio.GroupTransform([_build_sgamut3_mtx()]),
-        TF_ID_PREFIX
-        + "Sony:Input:Linear_SGamut3_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Linear S-Gamut3 to ACES2065-1",
-        DEST_DIR / ("Linear-SGamut3_to_ACES2065-1" + CLF_SUFFIX),
-        "Linear S-Gamut3",
-        "ACES2065-1",
-        None,
+    name = "Linear_SGamut3_to_ACES2065-1"
+    input_descriptor = "Linear S-Gamut3"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_sgamut3_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
     )
 
     # Generate full S-Log3 - S-Gamut3.Cine transform.
 
-    generate_clf(
-        ocio.GroupTransform(
-            transforms=[
-                _build_slog3_curve(),
-                _build_sgamut3_cine_mtx(),
-            ]
-        ),
-        TF_ID_PREFIX
-        + "Sony:Input:SLog3_SGamut3Cine_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Sony S-Log3 S-Gamut3.Cine to ACES2065-1",
-        DEST_DIR / ("SLog3-SGamut3Cine_to_ACES2065-1" + CLF_SUFFIX),
-        "Sony S-Log3 S-Gamut3.Cine",
-        "ACES2065-1",
+    name = "SLog3_SGamut3Cine_to_ACES2065-1"
+    input_descriptor = "Sony S-Log3 S-Gamut3.Cine"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_slog3_curve(), _build_sgamut3_cine_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
         "urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3Cine.a1.v1",
     )
 
     # Generate the Linear S-Gamut3.Cine transform.
 
-    generate_clf(
-        ocio.GroupTransform([_build_sgamut3_cine_mtx()]),
-        TF_ID_PREFIX
-        + "Sony:Input:Linear_SGamut3Cine_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Linear S-Gamut3.Cine to ACES2065-1",
-        DEST_DIR / ("Linear-SGamut3Cine_to_ACES2065-1" + CLF_SUFFIX),
-        "Linear S-Gamut3.Cine",
-        "ACES2065-1",
-        None,
+    name = "Linear_SGamut3Cine_to_ACES2065-1"
+    input_descriptor = "Linear S-Gamut3.Cine"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_sgamut3_cine_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
     )
 
-    # Generate full Venice S-Log3 - S-Gamut3 transform.
+    # Generate full S-Log3 - Venice S-Gamut3 transform.
 
-    generate_clf(
-        ocio.GroupTransform(
-            transforms=[
-                _build_slog3_curve(),
-                _build_venice_sgamut3_mtx(),
-            ]
-        ),
-        TF_ID_PREFIX
-        + "Sony:Input:Venice_SLog3_SGamut3_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Sony Venice S-Log3 S-Gamut3 to ACES2065-1",
-        DEST_DIR / ("Venice-SLog3-SGamut3_to_ACES2065-1" + CLF_SUFFIX),
-        "Sony Venice S-Log3 S-Gamut3",
-        "ACES2065-1",
+    name = "SLog3_Venice_SGamut3_to_ACES2065-1"
+    input_descriptor = "Sony S-Log3 Venice S-Gamut3"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_slog3_curve(), _build_venice_sgamut3_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
         "urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1",
     )
 
     # Generate the Linear Venice S-Gamut3 transform.
 
-    generate_clf(
-        ocio.GroupTransform([_build_venice_sgamut3_cine_mtx()]),
-        TF_ID_PREFIX
-        + "Sony:Input:Linear_Venice_SGamut3_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Linear Venice S-Gamut3 to ACES2065-1",
-        DEST_DIR / ("Linear-Venice-SGamut3_to_ACES2065-1" + CLF_SUFFIX),
-        "Linear Venice S-Gamut3",
-        "ACES2065-1",
-        None,
+    name = "Linear_Venice_SGamut3_to_ACES2065-1"
+    input_descriptor = "Linear Venice S-Gamut3"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_venice_sgamut3_cine_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
     )
 
-    # Generate full Venice S-Log3 - S-Gamut3.Cine transform.
+    # Generate full S-Log3 - Venice S-Gamut3.Cine transform.
 
-    generate_clf(
-        ocio.GroupTransform(
-            transforms=[
-                _build_slog3_curve(),
-                _build_venice_sgamut3_cine_mtx(),
-            ]
-        ),
-        TF_ID_PREFIX
-        + "Sony:Input:Venice_SLog3_SGamut3Cine_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Sony Venice S-Log3 S-Gamut3.Cine to ACES2065-1",
-        DEST_DIR / ("Venice-SLog3-SGamut3Cine_to_ACES2065-1" + CLF_SUFFIX),
-        "Sony Venice S-Log3 S-Gamut3.Cine",
-        "ACES2065-1",
+    name = "SLog3_Venice_SGamut3Cine_to_ACES2065-1"
+    input_descriptor = "Sony S-Log3 Venice S-Gamut3.Cine"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_slog3_curve(), _build_venice_sgamut3_cine_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
         "urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1",
     )
 
     # Generate the Linear Venice S-Gamut3.Cine transform.
 
-    generate_clf(
-        ocio.GroupTransform([_build_venice_sgamut3_cine_mtx()]),
-        TF_ID_PREFIX
-        + "Sony:Input:Linear_Venice_SGamut3Cine_to_ACES2065-1"
-        + TF_ID_SUFFIX,
-        "Linear Venice S-Gamut3.Cine to ACES2065-1",
-        DEST_DIR / ("Linear-Venice-SGamut3Cine_to_ACES2065-1" + CLF_SUFFIX),
-        "Linear Venice S-Gamut3.Cine",
-        "ACES2065-1",
-        None,
+    name = "Linear_Venice_SGamut3Cine_to_ACES2065-1"
+    input_descriptor = "Linear Venice S-Gamut3.Cine"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_venice_sgamut3_cine_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
     )
 
-    # Generate named transform for S-Log3 curve only.
+    # Generate `NamedTransform` for S-Log3 curve only.
 
-    generate_clf(
-        ocio.GroupTransform([_build_slog3_curve()]),
-        TF_ID_PREFIX + "Sony:Input:SLog3_Log_to_Linear" + TF_ID_SUFFIX,
-        "S-Log3 Log to Linear Curve",
-        DEST_DIR / ("SLog3-Curve" + CLF_SUFFIX),
-        "S-Log3 Log (arbitrary primaries)",
-        "S-Log3 Linear (arbitrary primaries)",
-        None,
+    name = "SLog3-Curve_to_Linear"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    input_descriptor = "S-Log3 Log (arbitrary primaries)"
+    output_descriptor = "S-Log3 Linear (arbitrary primaries)"
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [_build_slog3_curve()],
+        clf_transform_id,
+        f'{input_descriptor.replace(" (arbitrary primaries)", "")} to Linear Curve',
+        input_descriptor,
+        output_descriptor,
     )
 
-    return 0
+    return clf_transforms
 
 
 if __name__ == "__main__":
-    import sys
+    import logging
 
-    sys.exit(generate_sony())
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
+    output_directory = Path(__file__).parent.resolve() / "input"
+
+    generate_clf_sony(output_directory)

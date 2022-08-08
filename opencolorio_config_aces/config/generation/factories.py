@@ -37,7 +37,8 @@ __all__ = [
     "named_transform_factory",
     "view_transform_factory",
     "look_factory",
-    "transform_factory_default",
+    "transform_factory_setter",
+    "transform_factory_constructor",
     "transform_factory_clf_transform_to_group_transform",
     "TRANSFORM_FACTORIES",
     "transform_factory",
@@ -47,7 +48,7 @@ __all__ = [
 
 def group_transform_factory(transforms):
     """
-    *OpenColorIO* group transform factory.
+    *OpenColorIO* `GroupTransform` factory.
 
     Parameters
     ----------
@@ -56,8 +57,8 @@ def group_transform_factory(transforms):
 
     Returns
     -------
-    GroupTransform
-        *OpenColorIO* group transform.
+    ocio.GroupTransform
+        *OpenColorIO* `GroupTransform`.
     """
 
     logging.debug(
@@ -91,40 +92,40 @@ def colorspace_factory(
     **kwargs,
 ):
     """
-    *OpenColorIO* colorspace factory.
+    *OpenColorIO* `Colorspace` factory.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* colorspace name.
+        *OpenColorIO* `Colorspace` name.
     family : unicode, optional
-        *OpenColorIO* colorspace family.
+        *OpenColorIO* `Colorspace` family.
     encoding : unicode, optional
-        *OpenColorIO* colorspace encoding.
+        *OpenColorIO* `Colorspace` encoding.
     aliases : unicode or array_like, optional
-        *OpenColorIO* colorspace aliases.
+        *OpenColorIO* `Colorspace` aliases.
     categories : unicode or array_like, optional
-        *OpenColorIO* colorspace categories.
+        *OpenColorIO* `Colorspace` categories.
     description : unicode, optional
-        *OpenColorIO* colorspace description.
+        *OpenColorIO* `Colorspace` description.
     equality_group : unicode, optional
-        *OpenColorIO* colorspace equality_group.
+        *OpenColorIO* `Colorspace` equality_group.
     bit_depth : int, optional
-        *OpenColorIO* colorspace bit depth.
+        *OpenColorIO* `Colorspace` bit depth.
     allocation : int, optional
-        *OpenColorIO* colorspace allocation type.
+        *OpenColorIO* `Colorspace` allocation type.
     allocation_vars : tuple, optional
-        *OpenColorIO* colorspace allocation variables.
+        *OpenColorIO* `Colorspace` allocation variables.
     to_reference : dict or object, optional
-        *To Reference* *OpenColorIO* colorspace transform.
+        *To Reference* *OpenColorIO* transform.
     from_reference : dict or object, optional
-        *From Reference* *OpenColorIO* colorspace transform.
+        *From Reference* *OpenColorIO* transform.
     reference_space : unicode or ReferenceSpaceType, optional
-        *OpenColorIO* colorspace reference space.
+        *OpenColorIO* `Colorspace` reference space.
     is_data : bool, optional
-        Whether the colorspace represents data.
+        Whether the `Colorspace` represents data.
     base_colorspace : dict or ColorSpace, optional
-        *OpenColorIO* base colorspace inherited for initial attribute values.
+        *OpenColorIO* base `Colorspace` inherited for initial attribute values.
 
     Other Parameters
     ----------------
@@ -133,7 +134,7 @@ def colorspace_factory(
 
     Returns
     -------
-    ColorSpace
+    ocio.ColorSpace
         *OpenColorIO* colorspace.
     """
 
@@ -188,16 +189,22 @@ def colorspace_factory(
 
     if aliases is not None:
         if isinstance(aliases, str):
-            aliases = [aliases]
+            aliases = re.split("[,;]+", aliases)
 
         for alias in aliases:
+            if not alias:
+                continue
+
             colorspace.addAlias(alias)
 
     if categories is not None:
         if isinstance(categories, str):
-            categories = re.split("[,;\\s]+", categories)
+            categories = re.split("[,;]+", categories)
 
         for category in categories:
+            if not category:
+                continue
+
             colorspace.addCategory(category)
 
     if description is not None:
@@ -225,28 +232,28 @@ def named_transform_factory(
     **kwargs,
 ):
     """
-    *OpenColorIO* named transform factory.
+    *OpenColorIO* `NamedTransform` factory.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* colorspace name.
+        *OpenColorIO* `NamedTransform` name.
     family : unicode, optional
-        *OpenColorIO* colorspace family.
+        *OpenColorIO* `NamedTransform` family.
     encoding : unicode, optional
-        *OpenColorIO* colorspace encoding.
+        *OpenColorIO* `NamedTransform` encoding.
     aliases : unicode or array_like, optional
-        *OpenColorIO* colorspace aliases.
+        *OpenColorIO* `NamedTransform` aliases.
     categories : unicode or array_like, optional
-        *OpenColorIO* colorspace categories.
+        *OpenColorIO* `NamedTransform` categories.
     description : unicode, optional
-        *OpenColorIO* colorspace description.
+        *OpenColorIO* `NamedTransform` description.
     forward_transform : dict or object, optional
         *Forward* *OpenColorIO* transform.
     inverse_transform : dict or object, optional
         *Inverse* *OpenColorIO* transform.
     base_named_transform : dict or NamedTransform, optional
-        *OpenColorIO* base named transform inherited for initial attribute
+        *OpenColorIO* base `NamedTransform` inherited for initial attribute
         values.
 
     Other Parameters
@@ -256,8 +263,8 @@ def named_transform_factory(
 
     Returns
     -------
-    NamedTransform
-        *OpenColorIO* named transform.
+    ocio.NamedTransform
+        *OpenColorIO* `NamedTransform`.
     """
 
     logging.debug(
@@ -304,7 +311,7 @@ def named_transform_factory(
 
     if categories is not None:
         if isinstance(categories, str):
-            categories = re.split("[,;\\s]+", categories)
+            categories = re.split("[,;]+", categories)
 
         for category in categories:
             named_transform.addCategory(category)
@@ -327,26 +334,26 @@ def view_transform_factory(
     **kwargs,
 ):
     """
-    *OpenColorIO* view transform factory.
+    *OpenColorIO* `ViewTransform` factory.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* view transform name.
+        *OpenColorIO* `ViewTransform` name.
     family : unicode, optional
-        *OpenColorIO* view transform family.
+        *OpenColorIO* `ViewTransform` family.
     categories : array_like, optional
-        *OpenColorIO* view transform categories.
+        *OpenColorIO* `ViewTransform` categories.
     description : unicode, optional
-        *OpenColorIO* view transform description.
+        *OpenColorIO* `ViewTransform` description.
     to_reference : dict or object, optional
-        *To Reference* *OpenColorIO* view transform.
+        *To Reference* *OpenColorIO* `ViewTransform`.
     from_reference : dict or object, optional
-        *From Reference* *OpenColorIO* view transform.
+        *From Reference* *OpenColorIO* `ViewTransform`.
     reference_space : unicode or ReferenceSpaceType, optional
-        *OpenColorIO* view transform reference space.
+        *OpenColorIO* `ViewTransform` reference space.
     base_view_transform : dict or ViewTransform, optional
-        *OpenColorIO* base view transform inherited for initial attribute
+        *OpenColorIO* base `ViewTransform` inherited for initial attribute
         values.
 
     Other Parameters
@@ -356,8 +363,8 @@ def view_transform_factory(
 
     Returns
     -------
-    ViewTransform
-        *OpenColorIO* view transform.
+    ocio.ViewTransform
+        *OpenColorIO* `ViewTransform`.
     """
 
     logging.debug(
@@ -417,23 +424,23 @@ def look_factory(
     **kwargs,
 ):
     """
-    *OpenColorIO* look factory.
+    *OpenColorIO* `Look` factory.
 
     Parameters
     ----------
     name : unicode
-        *OpenColorIO* look name.
+        *OpenColorIO* `Look` name.
     process_space : unicode, optional
-        *OpenColorIO* look process space, e.g. *OpenColorIO* colorspace or role
-        name.
+        *OpenColorIO* `Look` process space, e.g. *OpenColorIO* `Colorspace` or
+        role name.
     description : unicode, optional
-        *OpenColorIO* look description.
+        *OpenColorIO* `Look` description.
     forward_transform : dict or object, optional
-        *To Reference* *OpenColorIO* look transform.
+        *To Reference* *OpenColorIO* `Look` transform.
     inverse_transform : dict or object, optional
-        *From Reference* *OpenColorIO* look transform.
+        *From Reference* *OpenColorIO* `Look` transform.
     base_look : dict or ViewTransform, optional
-        *OpenColorIO* base look inherited for initial attribute values.
+        *OpenColorIO* base `Look` inherited for initial attribute values.
 
     Other Parameters
     ----------------
@@ -442,8 +449,8 @@ def look_factory(
 
     Returns
     -------
-    Look
-        *OpenColorIO* look.
+    ocio.Look
+        *OpenColorIO* `Look`.
     """
 
     logging.debug(
@@ -478,10 +485,11 @@ def look_factory(
     return look
 
 
-def transform_factory_default(**kwargs):
+def transform_factory_setter(**kwargs):
     """
     *OpenColorIO* default transform factory that produces an *OpenColorIO*
-    transform according to given ``name`` keyword argument.
+    transform according to given ``name`` keyword argument. The ``kwargs`` are
+    set on the instance.
 
     Other Parameters
     ----------------
@@ -500,6 +508,8 @@ def transform_factory_default(**kwargs):
 
     transform = getattr(ocio, kwargs.pop("transform_type"))()
 
+    kwargs.pop("transform_factory", None)
+
     logging.debug(
         f'Producing a "{transform.__class__.__name__}" transform with the '
         f"following parameters:\n"
@@ -517,10 +527,44 @@ def transform_factory_default(**kwargs):
     return transform
 
 
+def transform_factory_constructor(**kwargs):
+    """
+    *OpenColorIO* default transform factory that produces an *OpenColorIO*
+    transform according to given ``name`` keyword argument. The ``kwargs`` are
+    evaluated directly in the constructor.
+
+    Other Parameters
+    ----------------
+    name : unicode
+        *OpenColorIO* transform class/type name, e.g. ``CDLTransform``.
+    \\**kwargs : dict, optional
+        Keywords arguments that are evaluated directly in the constructor.
+
+    Returns
+    -------
+    object
+        *OpenColorIO* transform.
+    """
+
+    transform_type = kwargs.pop("transform_type")
+
+    transform = getattr(ocio, transform_type)
+
+    kwargs.pop("transform_factory", None)
+
+    logging.debug(
+        f'Producing a "{transform_type}" transform with the '
+        f"following parameters:\n"
+        f"{indent(pformat(kwargs), '    ')}"
+    )
+
+    return transform(**kwargs)
+
+
 def transform_factory_clf_transform_to_group_transform(**kwargs):
     """
     *OpenColorIO* transform factory that produces an *OpenColorIO*
-    group transform if given ``name`` keyword argument is ``FileTransform`` and
+    `GroupTransform` if given ``name`` keyword argument is ``FileTransform`` and
     the ``src`` keyword argument is a *CLF* transform absolute path.
 
     Other Parameters
@@ -532,8 +576,8 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
 
     Returns
     -------
-    GroupTransform
-        *OpenColorIO* group transform.
+    ocio.GroupTransform
+        *OpenColorIO* `GroupTransform`.
     """
 
     assert kwargs["transform_type"] == "FileTransform"
@@ -552,7 +596,8 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
 
 
 TRANSFORM_FACTORIES = {
-    "Default": transform_factory_default,
+    "Setter": transform_factory_setter,
+    "Constructor": transform_factory_constructor,
     "CLF Transform to Group Transform": (
         transform_factory_clf_transform_to_group_transform
     ),
@@ -571,7 +616,7 @@ def transform_factory(**kwargs):
     Other Parameters
     ----------------
     factory : unicode
-        {'Default', 'CLF Transform to Group Transform'},
+        {'Default', 'CLF Transform to `GroupTransform`'},
         *OpenColorIO* transform factory name.
     \\**kwargs : dict, optional
         Keywords arguments for the factory.
@@ -582,7 +627,7 @@ def transform_factory(**kwargs):
         *OpenColorIO* transform.
     """
 
-    factory = TRANSFORM_FACTORIES[kwargs.get("transform_factory", "Default")]
+    factory = TRANSFORM_FACTORIES[kwargs.get("transform_factory", "Setter")]
 
     return factory(**kwargs)
 
@@ -595,7 +640,7 @@ def produce_transform(transform):
     ----------
     transform : object or dict or array_like
         Transform to produce, either a single transform if a `Mapping`
-        instance or a group transform is a `Sequence` instance.
+        instance or a `GroupTransform` is a `Sequence` instance.
 
     Returns
     -------

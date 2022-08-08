@@ -3,7 +3,7 @@
 
 [tool.poetry]
 name = "opencolorio-config-aces"
-version = "0.2.0"
+version = "0.3.0"
 description = "OpenColorIO Configuration for ACES"
 authors = [ "OpenColorIO Contributors" ]
 maintainers = [ "OpenColorIO Contributors <ocio-dev@lists.aswf.io>" ]
@@ -84,6 +84,11 @@ development = [
 ]
 optional = [ "colour-science", "jsonpickle", "networkx" ]
 graphviz = [ "pygraphviz" ]
+read-the-docs = [
+    "networkx",
+    "pydata-sphinx-theme",
+    "pygraphviz",
+]
 
 [tool.black]
 line-length = 79

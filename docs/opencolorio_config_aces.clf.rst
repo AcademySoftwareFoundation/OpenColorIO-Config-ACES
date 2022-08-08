@@ -28,4 +28,21 @@ Common LUT Format Generation
 .. autosummary::
     :toctree: generated/
 
-    generate_clf
+    generate_clf_transform
+
+**Ancillary Objects**
+
+``opencolorio_config_aces.clf``
+
+.. currentmodule:: opencolorio_config_aces.clf
+
+.. autosummary::
+    :toctree: generated/
+
+    generate_clf_transforms_bmdfilm
+    generate_clf_transforms_davinci
+    generate_clf_transforms_itu
+    generate_clf_transforms_ocio
+    generate_clf_transforms_utility
+    generate_clf_transforms_panasonic
+    generate_clf_transforms_red

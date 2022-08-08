@@ -65,7 +65,6 @@ html_theme_options = {
         },
     ],
 }
-html_logo = "_static/Logo_Small_001.png"
 html_static_path = ["_static"]
 htmlhelp_basename = f"{basename}Doc"
 
@@ -88,7 +87,6 @@ latex_documents = [
         "manual",
     ),
 ]
-latex_logo = "_static/Logo_Medium_001.png"
 
 # -- Options for manual page output ---------------------------------------
 man_pages = [

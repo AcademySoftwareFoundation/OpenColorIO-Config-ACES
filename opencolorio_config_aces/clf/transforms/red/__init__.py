@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright Contributors to the OpenColorIO Project.
 
-from .generate import generate_red
+from .generate import (
+    generate_clf_transforms_red,
+)
 
 __all__ = [
-    "generate_red",
+    "generate_clf_transforms_red",
 ]

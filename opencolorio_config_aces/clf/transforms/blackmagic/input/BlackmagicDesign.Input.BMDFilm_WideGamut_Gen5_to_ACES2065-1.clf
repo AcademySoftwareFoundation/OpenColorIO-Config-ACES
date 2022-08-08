@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:BMDFilm_WideGamut_Gen5_to_ACES2065-1:1.0" name="Blackmagic Film Wide Gamut (Gen 5) to ACES2065-1">
+    <InputDescriptor>Blackmagic Film Wide Gamut (Gen 5)</InputDescriptor>
+    <OutputDescriptor>ACES2065-1</OutputDescriptor>
+    <Info>
+        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.BlackmagicDesign.BMDFilm_WideGamut_Gen5.a1.v1</ACEStransformID>
+    </Info>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="2.71828182845905" linSideSlope="1" linSideOffset="0.00549407243225781" logSideSlope="0.0869287606549122" logSideOffset="0.530013339229194" linSideBreak="0.005" />
+    </Log>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+  0.647091325580708   0.242595385134207   0.110313289285085
+ 0.0651915997328519    1.02504756760476 -0.0902391673376125
+-0.0275570729194699 -0.0805887097177784    1.10814578263725
+        </Array>
+    </Matrix>
+</ProcessList>
