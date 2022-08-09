@@ -284,6 +284,7 @@ PATTERNS_DISPLAY_NAME_REFERENCE : dict
 PATTERNS_ALIAS_REFERENCE = {
     "Curve": "crv",
     "Gamma ": "g",
+    "Linear ": "lin",
     "Texture": "",
     "-Gamut": "gamut",
     "-Log": "log",
