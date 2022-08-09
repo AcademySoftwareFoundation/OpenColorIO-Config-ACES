@@ -60,6 +60,7 @@ __status__ = "Production"
 __all__ = [
     "URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG",
     "PATH_TRANSFORMS_MAPPING_FILE_CG",
+    "is_reference",
     "clf_transform_to_description",
     "clf_transform_to_colorspace",
     "clf_transform_to_named_transform",
@@ -95,6 +96,28 @@ PATH_TRANSFORMS_MAPPING_FILE_CG : unicode
 """
 
 
+def is_reference(name):
+    """
+    Return whether given name represent a reference linear-like space.
+
+    Parameters
+    ----------
+    name : str
+        Name.
+
+    Returns
+    -------
+    str
+        Whether given name represent a reference linear-like space.
+    """
+
+    return name.lower() in (
+        COLORSPACE_SCENE_ENCODING_REFERENCE.lower(),
+        "ap0",
+        "linear",
+    )
+
+
 def clf_transform_to_colorspace_name(clf_transform):
     """
     Generate the *OpenColorIO* `Colorspace` name for given *CLF* transform.
@@ -110,11 +133,7 @@ def clf_transform_to_colorspace_name(clf_transform):
         *OpenColorIO* `Colorspace` name.
     """
 
-    if clf_transform.source in (
-        COLORSPACE_SCENE_ENCODING_REFERENCE,
-        "AP0",
-        "Linear",
-    ):
+    if is_reference(clf_transform.source):
         name = clf_transform.target
     else:
         name = clf_transform.source
@@ -192,8 +211,8 @@ def clf_transform_to_colorspace(
     describe : bool, optional
         Whether to use the full *CLF* transform description or just its ID.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* `Colorspace` signature only, i.e. the
-        arguments for its instantiation.
+        Whether to return the *OpenColorIO* `Colorspace` signature only, i.e.
+        the arguments for its instantiation.
 
     Other Parameters
     ----------------
@@ -215,12 +234,18 @@ def clf_transform_to_colorspace(
             f"{clf_transform.clf_transform_id.namespace}"
         ),
         "description": clf_transform_to_description(clf_transform, describe),
-        "from_reference": {
-            "transform_type": "FileTransform",
-            "transform_factory": "CLF Transform to Group Transform",
-            "src": clf_transform.path,
-        },
     }
+
+    file_transform = {
+        "transform_type": "FileTransform",
+        "transform_factory": "CLF Transform to Group Transform",
+        "src": clf_transform.path,
+    }
+    if is_reference(clf_transform.source):
+        signature["from_reference"] = file_transform
+    else:
+        signature["to_reference"] = file_transform
+
     signature.update(kwargs)
 
     signature["aliases"] = list(
@@ -276,12 +301,18 @@ def clf_transform_to_named_transform(
             f"{clf_transform.clf_transform_id.namespace}"
         ),
         "description": clf_transform_to_description(clf_transform, describe),
-        "forward_transform": {
-            "transform_type": "FileTransform",
-            "transform_factory": "CLF Transform to Group Transform",
-            "src": clf_transform.path,
-        },
     }
+
+    file_transform = {
+        "transform_type": "FileTransform",
+        "transform_factory": "CLF Transform to Group Transform",
+        "src": clf_transform.path,
+    }
+    if is_reference(clf_transform.source):
+        signature["forward_transform"] = file_transform
+    else:
+        signature["inverse_transform"] = file_transform
+
     signature.update(kwargs)
 
     signature["aliases"] = list(
@@ -334,6 +365,7 @@ def style_to_colorspace(
         *OpenColorIO* `Colorspace` or its signature for given style.
     """
 
+    # TODO: Implement "BuiltinTransform" name beautification.
     builtin_transform = ocio.BuiltinTransform(style)
 
     description = None
@@ -357,13 +389,25 @@ def style_to_colorspace(
                 clf_transform, signature_only=True, **kwargs
             )
         )
+        source = clf_transform.source
+    else:
+        # TODO: Implement solid "BuiltinTransform" source detection.
+        source = style.lower().split(" - ", 1)[-1].split("_to_")[0]
 
-    signature.update(
-        {
-            "to_reference": builtin_transform,
-            "description": description,
-        }
-    )
+    if is_reference(source):
+        signature.update(
+            {
+                "from_reference": builtin_transform,
+                "description": description,
+            }
+        )
+    else:
+        signature.update(
+            {
+                "to_reference": builtin_transform,
+                "description": description,
+            }
+        )
     signature.update(**kwargs)
 
     signature["aliases"] = list(
@@ -373,10 +417,15 @@ def style_to_colorspace(
     )
 
     if signature_only:
-        signature["to_reference"] = {
+        builtin_transform = {
             "transform_type": "BuiltinTransform",
             "style": style,
         }
+        if is_reference(source):
+            signature["from_reference"] = builtin_transform
+        else:
+            signature["to_reference"] = builtin_transform
+
         return signature
     else:
         colorspace = colorspace_factory(**signature)
@@ -420,6 +469,7 @@ def style_to_named_transform(
         *OpenColorIO* `NamedTransform` or its signature for given style.
     """
 
+    # TODO: Implement "BuiltinTransform" name beautification.
     builtin_transform = ocio.BuiltinTransform(style)
 
     description = None
@@ -444,13 +494,25 @@ def style_to_named_transform(
             )
         )
         signature.pop("from_reference", None)
+        source = clf_transform.source
+    else:
+        # TODO: Implement solid "BuiltinTransform" source detection.
+        source = style.lower().split(" - ", 1)[-1].split("_to_")[0]
 
-    signature.update(
-        {
-            "forward_transform": builtin_transform,
-            "description": description,
-        }
-    )
+    if is_reference(source):
+        signature.update(
+            {
+                "forward_transform": builtin_transform,
+                "description": description,
+            }
+        )
+    else:
+        signature.update(
+            {
+                "inverse_transform": builtin_transform,
+                "description": description,
+            }
+        )
     signature.update(**kwargs)
 
     signature["aliases"] = list(
@@ -460,10 +522,15 @@ def style_to_named_transform(
     )
 
     if signature_only:
-        signature["forward_transform"] = {
+        builtin_transform = {
             "transform_type": "BuiltinTransform",
             "style": style,
         }
+        if is_reference(source):
+            signature["forward_transform"] = builtin_transform
+        else:
+            signature["inverse_transform"] = builtin_transform
+
         return signature
     else:
         colorspace = named_transform_factory(**signature)
@@ -681,7 +748,6 @@ def generate_config_cg(
     builtin_transforms = [
         builtin for builtin in ocio.BuiltinTransformRegistry()
     ]
-
     logger.debug(f'Using {builtin_transforms} "Builtin" transforms...')
 
     def transform_aliases(transform_data):
