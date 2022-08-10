@@ -25,10 +25,15 @@ from opencolorio_config_aces.clf import (
     unclassify_clf_transforms,
 )
 from opencolorio_config_aces.config.generation import (
+    SEPARATOR_COLORSPACE_NAME,
+    SEPARATOR_BUILTIN_TRANSFORM_NAME,
+    SEPARATOR_COLORSPACE_FAMILY,
     VersionData,
+    beautify_alias,
+    beautify_colorspace_name,
     colorspace_factory,
-    named_transform_factory,
     generate_config,
+    named_transform_factory,
 )
 from opencolorio_config_aces.config.reference import (
     ColorspaceDescriptionStyle,
@@ -38,9 +43,6 @@ from opencolorio_config_aces.config.reference import (
 )
 from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_SCENE_ENCODING_REFERENCE,
-    SEPARATOR_COLORSPACE_FAMILY_REFERENCE,
-    beautify_alias,
-    beautify_colorspace_name,
     format_optional_prefix,
     format_swapped_affix,
 )
@@ -230,7 +232,7 @@ def clf_transform_to_colorspace(
         "name": clf_transform_to_colorspace_name(clf_transform),
         "family": (
             f"{clf_transform.clf_transform_id.type}"
-            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
+            f"{SEPARATOR_COLORSPACE_FAMILY}"
             f"{clf_transform.clf_transform_id.namespace}"
         ),
         "description": clf_transform_to_description(clf_transform, describe),
@@ -297,7 +299,7 @@ def clf_transform_to_named_transform(
         "name": clf_transform_to_colorspace_name(clf_transform),
         "family": (
             f"{clf_transform.clf_transform_id.type}"
-            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
+            f"{SEPARATOR_COLORSPACE_FAMILY}"
             f"{clf_transform.clf_transform_id.namespace}"
         ),
         "description": clf_transform_to_description(clf_transform, describe),
@@ -392,7 +394,11 @@ def style_to_colorspace(
         source = clf_transform.source
     else:
         # TODO: Implement solid "BuiltinTransform" source detection.
-        source = style.lower().split(" - ", 1)[-1].split("_to_")[0]
+        source = (
+            style.lower()
+            .split(SEPARATOR_COLORSPACE_NAME, 1)[-1]
+            .split(SEPARATOR_BUILTIN_TRANSFORM_NAME)[0]
+        )
 
     if is_reference(source):
         signature.update(
@@ -497,7 +503,11 @@ def style_to_named_transform(
         source = clf_transform.source
     else:
         # TODO: Implement solid "BuiltinTransform" source detection.
-        source = style.lower().split(" - ", 1)[-1].split("_to_")[0]
+        source = (
+            style.lower()
+            .split(SEPARATOR_COLORSPACE_NAME, 1)[-1]
+            .split(SEPARATOR_BUILTIN_TRANSFORM_NAME)[0]
+        )
 
     if is_reference(source):
         signature.update(

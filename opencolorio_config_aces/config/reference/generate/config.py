@@ -20,8 +20,16 @@ from enum import Flag, auto
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
-    VersionData,
     ConfigData,
+    SEPARATOR_COLORSPACE_FAMILY,
+    SEPARATOR_COLORSPACE_NAME,
+    VersionData,
+    beautify_alias,
+    beautify_colorspace_name,
+    beautify_display_name,
+    beautify_look_name,
+    beautify_transform_family,
+    beautify_view_transform_name,
     colorspace_factory,
     generate_config,
     look_factory,
@@ -36,9 +44,7 @@ from opencolorio_config_aces.config.reference import (
 )
 from opencolorio_config_aces.utilities import (
     git_describe,
-    multi_replace,
     regularise_version,
-    slugify,
     validate_method,
 )
 
@@ -55,23 +61,8 @@ __all__ = [
     "COLORSPACE_SCENE_ENCODING_REFERENCE",
     "COLORSPACE_OUTPUT_ENCODING_REFERENCE",
     "FAMILY_DISPLAY_REFERENCE",
-    "SEPARATOR_COLORSPACE_NAME_REFERENCE",
-    "SEPARATOR_COLORSPACE_FAMILY_REFERENCE",
-    "SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE",
-    "PATTERNS_COLORSPACE_NAME_REFERENCE",
-    "PATTERNS_LOOK_NAME_REFERENCE",
-    "PATTERNS_TRANSFORM_FAMILY_REFERENCE",
-    "PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE",
-    "PATTERNS_DISPLAY_NAME_REFERENCE",
-    "PATTERNS_ALIAS_REFERENCE",
     "ColorspaceDescriptionStyle",
     "version_config_mapping_file",
-    "beautify_name",
-    "beautify_colorspace_name",
-    "beautify_look_name",
-    "beautify_transform_family",
-    "beautify_view_transform_name",
-    "beautify_display_name",
     "format_optional_prefix",
     "format_swapped_affix",
     "ctl_transform_to_colorspace_name",
@@ -132,173 +123,6 @@ FAMILY_DISPLAY_REFERENCE = "Display"
 FAMILY_DISPLAY_REFERENCE : unicode
 """
 
-SEPARATOR_COLORSPACE_NAME_REFERENCE = " - "
-"""
-*OpenColorIO* config colorspace name separator.
-
-SEPARATOR_COLORSPACE_NAME_REFERENCE : unicode
-"""
-
-SEPARATOR_COLORSPACE_FAMILY_REFERENCE = "/"
-"""
-*OpenColorIO* config colorspace family separator.
-
-SEPARATOR_COLORSPACE_FAMILY_REFERENCE : unicode
-"""
-
-SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE = "_to_"
-"""
-*OpenColorIO* config *BuiltinTransform* name separator.
-
-SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE : unicode
-"""
-
-PATTERNS_COLORSPACE_NAME_REFERENCE = {
-    "ACES_0_1_1": "ACES 0.1.1",
-    "ACES_0_2_2": "ACES 0.2.2",
-    "ACES_0_7_1": "ACES 0.7.1",
-    "_7nits": "",
-    "_15nits": "",
-    "_": " ",
-    "-raw": "",
-    "-": " ",
-    "\\b(\\w+)limited\\b": "(\\1 Limited)",
-    "\\b(\\d+)nits\\b": "(\\1 nits)",
-    "RGBmonitor": "sRGB",
-    "\\bP3 D": "P3-D",
-    "Gamma1": "Gamma 1",
-    "Gamma2": "Gamma 2",
-    "Rec709": "Rec.709",
-    "Rec2020": "Rec.2020",
-    "ST2084": "ST-2084",
-    "Curve\\b": "- Curve",
-    "Texture\\b": "- Texture",
-    "\\b(\\w)Log": "\\1-Log",
-    "\\b(\\w)Gamut": "\\1-Gamut",
-    "Cine\\b": ".Cine",
-}
-"""
-*OpenColorIO* colorspace name substitution patterns.
-
-Notes
------
-- The substitutions are evaluated in order.
-
-PATTERNS_COLORSPACE_NAME_REFERENCE : dict
-"""
-
-PATTERNS_COLORSPACE_NAME_REFERENCE.update(
-    {
-        # Input transforms also use the "family" name and thus need beautifying.
-        (
-            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}Alexa"
-            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}v\\d+"
-            f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}.*"
-        ): "",
-        f"{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}": (
-            SEPARATOR_COLORSPACE_NAME_REFERENCE
-        ),
-    }
-)
-
-PATTERNS_LOOK_NAME_REFERENCE = {
-    # TODO: Implement support for callable patterns.
-    # The following ones should be a dedicated definition/callable.
-    "BlueLightArtifactFix": "Blue Light Artifact Fix",
-    "GamutCompress": "ACES 1.3 Reference Gamut Compression",
-}
-"""
-*OpenColorIO* look name substitution patterns.
-
-Notes
------
-- The substitutions are evaluated in order.
-
-PATTERNS_LOOK_NAME_REFERENCE : dict
-"""
-
-PATTERNS_TRANSFORM_FAMILY_REFERENCE = {
-    "\\\\": SEPARATOR_COLORSPACE_FAMILY_REFERENCE,
-    "vendorSupplied[/\\\\]": "",
-    "arri": "ARRI",
-    "alexa": "Alexa",
-    "canon": "Canon",
-    "panasonic": "Panasonic",
-    "red": "RED",
-    "sony": "Sony",
-}
-"""
-*OpenColorIO* transform family substitution patterns.
-
-Notes
------
-- The substitutions are evaluated in order.
-
-PATTERNS_TRANSFORM_FAMILY_REFERENCE : dict
-"""
-
-PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE = {
-    "7.2nit": "&",
-    "15nit": "&",
-    "lim": " lim",
-    "nit": " nits",
-    "sim": " sim on",
-    "CINEMA": "Cinema",
-    "VIDEO": "Video",
-    "REC1886": "Rec.1886",
-    "REC709": "Rec.709",
-    "REC2020": "Rec.2020",
-    "-": " ",
-}
-"""
-*OpenColorIO* view transform name substitution patterns.
-
-PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE : dict
-"""
-
-PATTERNS_DISPLAY_NAME_REFERENCE = {
-    "G2.6-": "",
-    "-BFD": "",
-    "REC.1886": "Rec.1886",
-    "REC.709": "Rec.709 Video",
-    "REC.2020": "Rec.2020 Video",
-    "REC.2100": "Rec.2100",
-    "-Rec.": " / Rec.",
-    "-1000nit": "",
-    # Legacy Substitutions
-    "dcdm": "DCDM",
-    "p3": "P3",
-    "rec709": "Rec. 709",
-    "rec2020": "Rec. 2020",
-}
-"""
-*OpenColorIO* display name substitution patterns.
-
-Notes
------
-- The substitutions are evaluated in order.
-
-PATTERNS_DISPLAY_NAME_REFERENCE : dict
-"""
-
-PATTERNS_ALIAS_REFERENCE = {
-    "Curve": "crv",
-    "Gamma ": "g",
-    "Linear ": "lin",
-    "Texture": "",
-    "-Gamut": "gamut",
-    "-Log": "log",
-}
-"""
-*OpenColorIO* alias substitution patterns.
-
-Notes
------
-- The substitutions are evaluated in order.
-
-PATTERNS_ALIAS_REFERENCE : dict
-"""
-
 
 class ColorspaceDescriptionStyle(Flag):
     """
@@ -354,212 +178,6 @@ def version_config_mapping_file(path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE):
         return ""
 
 
-def beautify_name(name, patterns):
-    """
-    Beautify given name by applying in succession the given patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        Name to beautify.
-    patterns : dict
-        Dictionary of regular expression patterns and substitution to apply
-        onto the name.
-
-    Returns
-    -------
-    unicode
-        Beautified name.
-
-    Examples
-    --------
-    >>> beautify_name(
-    ...     'Rec709_100nits_dim',
-    ...     PATTERNS_COLORSPACE_NAME_REFERENCE)
-    'Rec.709 (100 nits) dim'
-    """
-
-    return multi_replace(name, patterns).strip()
-
-
-def beautify_colorspace_name(name):
-    """
-    Beautify given *OpenColorIO* `Colorspace` name by applying in succession
-    the relevant patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        *OpenColorIO* `Colorspace` name to beautify.
-
-    Returns
-    -------
-    unicode
-        Beautified *OpenColorIO* `Colorspace` name.
-
-    Examples
-    --------
-    >>> beautify_colorspace_name('Rec709_100nits_dim')
-    'Rec.709 (100 nits) dim'
-    """
-
-    return beautify_name(name, PATTERNS_COLORSPACE_NAME_REFERENCE)
-
-
-def beautify_look_name(name):
-    """
-    Beautify given *OpenColorIO* `Look` name by applying in succession the
-    relevant patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        *OpenColorIO* `Look` name to beautify.
-
-    Returns
-    -------
-    unicode
-        Beautified *OpenColorIO* `Look` name.
-
-    Examples
-    --------
-    >>> beautify_look_name('BlueLightArtifactFix')
-    'Blue Light Artifact Fix'
-    """
-
-    return beautify_name(name, PATTERNS_LOOK_NAME_REFERENCE)
-
-
-def beautify_transform_family(name):
-    """
-    Beautify given *OpenColorIO* `Colorspace` family by applying in succession
-    the relevant patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        *OpenColorIO* `Colorspace` family to beautify.
-
-    Returns
-    -------
-    unicode
-        Beautified *OpenColorIO* `Colorspace` family.
-
-    Examples
-    --------
-    >>> beautify_transform_family('vendorSupplied/arri/alexa/v3/EI800')
-    'ARRI/Alexa/v3/EI800'
-    """
-
-    return beautify_name(name, PATTERNS_TRANSFORM_FAMILY_REFERENCE)
-
-
-def beautify_view_transform_name(name):
-    """
-    Beautify given *OpenColorIO* `ViewTransform` name by applying in
-    succession the relevant patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        *OpenColorIO* `ViewTransform` name to beautify.
-
-    Returns
-    -------
-    unicode
-        Beautified *OpenColorIO* `ViewTransform` name.
-
-    Examples
-    --------
-    >>> beautify_view_transform_name(
-    ...     'ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-CINEMA_1.0')
-    'SDR Cinema'
-    """
-
-    basename = name.split(SEPARATOR_COLORSPACE_NAME_REFERENCE)[-1].split("_")[
-        0
-    ]
-
-    tokens = basename.split("-")
-    family, genus = (
-        ["-".join(tokens[:2]), "-".join(tokens[2:])]
-        if len(tokens) > 2
-        else [basename, None]
-    )
-
-    family = beautify_name(family, PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE)
-
-    genus = (
-        beautify_name(genus, PATTERNS_VIEW_TRANSFORM_NAME_REFERENCE)
-        if genus is not None
-        else genus
-    )
-
-    return f"{family} ({genus})" if genus is not None else family
-
-
-def beautify_display_name(name):
-    """
-    Beautify given *OpenColorIO* display name by applying in succession the
-    relevant patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        *OpenColorIO* display name to beautify.
-
-    Returns
-    -------
-    unicode
-        Beautified *OpenColorIO* display name.
-
-    Examples
-    --------
-    >>> beautify_display_name('DISPLAY - CIE-XYZ-D65_to_sRGB')
-    'sRGB'
-    >>> beautify_display_name('rec709')
-    'Rec. 709'
-    """
-
-    basename = name.split(SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE)[-1]
-
-    name = beautify_name(basename, PATTERNS_DISPLAY_NAME_REFERENCE)
-
-    return name
-
-
-def beautify_alias(name):
-    """
-    Beautify given *OpenColorIO* alias by applying in succession the relevant
-    patterns.
-
-    Parameters
-    ----------
-    name : unicode
-        *OpenColorIO* alias to beautify.
-
-    Returns
-    -------
-    unicode
-        Beautified *OpenColorIO* alias.
-
-    Examples
-    --------
-    >>> beautify_alias('Rec.1886 / Rec.709 Video - Display')
-    'rec1886_rec709_video_display'
-    >>> beautify_alias('Rec.2100-PQ - Display')
-    'rec2100_pq_display'
-    >>> beautify_alias('V-Log - Curve')
-    'vlog_crv'
-    >>> beautify_alias('Gamma 1.8 Rec.709 - Texture')
-    'g18_rec709'
-    """
-
-    name = beautify_name(name, PATTERNS_ALIAS_REFERENCE)
-
-    return slugify(name).replace("-", "_")
-
-
 def format_optional_prefix(name, prefix, scheme="Modern 1"):
     """
     Format given name according to given prefix and naming convention scheme.
@@ -590,7 +208,7 @@ def format_optional_prefix(name, prefix, scheme="Modern 1"):
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
     return (
-        f"{prefix}{SEPARATOR_COLORSPACE_NAME_REFERENCE}{name}"
+        f"{prefix}{SEPARATOR_COLORSPACE_NAME}{name}"
         if scheme == "legacy"
         else name
     )
@@ -626,9 +244,9 @@ def format_swapped_affix(name, affix, scheme="Modern 1"):
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
     return (
-        f"{affix}{SEPARATOR_COLORSPACE_NAME_REFERENCE}{name}"
+        f"{affix}{SEPARATOR_COLORSPACE_NAME}{name}"
         if scheme == "legacy"
-        else f"{name}{SEPARATOR_COLORSPACE_NAME_REFERENCE}{affix}"
+        else f"{name}{SEPARATOR_COLORSPACE_NAME}{affix}"
     )
 
 
@@ -716,8 +334,7 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
             family = "CSC"
         elif ctl_transform.family == "input_transform":
             family = (
-                f"Input{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
-                f"{ctl_transform.genus}"
+                f"Input{SEPARATOR_COLORSPACE_FAMILY}" f"{ctl_transform.genus}"
             )
         elif ctl_transform.family == "output_transform":
             family = "Output"
@@ -732,13 +349,12 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
                 family = "ACES"
             else:
                 family = (
-                    f"Input{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
+                    f"Input{SEPARATOR_COLORSPACE_FAMILY}"
                     f"{ctl_transform.genus}"
                 )
         elif ctl_transform.family == "input_transform":
             family = (
-                f"Input{SEPARATOR_COLORSPACE_FAMILY_REFERENCE}"
-                f"{ctl_transform.genus}"
+                f"Input{SEPARATOR_COLORSPACE_FAMILY}" f"{ctl_transform.genus}"
             )
         elif ctl_transform.family == "output_transform":
             family = "Output"
@@ -1086,9 +702,7 @@ def style_to_view_transform(
 
         description = "\n".join(description)
 
-    version = style.split(SEPARATOR_COLORSPACE_NAME_REFERENCE)[-1].split("_")[
-        -1
-    ]
+    version = style.split(SEPARATOR_COLORSPACE_NAME)[-1].split("_")[-1]
     signature = {
         "name": format_swapped_affix(
             f"ACES {version}",
