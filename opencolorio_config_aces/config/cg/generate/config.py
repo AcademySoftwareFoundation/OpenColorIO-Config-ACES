@@ -79,8 +79,8 @@ logger = logging.getLogger(__name__)
 
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG = (
     "https://docs.google.com/spreadsheets/d/"
-    "1DqxmtZpnhL_9N1wayvcW0y3bZoHRom7A1c58YLlr89g/"
-    "export?format=csv&gid=609660164"
+    "1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4/"
+    "export?format=csv&gid=365242296"
 )
 """
 URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
@@ -980,6 +980,13 @@ def generate_config_cg(
 
     # CLF Transforms & BuiltinTransform Creation
     for transform_data in yield_from_config_mapping():
+        # Inherited from the "Reference" config.
+        if (
+            transform_data["aces_transform_id"]
+            and not transform_data["clf_transform_id"]
+        ):
+            continue
+
         kwargs = {
             "describe": describe,
             "signature_only": True,
