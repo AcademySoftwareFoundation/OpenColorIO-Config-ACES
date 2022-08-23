@@ -9,6 +9,9 @@ from .utilities import (
     format_clf_transform_id,
     clf_basename,
 )
+from .arri import (
+    generate_clf_arri,
+)
 from .blackmagic import (
     generate_clf_transforms_bmdfilm,
     generate_clf_transforms_davinci,
@@ -34,6 +37,7 @@ __all__ = [
     "format_clf_transform_id",
     "clf_basename",
 ]
+__all__ += ["generate_clf_arri"]
 __all__ += [
     "generate_clf_transforms_bmdfilm",
     "generate_clf_transforms_davinci",
