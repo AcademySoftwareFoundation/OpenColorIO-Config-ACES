@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0">
-    <Description>ARRI LogC4 to ACES2065-1</Description>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0" name="ARRI LogC4 to ACES2065-1">
     <InputDescriptor>ARRI LogC4</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
@@ -11,9 +10,9 @@
     </Log>
     <Matrix inBitDepth="32f" outBitDepth="32f">
         <Array dim="3 3">
-       0.7509573628        0.1444227867        0.1046198505
-       0.0008218371        1.0073975849        -0.008219422
-      -0.0004999521       -0.0008541772        1.0013541294
+  0.750957362824734   0.144422786709757   0.104619850465509
+0.000821837079380207       1.007397584885 -0.00821942196438358
+-0.000499952143533471 -0.000854177231436971      1.00135412937497
         </Array>
     </Matrix>
 </ProcessList>

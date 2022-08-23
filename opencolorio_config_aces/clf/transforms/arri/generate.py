@@ -5,15 +5,23 @@
 =======================================
 
 Defines procedures for generating ARRI *Common LUT Format* (CLF)
-transforms for the OpenColorIO project.
-"""
+transforms:
 
+-   :func:`opencolorio_config_aces.clf.generate_clf_arri`
+"""
 
 from math import log, log10
 import PyOpenColorIO as ocio
 from pathlib import Path
 import sys
 
+from opencolorio_config_aces.clf.transforms import (
+    clf_basename,
+    format_clf_transform_id,
+    generate_clf_transform,
+    matrix_RGB_to_RGB_transform,
+)
+from opencolorio_config_aces.config import transform_factory
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -23,47 +31,69 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
-    "generate_logc3",
-    "generate_logc4",
+    "FAMILY",
+    "GENUS",
+    "VERSION",
+    "generate_clf_arri",
 ]
 
-THIS_DIR = Path(__file__).parent.resolve()
+FAMILY = "ARRI"
+"""
+*CLF* transforms family.
+"""
 
-TF_ID_PREFIX = "urn:aswf:ocio:transformId:1.0:"
-TF_ID_SUFFIX = ":1.0"
+GENUS = "Input"
+"""
+*CLF* transforms genus.
+"""
 
-CLF_SUFFIX = ".clf"
+VERSION = "1.0"
+"""
+*CLF* transforms version.
+"""
 
 
-def generate_logc3(ei=800, clipping=True, debug=False):
-    """Generate ARRI LogC3 CLF transforms.
+def _build_awg3_mtx():
+    """
+    Build the `MatrixTransform` for ARRI Wide Gamut 3 primaries.
 
-    This method provides the connecting derivation between the public aces-dev IDT
-    "v3_IDT_maker" code and the "ALEXA Log C Curve Usage in VFX 09-Mar-17" White Paper
-    parameters, which also conform to the required CLF cameraLogToLin parameters.
-
-    Currently only EI values between 160 and 1280 are supported.
-
-    Parameters
-    ----------
-    ei : int
-        EI value to generate, must be 160 <= EI < 1280.
-
-    clipping : bool
-        Clip input domain to [0.0, 1.0] to match IDT 1D LUT behavior. Required
-        for a precise match to 'ctlrender' processing.
-
-    debug : bool
-        Whether to print additional information for diagnostics.
+    Matrix precision is insufficient for Float64 comparison in the LogC
+    White Paper, values are derived from the primaries here.
 
     Returns
     -------
-    bool
+    ocio.MatrixTransform
+         *OpenColorIO* `MatrixTransform`.
+    """
+
+    mtx = matrix_RGB_to_RGB_transform(
+        "ALEXA Wide Gamut", "ACES2065-1", "CAT02"
+    )
+    return mtx
+
+
+def _build_logc3_curve(ei=800, info=False):
+    """
+    Build the `LogCameraTransform` for ARRI LogC3 Curve.
+
+    Parameter values are derived from the published aces-dev IDT formula.
+
+    Parameters
+    ----------
+    ei : int, optional
+        *Exposure Index* of the LogC3 Curve to generate.
+    info : bool, optional
+        Whether to print additional informative text.
+
+    Returns
+    -------
+    ocio.LogCameraTransform
+         *OpenColorIO* `LogCameraTransform`.
     """
 
     if not (160 <= ei <= 1280):
         print(
-            f"Error: Unsupported EI{ei:d} requested, must be 160 <= EI < 1280".format(
+            f"Error: Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280".format(
                 ei
             )
         )
@@ -94,15 +124,16 @@ def generate_logc3(ei=800, clipping=True, debug=False):
     c = encGain
     d = encOffset
 
-    if debug:
+    # print informative text if requested
+    if info:
 
-        # unused variables for completeness
-        e = c * (
-            a / ((a * cut + b) * log(10))
-        )  # follows CLF 6.6 Log specification
-        f = (
-            c * log10(a * cut + b) + d
-        ) - e * cut  # follows CLF 6.6 Log specification
+        # compute unused variables for completeness
+
+        # follows CLF 6.6 Log specification
+        e = c * (a / ((a * cut + b) * log(10)))
+
+        # follows CLF 6.6 Log specification
+        f = c * log10(a * cut + b) + d
 
         print(f"White Paper Values for EI{ei:d}")
         print(f"cut: {cut:.6f} :: {cut:.15f}")
@@ -113,205 +144,302 @@ def generate_logc3(ei=800, clipping=True, debug=False):
         print(f"e:   {e:.6f} :: {e:.15f}")
         print(f"f:   {f:.6f} :: {f:.15f}")
 
-    config = ocio.Config.CreateRaw()
+    # OCIO LogCameraTransform translation variables
+    base = 10.0
+    linSideBreak = [cut] * 3
+    logSideSlope = [c] * 3
+    logSideOffset = [d] * 3
+    linSideSlope = [a] * 3
+    linSideOffset = [b] * 3
+    direction = ocio.TRANSFORM_DIR_INVERSE
 
-    lct = ocio.LogCameraTransform(
-        base=10,
-        linSideBreak=[cut, cut, cut],
-        logSideSlope=[c, c, c],
-        logSideOffset=[d, d, d],
-        linSideSlope=[a, a, a],
-        linSideOffset=[b, b, b],
-        direction=ocio.TRANSFORM_DIR_INVERSE,
+    return transform_factory(
+        transform_type="LogCameraTransform",
+        transform_factory="Constructor",
+        base=base,
+        linSideBreak=linSideBreak,
+        logSideSlope=logSideSlope,
+        logSideOffset=logSideOffset,
+        linSideSlope=linSideSlope,
+        linSideOffset=linSideOffset,
+        direction=direction,
     )
 
-    # consistent with ARRI aces-dev IDT
-    mtx = [
-        [6.8020600000000e-01, 2.3613700000000e-01, 8.3658000000000e-02],
-        [8.5415000000000e-02, 1.0174710000000e00, -1.0288600000000e-01],
-        [2.0570000000000e-03, -6.2563000000000e-02, 1.0605060000000e00],
-    ]
 
-    if clipping:
-        # Range Transform to mimic clipping behavior of IDT 1D LUT
-        rt = ocio.RangeTransform()
-        rt.setMinInValue(0.0)
-        rt.setMaxInValue(1.0)
-        rt.setMinOutValue(0.0)
-        rt.setMaxOutValue(1.0)
-        rt.setStyle(ocio.RangeStyle.RANGE_CLAMP)
+def _build_awg4_mtx():
+    """
+    Build the `MatrixTransform` for ARRI Wide Gamut 4 primaries.
 
-        transform_list = [rt, lct, package_matrix(mtx)]
-
-    else:
-        transform_list = [lct, package_matrix(mtx)]
-
-    gt = ocio.GroupTransform(transform_list)
-
-    aces_id = f"urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI{ei:d}.a1.v2"
-
-    # Write file compliant with new naming convention
-    clf_id = (
-        TF_ID_PREFIX
-        + f"ARRI:Input:ARRI_LogC3_EI{ei:d}_to_ACES2065-1".format(ei)
-        + TF_ID_SUFFIX
-    )
-
-    fmdg = gt.getFormatMetadata()
-    fmdg.setID(clf_id)
-    fmdg.addChildElement(
-        "Description", f"ARRI LogC3 (EI{ei:d}) to ACES2065-1".format(ei)
-    )
-    fmdg.addChildElement(
-        "InputDescriptor", f"ARRI LogC3 (EI{ei:d})".format(ei)
-    )
-    fmdg.addChildElement("OutputDescriptor", "ACES2065-1")
-    fmdg.addChildElement("Info", "")
-    info = fmdg.getChildElements()[3]
-    info.addChildElement("ACEStransformID", aces_id)
-
-    dest_dir = THIS_DIR / "input"
-    if not dest_dir.exists():
-        dest_dir.mkdir()
-
-    fname = dest_dir / (
-        f"ARRI.LogC3_EI{ei:d}_to_ACES2065-1".format(ei) + CLF_SUFFIX
-    )
-    gt.write("Academy/ASC Common LUT Format", str(fname), config)
-
-    return True
-
-
-def generate_logc4(debug=False):
-    """Generate ARRI LogC4 CLF transforms.
-
-    Parameters
-    ----------
-    debug : bool
-        Whether to print additional information for diagnostics.
+    Values are copied directly from the LogC4 Specification.
 
     Returns
     -------
-    bool
+    ocio.MatrixTransform
+         *OpenColorIO* `MatrixTransform`.
     """
 
-    config = ocio.Config.CreateRaw()
-
-    # Parameters as defined in
-    # "ARRI LogC4 Logarithmic Color Space Specification - 1st May 2022"
-    # Parameters as defined in aces-dev CTL
-    a = (2.0**18.0 - 16.0) / 117.45
-    b = (1023.0 - 95.0) / 1023.0
-    c = 95.0 / 1023.0
-    s = (7.0 * log(2.0) * pow(2.0, 7.0 - 14.0 * c / b)) / (a * b)
-    t = (pow(2.0, 14.0 * (-c / b) + 6.0) - 64.0) / a
-
-    # Derived parameters compliant with CLF cameraLogToLin
-    LIN_SIDE_SLP = a
-    LIN_SIDE_OFF = 64.0
-    LOG_SIDE_SLP = b / 14.0
-    LOG_SIDE_OFF = -6.0 * b / 14.0 + c
-    LIN_SIDE_BRK = t
-    BASE = 2.0
-
-    # Verify that the default linear slope and offset that will be calculated by OCIO
-    # are sufficiently close to the constants used in the reference CTL.
-    if debug:
-        LINEAR_SLOPE = (
-            LOG_SIDE_SLP
-            * LIN_SIDE_SLP
-            / ((LIN_SIDE_SLP * LIN_SIDE_BRK + LIN_SIDE_OFF) * log(BASE))
-        )
-        LOG_SB = LOG_SIDE_OFF + LOG_SIDE_SLP * log(
-            LIN_SIDE_SLP * LIN_SIDE_BRK + LIN_SIDE_OFF
-        ) / log(BASE)
-        LINEAR_OFFSET = LOG_SB - LINEAR_SLOPE * LIN_SIDE_BRK
-        print(LINEAR_SLOPE, LINEAR_OFFSET, 1.0 / s, -t / s)
-    # This prints:
-    #  8.803033210331753 0.15895633652241092 8.803033210331753 0.15895633652241087
-    # indicating the default values have sufficient accuracy.
-
-    lct = ocio.LogCameraTransform(
-        base=BASE,
-        linSideBreak=[LIN_SIDE_BRK, LIN_SIDE_BRK, LIN_SIDE_BRK],
-        logSideSlope=[LOG_SIDE_SLP, LOG_SIDE_SLP, LOG_SIDE_SLP],
-        logSideOffset=[LOG_SIDE_OFF, LOG_SIDE_OFF, LOG_SIDE_OFF],
-        linSideSlope=[LIN_SIDE_SLP, LIN_SIDE_SLP, LIN_SIDE_SLP],
-        linSideOffset=[LIN_SIDE_OFF, LIN_SIDE_OFF, LIN_SIDE_OFF],
-        direction=ocio.TRANSFORM_DIR_INVERSE,
-    )
-
-    # Values as defined in:
-    # "ARRI LogC4 Logarithmic Color Space Specification - 1st May 2022"
+    # Values as defined in: "ARRI LogC4 Logarithmic Color Space Specification".
+    # Extra row and column for OCIO alpha channel.
     mtx = [
-        [0.7509573628, 0.1444227867, 0.1046198505],
-        [0.0008218371, 1.0073975849, -0.0082194220],
-        [-0.0004999521, -0.0008541772, 1.0013541294],
-    ]
-
-    gt = ocio.GroupTransform([lct, package_matrix(mtx)])
-
-    clf_id = (
-        TF_ID_PREFIX + "ARRI:Input:ARRI_LogC4_to_ACES2065-1" + TF_ID_SUFFIX
-    )
-
-    # Consistent with CTL in aces-dev PR:
-    aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.LogC4.a1.v1"
-
-    fmdg = gt.getFormatMetadata()
-    fmdg.setID(clf_id)
-    fmdg.addChildElement("Description", "ARRI LogC4 to ACES2065-1")
-    fmdg.addChildElement("InputDescriptor", "ARRI LogC4")
-    fmdg.addChildElement("OutputDescriptor", "ACES2065-1")
-    fmdg.addChildElement("Info", "")
-    info = fmdg.getChildElements()[3]
-    info.addChildElement("ACEStransformID", aces_id)
-
-    dest_dir = THIS_DIR / "input"
-    if not dest_dir.exists():
-        dest_dir.mkdir()
-
-    fname = dest_dir / ("ARRI.LogC4_to_ACES2065-1" + CLF_SUFFIX)
-    gt.write("Academy/ASC Common LUT Format", str(fname), config)
-
-    return True
-
-
-def package_matrix(mtx):
-    """Package a 3x3 matrix as an OCIO Matrix transform."""
-
-    coefs4x4 = [
+        0.750957362824734131,
+        0.144422786709757084,
+        0.104619850465508965,
         0.0,
+        0.000821837079380207,
+        1.007397584885003194,
+        -0.008219421964383583,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        -0.000499952143533471,
+        -0.000854177231436971,
+        1.001354129374970370,
         0.0,
         0.0,
         0.0,
         0.0,
         1.0,
     ]
-    coefs4x4[0:3] = mtx[0]
-    coefs4x4[4:7] = mtx[1]
-    coefs4x4[8:11] = mtx[2]
-    offs = [0.0, 0.0, 0.0, 0.0]
-    direc = ocio.TRANSFORM_DIR_FORWARD
-    mtxOp = ocio.MatrixTransform(coefs4x4, offs, direc)
-    return mtxOp
+
+    return transform_factory(transform_type="MatrixTransform", matrix=mtx)
 
 
-def main():
-    generate_logc3(800, False)
-    generate_logc4()
+def _build_logc4_curve():
+    """
+    Build the `LogCameraTransform` for ARRI LogC4 Curve.
+
+    Parameter values are derived from the published LogC4 Specification.
+
+    Returns
+    -------
+    ocio.LogCameraTransform
+         *OpenColorIO* `LogCameraTransform`.
+    """
+
+    # Parameters as defined in "ARRI LogC4 Logarithmic Color Space Specification"
+    # Parameters as defined in aces-dev CTL
+    a = (2.0**18.0 - 16.0) / 117.45
+    b = (1023.0 - 95.0) / 1023.0
+    c = 95.0 / 1023.0
+    t = (pow(2.0, 14.0 * (-c / b) + 6.0) - 64.0) / a
+
+    # OCIO LogCameraTransform translation variables
+    linSideSlope = [a] * 3
+    linSideOffset = [64.0] * 3
+    logSideSlope = [b / 14.0] * 3
+    logSideOffset = [-6.0 * b / 14.0 + c] * 3
+    linSideBreak = [t] * 3
+    base = 2.0
+    direction = ocio.TRANSFORM_DIR_INVERSE
+
+    return transform_factory(
+        transform_type="LogCameraTransform",
+        transform_factory="Constructor",
+        base=base,
+        linSideBreak=linSideBreak,
+        logSideSlope=logSideSlope,
+        logSideOffset=logSideOffset,
+        linSideSlope=linSideSlope,
+        linSideOffset=linSideOffset,
+        direction=direction,
+    )
+
+
+def _generate_logc3_transforms(
+    transforms_set, output_directory, ei_list=[800]
+):
+    """
+    Generate the collection LogC3 of transforms.
+
+    Parameters
+    ----------
+    transforms_set : dict
+        A `dict` of transforms to append to.
+    output_directory : PosixPath or WindowsPath
+        Directory where generated CTL files should be saved.
+    ei_list : array_like of int, optional
+        List of EI values to generate LogC3 and LogC3 Curve transforms for.
+
+    Returns
+    -------
+    dict
+        Dictionary of *OpenColorIO* `Transform` instances.
+    """
+
+    for ei in ei_list:
+
+        # Genereate ARRI LogC3 to ACES 2065-1 Transform
+        name = f"ARRI_LogC3_EI{ei}_to_ACES2065-1"
+        aces_id = f"urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI{ei}.a1.v2"
+        input_descriptor = f"ARRI LogC3 (EI{ei})"
+        output_descriptor = "ACES2065-1"
+        clf_transform_id = format_clf_transform_id(
+            FAMILY, GENUS, name, VERSION
+        )
+        filename = output_directory / clf_basename(clf_transform_id)
+        transforms_set[filename] = generate_clf_transform(
+            filename,
+            [_build_logc3_curve(ei), _build_awg3_mtx()],
+            clf_transform_id,
+            f"{input_descriptor} to {output_descriptor}",
+            input_descriptor,
+            output_descriptor,
+            aces_id,
+        )
+
+        # Genereate ARRI LogC3 Curve Transform
+        name = f"ARRI_LogC3_Curve_EI{ei:d}_to_Linear"
+        input_descriptor = f"ARRI LogC3 Curve (EI{ei:d})"
+        output_descriptor = "Relative Scene Linear"
+        clf_transform_id = format_clf_transform_id(
+            FAMILY, GENUS, name, VERSION
+        )
+        filename = output_directory / clf_basename(clf_transform_id)
+        transforms_set[filename] = generate_clf_transform(
+            filename,
+            [_build_logc3_curve(ei)],
+            clf_transform_id,
+            f"{input_descriptor} to {output_descriptor}",
+            input_descriptor,
+            output_descriptor,
+        )
+
+    # Genereate Linear ARRI Wide Gamut 3 to ACES 2065-1 Transform
+    name = "Linear_ARRI_Wide_Gamut_3_to_ACES2065-1"
+    input_descriptor = "Linear ARRI Wide Gamut 3"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    transforms_set[filename] = generate_clf_transform(
+        filename,
+        [_build_awg3_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
+    )
+
+    return transforms_set
+
+
+def _generate_logc4_transforms(transforms_set, output_directory):
+    """
+    Generate the collection LogC4 of transforms.
+
+    Parameters
+    ----------
+    transforms_set : dict
+        A `dict` of transforms to append to.
+    output_directory : PosixPath or WindowsPath
+        Directory where generated CTL files should be saved.
+
+    Returns
+    -------
+    dict
+        Dictionary of *OpenColorIO* `Transform` instances.
+    """
+
+    # Genereate ARRI LogC4 to ACES 2065-1 Transform
+    name = "ARRI_LogC4_to_ACES2065-1"
+    aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.LogC4.a1.v1"
+    input_descriptor = "ARRI LogC4"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    transforms_set[filename] = generate_clf_transform(
+        filename,
+        [_build_logc4_curve(), _build_awg4_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
+        aces_id,
+    )
+
+    # Genereate ARRI LogC4 Curve Transform
+    name = "ARRI_LogC4_Curve_to_Linear"
+    input_descriptor = "ARRI LogC4 Curve"
+    output_descriptor = "Relative Scene Linear"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    transforms_set[filename] = generate_clf_transform(
+        filename,
+        [_build_logc4_curve()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
+    )
+
+    # Genereate Linear ARRI Wide Gamut 4 to ACES 2065-1 Transform
+    name = "Linear_ARRI_Wide_Gamut_4_to_ACES2065-1"
+    input_descriptor = "Linear ARRI Wide Gamut 4"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    transforms_set[filename] = generate_clf_transform(
+        filename,
+        [_build_awg4_mtx()],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
+    )
+
+    return transforms_set
+
+
+def generate_clf_arri(output_directory):
+    """
+    Generate CLF files for ARRI color encodings and save to disk.
+
+    Parameters
+    ----------
+    output_directory : PosixPath or WindowsPath
+        Directory where generated CTL files should be saved.
+
+    Returns
+    -------
+    dict
+        Dictionary of *OpenColorIO* `Transform` instances.
+
+    References
+    ----------
+    -
+
+    """
+
+    output_directory.mkdir(parents=True, exist_ok=True)
+
+    clf_transforms = {}
+    clf_transforms = _generate_logc3_transforms(
+        clf_transforms, output_directory, ei_list=[800]
+    )
+    clf_transforms = _generate_logc4_transforms(
+        clf_transforms, output_directory
+    )
+
+    return clf_transforms
+
+
+def _main():
+    """
+    Generate files, initiate logging, and provide exit code.
+
+    Returns
+    -------
+    int
+        Software exit code for successful termination.
+    """
+    import logging
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
+    output_directory = Path(__file__).parent.resolve() / "input"
+
+    generate_clf_arri(output_directory)
+
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(_main())
