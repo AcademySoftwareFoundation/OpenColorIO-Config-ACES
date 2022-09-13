@@ -14,8 +14,12 @@ import PyOpenColorIO as ocio
 from datetime import datetime
 
 from opencolorio_config_aces.config.generation import (
-    VersionData,
     ConfigData,
+    SEPARATOR_BUILTIN_TRANSFORM_NAME,
+    SEPARATOR_COLORSPACE_NAME,
+    VersionData,
+    beautify_display_name,
+    beautify_name,
     colorspace_factory,
     generate_config,
 )
@@ -36,12 +40,8 @@ from opencolorio_config_aces.config.reference.discover import (
     version_aces_dev,
 )
 from opencolorio_config_aces.config.reference.generate.config import (
-    SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE,
-    SEPARATOR_COLORSPACE_NAME_REFERENCE,
     COLORSPACE_OUTPUT_ENCODING_REFERENCE,
     COLORSPACE_SCENE_ENCODING_REFERENCE,
-    beautify_display_name,
-    beautify_name,
     ctl_transform_to_colorspace,
 )
 from opencolorio_config_aces.utilities import git_describe, required
@@ -71,7 +71,7 @@ PATTERNS_VIEW_NAME_REFERENCE = {
     "\\(100 nits\\) dim": "",
     "\\(100 nits\\)": "",
     "\\(48 nits\\)": "",
-    f"Output{SEPARATOR_COLORSPACE_NAME_REFERENCE}": "",
+    f"Output{SEPARATOR_COLORSPACE_NAME}": "",
 }
 """
 *OpenColorIO* view name substitution patterns.
@@ -179,7 +179,7 @@ def node_to_builtin_transform(graph, node, direction="Forward"):
             source, target = edge
             transform_styles.append(
                 f"{source.split(SEPARATOR_NODE_NAME_CTL)[-1]}"
-                f"{SEPARATOR_BUILTIN_TRANSFORM_NAME_REFERENCE}"
+                f"{SEPARATOR_BUILTIN_TRANSFORM_NAME}"
                 f"{target.split(SEPARATOR_NODE_NAME_CTL)[-1]}"
             )
 
@@ -415,7 +415,7 @@ def generate_config_aces(
             if family == "output_transform":
                 display = (
                     f"Display"
-                    f"{SEPARATOR_COLORSPACE_NAME_REFERENCE}"
+                    f"{SEPARATOR_COLORSPACE_NAME}"
                     f"{beautify_display_name(node_to_ctl_transform(graph, node).genus)}"
                 )
                 display_names.add(display)
