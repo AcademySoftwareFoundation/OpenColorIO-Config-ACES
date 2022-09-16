@@ -89,15 +89,20 @@ def _build_logc3_curve(ei=800, info=False):
     -------
     ocio.LogCameraTransform
          *OpenColorIO* `LogCameraTransform`.
+
+    Raises
+    ------
+    ValueError
+        If `ei` is not in the supported range.
+
     """
 
     if not (160 <= ei <= 1280):
-        print(
-            f"Error: Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280".format(
+        raise ValueError(
+            f"Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280".format(
                 ei
             )
         )
-        return False
 
     # v3_IDT_maker.py parameters
     nominalEI = 400
@@ -247,14 +252,14 @@ def _generate_logc3_transforms(
     transforms_set, output_directory, ei_list=[800]
 ):
     """
-    Generate the collection LogC3 of transforms.
+    Generate the collection of LogC3 transforms.
 
     Parameters
     ----------
     transforms_set : dict
         A `dict` of transforms to append to.
     output_directory : PosixPath or WindowsPath
-        Directory where generated CTL files should be saved.
+        Directory where generated CLF files should be saved.
     ei_list : array_like of int, optional
         List of EI values to generate LogC3 and LogC3 Curve transforms for.
 
@@ -266,7 +271,7 @@ def _generate_logc3_transforms(
 
     for ei in ei_list:
 
-        # Genereate ARRI LogC3 to ACES 2065-1 Transform
+        # Generate ARRI LogC3 to ACES 2065-1 Transform
         name = f"ARRI_LogC3_EI{ei}_to_ACES2065-1"
         aces_id = f"urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI{ei}.a1.v2"
         input_descriptor = f"ARRI LogC3 (EI{ei})"
@@ -285,7 +290,7 @@ def _generate_logc3_transforms(
             aces_id,
         )
 
-        # Genereate ARRI LogC3 Curve Transform
+        # Generate ARRI LogC3 Curve Transform
         name = f"ARRI_LogC3_Curve_EI{ei:d}_to_Linear"
         input_descriptor = f"ARRI LogC3 Curve (EI{ei:d})"
         output_descriptor = "Relative Scene Linear"
@@ -302,7 +307,7 @@ def _generate_logc3_transforms(
             output_descriptor,
         )
 
-    # Genereate Linear ARRI Wide Gamut 3 to ACES 2065-1 Transform
+    # Generate Linear ARRI Wide Gamut 3 to ACES 2065-1 Transform
     name = "Linear_ARRI_Wide_Gamut_3_to_ACES2065-1"
     input_descriptor = "Linear ARRI Wide Gamut 3"
     output_descriptor = "ACES2065-1"
@@ -322,14 +327,14 @@ def _generate_logc3_transforms(
 
 def _generate_logc4_transforms(transforms_set, output_directory):
     """
-    Generate the collection LogC4 of transforms.
+    Generate the collection of LogC4 transforms.
 
     Parameters
     ----------
     transforms_set : dict
         A `dict` of transforms to append to.
     output_directory : PosixPath or WindowsPath
-        Directory where generated CTL files should be saved.
+        Directory where generated CLF files should be saved.
 
     Returns
     -------
@@ -337,7 +342,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
         Dictionary of *OpenColorIO* `Transform` instances.
     """
 
-    # Genereate ARRI LogC4 to ACES 2065-1 Transform
+    # Generate ARRI LogC4 to ACES 2065-1 Transform
     name = "ARRI_LogC4_to_ACES2065-1"
     aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.LogC4.a1.v1"
     input_descriptor = "ARRI LogC4"
@@ -354,7 +359,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
         aces_id,
     )
 
-    # Genereate ARRI LogC4 Curve Transform
+    # Generate ARRI LogC4 Curve Transform
     name = "ARRI_LogC4_Curve_to_Linear"
     input_descriptor = "ARRI LogC4 Curve"
     output_descriptor = "Relative Scene Linear"
@@ -369,7 +374,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
         output_descriptor,
     )
 
-    # Genereate Linear ARRI Wide Gamut 4 to ACES 2065-1 Transform
+    # Generate Linear ARRI Wide Gamut 4 to ACES 2065-1 Transform
     name = "Linear_ARRI_Wide_Gamut_4_to_ACES2065-1"
     input_descriptor = "Linear ARRI Wide Gamut 4"
     output_descriptor = "ACES2065-1"
@@ -394,7 +399,7 @@ def generate_clf_arri(output_directory):
     Parameters
     ----------
     output_directory : PosixPath or WindowsPath
-        Directory where generated CTL files should be saved.
+        Directory where generated CLF files should be saved.
 
     Returns
     -------
