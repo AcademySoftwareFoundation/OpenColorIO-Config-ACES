@@ -1,6 +1,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright Contributors to the OpenColorIO Project.
 
+from .profile_version import (
+    ProfileVersion,
+    PROFILE_VERSION_DEFAULT,
+    SUPPORTED_PROFILE_VERSIONS,
+)
 from .beautifiers import (
     SEPARATOR_COLORSPACE_NAME,
     SEPARATOR_COLORSPACE_FAMILY,
@@ -20,6 +25,7 @@ from .beautifiers import (
     beautify_alias,
 )
 from .factories import (
+    BUILTIN_TRANSFORMS,
     group_transform_factory,
     colorspace_factory,
     named_transform_factory,
@@ -30,7 +36,6 @@ from .factories import (
     produce_transform,
 )
 from .common import (
-    VersionData,
     ConfigData,
     deserialize_config_data,
     serialize_config_data,
@@ -39,6 +44,11 @@ from .common import (
 )
 
 __all__ = [
+    "ProfileVersion",
+    "PROFILE_VERSION_DEFAULT",
+    "SUPPORTED_PROFILE_VERSIONS",
+]
+__all__ += [
     "SEPARATOR_COLORSPACE_NAME",
     "SEPARATOR_COLORSPACE_FAMILY",
     "SEPARATOR_BUILTIN_TRANSFORM_NAME",
@@ -57,6 +67,7 @@ __all__ = [
     "beautify_alias",
 ]
 __all__ += [
+    "BUILTIN_TRANSFORMS",
     "group_transform_factory",
     "colorspace_factory",
     "named_transform_factory",
@@ -67,7 +78,6 @@ __all__ += [
     "produce_transform",
 ]
 __all__ += [
-    "VersionData",
     "ConfigData",
     "deserialize_config_data",
     "serialize_config_data",

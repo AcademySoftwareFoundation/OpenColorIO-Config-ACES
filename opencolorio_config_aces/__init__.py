@@ -31,8 +31,11 @@ from .config import (
     view_transform_factory,
 )
 from .config import (
+    BUILTIN_TRANSFORMS,
     ConfigData,
-    VersionData,
+    PROFILE_VERSION_DEFAULT,
+    ProfileVersion,
+    SUPPORTED_PROFILE_VERSIONS,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -85,8 +88,11 @@ __all__ = [
     "view_transform_factory",
 ]
 __all__ += [
+    "BUILTIN_TRANSFORMS",
     "ConfigData",
-    "VersionData",
+    "PROFILE_VERSION_DEFAULT",
+    "ProfileVersion",
+    "SUPPORTED_PROFILE_VERSIONS",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",
