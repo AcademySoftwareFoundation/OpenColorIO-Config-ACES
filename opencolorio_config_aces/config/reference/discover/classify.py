@@ -356,9 +356,9 @@ class ACESTransformID:
     type
     namespace
     name
-    major_version_number
-    minor_version_number
-    patch_version_number
+    major_version
+    minor_version
+    patch_version
     source
     target
 
@@ -375,9 +375,9 @@ class ACESTransformID:
         self._type = None
         self._namespace = None
         self._name = None
-        self._major_version_number = None
-        self._minor_version_number = None
-        self._patch_version_number = None
+        self._major_version = None
+        self._minor_version = None
+        self._patch_version = None
         self._source = None
         self._target = None
 
@@ -471,7 +471,7 @@ class ACESTransformID:
         return self._name
 
     @property
-    def major_version_number(self):
+    def major_version(self):
         """
         Getter property for the *ACEStransformID* major version number, e.g.
         *a1*.
@@ -486,10 +486,10 @@ class ACESTransformID:
         -   This property is read only.
         """
 
-        return self._major_version_number
+        return self._major_version
 
     @property
-    def minor_version_number(self):
+    def minor_version(self):
         """
         Getter property for the *ACEStransformID* minor version number, e.g.
         *0*.
@@ -504,10 +504,10 @@ class ACESTransformID:
         -   This property is read only.
         """
 
-        return self._minor_version_number
+        return self._minor_version
 
     @property
-    def patch_version_number(self):
+    def patch_version(self):
         """
         Getterproperty for the *ACEStransformID* patch version number, e.g. *3*.
 
@@ -521,7 +521,7 @@ class ACESTransformID:
         -   This property is read only.
         """
 
-        return self._patch_version_number
+        return self._patch_version
 
     @property
     def source(self):
@@ -607,32 +607,32 @@ class ACESTransformID:
 
         if len(components) == 3:
             (
-                self._major_version_number,
-                self._minor_version_number,
-                self._patch_version_number,
+                self._major_version,
+                self._minor_version,
+                self._patch_version,
             ) = components
         elif len(components) == 4:
             if self._type in ("ACESlib", "ACESutil"):
                 (
                     self._name,
-                    self._major_version_number,
-                    self._minor_version_number,
-                    self._patch_version_number,
+                    self._major_version,
+                    self._minor_version,
+                    self._patch_version,
                 ) = components
             elif self._type == "IDT":
                 (
                     self._namespace,
                     self._name,
-                    self._major_version_number,
-                    self._minor_version_number,
+                    self._major_version,
+                    self._minor_version,
                 ) = components
         else:
             (
                 self._namespace,
                 self._name,
-                self._major_version_number,
-                self._minor_version_number,
-                self._patch_version_number,
+                self._major_version,
+                self._minor_version,
+                self._patch_version,
             ) = components
 
         assert (

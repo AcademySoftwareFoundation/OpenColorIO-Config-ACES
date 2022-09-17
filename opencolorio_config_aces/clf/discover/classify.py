@@ -194,9 +194,9 @@ class CLFTransformID:
     type
     namespace
     name
-    major_version_number
-    minor_version_number
-    patch_version_number
+    major_version
+    minor_version
+    patch_version
     source
     target
 
@@ -213,9 +213,9 @@ class CLFTransformID:
         self._type = None
         self._namespace = None
         self._name = None
-        self._major_version_number = None
-        self._minor_version_number = None
-        self._patch_version_number = None
+        self._major_version = None
+        self._minor_version = None
+        self._patch_version = None
         self._source = None
         self._target = None
 
@@ -310,7 +310,7 @@ class CLFTransformID:
         return self._name
 
     @property
-    def major_version_number(self):
+    def major_version(self):
         """
         Getter property for the *CLFtransformID* major version number, e.g. *c1*.
 
@@ -324,10 +324,10 @@ class CLFTransformID:
         -   This property is read only.
         """
 
-        return self._major_version_number
+        return self._major_version
 
     @property
-    def minor_version_number(self):
+    def minor_version(self):
         """
         Getter property for the *CLFtransformID* minor version number, e.g. *v1*.
 
@@ -341,10 +341,10 @@ class CLFTransformID:
         -   This property is read only.
         """
 
-        return self._minor_version_number
+        return self._minor_version
 
     @property
-    def patch_version_number(self):
+    def patch_version(self):
         """
         Getter property for the *CLFtransformID* patch version number.
 
@@ -358,7 +358,7 @@ class CLFTransformID:
         -   This property is read only.
         """
 
-        return self._patch_version_number
+        return self._patch_version
 
     @property
     def source(self):
@@ -453,8 +453,8 @@ class CLFTransformID:
         )
 
         (
-            self._major_version_number,
-            self._minor_version_number,
+            self._major_version,
+            self._minor_version,
         ) = version.split(SEPARATOR_VERSION_CLF)
 
 
