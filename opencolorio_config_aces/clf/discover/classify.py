@@ -194,9 +194,9 @@ class CLFTransformID:
     type
     namespace
     name
-    major_version_number
-    minor_version_number
-    patch_version_number
+    major_version
+    minor_version
+    patch_version
     source
     target
 
@@ -213,9 +213,9 @@ class CLFTransformID:
         self._type = None
         self._namespace = None
         self._name = None
-        self._major_version_number = None
-        self._minor_version_number = None
-        self._patch_version_number = None
+        self._major_version = None
+        self._minor_version = None
+        self._patch_version = None
         self._source = None
         self._target = None
 
@@ -224,13 +224,8 @@ class CLFTransformID:
     @property
     def clf_transform_id(self):
         """
-        Getter and setter property for the *CLFtransformID*, e.g.
+        Getter property for the *CLFtransformID*, e.g.
         *urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
 
         Returns
         -------
@@ -247,13 +242,8 @@ class CLFTransformID:
     @property
     def urn(self):
         """
-        Getter and setter property for the *CLFtransformID* Uniform Resource
-        Name (*URN*), e.g. *urn:aswf:ocio:transformId:v1.0*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* Uniform Resource Name (*URN*),
+        e.g. *urn:aswf:ocio:transformId:v1.0*.
 
         Returns
         -------
@@ -270,12 +260,7 @@ class CLFTransformID:
     @property
     def type(self):
         """
-        Getter and setter property for the *CLFtransformID* type, e.g. *ACES*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* type, e.g. *ACES*.
 
         Returns
         -------
@@ -292,13 +277,7 @@ class CLFTransformID:
     @property
     def namespace(self):
         """
-        Getter and setter property for the *CLFtransformID* namespace, e.g.
-        *OCIO*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* namespace, e.g. *OCIO*.
 
         Returns
         -------
@@ -315,13 +294,8 @@ class CLFTransformID:
     @property
     def name(self):
         """
-        Getter and setter property for the *CLFtransformID* name, e.g.
+        Getter property for the *CLFtransformID* name, e.g.
         *AP0_to_AP1-Gamma2pnt2*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
 
         Returns
         -------
@@ -336,15 +310,9 @@ class CLFTransformID:
         return self._name
 
     @property
-    def major_version_number(self):
+    def major_version(self):
         """
-        Getter and setter property for the *CLFtransformID* major version
-        number, e.g. *c1*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* major version number, e.g. *c1*.
 
         Returns
         -------
@@ -356,18 +324,12 @@ class CLFTransformID:
         -   This property is read only.
         """
 
-        return self._major_version_number
+        return self._major_version
 
     @property
-    def minor_version_number(self):
+    def minor_version(self):
         """
-        Getter and setter property for the *CLFtransformID* minor version
-        number, e.g. *v1*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* minor version number, e.g. *v1*.
 
         Returns
         -------
@@ -379,18 +341,12 @@ class CLFTransformID:
         -   This property is read only.
         """
 
-        return self._minor_version_number
+        return self._minor_version
 
     @property
-    def patch_version_number(self):
+    def patch_version(self):
         """
-        Getter and setter property for the *CLFtransformID* patch version
-        number.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* patch version number.
 
         Returns
         -------
@@ -402,17 +358,12 @@ class CLFTransformID:
         -   This property is read only.
         """
 
-        return self._patch_version_number
+        return self._patch_version
 
     @property
     def source(self):
         """
-        Getter and setter property for the *CLFtransformID* source colourspace.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* source colourspace.
 
         Returns
         -------
@@ -429,12 +380,7 @@ class CLFTransformID:
     @property
     def target(self):
         """
-        Getter and setter property for the *CLFtransformID* target colourspace.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLFtransformID* target colourspace.
 
         Returns
         -------
@@ -507,8 +453,8 @@ class CLFTransformID:
         )
 
         (
-            self._major_version_number,
-            self._minor_version_number,
+            self._major_version,
+            self._minor_version,
         ) = version.split(SEPARATOR_VERSION_CLF)
 
 
@@ -566,12 +512,7 @@ class CLFTransform:
     @property
     def path(self):
         """
-        Getter and setter property for the *CLF* transform path.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform path.
 
         Returns
         -------
@@ -588,13 +529,8 @@ class CLFTransform:
     @property
     def code(self):
         """
-        Getter and setter property for the *CLF* transform code, i.e. the *CLF*
-        transform file content.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform code, i.e. the *CLF* transform
+        file content.
 
         Returns
         -------
@@ -613,12 +549,7 @@ class CLFTransform:
     @property
     def clf_transform_id(self):
         """
-        Getter and setter property for the *CLF* transform *CLFtransformID*.
-
-        Parameters
-        ----------
-        value : CLFTransformID
-            Attribute value.
+        Getter property for the *CLF* transform *CLFtransformID*.
 
         Returns
         -------
@@ -635,12 +566,7 @@ class CLFTransform:
     @property
     def user_name(self):
         """
-        Getter and setter property for the *CLF* transform user name.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform user name.
 
         Returns
         -------
@@ -657,13 +583,8 @@ class CLFTransform:
     @property
     def description(self):
         """
-        Getter and setter property for the *CLF* transform description
-        extracted from parsing the file content header.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform description extracted from
+        parsing the file content header.
 
         Returns
         -------
@@ -680,13 +601,8 @@ class CLFTransform:
     @property
     def input_descriptor(self):
         """
-        Getter and setter property for the *CLF* transform input descriptor
-        extracted from parsing the file content header.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform input descriptor extracted from
+        parsing the file content header.
 
         Returns
         -------
@@ -703,13 +619,8 @@ class CLFTransform:
     @property
     def output_descriptor(self):
         """
-        Getter and setter property for the *CLF* transform output descriptor
-        extracted from parsing the file content header.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform output descriptor extracted
+        from parsing the file content header.
 
         Returns
         -------
@@ -726,13 +637,8 @@ class CLFTransform:
     @property
     def information(self):
         """
-        Getter and setter property for the *CLF* transform information
-        extracted from parsing the file content header.
-
-        Parameters
-        ----------
-        value : dict
-            Attribute value.
+        Getter property for the *CLF* transform information extracted from
+        parsing the file content header.
 
         Returns
         -------
@@ -749,15 +655,9 @@ class CLFTransform:
     @property
     def family(self):
         """
-        Getter and setter property for the *CLF* transform family, e.g.
-        *aces*, a value in
+        Getter property for the *CLF* transform family, e.g. *aces*, a value in
         :attr:`opencolorio_config_aces.clf.reference.\
 TRANSFORM_FAMILIES_CLF` attribute dictionary.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
 
         Returns
         -------
@@ -774,13 +674,7 @@ TRANSFORM_FAMILIES_CLF` attribute dictionary.
     @property
     def genus(self):
         """
-        Getter and setter property for the *CLF* transform genus, e.g.
-        *undefined*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *CLF* transform genus, e.g. *undefined*.
 
         Returns
         -------
@@ -953,13 +847,7 @@ class CLFTransformPair:
     @property
     def forward_transform(self):
         """
-        Getter and setter property for the *CLF* transform pair forward
-        transform.
-
-        Parameters
-        ----------
-        value : CLFTransform
-            Attribute value.
+        Getter property for the *CLF* transform pair forward transform.
 
         Returns
         -------
@@ -976,13 +864,7 @@ class CLFTransformPair:
     @property
     def inverse_transform(self):
         """
-        Getter and setter property for the *CLF* transform pair inverse
-        transform.
-
-        Parameters
-        ----------
-        value : CLFTransform
-            Attribute value.
+        Getter property for the *CLF* transform pair inverse transform.
 
         Returns
         -------

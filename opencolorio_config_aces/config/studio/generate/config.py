@@ -17,6 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
+    PROFILE_VERSION_DEFAULT,
     generate_config,
 )
 from opencolorio_config_aces.config.reference import (
@@ -74,6 +75,7 @@ PATH_TRANSFORMS_MAPPING_FILE_STUDIO : unicode
 
 def config_basename_studio(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
+    profile_version=PROFILE_VERSION_DEFAULT,
 ):
     """
     Generate the ACES* Studio *OpenColorIO* config basename, i.e. the filename
@@ -83,6 +85,8 @@ def config_basename_studio(
     ----------
     config_mapping_file_path : str, optional
         Path to the *CSV* mapping file.
+    profile_version : ProfileVersion, optional
+        *OpenColorIO* config profile version.
 
     Returns
     -------
@@ -92,16 +96,17 @@ def config_basename_studio(
     Examples
     --------
     >>> config_basename_studio()  # doctest: +SKIP
-    'studio-config-v0.1.0_aces-v1.3_ocio-v2.1.2dev.ocio'
+    'studio-config-v0.2.0_aces-v1.3_ocio-v2.0.ocio'
     """
 
     return ("studio-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
-        **dependency_versions(config_mapping_file_path)
+        **dependency_versions(config_mapping_file_path, profile_version)
     )
 
 
 def config_name_studio(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
+    profile_version=PROFILE_VERSION_DEFAULT,
 ):
     """
     Generate the ACES* Studio *OpenColorIO* config name.
@@ -110,6 +115,8 @@ def config_name_studio(
     ----------
     config_mapping_file_path : str, optional
         Path to the *CSV* mapping file.
+    profile_version : ProfileVersion, optional
+        *OpenColorIO* config profile version.
 
     Returns
     -------
@@ -119,8 +126,8 @@ def config_name_studio(
     Examples
     --------
     >>> config_name_studio()  # doctest: +SKIP
-    'Academy Color Encoding System - Studio Config [COLORSPACES v0.1.0] \
-[ACES v1.3] [OCIO v2.1.2dev]'
+    'Academy Color Encoding System - Studio Config [COLORSPACES v0.2.0] \
+[ACES v1.3] [OCIO v2.0]'
     """
 
     return (
@@ -128,11 +135,12 @@ def config_name_studio(
         "[COLORSPACES {colorspaces}] "
         "[ACES {aces}] "
         "[OCIO {ocio}]"
-    ).format(**dependency_versions(config_mapping_file_path))
+    ).format(**dependency_versions(config_mapping_file_path, profile_version))
 
 
 def config_description_studio(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
+    profile_version=PROFILE_VERSION_DEFAULT,
 ):
     """
     Generate the ACES* Studio *OpenColorIO* config description.
@@ -141,6 +149,8 @@ def config_description_studio(
     ----------
     config_mapping_file_path : str, optional
         Path to the *CSV* mapping file.
+    profile_version : ProfileVersion, optional
+        *OpenColorIO* config profile version.
 
     Returns
     -------
@@ -148,7 +158,7 @@ def config_description_studio(
         ACES* Studio *OpenColorIO* config description.
     """
 
-    name = config_name_studio(config_mapping_file_path)
+    name = config_name_studio(config_mapping_file_path, profile_version)
     underline = "-" * len(name)
     description = (
         'This "OpenColorIO" config is geared toward studios requiring a config '
@@ -166,6 +176,7 @@ def config_description_studio(
 def generate_config_studio(
     data=None,
     config_name=None,
+    profile_version=PROFILE_VERSION_DEFAULT,
     validate=True,
     describe=ColorspaceDescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
@@ -198,6 +209,8 @@ def generate_config_studio(
     config_name : unicode, optional
         *OpenColorIO* config file name, if given the config will be written to
         disk.
+    profile_version : ProfileVersion, optional
+        *OpenColorIO* config profile version.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -219,13 +232,16 @@ def generate_config_studio(
     """
 
     logger.info(
-        f'Generating "{config_name_studio(config_mapping_file_path)}" config...'
+        f"Generating "
+        f'"{config_name_studio(config_mapping_file_path, profile_version)}" '
+        f"config..."
     )
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
     if data is None:
         _config, data = generate_config_cg(
+            profile_version=profile_version,
             describe=describe,
             scheme=scheme,
             config_mapping_file_path=config_mapping_file_path,
@@ -233,14 +249,16 @@ def generate_config_studio(
         )
 
     data.name = re.sub(
-        r"\.ocio$", "", config_basename_studio(config_mapping_file_path)
+        r"\.ocio$",
+        "",
+        config_basename_studio(config_mapping_file_path, profile_version),
     )
     data.description = config_description_studio(config_mapping_file_path)
     config = generate_config(data, config_name, validate)
 
     logger.info(
-        f'"{config_name_studio(config_mapping_file_path)}" config generation '
-        f"complete!"
+        f'"{config_name_studio(config_mapping_file_path, profile_version)}" '
+        f"config generation complete!"
     )
 
     if additional_data:
@@ -251,7 +269,10 @@ def generate_config_studio(
 
 if __name__ == "__main__":
     import opencolorio_config_aces
-    from opencolorio_config_aces import serialize_config_data
+    from opencolorio_config_aces import (
+        SUPPORTED_PROFILE_VERSIONS,
+        serialize_config_data,
+    )
     from pathlib import Path
 
     logging.basicConfig()
@@ -270,11 +291,15 @@ if __name__ == "__main__":
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
-    config_basename = config_basename_studio()
-    config, data = generate_config_studio(
-        config_name=build_directory / config_basename,
-        additional_data=True,
-    )
+    for profile_version in SUPPORTED_PROFILE_VERSIONS:
+        config_basename = config_basename_studio(
+            profile_version=profile_version
+        )
+        config, data = generate_config_studio(
+            config_name=build_directory / config_basename,
+            profile_version=profile_version,
+            additional_data=True,
+        )
 
     # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
     # versions.

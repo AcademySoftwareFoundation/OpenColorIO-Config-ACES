@@ -65,3 +65,4 @@ Ordering,Legacy Name,ACEStransformID,CLFtransformID,Interface,BuiltinTransform S
 420,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_Rec709-Texture:1.0,ColorSpace,,g22_rec709,sdr-video,
 420,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Texture:1.0,ColorSpace,,g24_rec709,sdr-video,file-io
 420,Utility - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB-Texture:1.0,ColorSpace,,"srgb,Input - Generic - sRGB - Texture",,
+500,Utility - Look - Gamut Compress,urn:ampas:aces:transformId:v1.5:LMT.Academy.GamutCompress.a1.3.0,,Look,,look_gamutcompress,,

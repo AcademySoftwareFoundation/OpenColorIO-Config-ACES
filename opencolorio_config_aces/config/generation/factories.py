@@ -23,6 +23,11 @@ from pprint import pformat
 from textwrap import indent
 from typing import Mapping, Sequence
 
+from opencolorio_config_aces.config.generation import (
+    PROFILE_VERSION_DEFAULT,
+    ProfileVersion,
+)
+from opencolorio_config_aces.utilities import DocstringDict
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -32,6 +37,7 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
+    "BUILTIN_TRANSFORMS",
     "group_transform_factory",
     "colorspace_factory",
     "named_transform_factory",
@@ -44,6 +50,27 @@ __all__ = [
     "transform_factory",
     "produce_transform",
 ]
+
+
+BUILTIN_TRANSFORMS = DocstringDict(
+    {
+        builtin: PROFILE_VERSION_DEFAULT
+        for builtin in ocio.BuiltinTransformRegistry()
+    }
+)
+BUILTIN_TRANSFORMS.__doc__ = """
+Mapping of *OpenColorIO* builtintransforms to their profile version.
+
+BUILTIN_TRANSFORMS : dict
+"""
+
+BUILTIN_TRANSFORMS.update(
+    {
+        "ACES-LMT - ACES 1.3 Reference Gamut Compression": ProfileVersion(
+            2, 1
+        ),
+    }
+)
 
 
 def group_transform_factory(transforms):

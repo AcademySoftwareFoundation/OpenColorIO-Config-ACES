@@ -356,9 +356,9 @@ class ACESTransformID:
     type
     namespace
     name
-    major_version_number
-    minor_version_number
-    patch_version_number
+    major_version
+    minor_version
+    patch_version
     source
     target
 
@@ -375,9 +375,9 @@ class ACESTransformID:
         self._type = None
         self._namespace = None
         self._name = None
-        self._major_version_number = None
-        self._minor_version_number = None
-        self._patch_version_number = None
+        self._major_version = None
+        self._minor_version = None
+        self._patch_version = None
         self._source = None
         self._target = None
 
@@ -386,13 +386,8 @@ class ACESTransformID:
     @property
     def aces_transform_id(self):
         """
-        Getter and setter property for the *ACEStransformID*, e.g.
+        Getter property for the *ACEStransformID*, e.g.
         *urn:ampas:aces:transformId:v1.5:ODT.Academy.DCDM.a1.0.3*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
 
         Returns
         -------
@@ -409,13 +404,8 @@ class ACESTransformID:
     @property
     def urn(self):
         """
-        Getter and setter property for the *ACEStransformID* Uniform Resource
-        Name (*URN*), e.g. *urn:ampas:aces:transformId:v1.5*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* Uniform Resource Name (*URN*),
+        e.g. *urn:ampas:aces:transformId:v1.5*.
 
         Returns
         -------
@@ -432,12 +422,7 @@ class ACESTransformID:
     @property
     def type(self):
         """
-        Getter and setter property for the *ACEStransformID* type, e.g. *ODT*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* type, e.g. *ODT*.
 
         Returns
         -------
@@ -454,13 +439,7 @@ class ACESTransformID:
     @property
     def namespace(self):
         """
-        Getter and setter property for the *ACEStransformID* namespace, e.g.
-        *Academy*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* namespace, e.g. *Academy*.
 
         Returns
         -------
@@ -477,13 +456,7 @@ class ACESTransformID:
     @property
     def name(self):
         """
-        Getter and setter property for the *ACEStransformID* name, e.g.
-        *DCDM*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* name, e.g. *DCDM*.
 
         Returns
         -------
@@ -498,15 +471,10 @@ class ACESTransformID:
         return self._name
 
     @property
-    def major_version_number(self):
+    def major_version(self):
         """
-        Getter and setter property for the *ACEStransformID* major version
-        number, e.g. *a1*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* major version number, e.g.
+        *a1*.
 
         Returns
         -------
@@ -518,18 +486,13 @@ class ACESTransformID:
         -   This property is read only.
         """
 
-        return self._major_version_number
+        return self._major_version
 
     @property
-    def minor_version_number(self):
+    def minor_version(self):
         """
-        Getter and setter property for the *ACEStransformID* minor version
-        number, e.g. *0*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* minor version number, e.g.
+        *0*.
 
         Returns
         -------
@@ -541,18 +504,12 @@ class ACESTransformID:
         -   This property is read only.
         """
 
-        return self._minor_version_number
+        return self._minor_version
 
     @property
-    def patch_version_number(self):
+    def patch_version(self):
         """
-        Getter and setter property for the *ACEStransformID* patch version
-        number, e.g. *3*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getterproperty for the *ACEStransformID* patch version number, e.g. *3*.
 
         Returns
         -------
@@ -564,18 +521,12 @@ class ACESTransformID:
         -   This property is read only.
         """
 
-        return self._patch_version_number
+        return self._patch_version
 
     @property
     def source(self):
         """
-        Getter and setter property for the *ACEStransformID* source
-        colourspace.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* source colourspace.
 
         Returns
         -------
@@ -592,13 +543,7 @@ class ACESTransformID:
     @property
     def target(self):
         """
-        Getter and setter property for the *ACEStransformID* target
-        colourspace.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACEStransformID* target colourspace.
 
         Returns
         -------
@@ -662,32 +607,32 @@ class ACESTransformID:
 
         if len(components) == 3:
             (
-                self._major_version_number,
-                self._minor_version_number,
-                self._patch_version_number,
+                self._major_version,
+                self._minor_version,
+                self._patch_version,
             ) = components
         elif len(components) == 4:
             if self._type in ("ACESlib", "ACESutil"):
                 (
                     self._name,
-                    self._major_version_number,
-                    self._minor_version_number,
-                    self._patch_version_number,
+                    self._major_version,
+                    self._minor_version,
+                    self._patch_version,
                 ) = components
             elif self._type == "IDT":
                 (
                     self._namespace,
                     self._name,
-                    self._major_version_number,
-                    self._minor_version_number,
+                    self._major_version,
+                    self._minor_version,
                 ) = components
         else:
             (
                 self._namespace,
                 self._name,
-                self._major_version_number,
-                self._minor_version_number,
-                self._patch_version_number,
+                self._major_version,
+                self._minor_version,
+                self._patch_version,
             ) = components
 
         assert (
@@ -772,12 +717,7 @@ class CTLTransform:
     @property
     def path(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform path.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter  property for the *ACES* *CTL* transform path.
 
         Returns
         -------
@@ -794,13 +734,8 @@ class CTLTransform:
     @property
     def code(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform code, i.e.
-        the *ACES* *CTL* transform file content.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter  property for the *ACES* *CTL* transform code, i.e. the *ACES*
+        *CTL* transform file content.
 
         Returns
         -------
@@ -819,13 +754,7 @@ class CTLTransform:
     @property
     def aces_transform_id(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform
-        *ACEStransformID*.
-
-        Parameters
-        ----------
-        value : ACESTransformID
-            Attribute value.
+        Getter property for the *ACES* *CTL* transform *ACEStransformID*.
 
         Returns
         -------
@@ -842,13 +771,7 @@ class CTLTransform:
     @property
     def user_name(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform
-        *ACESuserName*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACES* *CTL* transform *ACESuserName*.
 
         Returns
         -------
@@ -865,13 +788,8 @@ class CTLTransform:
     @property
     def description(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform description
-        extracted from parsing the file content header.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACES* *CTL* transform description extracted
+        from parsing the file content header.
 
         Returns
         -------
@@ -888,15 +806,10 @@ class CTLTransform:
     @property
     def family(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform family, e.g.
+        Getter property for the *ACES* *CTL* transform family, e.g.
         *output_transform*, a value in
         :attr:`opencolorio_config_aces.config.reference.\
 TRANSFORM_FAMILIES_CTL` attribute dictionary.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
 
         Returns
         -------
@@ -913,13 +826,7 @@ TRANSFORM_FAMILIES_CTL` attribute dictionary.
     @property
     def genus(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform genus, e.g.
-        *dcdm*.
-
-        Parameters
-        ----------
-        value : unicode
-            Attribute value.
+        Getter property for the *ACES* *CTL* transform genus, e.g. *dcdm*.
 
         Returns
         -------
@@ -1094,13 +1001,7 @@ class CTLTransformPair:
     @property
     def forward_transform(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform pair forward
-        transform.
-
-        Parameters
-        ----------
-        value : CTLTransform
-            Attribute value.
+        Getter property for the *ACES* *CTL* transform pair forward transform.
 
         Returns
         -------
@@ -1117,13 +1018,7 @@ class CTLTransformPair:
     @property
     def inverse_transform(self):
         """
-        Getter and setter property for the *ACES* *CTL* transform pair inverse
-        transform.
-
-        Parameters
-        ----------
-        value : CTLTransform
-            Attribute value.
+        Getter property for the *ACES* *CTL* transform pair inverse transform.
 
         Returns
         -------

@@ -5,6 +5,20 @@
 Generation
 ==========
 
+Profile Version
+---------------
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/
+
+    ProfileVersion
+    PROFILE_VERSION_DEFAULT
+    SUPPORTED_PROFILE_VERSIONS
+
 Config Generation Common Objects
 --------------------------------
 
@@ -16,7 +30,6 @@ Config Generation Common Objects
     :toctree: generated/
 
     ConfigData
-    VersionData
     deserialize_config_data
     generate_config
     serialize_config_data
@@ -30,6 +43,7 @@ Factories
 .. autosummary::
     :toctree: generated/
 
+    BUILTIN_TRANSFORMS
     TRANSFORM_FACTORIES
     colorspace_factory
     group_transform_factory
