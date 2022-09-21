@@ -1028,8 +1028,8 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
     >>> os.path.basename(key)
     'input'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
-    ['BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf', \
-'BlackmagicDesign.Input.BMDFilm_WideGamut_Gen5_to_ACES2065-1.clf']
+    ['ARRI.Input.ARRI_LogC3_Curve_EI800.clf', \
+'ARRI.Input.ARRI_LogC3_EI800_to_ACES2065-1.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1088,19 +1088,18 @@ def classify_clf_transforms(unclassified_clf_transforms):
     ...     discover_clf_transforms())
     >>> family = sorted(clf_transforms.keys())[0]
     >>> str(family)
-    'blackmagic'
+    'arri'
     >>> genera = sorted(clf_transforms[family])
     >>> print(genera)
     ['Input']
     >>> genus = genera[0]
     >>> sorted(clf_transforms[family][genus].items())[:2]  # doctest: +ELLIPSIS
-    [('BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve', \
+    [('ARRI.Input.ARRI_LogC3_Curve_EI800', \
 CLFTransform(\
-'blackmagic...input...BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf')), \
-('BlackmagicDesign.Input.BMDFilm_WideGamut_Gen5_to_ACES2065-1', \
+'arri...input...ARRI.Input.ARRI_LogC3_Curve_EI800.clf')), \
+('ARRI.Input.ARRI_LogC3_EI800_to_ACES2065-1', \
 CLFTransform(\
-'blackmagic...input...BlackmagicDesign.Input\
-.BMDFilm_WideGamut_Gen5_to_ACES2065-1.clf'))]
+'arri...input...ARRI.Input.ARRI_LogC3_EI800_to_ACES2065-1.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1180,7 +1179,7 @@ def unclassify_clf_transforms(classified_clf_transforms):
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
     CLFTransform(\
-'blackmagic...input...BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf')
+'arri...input...ARRI.Input.ARRI_LogC3_Curve_EI800.clf')
     """
 
     unclassified_clf_transforms = []

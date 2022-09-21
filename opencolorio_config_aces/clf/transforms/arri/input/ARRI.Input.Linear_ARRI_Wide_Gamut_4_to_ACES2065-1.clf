@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_4_to_ACES2065-1:1.0" name="Linear ARRI Wide Gamut 4 to ACES2065-1">
+    <InputDescriptor>Linear ARRI Wide Gamut 4</InputDescriptor>
+    <OutputDescriptor>ACES2065-1</OutputDescriptor>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+  0.750957362824734   0.144422786709757   0.104619850465509
+0.000821837079380207       1.007397584885 -0.00821942196438358
+-0.000499952143533471 -0.000854177231436971      1.00135412937497
+        </Array>
+    </Matrix>
+</ProcessList>

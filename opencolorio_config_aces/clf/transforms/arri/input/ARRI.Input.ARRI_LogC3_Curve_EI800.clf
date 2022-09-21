@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_Curve_EI800_to_Linear:1.0" name="ARRI LogC3 Curve (EI800) to Relative Scene Linear">
+    <InputDescriptor>ARRI LogC3 Curve (EI800)</InputDescriptor>
+    <OutputDescriptor>Relative Scene Linear</OutputDescriptor>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="5.55555555555556" linSideOffset="0.0522722750251688" logSideSlope="0.247189638318671" logSideOffset="0.385536998692443" linSideBreak="0.0105909904954696" />
+    </Log>
+</ProcessList>
