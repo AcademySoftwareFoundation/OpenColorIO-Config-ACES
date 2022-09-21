@@ -248,16 +248,12 @@ def _build_logc4_curve():
     )
 
 
-def _generate_logc3_transforms(
-    transforms_set, output_directory, ei_list=[800]
-):
+def _generate_logc3_transforms(output_directory, ei_list=[800]):
     """
     Generate the collection of LogC3 transforms.
 
     Parameters
     ----------
-    transforms_set : dict
-        A `dict` of transforms to append to.
     output_directory : PosixPath or WindowsPath
         Directory where generated CLF files should be saved.
     ei_list : array_like of int, optional
@@ -268,6 +264,8 @@ def _generate_logc3_transforms(
     dict
         Dictionary of *OpenColorIO* `Transform` instances.
     """
+
+    transforms = {}
 
     for ei in ei_list:
 
@@ -280,7 +278,7 @@ def _generate_logc3_transforms(
             FAMILY, GENUS, name, VERSION
         )
         filename = output_directory / clf_basename(clf_transform_id)
-        transforms_set[filename] = generate_clf_transform(
+        transforms[filename] = generate_clf_transform(
             filename,
             [_build_logc3_curve(ei), _build_awg3_mtx()],
             clf_transform_id,
@@ -298,7 +296,7 @@ def _generate_logc3_transforms(
             FAMILY, GENUS, name, VERSION
         )
         filename = output_directory / clf_basename(clf_transform_id)
-        transforms_set[filename] = generate_clf_transform(
+        transforms[filename] = generate_clf_transform(
             filename,
             [_build_logc3_curve(ei)],
             clf_transform_id,
@@ -313,7 +311,7 @@ def _generate_logc3_transforms(
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
-    transforms_set[filename] = generate_clf_transform(
+    transforms[filename] = generate_clf_transform(
         filename,
         [_build_awg3_mtx()],
         clf_transform_id,
@@ -322,17 +320,15 @@ def _generate_logc3_transforms(
         output_descriptor,
     )
 
-    return transforms_set
+    return transforms
 
 
-def _generate_logc4_transforms(transforms_set, output_directory):
+def _generate_logc4_transforms(output_directory):
     """
     Generate the collection of LogC4 transforms.
 
     Parameters
     ----------
-    transforms_set : dict
-        A `dict` of transforms to append to.
     output_directory : PosixPath or WindowsPath
         Directory where generated CLF files should be saved.
 
@@ -342,6 +338,8 @@ def _generate_logc4_transforms(transforms_set, output_directory):
         Dictionary of *OpenColorIO* `Transform` instances.
     """
 
+    transforms = {}
+
     # Generate ARRI LogC4 to ACES 2065-1 Transform
     name = "ARRI_LogC4_to_ACES2065-1"
     aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.LogC4.a1.v1"
@@ -349,7 +347,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
-    transforms_set[filename] = generate_clf_transform(
+    transforms[filename] = generate_clf_transform(
         filename,
         [_build_logc4_curve(), _build_awg4_mtx()],
         clf_transform_id,
@@ -365,7 +363,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
     output_descriptor = "Relative Scene Linear"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
-    transforms_set[filename] = generate_clf_transform(
+    transforms[filename] = generate_clf_transform(
         filename,
         [_build_logc4_curve()],
         clf_transform_id,
@@ -380,7 +378,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
-    transforms_set[filename] = generate_clf_transform(
+    transforms[filename] = generate_clf_transform(
         filename,
         [_build_awg4_mtx()],
         clf_transform_id,
@@ -389,7 +387,7 @@ def _generate_logc4_transforms(transforms_set, output_directory):
         output_descriptor,
     )
 
-    return transforms_set
+    return transforms
 
 
 def generate_clf_arri(output_directory):
@@ -414,13 +412,12 @@ def generate_clf_arri(output_directory):
 
     output_directory.mkdir(parents=True, exist_ok=True)
 
-    clf_transforms = {}
-    clf_transforms = _generate_logc3_transforms(
-        clf_transforms, output_directory, ei_list=[800]
+    logc3_transforms = _generate_logc3_transforms(
+        output_directory, ei_list=[800]
     )
-    clf_transforms = _generate_logc4_transforms(
-        clf_transforms, output_directory
-    )
+    logc4_transforms = _generate_logc4_transforms(output_directory)
+
+    clf_transforms = {**logc3_transforms, **logc4_transforms}
 
     return clf_transforms
 
