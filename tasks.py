@@ -248,6 +248,7 @@ def build_clf_transforms(ctx: Context):
     for family in [
         "arri",
         "blackmagic",
+        "canon",
         "itu",
         "ocio",
         "panasonic",
