@@ -19,7 +19,6 @@ from opencolorio_config_aces.clf.transforms import (
     generate_clf_transform,
     matrix_RGB_to_RGB_transform,
 )
-from opencolorio_config_aces.config import transform_factory
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -78,9 +77,7 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
 
     bt = ocio.BuiltinTransform(style="CANON_CLOG3-CGAMUT_to_ACES2065-1")
 
-    mtx = matrix_RGB_to_RGB_transform(
-        "Cinema Gamut", "ACES2065-1", "CAT02"
-    )
+    mtx = matrix_RGB_to_RGB_transform("Cinema Gamut", "ACES2065-1", "CAT02")
 
     aces_transform_id = (
         "urn:ampas:aces:transformId:v1.5:"
@@ -124,7 +121,7 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
 
     # Generate `NamedTransform` for log curve only.
 
-    # TODO: This will have to wait for OCIO 2.2 in order to do this without 
+    # TODO: This will have to wait for OCIO 2.2 in order to do this without
     # requiring an external LUT file.
 
     return clf_transforms
