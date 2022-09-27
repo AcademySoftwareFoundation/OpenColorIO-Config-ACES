@@ -16,6 +16,7 @@ import unicodedata
 from collections import defaultdict
 from html.parser import HTMLParser
 from itertools import chain
+from pathlib import Path
 from pprint import PrettyPrinter
 from textwrap import TextWrapper
 
@@ -27,6 +28,7 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = [
+    "ROOT_BUILD_DEFAULT",
     "DocstringDict",
     "first_item",
     "common_ancestor",
@@ -62,6 +64,14 @@ class _dispatch(dict):
 
 
 PrettyPrinter._dispatch = _dispatch()
+
+
+ROOT_BUILD_DEFAULT = (Path(__file__) / ".." / ".." / ".." / "build").resolve()
+"""
+Default build root directory.
+
+ROOT_BUILD_DEFAULT : str
+"""
 
 
 class DocstringDict(dict):

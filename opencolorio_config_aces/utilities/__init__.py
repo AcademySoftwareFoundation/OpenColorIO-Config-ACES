@@ -2,6 +2,7 @@
 # Copyright Contributors to the OpenColorIO Project.
 
 from .common import (
+    ROOT_BUILD_DEFAULT,
     DocstringDict,
     first_item,
     common_ancestor,
@@ -26,6 +27,7 @@ from .common import (
 )
 
 __all__ = [
+    "ROOT_BUILD_DEFAULT",
     "DocstringDict",
     "first_item",
     "common_ancestor",

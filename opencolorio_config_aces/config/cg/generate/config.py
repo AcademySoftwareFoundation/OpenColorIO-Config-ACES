@@ -1129,24 +1129,16 @@ def generate_config_cg(
 
 
 if __name__ == "__main__":
-    import opencolorio_config_aces
     from opencolorio_config_aces import (
         SUPPORTED_PROFILE_VERSIONS,
         serialize_config_data,
     )
-    from pathlib import Path
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = (
-        Path(opencolorio_config_aces.__path__[0])
-        / ".."
-        / "build"
-        / "config"
-        / "aces"
-        / "cg"
-    ).resolve()
+    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "cg").resolve()
 
     logging.info(f'Using "{build_directory}" build directory...')
 
