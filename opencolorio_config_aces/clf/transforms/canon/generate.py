@@ -2,7 +2,7 @@
 # Copyright Contributors to the OpenColorIO Project.
 """
 *Canon* CLF Transforms Generation
-===============================
+=================================
 
 Defines procedures for generating Canon *Common LUT Format* (CLF)
 transforms:
