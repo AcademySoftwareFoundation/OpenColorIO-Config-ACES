@@ -10,7 +10,6 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_canon`
 """
 
-import PyOpenColorIO as ocio
 from pathlib import Path
 
 from opencolorio_config_aces.clf.transforms import (
@@ -75,8 +74,6 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
 
     clf_transforms = {}
 
-    bt = ocio.BuiltinTransform(style="CANON_CLOG3-CGAMUT_to_ACES2065-1")
-
     mtx = matrix_RGB_to_RGB_transform("Cinema Gamut", "ACES2065-1", "CAT02")
 
     aces_transform_id = (
@@ -93,14 +90,16 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
+    style = "CANON_CLOG3-CGAMUT_to_ACES2065-1"
     clf_transforms[filename] = generate_clf_transform(
         filename,
-        [bt],
+        [{"transform_type": "BuiltinTransform", "style": style}],
         clf_transform_id,
         f"{input_descriptor} to {output_descriptor}",
         input_descriptor,
         output_descriptor,
         aces_transform_id,
+        style=style,
     )
 
     # Generate transform for primaries only.
