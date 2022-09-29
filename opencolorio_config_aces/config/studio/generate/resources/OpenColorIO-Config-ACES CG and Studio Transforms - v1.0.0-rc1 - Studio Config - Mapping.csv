@@ -4,17 +4,18 @@ Ordering,Legacy Name,ACEStransformID,CLFtransformID,Interface,BuiltinTransform S
 100,ACES - ACEScg,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,ColorSpace,ACEScg_to_ACES2065-1,"acescg,lin_ap1",scene-linear,ACES
 200,Input - ADX - ADX10,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX10_to_ACES.a1.0.3,,ColorSpace,ADX10_to_ACES2065-1,adx10,log,ACES
 200,Input - ADX - ADX16,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX16_to_ACES.a1.0.3,,ColorSpace,ADX16_to_ACES2065-1,adx16,log,ACES
-203,Input - ARRI - Curve - V3 LogC (EI800),,,NamedTransform,,crv_logc3ei800,log,ARRI
-203,Input - ARRI - Linear - ALEXA Wide Gamut,,,ColorSpace,,lin_awg,scene-linear,ARRI
-203,Input - ARRI - V3 LogC (EI800) - Wide Gamut,urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI800.a1.v2,,ColorSpace,,logc3ei800_awg,log,ARRI
-204,Input - ARRI - Curve - LogC4,,,NamedTransform,,crv_logc4,log,
-204,Input - ARRI - Linear - ARRI Wide Gamut 4,,,ColorSpace,,lin_awg4,scene-linear,
-204,Input - ARRI LogC4,,,ColorSpace,,logc4_awg4,log,
+203,Input - ARRI - Curve - V3 LogC (EI800),,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_Curve_EI800_to_Linear:1.0,NamedTransform,,crv_logc3ei800,log,ARRI
+203,Input - ARRI - Linear - ALEXA Wide Gamut,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_3_to_ACES2065-1:1.0,ColorSpace,,lin_awg,scene-linear,ARRI
+203,Input - ARRI - V3 LogC (EI800) - Wide Gamut,urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI800.a1.v2,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_EI800_to_ACES2065-1:1.0,ColorSpace,,logc3ei800_awg,log,ARRI
+204,Input - ARRI - Curve - LogC4,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_Curve_to_Linear:1.0,NamedTransform,,crv_logc4,log,
+204,Input - ARRI - Linear - ARRI Wide Gamut 4,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_4_to_ACES2065-1:1.0,ColorSpace,,lin_awg4,scene-linear,
+204,Input - ARRI LogC4,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0,ColorSpace,,logc4_awg4,log,
 210,Input - Blackmagic - Curve - DaVinci Intermediate,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_Log-Curve_to_Linear:1.0,NamedTransform,,crv_davinci_intermediate,log,Blackmagic
 210,Input - Blackmagic - DaVinci Intermediate - DaVinci Wide Gamut,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1:1.0,ColorSpace,,davinci_intermediate_dwg,log,Blackmagic
 210,Input - Blackmagic - Linear - DaVinci Wide Gamut,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1:1.0,ColorSpace,,lin_dwg,scene-linear,Blackmagic
+210,Input - Canon - Canon-Log3 - Cinema Gamut Daylight,,urn:aswf:ocio:transformId:1.0:Canon:Input:CanonLog3_CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,CANON_CLOG3-CGAMUT_to_ACES2065-1,clog3_cgamut,log,Canon
 210,Input - Canon - Curve - Canon-Log3,,,NamedTransform,,crv_clog3,log,Canon
-210,Input - Canon - Linear - Canon Cinema Gamut Daylight,,,ColorSpace,,lin_cgamut,scene-linear,Canon
+210,Input - Canon - Linear - Canon Cinema Gamut Daylight,,urn:aswf:ocio:transformId:1.0:Canon:Input:Linear-CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,,lin_cgamut,scene-linear,Canon
 210,Input - Panasonic - Curve - V-Log,,urn:aswf:ocio:transformId:1.0:Panasonic:Input:VLog-Curve_to_Linear:1.0,NamedTransform,,crv_vlog,log,Panasonic
 210,Input - Panasonic - Linear - V-Gamut,,urn:aswf:ocio:transformId:1.0:Panasonic:Input:Linear_VGamut_to_ACES2065-1:1.0,ColorSpace,,lin_vgamut,scene-linear,Panasonic
 210,Input - Panasonic - V-Log - V-Gamut,,urn:aswf:ocio:transformId:1.0:Panasonic:Input:VLog_VGamut_to_ACES2065-1:1.0,ColorSpace,,vlog_vgamut,log,Panasonic
