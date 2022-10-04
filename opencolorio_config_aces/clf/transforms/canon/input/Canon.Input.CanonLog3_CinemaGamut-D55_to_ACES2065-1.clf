@@ -4,6 +4,7 @@
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
         <ACEStransformID>urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog3_CGamut_to_ACES.a1.1.0</ACEStransformID>
+        <BuiltinTransform>CANON_CLOG3-CGAMUT_to_ACES2065-1</BuiltinTransform>
     </Info>
     <LUT1D inBitDepth="32f" outBitDepth="32f" interpolation="linear">
         <Array dim="4096 1">

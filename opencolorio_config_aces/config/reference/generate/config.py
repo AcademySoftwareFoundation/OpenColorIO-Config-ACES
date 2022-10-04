@@ -172,7 +172,7 @@ def version_config_mapping_file(path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE):
     ''
     """
 
-    search = re.search(r"- (v\d\.\d\.\d) -", Path(path).stem)
+    search = re.search(r"- (v\d\.\d\.\d(-rc\d+)?) -", Path(path).stem)
     if search:
         return search.group(1)
     else:
