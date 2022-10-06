@@ -11,11 +11,11 @@ Ordering,Legacy Name,ACEStransformID,CLFtransformID,Interface,BuiltinTransform S
 400,Utility - Curve - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB-Curve:1.0,NamedTransform,,crv_srgb,sdr-video,
 410,Utility - Linear - P3-D65,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_P3-D65:1.0,ColorSpace,,lin_p3d65,scene-linear,
 410,Utility - Linear - Rec.2020,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec2020:1.0,ColorSpace,,lin_rec2020,scene-linear,
-410,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec709:1.0,ColorSpace,,"lin_rec709,lin_srgb,Linear sRGB",scene-linear,
+410,Utility - Linear - Rec.709,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec709:1.0,ColorSpace,,"lin_rec709,lin_srgb,Utility - Linear - sRGB",scene-linear,
 410,Utility - Linear - sRGB,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec709:1.0,ColorSpace,,,scene-linear,
 420,Utility - Gamma 1.8 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma1.8_Rec709-Texture:1.0,ColorSpace,,g18_rec709,sdr-video,
 420,Utility - Gamma 2.2 - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_AP1-Texture:1.0,ColorSpace,,g22_ap1,sdr-video,file-io
 420,Utility - Gamma 2.2 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_Rec709-Texture:1.0,ColorSpace,,g22_rec709,sdr-video,
-420,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Texture:1.0,ColorSpace,,g24_rec709,sdr-video,file-io
-420,Utility - sRGB - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_AP1-Texture:1.0,ColorSpace,,srgb_ap1,sdr-video,file-io
-420,Utility - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB-Texture:1.0,ColorSpace,,"srgb,Input - Generic - sRGB - Texture",,
+420,Utility - Gamma 2.4 - Rec.709 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Texture:1.0,ColorSpace,,"g24_rec709,rec709_display,Utility - Rec.709 - Display",sdr-video,file-io
+420,Utility - sRGB - AP1 - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_AP1-Texture:1.0,ColorSpace,,srgb_ap1,sdr-video,file-io
+420,Utility - sRGB - Texture,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB-Texture:1.0,ColorSpace,,"srgb_texture,Input - Generic - sRGB - Texture",,
