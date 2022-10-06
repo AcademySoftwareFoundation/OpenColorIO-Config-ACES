@@ -74,6 +74,7 @@ __all__ = [
     "ctl_transform_to_look",
     "style_to_view_transform",
     "style_to_display_colorspace",
+    "transform_data_aliases",
     "dependency_versions",
     "config_basename_aces",
     "config_description_aces",
@@ -519,8 +520,7 @@ def ctl_transform_to_colorspace(
 
     signature["aliases"] = list(
         dict.fromkeys(
-            [beautify_alias(signature["name"])]
-            + re.split("[,;]+", signature["aliases"])
+            [beautify_alias(signature["name"])] + signature["aliases"]
         )
     )
 
@@ -793,8 +793,7 @@ def style_to_display_colorspace(
 
     signature["aliases"] = list(
         dict.fromkeys(
-            [beautify_alias(signature["name"])]
-            + re.split("[,;]+", signature["aliases"])
+            [beautify_alias(signature["name"])] + signature["aliases"]
         )
     )
 
@@ -809,6 +808,32 @@ def style_to_display_colorspace(
         colorspace = colorspace_factory(**signature)
 
         return colorspace
+
+
+def transform_data_aliases(transform_data):
+    """
+    Return the aliases from given transform data.
+
+    Parameters
+    ----------
+    transform_data : dict
+        Transform data containing the aliases.
+
+    Returns
+    -------
+    list
+        Aliases.
+    """
+
+    aliases = re.split("[,;]+", transform_data.get("aliases", ""))
+
+    if not aliases:
+        aliases = []
+
+    if transform_data["legacy"] == "TRUE":
+        return [transform_data["colorspace"]] + aliases
+    else:
+        return aliases
 
 
 def dependency_versions(
@@ -1032,6 +1057,8 @@ def generate_config_aces(
             fieldnames=[
                 "ordering",
                 "aces_transform_id",
+                "colorspace",
+                "legacy",
                 "builtin_transform_style",
                 "linked_display_colorspace_style",
                 "interface",
@@ -1170,7 +1197,7 @@ def generate_config_aces(
                     scheme=scheme,
                     encoding=transform_data.get("encoding"),
                     categories=transform_data.get("categories"),
-                    aliases=transform_data.get("aliases", ""),
+                    aliases=transform_data_aliases(transform_data),
                 )
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
@@ -1228,7 +1255,7 @@ def generate_config_aces(
                         },
                         encoding=transform_data.get("encoding"),
                         categories=transform_data.get("categories"),
-                        aliases=transform_data.get("aliases", ""),
+                        aliases=transform_data_aliases(transform_data),
                     )
                     colorspace["transforms_data"] = [transform_data]
                     colorspaces.append(colorspace)

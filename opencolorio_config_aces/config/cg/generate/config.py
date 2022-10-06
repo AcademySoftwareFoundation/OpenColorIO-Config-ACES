@@ -46,6 +46,7 @@ from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     format_optional_prefix,
     format_swapped_affix,
+    transform_data_aliases,
 )
 from opencolorio_config_aces.utilities import (
     git_describe,
@@ -780,13 +781,6 @@ def generate_config_cg(
         f'Using {list(BUILTIN_TRANSFORMS.keys())} "Builtin" transforms...'
     )
 
-    def transform_aliases(transform_data):
-        """Return the aliases from given transform."""
-
-        return [transform_data["legacy_name"]] + re.split(
-            "[,;]+", transform_data.get("aliases", "")
-        )
-
     def clf_transform_from_id(clf_transform_id):
         """Filter the "CLFTransform" instances matching given "CLFtransformID"."""
 
@@ -832,7 +826,8 @@ def generate_config_cg(
             delimiter=",",
             fieldnames=[
                 "ordering",
-                "legacy_name",
+                "colorspace",
+                "legacy",
                 "aces_transform_id",
                 "clf_transform_id",
                 "interface",
@@ -878,9 +873,7 @@ def generate_config_cg(
 
                 transform_data["clf_transform"] = clf_transform
 
-            config_mapping[transform_data["legacy_name"]].append(
-                transform_data
-            )
+            config_mapping[transform_data["colorspace"]].append(transform_data)
 
     def yield_from_config_mapping():
         """Yield the transform data stored in the *CSV* mapping file."""
@@ -1014,7 +1007,7 @@ def generate_config_cg(
         kwargs = {
             "describe": describe,
             "signature_only": True,
-            "aliases": transform_aliases(transform_data),
+            "aliases": transform_data_aliases(transform_data),
             "encoding": transform_data.get("encoding"),
             "categories": transform_data.get("categories"),
         }
