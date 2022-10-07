@@ -730,7 +730,8 @@ def slugify(object_, allow_unicode=False):
 
     References
     ----------
-    :cite:`DjangoSoftwareFoundation2022`
+    -   https://github.com/django/django/blob/\
+0dd29209091280ccf34e07c9468746c396b7778e/django/utils/text.py#L400
 
     Examples
     --------
