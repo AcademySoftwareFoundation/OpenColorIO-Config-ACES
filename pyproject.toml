@@ -18,7 +18,7 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = ">= 3.8, < 3.11"
+python = ">= 3.9, < 3.11"
 # numpy = ">= 1.19, < 2"
 opencolorio = ">= 2, < 3"
 requests = ">= 2, < 3"
