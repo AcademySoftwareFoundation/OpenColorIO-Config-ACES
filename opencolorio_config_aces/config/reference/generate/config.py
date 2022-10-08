@@ -1137,6 +1137,7 @@ def generate_config_aces(
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
+        "ACES - ACES2065-1",
         "lin_ap0",
     ]
 
@@ -1156,7 +1157,10 @@ def generate_config_aces(
         "is_data": True,
         "categories": ["file-io"],
     }
-    raw_colorspace["aliases"] = [beautify_alias(raw_colorspace["name"])]
+    raw_colorspace["aliases"] = [
+        beautify_alias(raw_colorspace["name"]),
+        "Utility - Raw",
+    ]
 
     colorspaces += [
         scene_reference_colorspace,

@@ -7,7 +7,7 @@
 Defines procedures for generating Sony *Common LUT Format* (CLF)
 transforms:
 
--   :func:`opencolorio_config_aces.clf.generate_clf_sony`
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_sony`
 """
 
 import PyOpenColorIO as ocio
@@ -32,7 +32,7 @@ __all__ = [
     "FAMILY",
     "GENUS",
     "VERSION",
-    "generate_clf_sony",
+    "generate_clf_transforms_sony",
 ]
 
 FAMILY = "Sony"
@@ -102,7 +102,7 @@ def _build_venice_sgamut3_cine_mtx():
     return mtx
 
 
-def generate_clf_sony(output_directory):
+def generate_clf_transforms_sony(output_directory):
     """
     Make all the Sony CLFs.
 
@@ -281,4 +281,4 @@ if __name__ == "__main__":
 
     output_directory = Path(__file__).parent.resolve() / "input"
 
-    generate_clf_sony(output_directory)
+    generate_clf_transforms_sony(output_directory)
