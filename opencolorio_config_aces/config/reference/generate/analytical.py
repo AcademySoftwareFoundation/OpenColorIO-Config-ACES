@@ -265,7 +265,7 @@ def node_to_colorspace(
         from_reference=node_to_builtin_transform(
             graph, node, profile_version, "Reverse"
         ),
-        aliases="",
+        aliases=[],
     )
 
     return colorspace

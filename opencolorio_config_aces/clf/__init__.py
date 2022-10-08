@@ -10,12 +10,15 @@ from .discover import (
 )
 from .transforms import (
     generate_clf_transform,
+    generate_clf_transforms_arri,
     generate_clf_transforms_bmdfilm,
+    generate_clf_transforms_canon,
     generate_clf_transforms_davinci,
     generate_clf_transforms_itu,
     generate_clf_transforms_ocio,
     generate_clf_transforms_panasonic,
     generate_clf_transforms_red,
+    generate_clf_transforms_sony,
 )
 
 __all__ = [
@@ -27,10 +30,14 @@ __all__ = [
 ]
 __all__ += [
     "generate_clf_transform",
+    "generate_clf_transform",
+    "generate_clf_transforms_arri",
     "generate_clf_transforms_bmdfilm",
+    "generate_clf_transforms_canon",
     "generate_clf_transforms_davinci",
     "generate_clf_transforms_itu",
     "generate_clf_transforms_ocio",
     "generate_clf_transforms_panasonic",
     "generate_clf_transforms_red",
+    "generate_clf_transforms_sony",
 ]

@@ -7,7 +7,7 @@
 Defines procedures for generating ARRI *Common LUT Format* (CLF)
 transforms:
 
--   :func:`opencolorio_config_aces.clf.generate_clf_arri`
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_arri`
 """
 
 from math import log, log10
@@ -34,7 +34,7 @@ __all__ = [
     "FAMILY",
     "GENUS",
     "VERSION",
-    "generate_clf_arri",
+    "generate_clf_transforms_arri",
 ]
 
 FAMILY = "ARRI"
@@ -390,7 +390,7 @@ def _generate_logc4_transforms(output_directory):
     return transforms
 
 
-def generate_clf_arri(output_directory):
+def generate_clf_transforms_arri(output_directory):
     """
     Generate CLF files for ARRI color encodings and save to disk.
 
@@ -438,7 +438,7 @@ def _main():
 
     output_directory = Path(__file__).parent.resolve() / "input"
 
-    generate_clf_arri(output_directory)
+    generate_clf_transforms_arri(output_directory)
 
     return 0
 

@@ -193,9 +193,10 @@ PATTERNS_ALIAS = {
     "Curve": "crv",
     "Gamma ": "g",
     "Linear": "lin",
-    "Texture": "",
+    "Texture": "tx",
     "-Gamut": "gamut",
     "-Log": "log",
+    "P3-D6": "p3d6",
 }
 """
 *OpenColorIO* alias substitution patterns.
@@ -404,7 +405,7 @@ def beautify_alias(name):
     >>> beautify_alias('V-Log - Curve')
     'vlog_crv'
     >>> beautify_alias('Gamma 1.8 Rec.709 - Texture')
-    'g18_rec709'
+    'g18_rec709_tx'
     """
 
     name = beautify_name(name, PATTERNS_ALIAS)

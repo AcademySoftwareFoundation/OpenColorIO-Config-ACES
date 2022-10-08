@@ -405,7 +405,7 @@ if __name__ == "__main__":
     if not os.path.exists(build_directory):
         os.makedirs(build_directory)
 
-    filename = os.path.join(build_directory, "aces_conversion_graph.png")
+    filename = os.path.join(build_directory, "aces_conversion_graph.svg")
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)

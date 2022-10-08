@@ -622,14 +622,16 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
     return processor.createGroupTransform()
 
 
-TRANSFORM_FACTORIES = {
-    "Setter": transform_factory_setter,
-    "Constructor": transform_factory_constructor,
-    "CLF Transform to Group Transform": (
-        transform_factory_clf_transform_to_group_transform
-    ),
-}
-"""
+TRANSFORM_FACTORIES = DocstringDict(
+    {
+        "Setter": transform_factory_setter,
+        "Constructor": transform_factory_constructor,
+        "CLF Transform to Group Transform": (
+            transform_factory_clf_transform_to_group_transform
+        ),
+    }
+)
+TRANSFORM_FACTORIES.__doc__ = """
 *OpenColorIO* transform factories.
 
 TRANSFORM_FACTORIES : dict

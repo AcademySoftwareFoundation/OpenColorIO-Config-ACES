@@ -39,10 +39,12 @@ Common LUT Format Generation
 .. autosummary::
     :toctree: generated/
 
+    generate_clf_transforms_arri
     generate_clf_transforms_bmdfilm
+    generate_clf_transforms_canon
     generate_clf_transforms_davinci
     generate_clf_transforms_itu
     generate_clf_transforms_ocio
-    generate_clf_transforms_utility
     generate_clf_transforms_panasonic
     generate_clf_transforms_red
+    generate_clf_transforms_sony

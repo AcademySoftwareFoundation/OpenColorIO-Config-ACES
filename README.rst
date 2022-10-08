@@ -42,10 +42,13 @@ The following features are available:
 -   Automatic *OCIO* **Reference** configuration generation for *aces-dev*
     *CTL* reference implementation.
 
-    - Discovery of *aces-dev* *CTL* transforms.
-    - Generation of the *CTL* transforms graph.
+    -   Discovery of *aces-dev* *CTL* transforms.
+    -   Generation of the *CTL* transforms graph.
+    -   `Spreadsheet <https://docs.google.com/spreadsheets/d/1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg>`__-driven generation.
 
 -   Generators producing the *OCIO* **CG** and **Studio** configurations.
+    -   `Spreadsheet <https://docs.google.com/spreadsheets/d/1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4>`__-driven generation.
+
 -   Included *CLF* transforms along with generator and discovery support.
 
 User Guide
@@ -171,17 +174,17 @@ Components Status
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Custom Config Generation      | In-Progress    | We are designing the components so that one can generate a custom *ACES* config. |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *Studio* Config Generation    | In-Progress    |                                                                                  |
+| *Studio* Config Generation    | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | *CLF* Transforms Discovery    | Complete       | Minor updates will be required if classification changes.                        |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
-| *CLF* Transforms Generation   | In-Progress    | The *CG* Config *CLF* transforms are implemented                                 |
+| *CLF* Transforms Generation   | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Public API Surfacing          | In-Progress    | What is part of the Public API is not well defined currently.                    |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Unit Tests                    | In-Progress    |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
-| API Documentation             | In-Progress    |                                                                                  |
+| API Documentation             | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Continuous Integration        | Complete       |                                                                                  |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
