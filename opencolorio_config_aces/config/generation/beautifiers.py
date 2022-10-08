@@ -196,6 +196,7 @@ PATTERNS_ALIAS = {
     "Texture": "",
     "-Gamut": "gamut",
     "-Log": "log",
+    "P3-D6": "p3d6",
 }
 """
 *OpenColorIO* alias substitution patterns.
