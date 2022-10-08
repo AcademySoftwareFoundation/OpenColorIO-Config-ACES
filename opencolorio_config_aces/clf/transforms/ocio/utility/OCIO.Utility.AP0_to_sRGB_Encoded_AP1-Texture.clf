@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_AP1-Texture:1.0" name="AP0 to sRGB Encoded AP1 - Texture">
+    <InputDescriptor>ACES2065-1</InputDescriptor>
+    <OutputDescriptor>sRGB Encoded AP1 primaries, D60 white point</OutputDescriptor>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+   1.45143931614567   -0.23651074689374  -0.214928569251925
+-0.0765537733960206    1.17622969983357 -0.0996759264375522
+0.00831614842569772 -0.00603244979102102    0.997716301365323
+        </Array>
+    </Matrix>
+    <Exponent inBitDepth="32f" outBitDepth="32f" style="monCurveRev">
+        <ExponentParams exponent="2.4" offset="0.055" />
+    </Exponent>
+</ProcessList>
