@@ -129,9 +129,9 @@ __all__ += ["generate_clf_transform"]
 
 __application_name__ = "OpenColorIO Configuration for ACES"
 
-__major_version__ = "0"
-__minor_version__ = "3"
-__change_version__ = "1"
+__major_version__ = "1"
+__minor_version__ = "0"
+__change_version__ = "0-rc1"
 __version__ = ".".join(
     (__major_version__, __minor_version__, __change_version__)
-)  # yapf: disable
+)

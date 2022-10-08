@@ -3,7 +3,7 @@
 
 [tool.poetry]
 name = "opencolorio-config-aces"
-version = "0.3.1"
+version = "1.0.0-rc1"
 description = "OpenColorIO Configuration for ACES"
 authors = [ "OpenColorIO Contributors" ]
 maintainers = [ "OpenColorIO Contributors <ocio-dev@lists.aswf.io>" ]
