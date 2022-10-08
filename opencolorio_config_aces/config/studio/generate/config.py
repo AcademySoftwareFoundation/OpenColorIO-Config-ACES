@@ -301,11 +301,11 @@ if __name__ == "__main__":
             additional_data=True,
         )
 
-    # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
-    # versions.
-    try:
-        serialize_config_data(
-            data, build_directory / config_basename.replace("ocio", "json")
-        )
-    except TypeError as error:
-        logging.critical(error)
+        # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
+        # versions.
+        try:
+            serialize_config_data(
+                data, build_directory / config_basename.replace("ocio", "json")
+            )
+        except TypeError as error:
+            logging.critical(error)
