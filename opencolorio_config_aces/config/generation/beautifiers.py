@@ -84,6 +84,8 @@ PATTERNS_COLORSPACE_NAME = {
     "\\b(\\w)Log": "\\1-Log",
     "\\b(\\w)Gamut": "\\1-Gamut",
     "Cine\\b": ".Cine",
+    "EI800": "(EI800)",
+    "Linear Rec.709": "Linear Rec.709 (sRGB)",
 }
 """
 *OpenColorIO* colorspace name substitution patterns.

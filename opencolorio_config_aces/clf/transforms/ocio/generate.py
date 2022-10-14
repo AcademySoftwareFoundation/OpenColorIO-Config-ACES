@@ -139,7 +139,7 @@ def generate_clf_transforms_ocio(output_directory):
         filename,
         [matrix_RGB_to_RGB_transform("ACES2065-1", "ITU-R BT.709")],
         clf_transform_id,
-        "AP0 to Linear Rec.709",
+        "AP0 to Linear Rec.709 (sRGB)",
         "ACES2065-1",
         "linear Rec.709 primaries, D65 white point",
     )
