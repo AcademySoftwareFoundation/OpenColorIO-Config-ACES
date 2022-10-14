@@ -1330,7 +1330,7 @@ def generate_config_aces(
         shared_views=shared_views,
         views=shared_views + views,
         active_displays=display_names,
-        active_views=view_transform_names + ["Raw"],
+        active_views=view_transform_names + ["Un-tone-mapped", "Raw"],
         file_rules=[
             {
                 "name": "Default",
