@@ -1134,6 +1134,7 @@ def generate_config_aces(
         "family": "ACES",
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
+        "categories": ["file-io"],
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
