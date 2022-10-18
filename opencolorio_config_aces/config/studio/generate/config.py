@@ -253,7 +253,9 @@ def generate_config_studio(
         "",
         config_basename_studio(config_mapping_file_path, profile_version),
     )
-    data.description = config_description_studio(config_mapping_file_path)
+    data.description = config_description_studio(
+        config_mapping_file_path, profile_version
+    )
     config = generate_config(data, config_name, validate)
 
     logger.info(
