@@ -1098,7 +1098,6 @@ def generate_config_cg(
                 "ACEScct", "ACES", scheme
             ),
             ocio.ROLE_DATA: "Raw",
-            ocio.ROLE_DEFAULT: "ACES - ACES2065-1",
             ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65",
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme

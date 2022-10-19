@@ -1312,7 +1312,6 @@ def generate_config_aces(
                 "ACEScct", aces_family_prefix, scheme
             ),
             ocio.ROLE_DATA: raw_colorspace["name"],
-            ocio.ROLE_DEFAULT: scene_reference_colorspace["name"],
             ocio.ROLE_INTERCHANGE_DISPLAY: display_reference_colorspace[
                 "name"
             ],
