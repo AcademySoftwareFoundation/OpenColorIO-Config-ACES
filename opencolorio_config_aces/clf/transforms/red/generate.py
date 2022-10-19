@@ -141,8 +141,8 @@ white-paper-on-redwidegamutrgb-and-log3g10
 
     name = "Log3G10-Curve_to_Linear"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
-    input_descriptor = "RED Log3G10 (SUP v3) Log (arbitrary primaries)"
-    output_descriptor = "RED Log3G10 (SUP v3) Linear (arbitrary primaries)"
+    input_descriptor = "RED Log3G10 Log (arbitrary primaries)"
+    output_descriptor = "RED Log3G10 Linear (arbitrary primaries)"
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
         filename,
