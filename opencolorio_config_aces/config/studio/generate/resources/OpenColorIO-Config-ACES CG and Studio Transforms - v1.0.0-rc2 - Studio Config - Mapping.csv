@@ -57,7 +57,7 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 300,Output - sRGB,TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,,sdr-video,file-io
 300,Output - sRGB (D60 sim.),TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_D60sim_100nits_dim.a1.0.3,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,,sdr-video,file-io
 400,Utility - Curve - Rec.1886,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886-Curve:1.0,NamedTransform,,crv_rec1886,sdr-video,file-io
-400,Utility - Curve - Rec.709,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec709-Curve:1.0,NamedTransform,,crv_rec709,sdr-video,file-io
+400,Utility - Curve - Rec.709,TRUE,,urn:aswf:ocio:transformId:1.0:ITU:Utility:Linear_to_Rec709-Curve:1.0,NamedTransform,,crv_rec709,sdr-video,file-io
 400,Utility - Curve - sRGB,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB-Curve:1.0,NamedTransform,,crv_srgb,sdr-video,file-io
 400,Utility - Curve - ST2084,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_ST2084-Curve:1.0,NamedTransform,CURVE - LINEAR_to_ST-2084,crv_dolbypq_10000,hdr-video,file-io
 410,Utility - Linear - P3-D65,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_P3-D65:1.0,ColorSpace,,lin_p3d65,scene-linear,"file-io,working-space"

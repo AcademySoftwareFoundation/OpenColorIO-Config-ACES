@@ -82,18 +82,6 @@ def generate_clf_transforms_ocio(output_directory):
         "generic gamma-corrected RGB",
     )
 
-    name = "Linear_to_Rec709-Curve"
-    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
-    filename = output_directory / clf_basename(clf_transform_id)
-    clf_transforms[filename] = generate_clf_transform(
-        filename,
-        [gamma_transform("Rec709")],
-        clf_transform_id,
-        "Linear to Rec.709",
-        "generic linear RGB",
-        "generic gamma-corrected RGB",
-    )
-
     name = "Linear_to_ST2084-Curve"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
