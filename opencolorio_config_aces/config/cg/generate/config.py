@@ -63,8 +63,11 @@ __status__ = "Production"
 __all__ = [
     "URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG",
     "PATH_TRANSFORMS_MAPPING_FILE_CG",
+    "FILTERED_NAMESPACES",
     "is_reference",
+    "clf_transform_to_colorspace_name",
     "clf_transform_to_description",
+    "clf_transform_to_family",
     "clf_transform_to_colorspace",
     "clf_transform_to_named_transform",
     "style_to_colorspace",
@@ -96,6 +99,13 @@ PATH_TRANSFORMS_MAPPING_FILE_CG = next(
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 
 PATH_TRANSFORMS_MAPPING_FILE_CG : unicode
+"""
+
+FILTERED_NAMESPACES = ("OCIO",)
+"""
+Filtered namespaces.
+
+FILTERED_NAMESPACES : tuple
 """
 
 
@@ -198,6 +208,39 @@ def clf_transform_to_description(
     return description
 
 
+def clf_transform_to_family(
+    clf_transform, filtered_namespaces=FILTERED_NAMESPACES
+):
+    """
+    Generate the *OpenColorIO* `Colorspace` or `NamedTransform` family for
+    given *CLF* transform.
+
+    Parameters
+    ----------
+    clf_transform : CLFTransform
+        *CLF* transform.
+    filtered_namespaces : tuple, optional
+        Filtered namespaces.
+
+    Returns
+    -------
+    str
+        *OpenColorIO* `Colorspace` or `NamedTransform` family.
+    """
+
+    family = (
+        clf_transform.clf_transform_id.type
+        if clf_transform.clf_transform_id.namespace in filtered_namespaces
+        else (
+            f"{clf_transform.clf_transform_id.type}"
+            f"{SEPARATOR_COLORSPACE_FAMILY}"
+            f"{clf_transform.clf_transform_id.namespace}"
+        )
+    )
+
+    return family
+
+
 def clf_transform_to_colorspace(
     clf_transform,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
@@ -231,11 +274,7 @@ def clf_transform_to_colorspace(
 
     signature = {
         "name": clf_transform_to_colorspace_name(clf_transform),
-        "family": (
-            f"{clf_transform.clf_transform_id.type}"
-            f"{SEPARATOR_COLORSPACE_FAMILY}"
-            f"{clf_transform.clf_transform_id.namespace}"
-        ),
+        "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(clf_transform, describe),
     }
 
@@ -298,11 +337,7 @@ def clf_transform_to_named_transform(
 
     signature = {
         "name": clf_transform_to_colorspace_name(clf_transform),
-        "family": (
-            f"{clf_transform.clf_transform_id.type}"
-            f"{SEPARATOR_COLORSPACE_FAMILY}"
-            f"{clf_transform.clf_transform_id.namespace}"
-        ),
+        "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(clf_transform, describe),
     }
 
