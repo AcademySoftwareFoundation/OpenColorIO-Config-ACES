@@ -1168,6 +1168,7 @@ def generate_config_aces(
         display_reference_colorspace,
         raw_colorspace,
     ]
+    inactive_colorspaces = [display_reference_colorspace["name"]]
 
     logger.info(
         f'Implicit colorspaces: "{list(a["name"] for a in colorspaces)}"'
@@ -1206,6 +1207,7 @@ def generate_config_aces(
                 )
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
+                inactive_colorspaces.append(display["name"])
 
                 if display_name not in display_names:
                     displays.append(display)
@@ -1337,7 +1339,7 @@ def generate_config_aces(
                 "colorspace": scene_reference_colorspace["name"],
             }
         ],
-        inactive_colorspaces=["CIE-XYZ-D65"],
+        inactive_colorspaces=inactive_colorspaces,
         default_view_transform=untonemapped_view_transform["name"],
         profile_version=profile_version,
     )
