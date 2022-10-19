@@ -1109,6 +1109,13 @@ def generate_config_cg(
                 colorspace["transforms_data"] = [transform_data]
                 data.colorspaces.append(colorspace)
 
+    # Reordering the "Raw" colorspace for aesthetics.
+    data.colorspaces.extend(
+        data.colorspaces.pop(i)
+        for i, a in enumerate(data.colorspaces[:])
+        if a["name"] == "Raw"
+    )
+
     # Roles Filtering & Update
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
