@@ -45,7 +45,6 @@ from opencolorio_config_aces.config.reference import (
 from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     format_optional_prefix,
-    format_swapped_affix,
     transform_data_aliases,
 )
 from opencolorio_config_aces.utilities import (
@@ -1088,9 +1087,7 @@ def generate_config_cg(
 
     data.roles.update(
         {
-            ocio.ROLE_COLOR_PICKING: format_swapped_affix(
-                "sRGB", "Display", scheme
-            ),
+            ocio.ROLE_COLOR_PICKING: "sRGB - Texture",
             ocio.ROLE_COLOR_TIMING: format_optional_prefix(
                 "ACEScct", "ACES", scheme
             ),
