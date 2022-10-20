@@ -347,9 +347,9 @@ def clf_transform_to_named_transform(
         "src": clf_transform.path,
     }
     if is_reference(clf_transform.source):
-        signature["forward_transform"] = file_transform
-    else:
         signature["inverse_transform"] = file_transform
+    else:
+        signature["forward_transform"] = file_transform
 
     signature.update(kwargs)
 
@@ -548,14 +548,14 @@ def style_to_named_transform(
     if is_reference(source):
         signature.update(
             {
-                "forward_transform": builtin_transform,
+                "inverse_transform": builtin_transform,
                 "description": description,
             }
         )
     else:
         signature.update(
             {
-                "inverse_transform": builtin_transform,
+                "forward_transform": builtin_transform,
                 "description": description,
             }
         )
@@ -573,9 +573,9 @@ def style_to_named_transform(
             "style": style,
         }
         if is_reference(source):
-            signature["forward_transform"] = builtin_transform
-        else:
             signature["inverse_transform"] = builtin_transform
+        else:
+            signature["forward_transform"] = builtin_transform
 
         return signature
     else:
