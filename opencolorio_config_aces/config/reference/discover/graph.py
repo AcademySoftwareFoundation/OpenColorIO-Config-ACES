@@ -388,24 +388,20 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
 
 
 if __name__ == "__main__":
-    import os
-    import opencolorio_config_aces
     from pprint import pprint
     from opencolorio_config_aces.utilities import message_box
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0], "..", "build", "aces", "graph"
-    )
+    build_directory = (ROOT_BUILD_DEFAULT / "aces" / "graph").resolve()
 
     logger.info(f'Using "{build_directory}" build directory...')
 
-    if not os.path.exists(build_directory):
-        os.makedirs(build_directory)
+    build_directory.mkdir(parents=True, exist_ok=True)
 
-    filename = os.path.join(build_directory, "aces_conversion_graph.svg")
+    filename = build_directory / "aces_conversion_graph.svg"
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)

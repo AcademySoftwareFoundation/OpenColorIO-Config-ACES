@@ -112,7 +112,7 @@ VARICAM_V-Log_V-Gamut.pdf
     # Generate full transform.
 
     name = "VLog_VGamut_to_ACES2065-1"
-    input_descriptor = "Panasonic V-Log - V-Gamut (SUP v3)"
+    input_descriptor = "Panasonic V-Log - V-Gamut"
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
@@ -129,7 +129,7 @@ VARICAM_V-Log_V-Gamut.pdf
     # Generate transform for primaries only.
 
     name = "Linear_VGamut_to_ACES2065-1"
-    input_descriptor = "Linear Panasonic V-Gamut (SUP v3)"
+    input_descriptor = "Linear Panasonic V-Gamut"
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
@@ -144,8 +144,8 @@ VARICAM_V-Log_V-Gamut.pdf
 
     # Generate `NamedTransform` for log curve only.
     name = "VLog-Curve_to_Linear"
-    input_descriptor = "Panasonic V-Log (SUP v3) Log (arbitrary primaries)"
-    output_descriptor = "Panasonic V-Log (SUP v3) Linear (arbitrary primaries)"
+    input_descriptor = "Panasonic V-Log Log (arbitrary primaries)"
+    output_descriptor = "Panasonic V-Log Linear (arbitrary primaries)"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(

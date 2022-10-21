@@ -84,6 +84,8 @@ PATTERNS_COLORSPACE_NAME = {
     "\\b(\\w)Log": "\\1-Log",
     "\\b(\\w)Gamut": "\\1-Gamut",
     "Cine\\b": ".Cine",
+    "EI800": "(EI800)",
+    "Linear Rec.709": "Linear Rec.709 (sRGB)",
 }
 """
 *OpenColorIO* colorspace name substitution patterns.
@@ -166,10 +168,10 @@ PATTERNS_DISPLAY_NAME = {
     "G2.6-": "",
     "-BFD": "",
     "REC.1886": "Rec.1886",
-    "REC.709": "Rec.709 Video",
-    "REC.2020": "Rec.2020 Video",
+    "REC.709": "Rec.709",
+    "REC.2020": "Rec.2020",
     "REC.2100": "Rec.2100",
-    "-Rec.": " / Rec.",
+    "-Rec.": " Rec.",
     "-1000nit": "",
     # Legacy Substitutions
     "dcdm": "DCDM",

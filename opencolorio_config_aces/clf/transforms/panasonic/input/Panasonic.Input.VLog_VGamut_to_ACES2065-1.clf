@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Panasonic:Input:VLog_VGamut_to_ACES2065-1:1.0" name="Panasonic V-Log - V-Gamut (SUP v3) to ACES2065-1">
-    <InputDescriptor>Panasonic V-Log - V-Gamut (SUP v3)</InputDescriptor>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Panasonic:Input:VLog_VGamut_to_ACES2065-1:1.0" name="Panasonic V-Log - V-Gamut to ACES2065-1">
+    <InputDescriptor>Panasonic V-Log - V-Gamut</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
         <ACEStransformID>urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0</ACEStransformID>

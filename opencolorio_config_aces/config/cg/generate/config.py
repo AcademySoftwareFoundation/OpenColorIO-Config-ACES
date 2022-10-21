@@ -45,7 +45,6 @@ from opencolorio_config_aces.config.reference import (
 from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     format_optional_prefix,
-    format_swapped_affix,
     transform_data_aliases,
 )
 from opencolorio_config_aces.utilities import (
@@ -64,8 +63,11 @@ __status__ = "Production"
 __all__ = [
     "URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG",
     "PATH_TRANSFORMS_MAPPING_FILE_CG",
+    "FILTERED_NAMESPACES",
     "is_reference",
+    "clf_transform_to_colorspace_name",
     "clf_transform_to_description",
+    "clf_transform_to_family",
     "clf_transform_to_colorspace",
     "clf_transform_to_named_transform",
     "style_to_colorspace",
@@ -97,6 +99,13 @@ PATH_TRANSFORMS_MAPPING_FILE_CG = next(
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 
 PATH_TRANSFORMS_MAPPING_FILE_CG : unicode
+"""
+
+FILTERED_NAMESPACES = ("OCIO",)
+"""
+Filtered namespaces.
+
+FILTERED_NAMESPACES : tuple
 """
 
 
@@ -199,6 +208,39 @@ def clf_transform_to_description(
     return description
 
 
+def clf_transform_to_family(
+    clf_transform, filtered_namespaces=FILTERED_NAMESPACES
+):
+    """
+    Generate the *OpenColorIO* `Colorspace` or `NamedTransform` family for
+    given *CLF* transform.
+
+    Parameters
+    ----------
+    clf_transform : CLFTransform
+        *CLF* transform.
+    filtered_namespaces : tuple, optional
+        Filtered namespaces.
+
+    Returns
+    -------
+    str
+        *OpenColorIO* `Colorspace` or `NamedTransform` family.
+    """
+
+    family = (
+        clf_transform.clf_transform_id.type
+        if clf_transform.clf_transform_id.namespace in filtered_namespaces
+        else (
+            f"{clf_transform.clf_transform_id.type}"
+            f"{SEPARATOR_COLORSPACE_FAMILY}"
+            f"{clf_transform.clf_transform_id.namespace}"
+        )
+    )
+
+    return family
+
+
 def clf_transform_to_colorspace(
     clf_transform,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
@@ -232,11 +274,7 @@ def clf_transform_to_colorspace(
 
     signature = {
         "name": clf_transform_to_colorspace_name(clf_transform),
-        "family": (
-            f"{clf_transform.clf_transform_id.type}"
-            f"{SEPARATOR_COLORSPACE_FAMILY}"
-            f"{clf_transform.clf_transform_id.namespace}"
-        ),
+        "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(clf_transform, describe),
     }
 
@@ -299,11 +337,7 @@ def clf_transform_to_named_transform(
 
     signature = {
         "name": clf_transform_to_colorspace_name(clf_transform),
-        "family": (
-            f"{clf_transform.clf_transform_id.type}"
-            f"{SEPARATOR_COLORSPACE_FAMILY}"
-            f"{clf_transform.clf_transform_id.namespace}"
-        ),
+        "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(clf_transform, describe),
     }
 
@@ -313,9 +347,9 @@ def clf_transform_to_named_transform(
         "src": clf_transform.path,
     }
     if is_reference(clf_transform.source):
-        signature["forward_transform"] = file_transform
-    else:
         signature["inverse_transform"] = file_transform
+    else:
+        signature["forward_transform"] = file_transform
 
     signature.update(kwargs)
 
@@ -514,14 +548,14 @@ def style_to_named_transform(
     if is_reference(source):
         signature.update(
             {
-                "forward_transform": builtin_transform,
+                "inverse_transform": builtin_transform,
                 "description": description,
             }
         )
     else:
         signature.update(
             {
-                "inverse_transform": builtin_transform,
+                "forward_transform": builtin_transform,
                 "description": description,
             }
         )
@@ -539,9 +573,9 @@ def style_to_named_transform(
             "style": style,
         }
         if is_reference(source):
-            signature["forward_transform"] = builtin_transform
-        else:
             signature["inverse_transform"] = builtin_transform
+        else:
+            signature["forward_transform"] = builtin_transform
 
         return signature
     else:
@@ -1075,6 +1109,13 @@ def generate_config_cg(
                 colorspace["transforms_data"] = [transform_data]
                 data.colorspaces.append(colorspace)
 
+    # Reordering the "Raw" colorspace for aesthetics.
+    data.colorspaces.extend(
+        data.colorspaces.pop(i)
+        for i, a in enumerate(data.colorspaces[:])
+        if a["name"] == "Raw"
+    )
+
     # Roles Filtering & Update
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
@@ -1088,9 +1129,7 @@ def generate_config_cg(
 
     data.roles.update(
         {
-            ocio.ROLE_COLOR_PICKING: format_swapped_affix(
-                "sRGB", "Display", scheme
-            ),
+            ocio.ROLE_COLOR_PICKING: "sRGB - Texture",
             ocio.ROLE_COLOR_TIMING: format_optional_prefix(
                 "ACEScct", "ACES", scheme
             ),
@@ -1098,18 +1137,17 @@ def generate_config_cg(
                 "ACEScct", "ACES", scheme
             ),
             ocio.ROLE_DATA: "Raw",
-            ocio.ROLE_DEFAULT: "sRGB - Texture",
             ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65",
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme
             ),
-            ocio.ROLE_MATTE_PAINT: format_optional_prefix(
-                "ACEScct", "ACES", scheme
-            ),
+            ocio.ROLE_MATTE_PAINT: "sRGB - Texture",
             ocio.ROLE_SCENE_LINEAR: format_optional_prefix(
                 "ACEScg", "ACES", scheme
             ),
-            ocio.ROLE_TEXTURE_PAINT: "sRGB - Texture",
+            ocio.ROLE_TEXTURE_PAINT: format_optional_prefix(
+                "ACEScct", "ACES", scheme
+            ),
         }
     )
 
@@ -1129,24 +1167,16 @@ def generate_config_cg(
 
 
 if __name__ == "__main__":
-    import opencolorio_config_aces
     from opencolorio_config_aces import (
         SUPPORTED_PROFILE_VERSIONS,
         serialize_config_data,
     )
-    from pathlib import Path
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = (
-        Path(opencolorio_config_aces.__path__[0])
-        / ".."
-        / "build"
-        / "config"
-        / "aces"
-        / "cg"
-    ).resolve()
+    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "cg").resolve()
 
     logging.info(f'Using "{build_directory}" build directory...')
 

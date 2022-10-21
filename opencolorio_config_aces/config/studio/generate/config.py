@@ -253,7 +253,9 @@ def generate_config_studio(
         "",
         config_basename_studio(config_mapping_file_path, profile_version),
     )
-    data.description = config_description_studio(config_mapping_file_path)
+    data.description = config_description_studio(
+        config_mapping_file_path, profile_version
+    )
     config = generate_config(data, config_name, validate)
 
     logger.info(
@@ -268,23 +270,17 @@ def generate_config_studio(
 
 
 if __name__ == "__main__":
-    import opencolorio_config_aces
     from opencolorio_config_aces import (
         SUPPORTED_PROFILE_VERSIONS,
         serialize_config_data,
     )
-    from pathlib import Path
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = (
-        Path(opencolorio_config_aces.__path__[0])
-        / ".."
-        / "build"
-        / "config"
-        / "aces"
-        / "studio"
+        ROOT_BUILD_DEFAULT / "config" / "aces" / "studio"
     ).resolve()
 
     logging.info(f'Using "{build_directory}" build directory...')

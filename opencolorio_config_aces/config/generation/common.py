@@ -408,25 +408,18 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
 
 
 if __name__ == "__main__":
-    import os
-    import opencolorio_config_aces
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = os.path.join(
-        opencolorio_config_aces.__path__[0],
-        "..",
-        "build",
-        "config",
-        "common",
-        "tests",
-    )
+    build_directory = (
+        ROOT_BUILD_DEFAULT / "config" / "common" / "tests"
+    ).resolve()
 
     logger.info(f'Using "{build_directory}" build directory...')
 
-    if not os.path.exists(build_directory):
-        os.makedirs(build_directory)
+    build_directory.mkdir(parents=True, exist_ok=True)
 
     # "OpenColorIO 1" configuration.
     colorspace_1 = {"name": "Gamut - sRGB", "family": "Gamut"}
@@ -515,14 +508,12 @@ if __name__ == "__main__":
         active_views=["sRGB - sRGB"],
     )
 
-    generate_config(data, os.path.join(build_directory, "config-v1.ocio"))
+    generate_config(data, build_directory / "config-v1.ocio")
 
     # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
     # versions.
     try:
-        serialize_config_data(
-            data, os.path.join(build_directory, "config-v1.json")
-        )
+        serialize_config_data(data, build_directory / "config-v1.json")
     except TypeError as error:
         logger.critical(error)
 
@@ -714,16 +705,12 @@ if __name__ == "__main__":
         viewing_rules=[],
     )
 
-    config = generate_config(
-        data, os.path.join(build_directory, "config-v2.ocio")
-    )
+    config = generate_config(data, build_directory / "config-v2.ocio")
 
     # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
     # versions.
     try:
-        serialize_config_data(
-            data, os.path.join(build_directory, "config-v2.json")
-        )
+        serialize_config_data(data, build_directory / "config-v2.json")
     except TypeError as error:
         logger.critical(error)
 
@@ -757,7 +744,7 @@ if __name__ == "__main__":
 
     generate_config(
         data,
-        os.path.join(build_directory, "config-v2-with-named-transform.ocio"),
+        build_directory / "config-v2-with-named-transform.ocio",
         base_config=config,
     )
 
@@ -765,10 +752,7 @@ if __name__ == "__main__":
     # versions.
     try:
         serialize_config_data(
-            data,
-            os.path.join(
-                build_directory, "config-v2-with-named-transform.json"
-            ),
+            data, build_directory / "config-v2-with-named-transform.json"
         )
     except TypeError as error:
         logger.critical(error)

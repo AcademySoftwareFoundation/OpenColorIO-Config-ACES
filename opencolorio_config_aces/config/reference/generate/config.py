@@ -1134,6 +1134,7 @@ def generate_config_aces(
         "family": "ACES",
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
+        "categories": ["file-io"],
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
@@ -1167,6 +1168,7 @@ def generate_config_aces(
         display_reference_colorspace,
         raw_colorspace,
     ]
+    inactive_colorspaces = [display_reference_colorspace["name"]]
 
     logger.info(
         f'Implicit colorspaces: "{list(a["name"] for a in colorspaces)}"'
@@ -1205,6 +1207,7 @@ def generate_config_aces(
                 )
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
+                inactive_colorspaces.append(display["name"])
 
                 if display_name not in display_names:
                     displays.append(display)
@@ -1311,7 +1314,6 @@ def generate_config_aces(
                 "ACEScct", aces_family_prefix, scheme
             ),
             ocio.ROLE_DATA: raw_colorspace["name"],
-            ocio.ROLE_DEFAULT: scene_reference_colorspace["name"],
             ocio.ROLE_INTERCHANGE_DISPLAY: display_reference_colorspace[
                 "name"
             ],
@@ -1330,14 +1332,14 @@ def generate_config_aces(
         shared_views=shared_views,
         views=shared_views + views,
         active_displays=display_names,
-        active_views=view_transform_names + ["Raw"],
+        active_views=view_transform_names + ["Un-tone-mapped", "Raw"],
         file_rules=[
             {
                 "name": "Default",
                 "colorspace": scene_reference_colorspace["name"],
             }
         ],
-        inactive_colorspaces=["CIE-XYZ-D65"],
+        inactive_colorspaces=inactive_colorspaces,
         default_view_transform=untonemapped_view_transform["name"],
         profile_version=profile_version,
     )
@@ -1356,23 +1358,17 @@ def generate_config_aces(
 
 
 if __name__ == "__main__":
-    import opencolorio_config_aces
     from opencolorio_config_aces import (
         SUPPORTED_PROFILE_VERSIONS,
         serialize_config_data,
     )
-    from pathlib import Path
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
     build_directory = (
-        Path(opencolorio_config_aces.__path__[0])
-        / ".."
-        / "build"
-        / "config"
-        / "aces"
-        / "reference"
+        ROOT_BUILD_DEFAULT / "config" / "aces" / "reference"
     ).resolve()
 
     logger.info(f'Using "{build_directory}" build directory...')

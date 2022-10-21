@@ -15,6 +15,7 @@ Common
 .. autosummary::
     :toctree: generated/
 
+    ROOT_BUILD_DEFAULT
     DocstringDict
     first_item
     common_ancestor

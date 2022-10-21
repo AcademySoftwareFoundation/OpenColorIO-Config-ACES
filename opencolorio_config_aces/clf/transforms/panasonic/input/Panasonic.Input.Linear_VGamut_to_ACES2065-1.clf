@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Panasonic:Input:Linear_VGamut_to_ACES2065-1:1.0" name="Linear Panasonic V-Gamut (SUP v3) to ACES2065-1">
-    <InputDescriptor>Linear Panasonic V-Gamut (SUP v3)</InputDescriptor>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:Panasonic:Input:Linear_VGamut_to_ACES2065-1:1.0" name="Linear Panasonic V-Gamut to ACES2065-1">
+    <InputDescriptor>Linear Panasonic V-Gamut</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">
         <Array dim="3 3">
