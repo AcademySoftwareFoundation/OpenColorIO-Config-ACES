@@ -214,7 +214,7 @@ def generate_clf_transforms_sony(output_directory):
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
         filename,
-        [_build_venice_sgamut3_cine_mtx()],
+        [_build_venice_sgamut3_mtx()],
         clf_transform_id,
         f"{input_descriptor} to {output_descriptor}",
         input_descriptor,
