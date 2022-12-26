@@ -86,5 +86,5 @@ typing_extensions==4.4.0
 urllib3==1.26.12
 virtualenv==20.16.5
 webencodings==0.5.1
-wheel==0.37.1
+wheel==0.38.1
 zipp==3.8.1
