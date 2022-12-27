@@ -67,7 +67,7 @@ restructuredtext-lint==1.4.0
 rfc3986==2.0.0
 rich==12.6.0
 scipy==1.9.1
-setuptools==65.3.0
+setuptools==65.5.1
 six==1.16.0
 snowballstemmer==2.2.0
 soupsieve==2.3.2.post1
