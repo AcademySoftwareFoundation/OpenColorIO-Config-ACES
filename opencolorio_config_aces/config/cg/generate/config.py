@@ -1116,6 +1116,18 @@ def generate_config_cg(
         if a["name"] == "Raw"
     )
 
+    # Inactive Colorspaces Filtering
+    colorspace_named_transform_names = [a["name"] for a in data.colorspaces]
+    inactive_colorspaces = []
+    for colorspace in data.inactive_colorspaces:
+        if colorspace not in colorspace_named_transform_names:
+            logger.info(f'Removing "{colorspace}" inactive colorspace.')
+            continue
+
+        inactive_colorspaces.append(colorspace)
+
+    data.inactive_colorspaces = inactive_colorspaces
+
     # Roles Filtering & Update
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
