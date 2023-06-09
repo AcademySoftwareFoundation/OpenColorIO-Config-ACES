@@ -1207,7 +1207,8 @@ def generate_config_aces(
                 )
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
-                inactive_colorspaces.append(display["name"])
+                if display_name not in inactive_colorspaces:
+                    inactive_colorspaces.append(display_name)
 
                 if display_name not in display_names:
                     displays.append(display)
