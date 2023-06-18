@@ -222,7 +222,7 @@ def generate_clf_transform(
         Updated `GroupTransform`.
     """
 
-    logger.info(f'Creating "{clf_transform_id}" "CLF" transform...')
+    logger.info('Creating "%s" "CLF" transform...', clf_transform_id)
 
     group_tf = produce_transform(transforms)
 
@@ -243,7 +243,7 @@ def generate_clf_transform(
             info.addChildElement("BuiltinTransform", style)
 
     logger.info(
-        f'Writing "{clf_transform_id}" "CLF" transform to "{filename}.'
+        'Writing "%s" "CLF" transform to "%s".', clf_transform_id, filename
     )
 
     group_tf.write(

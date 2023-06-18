@@ -12,8 +12,6 @@ Defines various objects related to the generation of the *ACES* Studio
 
 import logging
 import re
-
-from datetime import datetime
 from pathlib import Path
 
 from opencolorio_config_aces.config.generation import (
@@ -30,7 +28,7 @@ from opencolorio_config_aces.config.cg.generate.config import (
     dependency_versions,
 )
 from opencolorio_config_aces.utilities import (
-    git_describe,
+    timestamp,
     validate_method,
 )
 
@@ -165,12 +163,8 @@ def config_description_studio(
         "that includes a wide variety of camera colorspaces, displays and "
         "looks."
     )
-    timestamp = (
-        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
-    )
 
-    return "\n".join([name, underline, "", description, "", timestamp])
+    return "\n".join([name, underline, "", description, "", timestamp()])
 
 
 def generate_config_studio(
@@ -232,9 +226,8 @@ def generate_config_studio(
     """
 
     logger.info(
-        f"Generating "
-        f'"{config_name_studio(config_mapping_file_path, profile_version)}" '
-        f"config..."
+        'Generating "%s" config...',
+        config_name_studio(config_mapping_file_path, profile_version),
     )
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
@@ -259,8 +252,8 @@ def generate_config_studio(
     config = generate_config(data, config_name, validate)
 
     logger.info(
-        f'"{config_name_studio(config_mapping_file_path, profile_version)}" '
-        f"config generation complete!"
+        '"%s" config generation complete!',
+        config_name_studio(config_mapping_file_path, profile_version),
     )
 
     if additional_data:
@@ -283,7 +276,7 @@ if __name__ == "__main__":
         ROOT_BUILD_DEFAULT / "config" / "aces" / "studio"
     ).resolve()
 
-    logging.info(f'Using "{build_directory}" build directory...')
+    logging.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 

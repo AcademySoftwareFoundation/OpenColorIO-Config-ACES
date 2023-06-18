@@ -11,7 +11,6 @@ reference *OpenColorIO* config.
 import itertools
 import logging
 import PyOpenColorIO as ocio
-from datetime import datetime
 
 from opencolorio_config_aces.config.generation import (
     BUILTIN_TRANSFORMS,
@@ -45,7 +44,7 @@ from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     ctl_transform_to_colorspace,
 )
-from opencolorio_config_aces.utilities import git_describe, required
+from opencolorio_config_aces.utilities import required, timestamp
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -130,20 +129,22 @@ def create_builtin_transform(style, profile_version=PROFILE_VERSION_DEFAULT):
             BUILTIN_TRANSFORMS.get(style, PROFILE_VERSION_DEFAULT)
             > profile_version
         ):
-            raise ValueError()
+            raise ValueError()  # noqa: TRY301
 
         builtin_transform = ocio.BuiltinTransform()
         builtin_transform.setStyle(style)
     except (ValueError, ocio.Exception) as error:
         if isinstance(error, ValueError):
             logger.warning(
-                f"{style} style is unavailable for {profile_version} profile "
-                f"version!"
+                '"%s" style is unavailable for "%s" profile version!',
+                style,
+                profile_version,
             )
         else:
             logger.warning(
-                f"{style} style is either undefined using a placeholder "
-                f'"FileTransform" instead!'
+                '"%s" style is either undefined using a placeholder '
+                '"FileTransform" instead!',
+                style,
             )
         builtin_transform = ocio.FileTransform()
         builtin_transform.setSrc(style)
@@ -189,12 +190,14 @@ def node_to_builtin_transform(
         path = conversion_path(graph, *path)
 
         if not path:
-            return
+            return None
 
         verbose_path = " --> ".join(
             dict.fromkeys(itertools.chain.from_iterable(path))
         )
-        logger.debug(f'Creating "BuiltinTransform" with {verbose_path} path.')
+        logger.debug(
+            'Creating "BuiltinTransform" with "%s" path.', verbose_path
+        )
 
         for edge in path:
             source, target = edge
@@ -221,7 +224,9 @@ def node_to_builtin_transform(
 
     except NetworkXNoPath:
         logger.debug(
-            f"No path to {COLORSPACE_SCENE_ENCODING_REFERENCE} for {node}!"
+            'No path to "%s" for "%s" node!',
+            COLORSPACE_SCENE_ENCODING_REFERENCE,
+            node,
         )
 
 
@@ -343,12 +348,8 @@ def config_description_aces(profile_version=PROFILE_VERSION_DEFAULT):
         "produces the expected output. It is not usable as it does not "
         'map to existing "OpenColorIO" builtin transforms.'
     )
-    timestamp = (
-        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
-    )
 
-    return "\n".join([name, underline, "", description, "", timestamp])
+    return "\n".join([name, underline, "", description, "", timestamp()])
 
 
 def generate_config_aces(
@@ -398,7 +399,7 @@ def generate_config_aces(
         instances.
     """
 
-    logger.info(f'Generating "{config_name_aces()}" config...')
+    logger.info('Generating "%s" config...', config_name_aces())
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
@@ -442,19 +443,21 @@ def generate_config_aces(
     ]
 
     logger.info(
-        f'Implicit colorspaces: "{list(a.getName() for a in colorspaces)}"'
+        'Implicit colorspaces: "%s"', [a.getName() for a in colorspaces]
     )
 
     for family in ("csc", "input_transform", "lmt", "output_transform"):
         family_colourspaces = []
-        for node in filter_nodes(graph, [lambda x: x.family == family]):
+        for node in filter_nodes(
+            graph, [lambda x, family=family: x.family == family]
+        ):
             if node in (
                 COLORSPACE_SCENE_ENCODING_REFERENCE,
                 COLORSPACE_OUTPUT_ENCODING_REFERENCE,
             ):
                 continue
 
-            logger.info(f'Creating a colorspace for "{node}" node...')
+            logger.info('Creating a colorspace for "%s" node...', node)
             colorspace = node_to_colorspace(
                 graph, node, profile_version, describe
             )
@@ -485,13 +488,13 @@ def generate_config_aces(
         colorspaces += family_colourspaces
 
     views = sorted(views, key=lambda x: (x["display"], x["view"]))
-    display_names = sorted(list(display_names))
+    display_names = sorted(display_names)
     if "sRGB" in display_names:
         display_names.insert(0, display_names.pop(display_names.index("sRGB")))
 
     for display_name in display_names:
         view = beautify_view_name(raw_colorspace.getName())
-        logger.info(f'Adding "{view}" view to "{display_name}" display.')
+        logger.info('Adding "%s" view to "%s" display.', view, display_name)
         views.append(
             {
                 "display": display_name,
@@ -516,7 +519,7 @@ def generate_config_aces(
 
     config = generate_config(data, config_name, validate)
 
-    logger.info(f'"{config_name_aces()}" config generation complete!')
+    logger.info('"%s" config generation complete!', config_name_aces())
 
     if additional_data:
         return config, data, colorspaces_to_ctl_transforms
@@ -538,7 +541,7 @@ if __name__ == "__main__":
         ROOT_BUILD_DEFAULT / "config" / "aces" / "analytical"
     ).resolve()
 
-    logger.info(f'Using "{build_directory}" build directory...')
+    logger.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
@@ -551,7 +554,7 @@ if __name__ == "__main__":
         )
 
         for ctl_transform in colorspaces.values():
-            print(ctl_transform.aces_transform_id)
+            logger.info(ctl_transform.aces_transform_id)
 
         # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
         # versions.

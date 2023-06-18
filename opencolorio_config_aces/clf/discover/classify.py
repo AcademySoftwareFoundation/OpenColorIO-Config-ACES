@@ -17,11 +17,12 @@ discovery and classification:
 import itertools
 import logging
 import os
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree
 from collections import defaultdict
 from collections.abc import Mapping
 
 from opencolorio_config_aces.utilities import (
+    attest,
     message_box,
     paths_common_ancestor,
     vivified_to_dict,
@@ -258,7 +259,7 @@ class CLFTransformID:
         return self._urn
 
     @property
-    def type(self):
+    def type(self):  # noqa: A003
         """
         Getter property for the *CLFtransformID* type, e.g. *ACES*.
 
@@ -404,7 +405,7 @@ class CLFTransformID:
             Formatted string representation.
         """
 
-        return f"{self.__class__.__name__}(" f"'{self._clf_transform_id}')"
+        return f"{self.__class__.__name__}('{self._clf_transform_id}')"
 
     def __repr__(self):
         """
@@ -426,30 +427,33 @@ class CLFTransformID:
 
         clf_transform_id = self._clf_transform_id
 
-        assert clf_transform_id.startswith(
-            URN_CLF
-        ), f"{self._clf_transform_id} URN {self._urn} is invalid!"
+        attest(
+            clf_transform_id.startswith(URN_CLF),
+            f"{self._clf_transform_id} URN {self._urn} is invalid!",
+        )
 
         self._urn = clf_transform_id[: len(URN_CLF) + 1]
         components = clf_transform_id[len(URN_CLF) + 1 :]
         components = components.split(SEPARATOR_ID_CLF)
 
-        assert (
-            len(components) == 4
-        ), f'{self._clf_transform_id} is an invalid "CLFtransformID"!'
+        attest(
+            (len(components) == 4),
+            f'{self._clf_transform_id} is an invalid "CLFtransformID"!',
+        )
 
-        (self._namespace, self._type, self._name, version) = components
+        self._namespace, self._type, self._name, version = components
 
-        assert (
-            self._type in TRANSFORM_TYPES_CLF
-        ), f"{self._clf_transform_id} type {self._type} is invalid!"
+        attest(
+            (self._type in TRANSFORM_TYPES_CLF),
+            f"{self._clf_transform_id} type {self._type} is invalid!",
+        )
 
         if self._name is not None:
             self._source, self._target = self._name.split("_to_")
 
-        assert version.count(SEPARATOR_VERSION_CLF) == 1, (
-            f'{self._clf_transform_id} has an invalid "CLFtransformID" '
-            f"version!"
+        attest(
+            version.count(SEPARATOR_VERSION_CLF) == 1,
+            f'{self._clf_transform_id} has an invalid "CLFtransformID" version!',
         )
 
         (
@@ -779,7 +783,7 @@ CLFTransform` class are tried on the underlying
     def _parse(self):
         """Parse the *CLF* transform."""
 
-        tree = ET.parse(self._path)
+        tree = xml.etree.ElementTree.parse(self._path)  # noqa: S314
         root = tree.getroot()
 
         self._clf_transform_id = CLFTransformID(root.attrib["id"])
@@ -890,8 +894,8 @@ class CLFTransformPair:
 
         return (
             f"{self.__class__.__name__}("
-            f"{str(self._forward_transform)}', "
-            f"{str(self._inverse_transform)}')"
+            f"{self._forward_transform!s}', "
+            f"{self._inverse_transform!s}')"
         )
 
     def __repr__(self):
@@ -925,9 +929,8 @@ class CLFTransformPair:
         if not isinstance(other, CLFTransformPair):
             return False
         else:
-            (
-                (self._forward_transform == other._forward_transform)
-                and (self._inverse_transform == other._inverse_transform)
+            return (self._forward_transform == other._forward_transform) and (
+                self._inverse_transform == other._inverse_transform
             )
 
     def __ne__(self, other):
@@ -1046,8 +1049,8 @@ def discover_clf_transforms(root_directory=ROOT_TRANSFORMS_CLF):
             clf_transform = os.path.join(directory, filename)
 
             logger.debug(
-                f'"{clf_transform_relative_path(clf_transform)}" '
-                f"CLF transform was found!"
+                '"%s" CLF transform was found!',
+                clf_transform_relative_path(clf_transform),
             )
 
             clf_transforms[directory].append(clf_transform)
@@ -1128,7 +1131,9 @@ CLFTransform(\
                     list(pairs.values())[0], family, genus
                 )
 
-                logger.debug(f'Classifying "{clf_transform}" under "{genus}".')
+                logger.debug(
+                    'Classifying "%s" under "%s".', clf_transform, genus
+                )
 
                 classified_clf_transforms[family][genus][
                     basename
@@ -1146,7 +1151,9 @@ CLFTransform(\
                     forward_clf_transform, inverse_clf_transform
                 )
 
-                logger.debug(f'Classifying "{clf_transform}" under "{genus}".')
+                logger.debug(
+                    'Classifying "%s" under "%s".', clf_transform, genus
+                )
 
                 classified_clf_transforms[family][genus][
                     basename
@@ -1279,20 +1286,20 @@ reference.ROOT_TRANSFORMS_CLF` attribute using the
     for family, genera in classified_clf_transforms.items():
         message_box(family, print_callable=logger.info)
         for genus, clf_transforms in genera.items():
-            logger.info(f"[ {genus} ]")
+            logger.info("[ %s ]", genus)
             for name, clf_transform in clf_transforms.items():
-                logger.info(f"\t( {name} )")
+                logger.info("\t( %s )", name)
                 if isinstance(clf_transform, CLFTransform):
                     logger.info(
-                        f'\t\t"{clf_transform.source}"'
-                        f" --> "
-                        f'"{clf_transform.target}"'
+                        '\t\t"%s" --> "%s"',
+                        clf_transform.source,
+                        clf_transform.target,
                     )
                 elif isinstance(clf_transform, CLFTransformPair):
                     logger.info(
-                        f'\t\t"{clf_transform.forward_transform.source}"'
-                        f" <--> "
-                        f'"{clf_transform.forward_transform.target}"'
+                        '\t\t"%s" <--> "%s"',
+                        clf_transform.forward_transform.source,
+                        clf_transform.forward_transform.target,
                     )
 
 

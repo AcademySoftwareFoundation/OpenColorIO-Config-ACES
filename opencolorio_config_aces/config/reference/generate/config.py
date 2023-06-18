@@ -15,7 +15,6 @@ import logging
 import PyOpenColorIO as ocio
 import re
 from collections import defaultdict
-from datetime import datetime
 from enum import Flag, auto
 from pathlib import Path
 
@@ -44,9 +43,10 @@ from opencolorio_config_aces.config.reference import (
     version_aces_dev,
 )
 from opencolorio_config_aces.utilities import (
-    git_describe,
+    attest,
     regularise_version,
     validate_method,
+    timestamp,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -335,15 +335,13 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
         ):
             family = "CSC"
         elif ctl_transform.family == "input_transform":
-            family = (
-                f"Input{SEPARATOR_COLORSPACE_FAMILY}" f"{ctl_transform.genus}"
-            )
+            family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
         elif ctl_transform.family == "output_transform":
             family = "Output"
         elif ctl_transform.family == "lmt":
             family = "LMT"
     else:
-        if (
+        if (  # noqa: PLR5501
             ctl_transform.family == "csc"
             and ctl_transform.namespace == "Academy"
         ):
@@ -355,9 +353,7 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
                     f"{ctl_transform.genus}"
                 )
         elif ctl_transform.family == "input_transform":
-            family = (
-                f"Input{SEPARATOR_COLORSPACE_FAMILY}" f"{ctl_transform.genus}"
-            )
+            family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
         elif ctl_transform.family == "output_transform":
             family = "Output"
         elif ctl_transform.family == "lmt":
@@ -408,7 +404,6 @@ def ctl_transform_to_description(
             ColorspaceDescriptionStyle.SHORT_UNION,
             ColorspaceDescriptionStyle.LONG_UNION,
         ):
-
             forward, inverse = (
                 [
                     "to_reference",
@@ -831,7 +826,7 @@ def transform_data_aliases(transform_data):
         aliases = []
 
     if transform_data["legacy"] == "TRUE":
-        return [transform_data["colorspace"]] + aliases
+        return [transform_data["colorspace"], *aliases]
     else:
         return aliases
 
@@ -968,12 +963,8 @@ def config_description_aces(
         "transforms in OpenColorIO. It is not a replacement for the previous "
         '"ACES" configs nor the "ACES Studio Config".'
     )
-    timestamp = (
-        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
-    )
 
-    return "\n".join([name, underline, "", description, "", timestamp])
+    return "\n".join([name, underline, "", description, "", timestamp()])
 
 
 def generate_config_aces(
@@ -1032,22 +1023,23 @@ def generate_config_aces(
     """
 
     logger.info(
-        f"Generating "
-        f'"{config_name_aces(config_mapping_file_path, profile_version)}" '
-        f"config..."
+        'Generating "%s" config...',
+        config_name_aces(config_mapping_file_path, profile_version),
     )
 
     ctl_transforms = unclassify_ctl_transforms(
         classify_aces_ctl_transforms(discover_aces_ctl_transforms())
     )
 
-    logger.debug(f'Using {ctl_transforms} "CTL" transforms...')
+    logger.debug('Using %s "CTL" transforms...', ctl_transforms)
 
     logger.debug(
-        f'Using {list(BUILTIN_TRANSFORMS.keys())} "Builtin" transforms...'
+        'Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys())
     )
 
-    logger.info(f'Parsing "{config_mapping_file_path}" config mapping file...')
+    logger.info(
+        'Parsing "%s" config mapping file...', config_mapping_file_path
+    )
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -1075,14 +1067,17 @@ def generate_config_aces(
             # Checking whether the "BuiltinTransform" style exists.
             style = transform_data["builtin_transform_style"]
             if style:
-                assert (
-                    style in BUILTIN_TRANSFORMS
-                ), f'"{style}" "BuiltinTransform" style does not exist!'
+                attest(
+                    style in BUILTIN_TRANSFORMS,
+                    f'"{style}" "BuiltinTransform" style does not exist!',
+                )
 
                 if BUILTIN_TRANSFORMS[style] > profile_version:
                     logger.warning(
-                        f"{style} style is unavailable for {profile_version} "
-                        f"profile version, skipping transform!"
+                        '"%s" style is unavailable for "%s" profile version, '
+                        "skipping transform!",
+                        style,
+                        profile_version,
                     )
                     continue
 
@@ -1090,9 +1085,10 @@ def generate_config_aces(
             # "BuiltinTransform" style exists.
             style = transform_data["linked_display_colorspace_style"]
             if style:
-                assert (
-                    style in BUILTIN_TRANSFORMS
-                ), f'"{style}" "BuiltinTransform" style does not exist!"'
+                attest(
+                    style in BUILTIN_TRANSFORMS,
+                    f'"{style}" "BuiltinTransform" style does not exist!"',
+                )
 
             # Finding the "CTLTransform" class instance that matches given
             # "ACEStransformID", if it does not exist, there is a critical
@@ -1107,11 +1103,14 @@ def generate_config_aces(
 
             ctl_transform = next(iter(filtered_ctl_transforms), None)
 
-            assert ctl_transform is not None, (
-                f'"aces-dev" has no transform with "{aces_transform_id}" '
-                f"ACEStransformID, please cross-check the "
-                f'"{config_mapping_file_path}" config mapping file and '
-                f'the "aces-dev" "CTL" transforms!'
+            attest(
+                ctl_transform is not None,
+                (
+                    f'"aces-dev" has no transform with "{aces_transform_id}" '
+                    f"ACEStransformID, please cross-check the "
+                    f'"{config_mapping_file_path}" config mapping file and '
+                    f'the "aces-dev" "CTL" transforms!'
+                ),
             )
 
             transform_data["ctl_transform"] = ctl_transform
@@ -1170,13 +1169,11 @@ def generate_config_aces(
     ]
     inactive_colorspaces = [display_reference_colorspace["name"]]
 
-    logger.info(
-        f'Implicit colorspaces: "{list(a["name"] for a in colorspaces)}"'
-    )
+    logger.info('Implicit colorspaces: "%s"', [a["name"] for a in colorspaces])
 
     for style, transforms_data in config_mapping.items():
         if transforms_data[0]["interface"] == "ViewTransform":
-            logger.info(f'Creating a "View" transform for "{style}" style...')
+            logger.info('Creating a "View" transform for "%s" style...', style)
             view_transform = style_to_view_transform(
                 style,
                 [
@@ -1220,8 +1217,9 @@ def generate_config_aces(
                     "view_transform": view_transform_name,
                 }
                 logger.info(
-                    f'Adding {shared_view["view"]} shared view to '
-                    f'"{display_name}" display.'
+                    'Adding "%s" shared view to "%s" display.',
+                    shared_view["view"],
+                    display_name,
                 )
                 shared_views.append(shared_view)
         else:
@@ -1230,7 +1228,7 @@ def generate_config_aces(
 
                 if transform_data["interface"] == "Look":
                     logger.info(
-                        f'Creating a "Look" transform for "{style}" style...'
+                        'Creating a "Look" transform for "%s" style...', style
                     )
                     look = ctl_transform_to_look(
                         ctl_transform,
@@ -1248,7 +1246,8 @@ def generate_config_aces(
                     looks.append(look)
                 else:
                     logger.info(
-                        f'Creating a "Colorspace" transform for "{style}" style...'
+                        'Creating a "Colorspace" transform for "%s" style...',
+                        style,
                     )
 
                     colorspace = ctl_transform_to_colorspace(
@@ -1282,8 +1281,9 @@ def generate_config_aces(
             "view_transform": untonemapped_view_transform["name"],
         }
         logger.info(
-            f'Adding "{untonemapped_shared_view["view"]}" shared view to '
-            f'"{display_name}" display.'
+            'Adding "%s" shared view to "%s" display.',
+            untonemapped_shared_view["view"],
+            display_name,
         )
         shared_views.append(untonemapped_shared_view)
 
@@ -1294,7 +1294,7 @@ def generate_config_aces(
             "colorspace": raw_colorspace["name"],
         }
         logger.info(
-            f'Adding "{raw_view["view"]}" view to "{display_name}" display.'
+            'Adding "%s" view to "%s" display.', raw_view["view"], display_name
         )
         views.append(raw_view)
 
@@ -1329,11 +1329,11 @@ def generate_config_aces(
         },
         colorspaces=colorspaces + displays,
         looks=looks,
-        view_transforms=view_transforms + [untonemapped_view_transform],
+        view_transforms=[*view_transforms, untonemapped_view_transform],
         shared_views=shared_views,
         views=shared_views + views,
         active_displays=display_names,
-        active_views=view_transform_names + ["Un-tone-mapped", "Raw"],
+        active_views=[*view_transform_names, "Un-tone-mapped", "Raw"],
         file_rules=[
             {
                 "name": "Default",
@@ -1348,8 +1348,8 @@ def generate_config_aces(
     config = generate_config(data, config_name, validate)
 
     logger.info(
-        f'"{config_name_aces(config_mapping_file_path, profile_version)}" '
-        f"config generation complete!"
+        '"%s" config generation complete!',
+        config_name_aces(config_mapping_file_path, profile_version),
     )
 
     if additional_data:
@@ -1372,7 +1372,7 @@ if __name__ == "__main__":
         ROOT_BUILD_DEFAULT / "config" / "aces" / "reference"
     ).resolve()
 
-    logger.info(f'Using "{build_directory}" build directory...')
+    logger.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 

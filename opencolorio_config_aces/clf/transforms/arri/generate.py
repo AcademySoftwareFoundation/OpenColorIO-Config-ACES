@@ -10,10 +10,11 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_arri`
 """
 
-from math import log, log10
+import logging
 import PyOpenColorIO as ocio
-from pathlib import Path
 import sys
+from math import log, log10
+from pathlib import Path
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -36,6 +37,9 @@ __all__ = [
     "VERSION",
     "generate_clf_transforms_arri",
 ]
+
+logger = logging.getLogger(__name__)
+
 
 FAMILY = "ARRI"
 """
@@ -94,14 +98,11 @@ def _build_logc3_curve(ei=800, info=False):
     ------
     ValueError
         If `ei` is not in the supported range.
-
     """
 
     if not (160 <= ei <= 1280):
         raise ValueError(
-            f"Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280".format(
-                ei
-            )
+            f"Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280"
         )
 
     # v3_IDT_maker.py parameters
@@ -117,7 +118,7 @@ def _build_logc3_curve(ei=800, info=False):
     encGain = (log(gain) / log(2) * (0.89 - 1) / 3 + 1) * encodingGain
     encOffset = encodingOffset
 
-    for i in range(0, 3):
+    for _ in range(0, 3):
         nz = ((95 / 1023 - encOffset) / encGain - offset) / slope
         encOffset = encodingOffset - log10(1 + nz) * encGain
 
@@ -131,7 +132,6 @@ def _build_logc3_curve(ei=800, info=False):
 
     # print informative text if requested
     if info:
-
         # compute unused variables for completeness
 
         # follows CLF 6.6 Log specification
@@ -140,14 +140,14 @@ def _build_logc3_curve(ei=800, info=False):
         # follows CLF 6.6 Log specification
         f = c * log10(a * cut + b) + d
 
-        print(f"White Paper Values for EI{ei:d}")
-        print(f"cut: {cut:.6f} :: {cut:.15f}")
-        print(f"a:   {a:.6f} :: {a:.15f}")
-        print(f"b:   {b:.6f} :: {b:.15f}")
-        print(f"c:   {c:.6f} :: {c:.15f}")
-        print(f"d:   {d:.6f} :: {d:.15f}")
-        print(f"e:   {e:.6f} :: {e:.15f}")
-        print(f"f:   {f:.6f} :: {f:.15f}")
+        logger.info("White Paper Values for EI%s", ei)
+        logger.info("cut: {%.6f} :: {%.15f}", cut, cut)
+        logger.info("a:   {%.6f} :: {%.15f}", a, a)
+        logger.info("b:   {%.6f} :: {%.15f}", b, b)
+        logger.info("c:   {%.6f} :: {%.15f}", c, c)
+        logger.info("d:   {%.6f} :: {%.15f}", d, d)
+        logger.info("e:   {%.6f} :: {%.15f}", e, e)
+        logger.info("f:   {%.6f} :: {%.15f}", f, f)
 
     # OCIO LogCameraTransform translation variables
     base = 10.0
@@ -248,7 +248,7 @@ def _build_logc4_curve():
     )
 
 
-def _generate_logc3_transforms(output_directory, ei_list=[800]):
+def _generate_logc3_transforms(output_directory, ei_list=(800,)):
     """
     Generate the collection of LogC3 transforms.
 
@@ -268,7 +268,6 @@ def _generate_logc3_transforms(output_directory, ei_list=[800]):
     transforms = {}
 
     for ei in ei_list:
-
         # Generate ARRI LogC3 to ACES 2065-1 Transform
         name = f"ARRI_LogC3_EI{ei}_to_ACES2065-1"
         aces_id = f"urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI{ei}.a1.v2"
@@ -444,4 +443,7 @@ def _main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
     sys.exit(_main())

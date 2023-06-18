@@ -16,7 +16,6 @@ import re
 
 import PyOpenColorIO as ocio
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
 
 from opencolorio_config_aces.clf import (
@@ -48,9 +47,10 @@ from opencolorio_config_aces.config.reference.generate.config import (
     transform_data_aliases,
 )
 from opencolorio_config_aces.utilities import (
-    git_describe,
+    attest,
     regularise_version,
     validate_method,
+    timestamp,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -190,7 +190,7 @@ def clf_transform_to_description(
                     f"to {clf_transform.output_descriptor}"
                 )
 
-        elif describe in (
+        elif describe in (  # noqa: SIM102
             ColorspaceDescriptionStyle.OPENCOLORIO,
             ColorspaceDescriptionStyle.LONG,
             ColorspaceDescriptionStyle.LONG_UNION,
@@ -371,7 +371,7 @@ def style_to_colorspace(
     style,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
     signature_only=False,
-    scheme="Modern 1",
+    scheme="Modern 1",  # noqa: ARG001
     **kwargs,
 ):
     """
@@ -479,7 +479,7 @@ def style_to_named_transform(
     style,
     describe=ColorspaceDescriptionStyle.LONG_UNION,
     signature_only=False,
-    scheme="Modern 1",
+    scheme="Modern 1",  # noqa: ARG001
     **kwargs,
 ):
     """
@@ -714,12 +714,8 @@ def config_description_cg(
         "graphics artists requiring a lean config that does not include "
         "camera colorspaces and the less common displays and looks."
     )
-    timestamp = (
-        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-        f'on the {datetime.now().strftime("%Y/%m/%d at %H:%M")}.'
-    )
 
-    return "\n".join([name, underline, "", description, "", timestamp])
+    return "\n".join([name, underline, "", description, "", timestamp()])
 
 
 def generate_config_cg(
@@ -789,9 +785,8 @@ def generate_config_cg(
     """
 
     logger.info(
-        f"Generating "
-        f'"{config_name_cg(config_mapping_file_path, profile_version)}" '
-        f"config..."
+        'Generating "%s" config...',
+        config_name_cg(config_mapping_file_path, profile_version),
     )
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
@@ -809,14 +804,16 @@ def generate_config_cg(
         classify_clf_transforms(discover_clf_transforms())
     )
 
-    logger.debug(f'Using {clf_transforms} "CLF" transforms...')
+    logger.debug('Using %s "CLF" transforms...', clf_transforms)
 
     logger.debug(
-        f'Using {list(BUILTIN_TRANSFORMS.keys())} "Builtin" transforms...'
+        'Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys())
     )
 
     def clf_transform_from_id(clf_transform_id):
-        """Filter the "CLFTransform" instances matching given "CLFtransformID"."""
+        """
+        Filter the "CLFTransform" instances matching given "CLFtransformID".
+        """
 
         filtered_clf_transforms = [
             clf_transform
@@ -828,8 +825,9 @@ def generate_config_cg(
         clf_transform = next(iter(filtered_clf_transforms), None)
 
         logger.debug(
-            f'Filtered "CLF" transform with "{clf_transform_id}" '
-            f'"CLFtransformID": {clf_transform}.'
+            'Filtered "CLF" transform with "%s" "CLFtransformID": %s.',
+            clf_transform_id,
+            clf_transform,
         )
 
         return clf_transform
@@ -846,12 +844,16 @@ def generate_config_cg(
         clf_transform = next(iter(filtered_clf_transforms), None)
 
         logger.debug(
-            f'Filtered "CLF" transform with "{style}" style: {clf_transform}.'
+            'Filtered "CLF" transform with "%s" style: %s.',
+            style,
+            clf_transform,
         )
 
         return clf_transform
 
-    logger.info(f'Parsing "{config_mapping_file_path}" config mapping file...')
+    logger.info(
+        'Parsing "%s" config mapping file...', config_mapping_file_path
+    )
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -879,9 +881,10 @@ def generate_config_cg(
             # Checking whether the "BuiltinTransform" style exists.
             style = transform_data["builtin_transform_style"]
             if style:
-                assert (
-                    style in BUILTIN_TRANSFORMS
-                ), f'"{style}" "BuiltinTransform" style does not exist!'
+                attest(
+                    style in BUILTIN_TRANSFORMS,
+                    f'"{style}" "BuiltinTransform" style does not exist!',
+                )
 
             # Finding the "CLFTransform" class instance that matches given
             # "CLFtransformID", if it does not exist, there is a critical
@@ -899,10 +902,11 @@ def generate_config_cg(
 
                 clf_transform = next(iter(filtered_clf_transforms), None)
 
-                assert clf_transform is not None, (
+                attest(
+                    clf_transform is not None,
                     f'"OpenColorIO-Config-ACES" has no transform with '
                     f'"{clf_transform_id}" ACEStransformID, please cross-check '
-                    f'the "{config_mapping_file_path}" config mapping file!'
+                    f'the "{config_mapping_file_path}" config mapping file!',
                 )
 
                 transform_data["clf_transform"] = clf_transform
@@ -929,7 +933,7 @@ def generate_config_cg(
         a["name"] for a in transforms if a.get("transforms_data") is None
     ]
 
-    logger.info(f"Implicit transforms: {implicit_transforms}.")
+    logger.info("Implicit transforms: %s.", implicit_transforms)
 
     def implicit_filterer(transform):
         """Return whether given transform is an implicit transform."""
@@ -962,14 +966,14 @@ def generate_config_cg(
     colorspace_filterers = [implicit_filterer, transform_filterer]
     data.colorspaces = multi_filters(data.colorspaces, colorspace_filterers)
     logger.info(
-        'Filtered "Colorspace" transforms: '
-        f'{[a["name"] for a in data.colorspaces]} '
+        'Filtered "Colorspace" transforms: %s.',
+        [a["name"] for a in data.colorspaces],
     )
 
     look_filterers = [implicit_filterer, transform_filterer]
     data.looks = multi_filters(data.looks, look_filterers)
     logger.info(
-        'Filtered "Look" transforms: ' f'{[a["name"] for a in data.looks]} '
+        'Filtered "Look" transforms: %s ', [a["name"] for a in data.looks]
     )
 
     view_transform_filterers = [implicit_filterer, transform_filterer]
@@ -977,8 +981,8 @@ def generate_config_cg(
         data.view_transforms, view_transform_filterers
     )
     logger.info(
-        'Filtered "View" transforms: '
-        f'{[a["name"] for a in data.view_transforms]} '
+        'Filtered "View" transforms: %s.',
+        [a["name"] for a in data.view_transforms],
     )
 
     # Views Filtering
@@ -1011,23 +1015,24 @@ def generate_config_cg(
     shared_view_filterers = [implicit_filterer, view_filterer]
     data.shared_views = multi_filters(data.shared_views, shared_view_filterers)
     logger.info(
-        f'Filtered shared "View(s)": {[a["view"] for a in data.shared_views]} '
+        'Filtered shared "View(s)": %s.',
+        [a["view"] for a in data.shared_views],
     )
 
     view_filterers = [implicit_filterer, view_filterer]
     data.views = multi_filters(data.views, view_filterers)
-    logger.info('Filtered "View(s)": ' f'{[a["view"] for a in data.views]} ')
+    logger.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
 
     # Active Displays Filtering
     data.active_displays = [
         a for a in data.active_displays if a in display_names
     ]
-    logger.info(f"Filtered active displays: {data.active_displays}")
+    logger.info("Filtered active displays: %s.", data.active_displays)
 
     # Active Views Filtering
     views = [view["view"] for view in data.views]
     data.active_views = [view for view in data.active_views if view in views]
-    logger.info(f"Filtered active views: {data.active_views}")
+    logger.info("Filtered active views: %s.", data.active_views)
 
     # CLF Transforms & BuiltinTransform Creation
     for transform_data in yield_from_config_mapping():
@@ -1059,7 +1064,8 @@ def generate_config_cg(
 
             if transform_data["interface"] == "ColorSpace":
                 logger.info(
-                    f'Creating a "Colorspace" transform for "{style}" style...'
+                    'Creating a "Colorspace" transform for "%s" style...',
+                    style,
                 )
 
                 colorspace = style_to_colorspace(**kwargs)
@@ -1067,7 +1073,8 @@ def generate_config_cg(
                 data.colorspaces.append(colorspace)
             elif transform_data["interface"] == "NamedTransform":
                 logger.info(
-                    f'Creating a "NamedTransform" transform for "{style}" style...'
+                    'Creating a "NamedTransform" transform for "%s" style...',
+                    style,
                 )
 
                 colorspace = style_to_named_transform(**kwargs)
@@ -1076,24 +1083,26 @@ def generate_config_cg(
 
             if style and clf_transform_id:
                 logger.warning(
-                    '"{style}" was defined along side a "CTLtransformID", '
-                    "hybrid transform generation was used!"
+                    '"%s" style was defined along side a "CTLtransformID", '
+                    "hybrid transform generation was used!",
+                    style,
                 )
                 continue
 
         if clf_transform_id:
             clf_transform = clf_transform_from_id(clf_transform_id)
 
-            assert (
-                clf_transform
-            ), f'"{clf_transform_id}" "CLF" transform does not exist!'
+            attest(
+                clf_transform,
+                f'"{clf_transform_id}" "CLF" transform does not exist!',
+            )
 
             kwargs["clf_transform"] = clf_transform
 
             if transform_data["interface"] == "NamedTransform":
                 logger.info(
-                    f'Adding "{clf_transform_id}" "CLF" transform as a '
-                    f'"Named" transform.'
+                    'Adding "%s" "CLF" transform as a "Named" transform.',
+                    clf_transform_id,
                 )
 
                 named_transform = clf_transform_to_named_transform(**kwargs)
@@ -1101,8 +1110,8 @@ def generate_config_cg(
                 data.named_transforms.append(named_transform)
             else:
                 logger.info(
-                    f'Adding "{clf_transform_id}" "CLF" transform as a '
-                    f'"Colorspace" transform.'
+                    'Adding "%s" "CLF" transform as a "Colorspace" transform.',
+                    clf_transform_id,
                 )
 
                 colorspace = clf_transform_to_colorspace(**kwargs)
@@ -1121,7 +1130,7 @@ def generate_config_cg(
     inactive_colorspaces = []
     for colorspace in data.inactive_colorspaces:
         if colorspace not in colorspace_named_transform_names:
-            logger.info(f'Removing "{colorspace}" inactive colorspace.')
+            logger.info('Removing "%s" inactive colorspace.', colorspace)
             continue
 
         inactive_colorspaces.append(colorspace)
@@ -1135,7 +1144,7 @@ def generate_config_cg(
         # The "Reference" role is deprecated.
         ocio.ROLE_REFERENCE,
     ):
-        logger.info(f'Removing "{role}" role.')
+        logger.info('Removing "%s" role.', role)
 
         data.roles.pop(role)
 
@@ -1168,8 +1177,8 @@ def generate_config_cg(
     config = generate_config(data, config_name, validate)
 
     logger.info(
-        f'"{config_name_cg(config_mapping_file_path, profile_version)}" '
-        f"config generation complete!"
+        '"%s" config generation complete!',
+        config_name_cg(config_mapping_file_path, profile_version),
     )
 
     if additional_data:
@@ -1190,7 +1199,7 @@ if __name__ == "__main__":
 
     build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "cg").resolve()
 
-    logging.info(f'Using "{build_directory}" build directory...')
+    logging.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
