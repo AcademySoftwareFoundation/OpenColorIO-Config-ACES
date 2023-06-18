@@ -396,9 +396,9 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
 
 
 if __name__ == "__main__":
-    from pprint import pformat
     from opencolorio_config_aces.utilities import message_box
     from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+    from pprint import pformat
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
