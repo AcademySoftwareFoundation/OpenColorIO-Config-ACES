@@ -222,6 +222,21 @@ def generate_clf_transforms_ocio(output_directory):
         "sRGB Encoded AP1 primaries, D60 white point",
     )
 
+    name = "AP0_to_sRGB_Encoded_P3-D65-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "P3-D65"),
+            gamma_transform("sRGB"),
+        ],
+        clf_transform_id,
+        "AP0 to sRGB Encoded P3-D65 - Texture",
+        "ACES2065-1",
+        "sRGB Encoded P3-D65 primaries, D65 white point",
+    )
+
     return clf_transforms
 
 

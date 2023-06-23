@@ -17,5 +17,6 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 420,Utility - Gamma 2.2 - Rec.709 - Texture,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_Rec709-Texture:1.0,ColorSpace,,g22_rec709,sdr-video,file-io
 420,Utility - Gamma 2.4 - Rec.709 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Texture:1.0,ColorSpace,,"g24_rec709,rec709_display,Utility - Rec.709 - Display",sdr-video,file-io
 420,Utility - sRGB - AP1 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_AP1-Texture:1.0,ColorSpace,,srgb_ap1,sdr-video,file-io
+420,Utility - sRGB - P3-D65 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_P3-D65-Texture:1.0,ColorSpace,,"srgb_p3d65,srgb_displayp3",sdr-video,file-io
 420,Utility - sRGB - Texture,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB-Texture:1.0,ColorSpace,,"srgb_texture,Input - Generic - sRGB - Texture",,file-io
 500,Utility - Look - Gamut Compress,FALSE,urn:ampas:aces:transformId:v1.5:LMT.Academy.GamutCompress.a1.3.0,,Look,,,,
