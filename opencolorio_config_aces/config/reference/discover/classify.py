@@ -108,17 +108,18 @@ NAMESPACE_CTL : unicode
 """
 
 TRANSFORM_TYPES_CTL = [
+    "ACEScsc",
+    "ACESlib",
+    "ACESutil",
     "IDT",
+    "InvLMT",
+    "InvODT",
+    "InvRRT",
+    "InvRRTODT",
     "LMT",
     "ODT",
     "RRT",
     "RRTODT",
-    "InvRRT",
-    "InvODT",
-    "InvRRTODT",
-    "ACESlib",
-    "ACEScsc",
-    "ACESutil",
 ]
 """
 *ACES* *CTL* transform types.
@@ -656,6 +657,8 @@ class ACESTransformID:
                 self._source, self._target = source, target
             elif self._type in ("IDT", "LMT"):
                 self._source, self._target = self._name, "ACES2065-1"
+            elif self._type == "InvLMT":
+                self._source, self._target = "ACES2065-1", self._name
             elif self._type == "ODT":
                 self._source, self._target = "OCES", self._name
             elif self._type == "InvODT":
