@@ -2,7 +2,7 @@
 # Copyright Contributors to the OpenColorIO Project.
 """
 *ARRI* CLF Transforms Generation
-=======================================
+================================
 
 Defines procedures for generating ARRI *Common LUT Format* (CLF)
 transforms:

@@ -320,7 +320,7 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
     analytical : bool, optional
         Whether to generate the *OpenColorIO* transform family that
         analytically matches the given *ACES* *CTL* transform, i.e. true to
-        the *aces-dev* reference but not necessarily user friendly.
+        the *aces-dev* reference but not necessarily user-friendly.
 
     Returns
     -------
@@ -478,7 +478,7 @@ def ctl_transform_to_colorspace(
     analytical : bool, optional
         Whether to generate the *OpenColorIO* transform family that
         analytically matches the given *ACES* *CTL* transform, i.e. true to
-        the *aces-dev* reference but not necessarily user friendly.
+        the *aces-dev* reference but not necessarily user-friendly.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* `Colorspace` signature only, i.e.
         the arguments for its instantiation.
@@ -549,7 +549,7 @@ def ctl_transform_to_look(
     analytical : bool, optional
         Whether to generate the *OpenColorIO* transform family that
         analytically matches the given *ACES* *CTL* transform, i.e. true to
-        the *aces-dev* reference but not necessarily user friendly.
+        the *aces-dev* reference but not necessarily user-friendly.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* `Look` signature only, i.e. the
         arguments for its instantiation.
@@ -1008,7 +1008,7 @@ def generate_config_aces(
     analytical : bool, optional
         Whether to generate *OpenColorIO* transform families that analytically
         match the given *ACES* *CTL* transform, i.e. true to the *aces-dev*
-        reference but not necessarily user friendly.
+        reference but not necessarily user-friendly.
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
