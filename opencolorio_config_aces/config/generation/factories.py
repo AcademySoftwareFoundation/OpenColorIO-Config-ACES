@@ -69,6 +69,8 @@ BUILTIN_TRANSFORMS.update(
         "ACES-LMT - ACES 1.3 Reference Gamut Compression": ProfileVersion(
             2, 1
         ),
+        "CURVE - CANON_CLOG2_to_LINEAR": ProfileVersion(2, 2),
+        "CURVE - CANON_CLOG3_to_LINEAR": ProfileVersion(2, 2),
         "DISPLAY - CIE-XYZ-D65_to_DisplayP3": ProfileVersion(2, 3),
     }
 )

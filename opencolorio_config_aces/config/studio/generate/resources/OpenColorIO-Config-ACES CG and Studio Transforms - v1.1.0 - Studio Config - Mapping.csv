@@ -16,9 +16,10 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 210,Input - Blackmagic - DaVinci Intermediate - DaVinci Wide Gamut,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
 210,Input - Blackmagic - Linear - Blackmagic Wide Gamut (Gen 5),FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1:1.0,ColorSpace,,,scene-linear,file-io
 210,Input - Blackmagic - Linear - DaVinci Wide Gamut,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1:1.0,ColorSpace,,,scene-linear,file-io
-210,Input - Canon - Canon-Log2 - Cinema Gamut Daylight,TRUE,,,ColorSpace,CANON_CLOG2-CGAMUT_to_ACES2065-1,,log,file-io
+210,Input - Canon - Canon-Log2 - Cinema Gamut Daylight,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CanonLog2_CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,CANON_CLOG2-CGAMUT_to_ACES2065-1,canonlog2_cgamutday,log,file-io
 210,Input - Canon - Canon-Log3 - Cinema Gamut Daylight,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CanonLog3_CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,CANON_CLOG3-CGAMUT_to_ACES2065-1,canonlog3_cgamutday,log,file-io
-210,Input - Canon - Curve - Canon-Log3,TRUE,,,NamedTransform,,crv_canonlog3,log,file-io
+210,Input - Canon - Curve - Canon-Log2,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CLog2-Curve_to_Linear:1.0,NamedTransform,CURVE - CANON_CLOG2_to_LINEAR,crv_canonlog2,log,file-io
+210,Input - Canon - Curve - Canon-Log3,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CLog3-Curve_to_Linear:1.0,NamedTransform,CURVE - CANON_CLOG3_to_LINEAR,crv_canonlog3,log,file-io
 210,Input - Canon - Linear - Canon Cinema Gamut Daylight,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:Linear-CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,,lin_canoncgamutday,scene-linear,file-io
 210,Input - Panasonic - Curve - V-Log,TRUE,,urn:aswf:ocio:transformId:1.0:Panasonic:Input:VLog-Curve_to_Linear:1.0,NamedTransform,,crv_vlog,log,file-io
 210,Input - Panasonic - Linear - V-Gamut,TRUE,,urn:aswf:ocio:transformId:1.0:Panasonic:Input:Linear_VGamut_to_ACES2065-1:1.0,ColorSpace,,lin_vgamut,scene-linear,file-io

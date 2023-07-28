@@ -886,6 +886,15 @@ def generate_config_cg(
                     f'"{style}" "BuiltinTransform" style does not exist!',
                 )
 
+                if BUILTIN_TRANSFORMS[style] > profile_version:
+                    logger.warning(
+                        '"%s" style is unavailable for "%s" profile version, '
+                        "skipping transform!",
+                        style,
+                        profile_version,
+                    )
+                    continue
+
             # Finding the "CLFTransform" class instance that matches given
             # "CLFtransformID", if it does not exist, there is a critical
             # mismatch in the config mapping file.
