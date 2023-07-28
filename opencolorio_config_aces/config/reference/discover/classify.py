@@ -1250,8 +1250,8 @@ def classify_aces_ctl_transforms(unclassified_ctl_transforms):
     'csc'
     >>> genera = sorted(ctl_transforms[family])
     >>> print(genera)
-    ['ACEScc', 'ACEScct', 'ACEScg', 'ACESproxy', 'ADX', 'arri', 'canon', \
-'panasonic', 'red', 'sony']
+    ['ACEScc', 'ACEScct', 'ACEScg', 'ACESproxy', 'ADX', 'arri', \
+'blackmagic_design', 'canon', 'panasonic', 'red', 'sony']
     >>> genus = genera[0]
     >>> sorted(ctl_transforms[family][genus].items())  # doctest: +ELLIPSIS
     [('ACEScsc.Academy.ACEScc', CTLTransformPair(\
