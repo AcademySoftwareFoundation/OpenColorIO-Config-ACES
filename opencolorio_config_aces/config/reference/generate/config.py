@@ -1090,6 +1090,15 @@ def generate_config_aces(
                     f'"{style}" "BuiltinTransform" style does not exist!"',
                 )
 
+                if BUILTIN_TRANSFORMS[style] > profile_version:
+                    logger.warning(
+                        '"%s" style is unavailable for "%s" profile version, '
+                        "skipping transform!",
+                        style,
+                        profile_version,
+                    )
+                    continue
+
             # Finding the "CTLTransform" class instance that matches given
             # "ACEStransformID", if it does not exist, there is a critical
             # mismatch in the mapping with *aces-dev*.

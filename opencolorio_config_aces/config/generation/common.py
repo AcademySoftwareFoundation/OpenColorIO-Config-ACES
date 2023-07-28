@@ -239,6 +239,8 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         *OpenColorIO* config.
     """
 
+    logger.debug("Config data:\n%s", data)
+
     if base_config is not None:
         config = base_config
     else:

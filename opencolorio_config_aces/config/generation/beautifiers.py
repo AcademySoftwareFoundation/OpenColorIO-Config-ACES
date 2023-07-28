@@ -167,6 +167,7 @@ PATTERNS_VIEW_TRANSFORM_NAME : dict
 PATTERNS_DISPLAY_NAME = {
     "G2.6-": "",
     "-BFD": "",
+    "DisplayP3": "Display P3",
     "REC.1886": "Rec.1886",
     "REC.709": "Rec.709",
     "REC.2020": "Rec.2020",

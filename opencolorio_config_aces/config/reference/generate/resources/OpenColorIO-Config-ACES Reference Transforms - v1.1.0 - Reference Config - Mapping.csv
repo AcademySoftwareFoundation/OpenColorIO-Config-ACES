@@ -14,7 +14,9 @@ Ordering,ACEStransformID,Colorspace,Legacy,BuiltinTransform Style,Linked Display
 140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3Cine_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3cine
 150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0,,FALSE,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,vlog_vgamut
 310,urn:ampas:aces:transformId:v1.5:LMT.Academy.BlueLightArtifactFix.a1.1.0,Utility - Look - Blue Light Artifact Fix,TRUE,ACES-LMT - BLUE_LIGHT_ARTIFACT_FIX,,Look,,,
-310,urn:ampas:aces:transformId:v1.5:LMT.Academy.GamutCompress.a1.3.0,,FALSE,ACES-LMT - ACES 1.3 Reference Gamut Compression,,Look,,,
+310,urn:ampas:aces:transformId:v1.5:LMT.Academy.ReferenceGamutCompress.a1.v1.0,,FALSE,ACES-LMT - ACES 1.3 Reference Gamut Compression,,Look,,,
+400,urn:ampas:aces:transformId:v1.5:ODT.Academy.DisplayP3_D60sim_dim.a1.0.0,Output - DisplayP3 (D60 sim.),FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,DISPLAY - CIE-XYZ-D65_to_DisplayP3,ViewTransform,sdr-video,file-io,
+400,urn:ampas:aces:transformId:v1.5:ODT.Academy.DisplayP3_dim.a1.0.0,Output - DisplayP3,FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_DisplayP3,ViewTransform,sdr-video,file-io,
 400,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,Output - sRGB,FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform,sdr-video,file-io,
 400,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_D60sim_100nits_dim.a1.0.3,Output - sRGB (D60 sim.),FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform,sdr-video,file-io,
 410,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_100nits_dim.a1.0.3,Output - Rec.709,FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709,ViewTransform,sdr-video,file-io,
