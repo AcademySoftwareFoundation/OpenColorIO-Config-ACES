@@ -204,7 +204,7 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "AP0 to Gamma 2.2 AP1 - Texture",
         "ACES2065-1",
-        "2.2 gamma-corrected AP1 primaries, D60 white point",
+        "2.2 gamma-corrected AP1 primaries, ACES D60 point",
     )
 
     name = "AP0_to_sRGB_Encoded_AP1-Texture"
@@ -219,7 +219,7 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "AP0 to sRGB Encoded AP1 - Texture",
         "ACES2065-1",
-        "sRGB Encoded AP1 primaries, D60 white point",
+        "sRGB Encoded AP1 primaries, ACES D60 point",
     )
 
     name = "AP0_to_sRGB_Encoded_P3-D65-Texture"
