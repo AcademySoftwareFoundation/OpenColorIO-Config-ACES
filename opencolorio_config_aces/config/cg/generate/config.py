@@ -1171,13 +1171,13 @@ def generate_config_cg(
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme
             ),
-            ocio.ROLE_MATTE_PAINT: "sRGB - Texture",
+            ocio.ROLE_MATTE_PAINT: format_optional_prefix(
+                "ACEScct", "ACES", scheme
+            ),
             ocio.ROLE_SCENE_LINEAR: format_optional_prefix(
                 "ACEScg", "ACES", scheme
             ),
-            ocio.ROLE_TEXTURE_PAINT: format_optional_prefix(
-                "ACEScct", "ACES", scheme
-            ),
+            ocio.ROLE_TEXTURE_PAINT: "sRGB - Texture",
         }
     )
 
