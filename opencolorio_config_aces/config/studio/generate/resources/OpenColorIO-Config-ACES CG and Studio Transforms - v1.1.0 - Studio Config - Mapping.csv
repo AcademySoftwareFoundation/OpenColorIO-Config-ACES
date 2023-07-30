@@ -27,11 +27,14 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 210,Input - RED - Curve - REDLog3G10,TRUE,,urn:aswf:ocio:transformId:1.0:RED:Input:Log3G10-Curve_to_Linear:1.0,NamedTransform,,crv_rl3g10,log,file-io
 210,Input - RED - Linear - REDWideGamutRGB,TRUE,,urn:aswf:ocio:transformId:1.0:RED:Input:Linear_REDWideGamutRGB_to_ACES2065-1:1.0,ColorSpace,,lin_rwg,scene-linear,file-io
 210,Input - RED - REDLog3G10 - REDWideGamutRGB,TRUE,,urn:aswf:ocio:transformId:1.0:RED:Input:Log3G10_REDWideGamutRGB_to_ACES2065-1:1.0,ColorSpace,,rl3g10_rwg,log,file-io
+210,Input - Sony - Curve - S-Log2,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog2-Curve_to_Linear:1.0,NamedTransform,,crv_slog2,log,file-io
 210,Input - Sony - Curve - S-Log3,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3-Curve_to_Linear:1.0,NamedTransform,,crv_slog3,log,file-io
+210,Input - Sony - Linear - S-Gamut,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:Linear_SGamut_to_ACES2065-1:1.0,ColorSpace,,lin_sgamut,scene-linear,file-io
 210,Input - Sony - Linear - S-Gamut3,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:Linear_SGamut3_to_ACES2065-1:1.0,ColorSpace,,lin_sgamut3,scene-linear,file-io
 210,Input - Sony - Linear - S-Gamut3.Cine,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:Linear_SGamut3Cine_to_ACES2065-1:1.0,ColorSpace,,lin_sgamut3cine,scene-linear,file-io
 210,Input - Sony - Linear - Venice S-Gamut3,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:Linear_Venice_SGamut3_to_ACES2065-1:1.0,ColorSpace,,lin_venice_sgamut3,scene-linear,file-io
 210,Input - Sony - Linear - Venice S-Gamut3.Cine,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:Linear_Venice_SGamut3Cine_to_ACES2065-1:1.0,ColorSpace,,lin_venice_sgamut3cine,scene-linear,file-io
+210,Input - Sony - S-Log2 - S-Gamut,TRUE,,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog2_SGamut_to_ACES2065-1:1.0,ColorSpace,,slog2_sgamut,log,file-io
 210,Input - Sony - S-Log3 - S-Gamut3,TRUE,urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3.a1.v1,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_SGamut3_to_ACES2065-1:1.0,ColorSpace,,slog3_sgamut3,log,file-io
 210,Input - Sony - S-Log3 - S-Gamut3.Cine,TRUE,urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3Cine.a1.v1,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_SGamut3Cine_to_ACES2065-1:1.0,ColorSpace,,slog3_sgamutcine,log,file-io
 210,Input - Sony - S-Log3 - Venice S-Gamut3,TRUE,urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_Venice_SGamut3_to_ACES2065-1:1.0,ColorSpace,,slog3_venice_sgamut3,log,file-io
