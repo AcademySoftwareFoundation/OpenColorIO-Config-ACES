@@ -1164,7 +1164,7 @@ def generate_config_aces(
         "family": "Utility",
         "description": 'The utility "Raw" colorspace.',
         "is_data": True,
-        "categories": ["file-io"],
+        "categories": ["file-io", "texture"],
     }
     raw_colorspace["aliases"] = [
         beautify_alias(raw_colorspace["name"]),
