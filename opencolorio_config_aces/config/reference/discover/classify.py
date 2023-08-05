@@ -289,10 +289,17 @@ ROOT_TRANSFORMS_CTL : unicode
 """
 
 
-def version_aces_dev():
+def version_aces_dev(tag_only=True):
     """
     Return the current *aces-dev* version, trying first with *git*, then by
     parsing the *CHANGELOG.md* file.
+
+    Parameters
+    ----------
+    tag_only : bool, optional
+        Whether to return the tag only instead of the tag name with the number
+        of additional commits on top of the tagged object and the abbreviated
+        hash of the most recent commit.
 
     Returns
     -------
@@ -306,7 +313,14 @@ def version_aces_dev():
             cwd=ROOT_TRANSFORMS_CTL,
             stderr=subprocess.STDOUT,
         ).strip()
-        return version.decode("utf-8")
+
+        version = version.decode("utf-8")
+
+        return (
+            re.search(r"v(\d\.\d(\.\d)?)", version).group(1)
+            if tag_only
+            else version
+        )
     except Exception:  # pragma: no cover
         changelog_path = os.path.join(
             ROOT_TRANSFORMS_CTL, "..", "..", "CHANGELOG.md"
