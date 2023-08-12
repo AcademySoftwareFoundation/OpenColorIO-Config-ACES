@@ -19,7 +19,7 @@ from opencolorio_config_aces.config.generation import (
     generate_config,
 )
 from opencolorio_config_aces.config.reference import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
 )
 from opencolorio_config_aces.config.cg import (
     generate_config_cg,
@@ -172,7 +172,7 @@ def generate_config_studio(
     config_name=None,
     profile_version=PROFILE_VERSION_DEFAULT,
     validate=True,
-    describe=ColorspaceDescriptionStyle.SHORT_UNION,
+    describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
     scheme="Modern 1",
     additional_data=False,
@@ -209,7 +209,7 @@ def generate_config_studio(
         Whether to validate the config.
     describe : int, optional
         Any value from the
-        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+        :class:`opencolorio_config_aces.DescriptionStyle` enum.
     config_mapping_file_path : unicode, optional
         Path to the *CSV* mapping file used to describe the transforms mapping.
     scheme : str, optional
@@ -222,7 +222,8 @@ def generate_config_studio(
     -------
     Config or tuple
         *OpenColorIO* config or tuple of *OpenColorIO* config and
-        :class:`opencolorio_config_aces.ConfigData` class instance.
+        :class:`opencolorio_config_aces.ConfigData` class instance, *ACES*
+        *CTL* transforms, *CLF* transforms and *ACES* *AMF* components.
     """
 
     logger.info(
@@ -233,7 +234,13 @@ def generate_config_studio(
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
     if data is None:
-        _config, data = generate_config_cg(
+        (
+            _config,
+            data,
+            ctl_transforms,
+            clf_transforms,
+            amf_components,
+        ) = generate_config_cg(
             profile_version=profile_version,
             describe=describe,
             scheme=scheme,
@@ -257,7 +264,7 @@ def generate_config_studio(
     )
 
     if additional_data:
-        return config, data
+        return config, data, ctl_transforms, clf_transforms, amf_components
     else:
         return config
 
@@ -284,7 +291,13 @@ if __name__ == "__main__":
         config_basename = config_basename_studio(
             profile_version=profile_version
         )
-        config, data = generate_config_studio(
+        (
+            config,
+            data,
+            ctl_transforms,
+            clf_transforms,
+            amf_components,
+        ) = generate_config_studio(
             config_name=build_directory / config_basename,
             profile_version=profile_version,
             additional_data=True,

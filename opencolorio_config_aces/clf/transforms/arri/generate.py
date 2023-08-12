@@ -341,7 +341,7 @@ def _generate_logc4_transforms(output_directory):
 
     # Generate ARRI LogC4 to ACES 2065-1 Transform
     name = "ARRI_LogC4_to_ACES2065-1"
-    aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.LogC4.a1.v1"
+    aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.ARRI-LogC4.a1.v1"
     input_descriptor = "ARRI LogC4"
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)

@@ -57,7 +57,7 @@ from .config import (
     version_config_mapping_file,
 )
 from .config import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
     generate_config_aces,
 )
 from .config import generate_config_cg, generate_config_studio
@@ -114,7 +114,7 @@ __all__ += [
     "version_config_mapping_file",
 ]
 __all__ += [
-    "ColorspaceDescriptionStyle",
+    "DescriptionStyle",
     "generate_config_aces",
 ]
 __all__ += ["generate_config_cg", "generate_config_studio"]

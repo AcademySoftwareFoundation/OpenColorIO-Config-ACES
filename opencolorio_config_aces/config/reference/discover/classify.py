@@ -12,17 +12,18 @@ transforms discovery and classification:
 -   :func:`opencolorio_config_aces.unclassify_ctl_transforms`
 -   :func:`opencolorio_config_aces.filter_ctl_transforms`
 -   :func:`opencolorio_config_aces.print_aces_taxonomy`
+-   :func:`opencolorio_config_aces.generate_amf_components`
 """
 
 import itertools
+import json
 import logging
-
-# TODO: Use "pathlib".
-import os
+import os  # TODO: Use "pathlib".
 import re
 import subprocess
 from collections.abc import Mapping
 from collections import defaultdict
+from pathlib import Path
 
 from opencolorio_config_aces.utilities import (
     attest,
@@ -62,6 +63,7 @@ __all__ = [
     "unclassify_ctl_transforms",
     "filter_ctl_transforms",
     "print_aces_taxonomy",
+    "generate_amf_components",
 ]
 
 logger = logging.getLogger(__name__)
@@ -198,6 +200,16 @@ PATTERNS_DESCRIPTION_CTL = {
 *ACES* *CTL* transform description substitution patterns.
 
 PATTERNS_DESCRIPTION_CTL : dict
+"""
+
+PATH_AMF_COMPONENTS_FILE = (
+    Path(__file__).parents[0] / "resources" / "ACES_AMF_Components.json"
+)
+
+"""
+Path to the *ACES* *AMF* components file.
+
+PATH_AMF_COMPONENTS_FILE : unicode
 """
 
 
@@ -698,9 +710,11 @@ class CTLTransform:
     path : unicode
         *ACES* *CTL* transform path.
     family : unicode, optional
-        *ACES* *CTL* transform family, e.g. *output_transform*
+        *ACES* *CTL* transform family, e.g. *output_transform*.
     genus : unicode, optional
-        *ACES* *CTL* transform genus, e.g. *dcdm*
+        *ACES* *CTL* transform genus, e.g. *dcdm*.
+    siblings : array_like, optional
+        *ACES* *CTL* transform siblings, e.g. inverse transform.
 
     Attributes
     ----------
@@ -722,7 +736,10 @@ class CTLTransform:
     __ne__
     """
 
-    def __init__(self, path, family=None, genus=None):
+    def __init__(self, path, family=None, genus=None, siblings=None):
+        if siblings is None:
+            siblings = []
+
         self._path = os.path.abspath(os.path.normpath(path))
 
         self._code = None
@@ -732,6 +749,7 @@ class CTLTransform:
 
         self._family = family
         self._genus = genus
+        self._siblings = siblings
 
         self._parse()
 
@@ -860,6 +878,24 @@ TRANSFORM_FAMILIES_CTL` attribute dictionary.
         """
 
         return self._genus
+
+    @property
+    def siblings(self):
+        """
+        Getter property for the *ACES* *CTL* transform siblings, e.g. inverse
+        transform.
+
+        Returns
+        -------
+        unicode
+            *ACES* *CTL* transform siblings.
+
+        Notes
+        -----
+        -   This property is read only.
+        """
+
+        return self._siblings
 
     def __getattr__(self, item):
         """
@@ -1311,6 +1347,9 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
                     pairs["inverse_transform"], family, genus
                 )
 
+                forward_ctl_transform.siblings.append(inverse_ctl_transform)
+                inverse_ctl_transform.siblings.append(forward_ctl_transform)
+
                 ctl_transform = CTLTransformPair(
                     forward_ctl_transform, inverse_ctl_transform
                 )
@@ -1328,7 +1367,7 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
 
 def unclassify_ctl_transforms(classified_ctl_transforms):
     """
-    Unclassifie given *ACES* *CTL* transforms.
+    Unclassify given *ACES* *CTL* transforms.
 
     Parameters
     ----------
@@ -1458,12 +1497,124 @@ reference.ROOT_TRANSFORMS_CTL` attribute using the
                         ctl_transform.source,
                         ctl_transform.target,
                     )
+                    logger.info(
+                        '\t\tACEStransformID : "%s"',
+                        ctl_transform.aces_transform_id.aces_transform_id,
+                    )
                 elif isinstance(ctl_transform, CTLTransformPair):
                     logger.info(
                         '\t\t"%s" <--> "%s"',
                         ctl_transform.forward_transform.source,
-                        ctl_transform.forward_transform.target,
+                        ctl_transform.inverse_transform.target,
                     )
+                    logger.info(
+                        '\t\tACEStransformID : "%s"',
+                        ctl_transform.forward_transform.aces_transform_id.aces_transform_id,
+                    )
+                    logger.info(
+                        '\t\tACEStransformID : "%s"',
+                        ctl_transform.inverse_transform.aces_transform_id.aces_transform_id,
+                    )
+
+
+def generate_amf_components(ctl_transforms, raise_exception=False):
+    """
+    Generate the *ACES* *AMF* components from given *ACES* *CTL* transforms.
+
+    Parameters
+    ----------
+    ctl_transforms : dict or list
+        *ACES* *CTL* transforms as returned by
+        :func:`opencolorio_config_aces.classify_aces_ctl_transforms` or
+        :func:`opencolorio_config_aces.unclassify_aces_ctl_transforms`
+        definitions.
+    raise_exception : bool, optional
+        Whether to raise an exception if an *ACES* *ACEStransformID* is
+        missing.
+
+    Returns
+    -------
+    dict
+        *ACES* *AMF* components.
+    """
+
+    amf_components = defaultdict(list)
+
+    with open(PATH_AMF_COMPONENTS_FILE) as json_file:
+        content = json_file.readlines()
+        content = json.loads(
+            "\n".join(
+                [line for line in content if not line.strip().startswith("//")]
+            )
+        )
+
+        attest(content["header"]["schema_version"].split(".")[0] == "1")
+
+        amf_components_implicit = content["amf_components"]
+
+    if isinstance(ctl_transforms, Mapping):
+        ctl_transforms = unclassify_ctl_transforms(ctl_transforms)
+
+    # Checking that the explicit "ACEStransformID" do exist.
+    for aces_transform_id, relations in amf_components_implicit.items():
+        explicit_aces_transform_ids = [aces_transform_id]
+        explicit_aces_transform_ids.extend(relations)
+
+        for explicit_aces_transform_id in explicit_aces_transform_ids:
+            filtered_ctl_transforms = filter_ctl_transforms(
+                ctl_transforms,
+                [
+                    lambda x, y=explicit_aces_transform_id: (
+                        x.aces_transform_id.aces_transform_id == y
+                    )
+                ],
+            )
+
+            ctl_transform = next(iter(filtered_ctl_transforms), None)
+
+            if ctl_transform is None:
+                exception_message = (
+                    f'"aces-dev" has no transform with '
+                    f'"{explicit_aces_transform_id}" "ACEStransformID!'
+                )
+
+                if raise_exception:
+                    attest(False, exception_message)
+                else:
+                    logger.critical(exception_message)
+
+    for ctl_transform in ctl_transforms:
+        aces_transform_id = ctl_transform.aces_transform_id.aces_transform_id
+
+        for siblings in [
+            ctl_transform.siblings
+            for ctl_transform in filter_ctl_transforms(
+                ctl_transforms,
+                [
+                    lambda x, y=aces_transform_id: (
+                        x.aces_transform_id.aces_transform_id == y
+                    )
+                ],
+            )
+        ]:
+            for sibling in siblings:
+                amf_components[aces_transform_id].append(
+                    sibling.aces_transform_id.aces_transform_id
+                )
+
+    # Extending with explicit relations.
+    for aces_transform_id, relations in amf_components_implicit.items():
+        amf_components[aces_transform_id].extend(relations)
+
+    # Generating the permutations.
+    for aces_transform_id, relations in amf_components.copy().items():
+        for relation in relations:
+            amf_components[relation] = sorted(
+                {*relations, *amf_components[relation], aces_transform_id}
+                - {relation}
+            )
+
+    return dict(amf_components)
 
 
 if __name__ == "__main__":

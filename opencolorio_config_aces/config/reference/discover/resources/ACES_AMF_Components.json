@@ -1,0 +1,43 @@
+{
+  "header": {
+    "schema_version": "1.0.0"
+  },
+  "amf_components": {
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.BMDFilm_WideGamut_Gen5_to_ACES.a1.v1": [
+      "urn:ampas:aces:transformId:v1.5:IDT.BlackmagicDesign.BMDFilm_WideGamut_Gen5.a1.v1"
+    ],
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.LogC_EI800_AWG_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI800.a1.v2"
+    ],
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3.a1.v1"
+    ],
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3Cine_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3Cine.a1.v1"
+    ],
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1"
+    ],
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3Cine_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1"
+    ],
+    // Not a published "ACEStransformID" but was approved by "Graeme Natress"
+    // during private discussions with "Carol Payne" and "Doug Walker" in March 2022.
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.Log3G10_RWG_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_REDWideGamutRGB.a1.v1"
+    ],
+    // The related "ACEStransformID" is not in "aces-dev" but available online
+    // in the following "IDT" : https://pro-av.panasonic.net/en/\
+    // cinema_camera_varicam_eva/support/download_data/\
+    // idt_panasonic_forV35_ver100.zip
+    "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0": [
+      "urn:ampas:aces:transformId:v1.5:IDT.Panasonic.VLog_VGamut.a1.v1"
+    ],
+    // The related "ACEStransformID" are not yet in "aces-dev" but pending in
+    // a pull request: https://github.com/ampas/aces-dev/pull/137
+    "urn:ampas:aces:transformId:v1.5:IDT.ARRI.ARRI-LogC4.a1.v1": [
+      "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.LogC4_to_ACES.a1.1.0",
+      "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACES_to_LogC4.a1.1.0"
+    ]
+  }
+}

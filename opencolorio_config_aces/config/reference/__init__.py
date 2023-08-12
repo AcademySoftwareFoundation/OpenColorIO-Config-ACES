@@ -7,6 +7,7 @@ from .discover import (
     classify_aces_ctl_transforms,
     unclassify_ctl_transforms,
     filter_ctl_transforms,
+    generate_amf_components,
     print_aces_taxonomy,
     build_aces_conversion_graph,
     node_to_ctl_transform,
@@ -16,7 +17,7 @@ from .discover import (
     plot_aces_conversion_graph,
 )
 from .generate import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
     version_config_mapping_file,
     generate_config_aces,
 )
@@ -27,6 +28,7 @@ __all__ = [
     "classify_aces_ctl_transforms",
     "unclassify_ctl_transforms",
     "filter_ctl_transforms",
+    "generate_amf_components",
     "print_aces_taxonomy",
     "build_aces_conversion_graph",
     "node_to_ctl_transform",
@@ -36,7 +38,7 @@ __all__ = [
     "plot_aces_conversion_graph",
 ]
 __all__ += [
-    "ColorspaceDescriptionStyle",
+    "DescriptionStyle",
     "version_config_mapping_file",
     "generate_config_aces",
 ]

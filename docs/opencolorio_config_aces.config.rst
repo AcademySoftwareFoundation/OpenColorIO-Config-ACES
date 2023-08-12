@@ -70,6 +70,7 @@ Reference Configuration
     classify_aces_ctl_transforms
     discover_aces_ctl_transforms
     filter_ctl_transforms
+    generate_amf_components
     print_aces_taxonomy
     unclassify_ctl_transforms
 
@@ -100,7 +101,7 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
-    ColorspaceDescriptionStyle
+    DescriptionStyle
     version_config_mapping_file
     generate_config_aces
 

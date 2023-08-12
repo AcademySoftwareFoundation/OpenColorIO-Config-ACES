@@ -27,7 +27,7 @@ from opencolorio_config_aces.config.reference.discover.graph import (
     SEPARATOR_NODE_NAME_CTL,
 )
 from opencolorio_config_aces.config.reference import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
     build_aces_conversion_graph,
     classify_aces_ctl_transforms,
     conversion_path,
@@ -234,7 +234,7 @@ def node_to_colorspace(
     graph,
     node,
     profile_version=PROFILE_VERSION_DEFAULT,
-    describe=ColorspaceDescriptionStyle.LONG_UNION,
+    describe=DescriptionStyle.LONG_UNION,
 ):
     """
     Generate the *OpenColorIO* `Colorspace` for given *aces-dev* conversion
@@ -250,7 +250,7 @@ def node_to_colorspace(
         *OpenColorIO* config profile version.
     describe : int, optional
         Any value from the
-        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+        :class:`opencolorio_config_aces.DescriptionStyle` enum.
 
     Returns
     -------
@@ -356,7 +356,7 @@ def generate_config_aces(
     config_name=None,
     profile_version=PROFILE_VERSION_DEFAULT,
     validate=True,
-    describe=ColorspaceDescriptionStyle.LONG_UNION,
+    describe=DescriptionStyle.LONG_UNION,
     filterers=None,
     additional_data=False,
 ):
@@ -381,7 +381,7 @@ def generate_config_aces(
         Whether to validate the config.
     describe : int, optional
         Any value from the
-        :class:`opencolorio_config_aces.ColorspaceDescriptionStyle` enum.
+        :class:`opencolorio_config_aces.DescriptionStyle` enum.
     filterers : array_like, optional
         List of callables used to filter the *ACES* *CTL* transforms, each
         callable takes an *ACES* *CTL* transform as argument and returns

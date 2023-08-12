@@ -30,6 +30,7 @@ from .reference import (
     discover_aces_ctl_transforms,
     filter_ctl_transforms,
     filter_nodes,
+    generate_amf_components,
     node_to_ctl_transform,
     plot_aces_conversion_graph,
     print_aces_taxonomy,
@@ -38,7 +39,7 @@ from .reference import (
     version_config_mapping_file,
 )
 from .reference import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
     generate_config_aces,
 )
 from .cg import generate_config_cg
@@ -73,6 +74,7 @@ __all__ += [
     "discover_aces_ctl_transforms",
     "filter_ctl_transforms",
     "filter_nodes",
+    "generate_amf_components",
     "node_to_ctl_transform",
     "plot_aces_conversion_graph",
     "print_aces_taxonomy",
@@ -81,7 +83,7 @@ __all__ += [
     "version_config_mapping_file",
 ]
 __all__ += [
-    "ColorspaceDescriptionStyle",
+    "DescriptionStyle",
     "generate_config_aces",
 ]
 __all__ += ["generate_config_cg"]
