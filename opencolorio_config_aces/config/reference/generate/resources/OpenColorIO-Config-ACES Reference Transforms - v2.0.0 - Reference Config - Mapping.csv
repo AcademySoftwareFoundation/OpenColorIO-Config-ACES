@@ -4,15 +4,15 @@ Ordering,ACEStransformID,Colorspace,Legacy,BuiltinTransform Style,Linked Display
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,ACES - ACEScg,TRUE,ACEScg_to_ACES2065-1,,ColorSpace,scene-linear,"file-io,working-space,texture","acescg,lin_ap1"
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX10_to_ACES.a1.0.3,Input - ADX - ADX10,TRUE,ADX10_to_ACES2065-1,,ColorSpace,log,file-io,adx10
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX16_to_ACES.a1.0.3,Input - ADX - ADX16,TRUE,ADX16_to_ACES2065-1,,ColorSpace,log,file-io,adx16
-110,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog2_CGamut_to_ACES.a1.1.0,,FALSE,CANON_CLOG2-CGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,canonlog2_cgamutday
-110,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog3_CGamut_to_ACES.a1.1.0,,FALSE,CANON_CLOG3-CGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,canonlog3_cgamutday
-120,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.Log3G10_RWG_to_ACES.a1.1.0,,FALSE,RED_LOG3G10-RWG_to_ACES2065-1,,ColorSpace,log,file-io,log3g10_rwg
-130,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.LogC_EI800_AWG_to_ACES.a1.1.0,,FALSE,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace,log,file-io,logc3ei800_alexawide
-140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3
-140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3Cine_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3.CINE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3cine
-140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3
-140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3Cine_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3cine
-150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0,,FALSE,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,vlog_vgamut
+120,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog2_CGamut_to_ACES.a1.1.0,,FALSE,CANON_CLOG2-CGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,canonlog2_cgamutday
+120,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog3_CGamut_to_ACES.a1.1.0,,FALSE,CANON_CLOG3-CGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,canonlog3_cgamutday
+130,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.Log3G10_RWG_to_ACES.a1.1.0,,FALSE,RED_LOG3G10-RWG_to_ACES2065-1,,ColorSpace,log,file-io,log3g10_rwg
+140,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.LogC_EI800_AWG_to_ACES.a1.1.0,,FALSE,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace,log,file-io,logc3ei800_alexawide
+150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3
+150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_SGamut3Cine_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3.CINE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3cine
+150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3
+150,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.SLog3_Venice_SGamut3Cine_to_ACES.a1.1.0,,FALSE,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3cine
+160,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0,,FALSE,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,vlog_vgamut
 310,urn:ampas:aces:transformId:v1.5:LMT.Academy.BlueLightArtifactFix.a1.1.0,Utility - Look - Blue Light Artifact Fix,TRUE,ACES-LMT - BLUE_LIGHT_ARTIFACT_FIX,,Look,,,
 310,urn:ampas:aces:transformId:v1.5:LMT.Academy.ReferenceGamutCompress.a1.v1.0,,FALSE,ACES-LMT - ACES 1.3 Reference Gamut Compression,,Look,,,
 400,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,Output - sRGB,FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,DISPLAY - CIE-XYZ-D65_to_sRGB,ViewTransform,sdr-video,file-io,
