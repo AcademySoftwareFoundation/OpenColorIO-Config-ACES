@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_ST2084-Curve:1.0" name="Linear to ST.2084">
     <InputDescriptor>generic linear RGB</InputDescriptor>
-    <OutputDescriptor>generic ST.2084 (PQ) encoded RGB</OutputDescriptor>
+    <OutputDescriptor>generic ST.2084 (PQ) encoded RGB mapping 1.0 to 100nits</OutputDescriptor>
     <Info>
         <BuiltinTransform>CURVE - LINEAR_to_ST-2084</BuiltinTransform>
     </Info>
