@@ -139,6 +139,7 @@ def config_name_studio(
 def config_description_studio(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
     profile_version=PROFILE_VERSION_DEFAULT,
+    describe=DescriptionStyle.SHORT_UNION,
 ):
     """
     Generate the ACES* Studio *OpenColorIO* config description.
@@ -149,6 +150,9 @@ def config_description_studio(
         Path to the *CSV* mapping file.
     profile_version : ProfileVersion, optional
         *OpenColorIO* config profile version.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.DescriptionStyle` enum.
 
     Returns
     -------
@@ -157,14 +161,21 @@ def config_description_studio(
     """
 
     name = config_name_studio(config_mapping_file_path, profile_version)
+
     underline = "-" * len(name)
-    description = (
+
+    summary = (
         'This "OpenColorIO" config is geared toward studios requiring a config '
         "that includes a wide variety of camera colorspaces, displays and "
         "looks."
     )
 
-    return "\n".join([name, underline, "", description, "", timestamp()])
+    description = [name, underline, "", summary]
+
+    if describe in ((DescriptionStyle.LONG_UNION,)):
+        description.extend(["", timestamp()])
+
+    return "\n".join(description)
 
 
 def generate_config_studio(

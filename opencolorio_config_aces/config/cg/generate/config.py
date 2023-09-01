@@ -753,6 +753,7 @@ def config_name_cg(
 def config_description_cg(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
     profile_version=PROFILE_VERSION_DEFAULT,
+    describe=DescriptionStyle.SHORT_UNION,
 ):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
@@ -764,6 +765,9 @@ def config_description_cg(
         Path to the *CSV* mapping file.
     profile_version : ProfileVersion, optional
         *OpenColorIO* config profile version.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.DescriptionStyle` enum.
 
     Returns
     -------
@@ -772,15 +776,21 @@ def config_description_cg(
     """
 
     name = config_name_cg(config_mapping_file_path, profile_version)
+
     underline = "-" * len(name)
-    description = (
+
+    summary = (
         'This minimalistic "OpenColorIO" config is geared toward computer '
         "graphics artists requiring a lean config that does not include "
         "camera colorspaces and the less common displays and looks."
     )
 
-    return "\n".join([name, underline, "", description, "", timestamp()])
+    description = [name, underline, "", summary]
 
+    if describe in ((DescriptionStyle.LONG_UNION,)):
+        description.extend(["", timestamp()])
+
+    return "\n".join(description)
 
 def generate_config_cg(
     data=None,

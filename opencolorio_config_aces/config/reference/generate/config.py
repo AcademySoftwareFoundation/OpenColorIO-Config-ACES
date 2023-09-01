@@ -1032,6 +1032,7 @@ def config_name_aces(
 def config_description_aces(
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
     profile_version=PROFILE_VERSION_DEFAULT,
+    describe=DescriptionStyle.SHORT_UNION,
 ):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
@@ -1043,6 +1044,9 @@ def config_description_aces(
         Path to the *CSV* mapping file.
     profile_version : ProfileVersion, optional
         *OpenColorIO* config profile version.
+    describe : int, optional
+        Any value from the
+        :class:`opencolorio_config_aces.DescriptionStyle` enum.
 
     Returns
     -------
@@ -1051,8 +1055,10 @@ def config_description_aces(
     """
 
     name = config_name_aces(config_mapping_file_path, profile_version)
+
     underline = "-" * len(name)
-    description = (
+
+    summary = (
         'This "OpenColorIO" config is a strict and quasi-analytical '
         'implementation of "aces-dev" and is designed as a reference to '
         'validate the implementation of the "ampas/aces-dev" "GitHub" "CTL" '
@@ -1060,7 +1066,12 @@ def config_description_aces(
         '"ACES" configs nor the "ACES Studio Config".'
     )
 
-    return "\n".join([name, underline, "", description, "", timestamp()])
+    description = [name, underline, "", summary]
+
+    if describe in ((DescriptionStyle.LONG_UNION,)):
+        description.extend(["", timestamp()])
+
+    return "\n".join(description)
 
 
 def generate_config_aces(
