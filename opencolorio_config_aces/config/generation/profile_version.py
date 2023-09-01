@@ -102,10 +102,8 @@ Default *OpenColorIO* profile version.
 PROFILE_VERSION_DEFAULT : ProfileVersion
 """
 
-# TODO: Implement programmatic way of finding that information from
-# *OpenColorIO*.
 SUPPORTED_PROFILE_VERSIONS = [
-    ProfileVersion(i, j) for i in range(2, 3) for j in range(0, 4)
+    ProfileVersion(i, j) for i in range(2, 3) for j in range(1, 4)
 ]
 
 """
