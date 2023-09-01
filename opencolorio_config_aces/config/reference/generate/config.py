@@ -162,7 +162,7 @@ def version_config_mapping_file(path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE):
     """
     Return the current version of given *CSV* mapping file.
 
-    No parsing of the file content is perform, a simple regex is used to
+    No parsing of the file content is performed, a simple regex is used to
     extract the version of the file name.
 
     Parameters
