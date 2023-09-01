@@ -792,6 +792,7 @@ def config_description_cg(
 
     return "\n".join(description)
 
+
 def generate_config_cg(
     data=None,
     config_name=None,
