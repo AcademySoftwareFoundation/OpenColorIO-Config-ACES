@@ -1445,7 +1445,6 @@ def generate_config_aces(
                 "name"
             ],
             ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace["name"],
-            ocio.ROLE_REFERENCE: scene_reference_colorspace["name"],
             ocio.ROLE_RENDERING: format_optional_prefix(
                 "ACEScg", aces_family_prefix, scheme
             ),

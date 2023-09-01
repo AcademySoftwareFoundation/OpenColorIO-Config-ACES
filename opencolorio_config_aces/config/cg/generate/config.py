@@ -1212,8 +1212,6 @@ def generate_config_cg(
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
         ocio.ROLE_RENDERING,
-        # The "Reference" role is deprecated.
-        ocio.ROLE_REFERENCE,
     ):
         logger.info('Removing "%s" role.', role)
 
