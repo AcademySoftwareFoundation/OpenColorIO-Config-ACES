@@ -463,9 +463,18 @@ def requirements(ctx: Context):
 
     message_box('Exporting "requirements.txt" file...')
     ctx.run(
-        "poetry run pip list --format=freeze | "
-        'egrep -v "opencolorio-config-aces" '
-        "> requirements.txt"
+        "poetry export -f requirements.txt "
+        "--without-hashes "
+        "--with dev,docs,graphviz,optional "
+        "--output requirements.txt"
+    )
+
+    message_box('Exporting "docs/requirements.txt" file...')
+    ctx.run(
+        "poetry export -f requirements.txt "
+        "--without-hashes "
+        "--with docs,graphviz,optional "
+        "--output docs/requirements.txt"
     )
 
 

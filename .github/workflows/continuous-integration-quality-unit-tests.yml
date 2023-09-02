@@ -38,7 +38,7 @@ jobs:
     - name: Install Package Dependencies
       run: |
         poetry run python -m pip install --upgrade pip
-        poetry install --extras "optional"
+        poetry install --without graphviz
       shell: bash
     - name: Pre-Commit (All Files)
       run: |
