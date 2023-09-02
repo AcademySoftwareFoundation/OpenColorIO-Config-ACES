@@ -48,11 +48,11 @@ __all__ = [
     "git_describe",
     "matrix_3x3_to_4x4",
     "multi_replace",
-    "regularise_version",
     "validate_method",
     "google_sheet_title",
     "slugify",
     "attest",
+    "timestamp",
 ]
 
 logger = logging.getLogger(__name__)
@@ -587,42 +587,6 @@ def multi_replace(name, patterns):
     return name
 
 
-def regularise_version(version, add_v_prefix=True):
-    """
-    Regularise given version name by either adding or removing a *v* affixe.
-
-    Parameters
-    ----------
-    version : str
-        Version name to regularise.
-    add_v_prefix : bool, optional
-        Whether to add the *v* affixe.
-
-    Returns
-    -------
-    str
-        Regularise version name.
-
-    Examples
-    --------
-    >>> regularise_version("0.1.0")
-    'v0.1.0'
-    >>> regularise_version("v0.1.0")
-    'v0.1.0'
-    >>> regularise_version("v0.1.0", False)
-    '0.1.0'
-    >>> regularise_version("0.1.0", False)
-    '0.1.0'
-    """
-
-    version = re.sub("^v", "", version)
-
-    if add_v_prefix:
-        version = f"v{version}"
-
-    return version
-
-
 def validate_method(
     method,
     valid_methods,
@@ -788,6 +752,14 @@ def attest(condition, message=""):
 
 
 def timestamp():
+    """
+    Return a timestamp description.
+
+    Returns
+    -------
+    :class:`str`
+    """
+
     now = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y/%m/%d at %H:%M"
     )

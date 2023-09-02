@@ -18,7 +18,6 @@ from .discover import (
 )
 from .generate import (
     DescriptionStyle,
-    version_config_mapping_file,
     generate_config_aces,
 )
 
@@ -39,6 +38,5 @@ __all__ = [
 ]
 __all__ += [
     "DescriptionStyle",
-    "version_config_mapping_file",
     "generate_config_aces",
 ]

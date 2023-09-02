@@ -34,8 +34,7 @@ from .config import (
     BUILTIN_TRANSFORMS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
-    SUPPORTED_PROFILE_VERSIONS,
+    PROFILE_VERSIONS,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -54,7 +53,6 @@ from .config import (
     print_aces_taxonomy,
     unclassify_ctl_transforms,
     version_aces_dev,
-    version_config_mapping_file,
 )
 from .config import (
     DescriptionStyle,
@@ -91,8 +89,7 @@ __all__ += [
     "BUILTIN_TRANSFORMS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
-    "ProfileVersion",
-    "SUPPORTED_PROFILE_VERSIONS",
+    "PROFILE_VERSIONS",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",

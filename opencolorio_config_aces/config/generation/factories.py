@@ -20,13 +20,11 @@ import logging
 import PyOpenColorIO as ocio
 from pathlib import Path
 from pprint import pformat
+from semver import Version
 from textwrap import indent
 from collections.abc import Mapping, Sequence
 
-from opencolorio_config_aces.config.generation import (
-    PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
-)
+from opencolorio_config_aces.config.generation import PROFILE_VERSION_DEFAULT
 from opencolorio_config_aces.utilities import DocstringDict, attest
 
 __author__ = "OpenColorIO Contributors"
@@ -66,12 +64,10 @@ BUILTIN_TRANSFORMS : dict
 
 BUILTIN_TRANSFORMS.update(
     {
-        "ACES-LMT - ACES 1.3 Reference Gamut Compression": ProfileVersion(
-            2, 1
-        ),
-        "CURVE - CANON_CLOG2_to_LINEAR": ProfileVersion(2, 2),
-        "CURVE - CANON_CLOG3_to_LINEAR": ProfileVersion(2, 2),
-        "DISPLAY - CIE-XYZ-D65_to_DisplayP3": ProfileVersion(2, 3),
+        "ACES-LMT - ACES 1.3 Reference Gamut Compression": Version(2, 1),
+        "CURVE - CANON_CLOG2_to_LINEAR": Version(2, 2),
+        "CURVE - CANON_CLOG3_to_LINEAR": Version(2, 2),
+        "DISPLAY - CIE-XYZ-D65_to_DisplayP3": Version(2, 3),
     }
 )
 

@@ -13,10 +13,11 @@ from .generation import (
 )
 from .generation import (
     BUILTIN_TRANSFORMS,
+    DEPENDENCY_VERSIONS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
-    SUPPORTED_PROFILE_VERSIONS,
+    PROFILE_VERSIONS,
+    DependencyVersions,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -36,7 +37,6 @@ from .reference import (
     print_aces_taxonomy,
     unclassify_ctl_transforms,
     version_aces_dev,
-    version_config_mapping_file,
 )
 from .reference import (
     DescriptionStyle,
@@ -57,10 +57,11 @@ __all__ = [
 ]
 __all__ += [
     "BUILTIN_TRANSFORMS",
+    "DEPENDENCY_VERSIONS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
-    "ProfileVersion",
-    "SUPPORTED_PROFILE_VERSIONS",
+    "PROFILE_VERSIONS",
+    "DependencyVersions",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",
@@ -80,7 +81,6 @@ __all__ += [
     "print_aces_taxonomy",
     "unclassify_ctl_transforms",
     "version_aces_dev",
-    "version_config_mapping_file",
 ]
 __all__ += [
     "DescriptionStyle",

@@ -24,6 +24,7 @@ import subprocess
 from collections.abc import Mapping
 from collections import defaultdict
 from pathlib import Path
+from semver import Version
 
 from opencolorio_config_aces.utilities import (
     attest,
@@ -301,21 +302,14 @@ ROOT_TRANSFORMS_CTL : unicode
 """
 
 
-def version_aces_dev(tag_only=True):
+def version_aces_dev():
     """
     Return the current *aces-dev* version, trying first with *git*, then by
     parsing the *CHANGELOG.md* file.
 
-    Parameters
-    ----------
-    tag_only : bool, optional
-        Whether to return the tag only instead of the tag name with the number
-        of additional commits on top of the tagged object and the abbreviated
-        hash of the most recent commit.
-
     Returns
     -------
-    str
+    :class:`semver.Version`
         *aces-dev* version.
     """
 
@@ -328,10 +322,9 @@ def version_aces_dev(tag_only=True):
 
         version = version.decode("utf-8")
 
-        return (
-            re.search(r"v(\d\.\d(\.\d)?)", version).group(1)
-            if tag_only
-            else version
+        return Version.parse(
+            re.search(r"v(\d\.\d(\.\d)?)", version).group(1),
+            optional_minor_and_patch=True,
         )
     except Exception:  # pragma: no cover
         changelog_path = os.path.join(
@@ -342,9 +335,9 @@ def version_aces_dev(tag_only=True):
                 for line in changelog_file.readlines():
                     search = re.search(r"Version\s+(\d\.\d(\.\d)?)", line)
                     if search:
-                        return search.group(1)
-        else:
-            return "Undefined"
+                        return Version.parse(search.group(1))
+
+        return Version(0)
 
 
 def ctl_transform_relative_path(path, root_directory=ROOT_TRANSFORMS_CTL):

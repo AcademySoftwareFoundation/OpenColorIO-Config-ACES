@@ -5,8 +5,8 @@
 Generation
 ==========
 
-Profile Version
----------------
+Version Utilities
+-----------------
 
 ``opencolorio_config_aces``
 
@@ -15,9 +15,10 @@ Profile Version
 .. autosummary::
     :toctree: generated/
 
-    ProfileVersion
     PROFILE_VERSION_DEFAULT
     SUPPORTED_PROFILE_VERSIONS
+    DependencyVersions
+    DEPENDENCY_VERSIONS
 
 Config Generation Common Objects
 --------------------------------

@@ -17,12 +17,12 @@ import logging
 import PyOpenColorIO as ocio
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field
+from semver import Version
 from typing import Union
 
 from opencolorio_config_aces.utilities import required
 from opencolorio_config_aces.config.generation import (
     PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
     colorspace_factory,
     look_factory,
     named_transform_factory,
@@ -54,7 +54,7 @@ class ConfigData:
 
     Parameters
     ----------
-    profile_version : ProfileVersion, optional
+    profile_version : :class:`semver.Version`, optional
         Config major and minor version, i.e. (1, 0) or (2, 0).
     name : unicode, optional
         Config name.
@@ -124,10 +124,8 @@ class ConfigData:
     default_view_transform
     """
 
-    schema_version: ProfileVersion = field(
-        default_factory=lambda: ProfileVersion(1, 0)
-    )
-    profile_version: ProfileVersion = field(
+    schema_version: Version = field(default_factory=lambda: Version(1, 0))
+    profile_version: Version = field(
         default_factory=lambda: PROFILE_VERSION_DEFAULT
     )
     name: str = field(default_factory=str)

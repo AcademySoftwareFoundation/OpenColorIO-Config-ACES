@@ -25,7 +25,8 @@ from opencolorio_config_aces.clf import (
 )
 from opencolorio_config_aces.config.generation import (
     BUILTIN_TRANSFORMS,
-    PROFILE_VERSION_DEFAULT,
+    DEPENDENCY_VERSIONS,
+    DependencyVersions,
     SEPARATOR_COLORSPACE_NAME,
     SEPARATOR_BUILTIN_TRANSFORM_NAME,
     SEPARATOR_COLORSPACE_FAMILY,
@@ -37,8 +38,6 @@ from opencolorio_config_aces.config.generation import (
 )
 from opencolorio_config_aces.config.reference import (
     DescriptionStyle,
-    version_aces_dev,
-    version_config_mapping_file,
     generate_config_aces,
 )
 from opencolorio_config_aces.config.reference.generate.config import (
@@ -50,7 +49,6 @@ from opencolorio_config_aces.config.reference.generate.config import (
 )
 from opencolorio_config_aces.utilities import (
     attest,
-    regularise_version,
     validate_method,
     timestamp,
 )
@@ -75,7 +73,6 @@ __all__ = [
     "clf_transform_to_named_transform",
     "style_to_colorspace",
     "style_to_named_transform",
-    "dependency_versions",
     "config_basename_cg",
     "config_name_cg",
     "config_description_cg",
@@ -648,57 +645,15 @@ def style_to_named_transform(
         return colorspace
 
 
-def dependency_versions(
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
-    profile_version=PROFILE_VERSION_DEFAULT,
-):
-    """
-    Return the dependency versions of the ACES* Computer Graphics (CG)
-    *OpenColorIO* config.
-
-    Parameters
-    ----------
-    config_mapping_file_path : str, optional
-        Path to the *CSV* mapping file.
-    profile_version : ProfileVersion, optional
-        *OpenColorIO* config profile version.
-
-    Returns
-    -------
-    dict
-        Dependency versions.
-
-    Examples
-    --------
-    >>> dependency_versions()  # doctest: +SKIP
-    {'aces': 'v1.3', 'ocio': 'v2.0', 'colorspaces': 'v0.2.0'}
-    """
-
-    versions = {
-        "aces": regularise_version(version_aces_dev()),
-        "ocio": regularise_version(str(profile_version)),
-        "colorspaces": regularise_version(
-            version_config_mapping_file(config_mapping_file_path)
-        ),
-    }
-
-    return versions
-
-
-def config_basename_cg(
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
-    profile_version=PROFILE_VERSION_DEFAULT,
-):
+def config_basename_cg(dependency_versions):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
     basename, i.e. the filename devoid of directory affix.
 
     Parameters
     ----------
-    config_mapping_file_path : str, optional
-        Path to the *CSV* mapping file.
-    profile_version : ProfileVersion, optional
-        *OpenColorIO* config profile version.
+    dependency_versions: DependencyVersions
+        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -707,28 +662,23 @@ def config_basename_cg(
 
     Examples
     --------
-    >>> config_basename_cg()  # doctest: +SKIP
-    'cg-config-v0.2.0_aces-v1.3_ocio-v2.0.ocio'
+    >>> config_basename_cg(DependencyVersions())
+    'cg-config-v0.0.0_aces-v0.0_ocio-v2.0.ocio'
     """
 
     return ("cg-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
-        **dependency_versions(config_mapping_file_path, profile_version)
+        **dependency_versions.to_regularised_versions()
     )
 
 
-def config_name_cg(
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
-    profile_version=PROFILE_VERSION_DEFAULT,
-):
+def config_name_cg(dependency_versions):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config name.
 
     Parameters
     ----------
-    config_mapping_file_path : str, optional
-        Path to the *CSV* mapping file.
-    profile_version : ProfileVersion, optional
-        *OpenColorIO* config profile version.
+    dependency_versions: DependencyVersions
+        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -737,9 +687,9 @@ def config_name_cg(
 
     Examples
     --------
-    >>> config_name_cg()  # doctest: +SKIP
-    'Academy Color Encoding System - CG Config [COLORSPACES v0.2.0] \
-[ACES v1.3] [OCIO v2.0]'
+    >>> config_name_cg(DependencyVersions())
+    'Academy Color Encoding System - CG Config [COLORSPACES v0.0.0] \
+[ACES v0.0] [OCIO v2.0]'
     """
 
     return (
@@ -747,12 +697,11 @@ def config_name_cg(
         "[COLORSPACES {colorspaces}] "
         "[ACES {aces}] "
         "[OCIO {ocio}]"
-    ).format(**dependency_versions(config_mapping_file_path, profile_version))
+    ).format(**dependency_versions.to_regularised_versions())
 
 
 def config_description_cg(
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
-    profile_version=PROFILE_VERSION_DEFAULT,
+    dependency_versions,
     describe=DescriptionStyle.SHORT_UNION,
 ):
     """
@@ -761,10 +710,8 @@ def config_description_cg(
 
     Parameters
     ----------
-    config_mapping_file_path : str, optional
-        Path to the *CSV* mapping file.
-    profile_version : ProfileVersion, optional
-        *OpenColorIO* config profile version.
+    dependency_versions: DependencyVersions
+        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -775,7 +722,7 @@ def config_description_cg(
         ACES* Computer Graphics (CG) *OpenColorIO* config description.
     """
 
-    name = config_name_cg(config_mapping_file_path, profile_version)
+    name = config_name_cg(dependency_versions)
 
     underline = "-" * len(name)
 
@@ -796,7 +743,7 @@ def config_description_cg(
 def generate_config_cg(
     data=None,
     config_name=None,
-    profile_version=PROFILE_VERSION_DEFAULT,
+    dependency_versions=DependencyVersions(),
     validate=True,
     describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
@@ -837,8 +784,8 @@ def generate_config_cg(
     config_name : unicode, optional
         *OpenColorIO* config file name, if given the config will be written to
         disk.
-    profile_version : ProfileVersion, optional
-        *OpenColorIO* config profile version.
+    dependency_versions: DependencyVersions, optional
+        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -864,7 +811,7 @@ def generate_config_cg(
 
     logger.info(
         'Generating "%s" config...',
-        config_name_cg(config_mapping_file_path, profile_version),
+        config_name_cg(dependency_versions),
     )
 
     clf_transforms = unclassify_clf_transforms(
@@ -875,7 +822,7 @@ def generate_config_cg(
 
     if data is None:
         _config, data, ctl_transforms, amf_components = generate_config_aces(
-            profile_version=profile_version,
+            dependency_versions=dependency_versions,
             describe=describe,
             analytical=False,
             scheme=scheme,
@@ -958,12 +905,12 @@ def generate_config_cg(
                     f'"{style}" "BuiltinTransform" style does not exist!',
                 )
 
-                if BUILTIN_TRANSFORMS[style] > profile_version:
+                if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
                     logger.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
-                        profile_version,
+                        dependency_versions.ocio,
                     )
                     continue
 
@@ -1002,11 +949,9 @@ def generate_config_cg(
     data.name = re.sub(
         r"\.ocio$",
         "",
-        config_basename_cg(config_mapping_file_path, profile_version),
+        config_basename_cg(dependency_versions),
     )
-    data.description = config_description_cg(
-        config_mapping_file_path, profile_version
-    )
+    data.description = config_description_cg(dependency_versions, describe)
 
     # Colorspaces, Looks and View Transforms Filtering
     transforms = data.colorspaces + data.view_transforms
@@ -1252,13 +1197,13 @@ def generate_config_cg(
         }
     )
 
-    data.profile_version = profile_version
+    data.profile_version = dependency_versions.ocio
 
     config = generate_config(data, config_name, validate)
 
     logger.info(
         '"%s" config generation complete!',
-        config_name_cg(config_mapping_file_path, profile_version),
+        config_name_cg(dependency_versions),
     )
 
     if additional_data:
@@ -1268,10 +1213,7 @@ def generate_config_cg(
 
 
 if __name__ == "__main__":
-    from opencolorio_config_aces import (
-        SUPPORTED_PROFILE_VERSIONS,
-        serialize_config_data,
-    )
+    from opencolorio_config_aces import serialize_config_data
     from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
 
     logging.basicConfig()
@@ -1283,8 +1225,8 @@ if __name__ == "__main__":
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
-    for profile_version in SUPPORTED_PROFILE_VERSIONS:
-        config_basename = config_basename_cg(profile_version=profile_version)
+    for dependency_versions in DEPENDENCY_VERSIONS:
+        config_basename = config_basename_cg(dependency_versions)
         (
             config,
             data,
@@ -1293,7 +1235,7 @@ if __name__ == "__main__":
             amf_components,
         ) = generate_config_cg(
             config_name=build_directory / config_basename,
-            profile_version=profile_version,
+            dependency_versions=dependency_versions,
             additional_data=True,
         )
 
