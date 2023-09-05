@@ -32,13 +32,13 @@ as follows::
 
     git clone --recursive https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES.git
     cd OpenColorIO-Config-ACES
-    poetry install --extras "optional"
+    poetry install --with optional
 
 The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <https://graphviz.org/>`__
 to be installed on the system and having installed the optional `pygraphviz <https://pypi.org/project/pygraphviz/>`__:
 python package::
 
-    poetry install --extras "optional graphviz"
+    poetry install --with graphviz,optional
 
 Docker
 ------
@@ -70,7 +70,7 @@ dependencies in order to run and be able to generate the *OCIO* configurations:
 Primary Dependencies
 ********************
 
--   `python >= 3.8, < 3.11 <https://www.python.org/download/releases/>`__
+-   `python >= 3.9, < 3.11 <https://www.python.org/download/releases/>`__
 -   `black <https://pypi.org/project/black/>`__
 -   `OpenColorIO <https://opencolorio.org/>`__
 
@@ -89,14 +89,11 @@ Development Dependencies
 -   `black <https://pypi.org/project/black/>`__
 -   `coverage <https://pypi.org/project/coverage/>`__
 -   `coveralls <https://pypi.org/project/coveralls/>`__
--   `flake8 <https://pypi.org/project/flake8/>`__
 -   `invoke <https://pypi.org/project/invoke/>`__
 -   `mypy <https://pypi.org/project/mypy/>`__
 -   `pre-commit <https://pypi.org/project/pre-commit/>`__
 -   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme/>`__
--   `pydocstyle <https://pypi.org/project/pydocstyle/>`__
 -   `pytest <https://pypi.org/project/pytest/>`__
--   `pyupgrade <https://pypi.org/project/pyupgrade/>`__
 -   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint/>`__
 -   `sphinx >= 4, < 5 <https://pypi.org/project/Sphinx/>`__
 -   `twine <https://pypi.org/project/twine/>`__
