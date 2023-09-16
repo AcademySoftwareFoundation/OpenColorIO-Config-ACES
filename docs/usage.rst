@@ -8,7 +8,7 @@ Usage
 Tasks
 ^^^^^
 
-Various tasks are currently exposed via `invoke <https://pypi.org/project/invoke/>`__.
+Various tasks are currently exposed via `invoke <https://pypi.org/project/invoke>`__.
 
 This is currently the recommended way to build the configuration until a
 dedicated CLI is provided.

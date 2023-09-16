@@ -19,8 +19,8 @@ OpenColorIO Configuration for ACES
 
 .. end-badges
 
-The `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/>`__
-is an open-source `Python <https://www.python.org/>`__ package implementing
+The `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__
+is an open-source `Python <https://www.python.org>`__ package implementing
 support for the generation of the *OCIO* configurations for the
 `Academy Color Encoding System <https://www.oscars.org/science-technology/sci-tech-projects/aces>`__
 (ACES).
@@ -77,8 +77,8 @@ The *OpenColorIO Configuration for ACES* repository adopts `Poetry <https://poet
 to help managing its dependencies, this is the recommended way to get started
 with development.
 
-Assuming `python >= 3.8 <https://www.python.org/download/releases/>`__ is
-available on your system along with `OpenColorIO <https://opencolorio.org/>`__,
+Assuming `python >= 3.9 <https://www.python.org/download/releases>`__ is
+available on your system along with `OpenColorIO <https://opencolorio.org>`__,
 the development dependencies are installed with `Poetry <https://poetry.eustace.io>`__
 as follows::
 
@@ -86,8 +86,8 @@ as follows::
     cd OpenColorIO-Config-ACES
     poetry install --with optional
 
-The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <https://graphviz.org/>`__
-to be installed on the system and having installed the optional `pygraphviz <https://pypi.org/project/pygraphviz/>`__:
+The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <https://graphviz.org>`__
+to be installed on the system and having installed the optional `pygraphviz <https://pypi.org/project/pygraphviz>`__:
 python package::
 
     poetry install --with graphviz,optional
@@ -99,7 +99,7 @@ Installing the dependencies for the `previous config generator <https://github.c
 was not a trivial task. For ease of use an `aswf-docker <https://github.com/AcademySoftwareFoundation/aswf-docker>`__
 based container is now available.
 
-Creating the container from the `Dockerfile <https://docs.docker.com/engine/reference/builder/>`__
+Creating the container from the `Dockerfile <https://docs.docker.com/engine/reference/builder>`__
 is done as follows::
 
     docker build -t aswf/opencolorio-config-aces:latest .
@@ -122,38 +122,36 @@ dependencies in order to run and be able to generate the *OCIO* configurations:
 Primary Dependencies
 ********************
 
--   `python >= 3.9, < 3.11 <https://www.python.org/download/releases/>`__
--   `OpenColorIO <https://opencolorio.org/>`__
+-   `python >= 3.9, < 3.11 <https://www.python.org/download/releases>`__
+-   `opencolorio <https://pypi.org/project/opencolorio>`__
+-   `requests <https://pypi.org/project/requests>`__
+-   `semver <https://pypi.org/project/semver>`__
 
 Optional Dependencies
 *********************
 
--   `colour <https://www.colour-science.org/>`__
--   `graphviz <https://www.graphviz.org/>`__
--   `jsonpickle <https://jsonpickle.github.io/>`__
--   `networkx <https://pypi.org/project/networkx/>`__
--   `pygraphviz <https://pypi.org/project/pygraphviz/>`__
+-   `colour-science <https://pypi.org/project/colour-science>`__
+-   `graphviz <https://www.graphviz.org>`__
+-   `jsonpickle <https://jsonpickle.github.io>`__
+-   `networkx <https://pypi.org/project/networkx>`__
+-   `pygraphviz <https://pypi.org/project/pygraphviz>`__
 
 Development Dependencies
 ************************
 
--   `black <https://pypi.org/project/black/>`__
--   `coverage <https://pypi.org/project/coverage/>`__
--   `coveralls <https://pypi.org/project/coveralls/>`__
--   `invoke <https://pypi.org/project/invoke/>`__
--   `mypy <https://pypi.org/project/mypy/>`__
--   `pre-commit <https://pypi.org/project/pre-commit/>`__
--   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme/>`__
--   `pytest <https://pypi.org/project/pytest/>`__
--   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint/>`__
--   `sphinx >= 4, < 5 <https://pypi.org/project/Sphinx/>`__
--   `twine <https://pypi.org/project/twine/>`__
-
-Once the dependencies are satisfied, the **OpenColorIO Configuration for ACES**
-package can be installed from the `Python Package Index <http://pypi.python.org/pypi/opencolorio-config-aces>`__
-by issuing this command in a shell::
-
-    pip install --user opencolorio-config-aces
+-   `black <https://pypi.org/project/black>`__
+-   `coverage <https://pypi.org/project/coverage>`__
+-   `coveralls <https://pypi.org/project/coveralls>`__
+-   `flynt <https://pypi.org/project/flynt>`__
+-   `invoke <https://pypi.org/project/invoke>`__
+-   `pre-commit <https://pypi.org/project/pre-commit>`__
+-   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
+-   `pytest <https://pypi.org/project/pytest>`__
+-   `pytest-cov <https://pypi.org/project/pytest-cov>`__
+-   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint>`__
+-   `ruff <https://pypi.org/project/ruff>`__
+-   `sphinx >= 4, < 5 <https://pypi.org/project/sphinx>`__
+-   `twine <https://pypi.org/project/twine>`__
 
 Components Status
 ^^^^^^^^^^^^^^^^^
@@ -189,6 +187,8 @@ Components Status
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
 | Containerisation              | Complete       | Minor updates will be required as the CLI evolves.                               |
 +-------------------------------+----------------+----------------------------------------------------------------------------------+
+| Pypi Package                  | Unavailable    |                                                                                  |
++-------------------------------+----------------+----------------------------------------------------------------------------------+
 
 Usage
 ^^^^^
@@ -196,7 +196,7 @@ Usage
 Tasks
 ~~~~~
 
-Various tasks are currently exposed via `invoke <https://pypi.org/project/invoke/>`__.
+Various tasks are currently exposed via `invoke <https://pypi.org/project/invoke>`__.
 
 This is currently the recommended way to build the configuration until a
 dedicated CLI is provided.
@@ -248,7 +248,7 @@ API Reference
 -------------
 
 The main technical reference for `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__
-is the `API Reference <https://opencolorio-config-aces.readthedocs.io/>`__.
+is the `API Reference <https://opencolorio-config-aces.readthedocs.io>`__.
 
 About
 -----

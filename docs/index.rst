@@ -5,8 +5,8 @@
 OpenColorIO Configuration for ACES
 ==================================
 
-The `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/>`__
-is an open-source `Python <https://www.python.org/>`__ package implementing
+The `OpenColorIO Configuration for ACES <https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES>`__
+is an open-source `Python <https://www.python.org>`__ package implementing
 support for the generation of the *OCIO* configurations for the
 `Academy Color Encoding System <https://www.oscars.org/science-technology/sci-tech-projects/aces>`__
 (ACES).
