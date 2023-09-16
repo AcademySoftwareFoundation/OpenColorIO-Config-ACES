@@ -113,7 +113,7 @@ PATTERNS_LOOK_NAME = {
     # TODO: Implement support for callable patterns.
     # The following ones should be a dedicated definition/callable.
     "BlueLightArtifactFix": "Blue Light Artifact Fix",
-    "GamutCompress": "ACES 1.3 Reference Gamut Compression",
+    "ReferenceGamutCompress": "ACES 1.3 Reference Gamut Compression",
 }
 """
 *OpenColorIO* look name substitution patterns.
@@ -167,6 +167,7 @@ PATTERNS_VIEW_TRANSFORM_NAME : dict
 PATTERNS_DISPLAY_NAME = {
     "G2.6-": "",
     "-BFD": "",
+    "DisplayP3": "Display P3",
     "REC.1886": "Rec.1886",
     "REC.709": "Rec.709",
     "REC.2020": "Rec.2020",
@@ -193,6 +194,7 @@ PATTERNS_DISPLAY_NAME : dict
 
 PATTERNS_ALIAS = {
     "Curve": "crv",
+    "Display P3": "DisplayP3",
     "Gamma ": "g",
     "Linear": "lin",
     "Texture": "tx",

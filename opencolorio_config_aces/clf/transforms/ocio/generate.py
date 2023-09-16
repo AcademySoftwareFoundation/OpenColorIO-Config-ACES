@@ -67,7 +67,7 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "Linear to Rec.1886",
         "generic linear RGB",
-        "generic gamma-corrected RGB",
+        "Rec.1886 encoded RGB",
     )
 
     name = "Linear_to_sRGB-Curve"
@@ -79,7 +79,7 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "Linear to sRGB",
         "generic linear RGB",
-        "generic gamma-corrected RGB",
+        "sRGB encoded RGB",
     )
 
     name = "Linear_to_ST2084-Curve"
@@ -92,7 +92,7 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "Linear to ST.2084",
         "generic linear RGB",
-        "generic ST.2084 (PQ) encoded RGB",
+        "generic ST.2084 (PQ) encoded RGB mapping 1.0 to 100nits",
         style=style,
     )
 
@@ -204,7 +204,7 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "AP0 to Gamma 2.2 AP1 - Texture",
         "ACES2065-1",
-        "2.2 gamma-corrected AP1 primaries, D60 white point",
+        "2.2 gamma-corrected AP1 primaries, ACES ~=D60 white point",
     )
 
     name = "AP0_to_sRGB_Encoded_AP1-Texture"
@@ -219,7 +219,22 @@ def generate_clf_transforms_ocio(output_directory):
         clf_transform_id,
         "AP0 to sRGB Encoded AP1 - Texture",
         "ACES2065-1",
-        "sRGB Encoded AP1 primaries, D60 white point",
+        "sRGB Encoded AP1 primaries, ACES ~=D60 white point",
+    )
+
+    name = "AP0_to_sRGB_Encoded_P3-D65-Texture"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "P3-D65"),
+            gamma_transform("sRGB"),
+        ],
+        clf_transform_id,
+        "AP0 to sRGB Encoded P3-D65 - Texture",
+        "ACES2065-1",
+        "sRGB Encoded P3-D65 primaries, D65 white point",
     )
 
     return clf_transforms

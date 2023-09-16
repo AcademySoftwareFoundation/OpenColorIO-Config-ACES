@@ -30,6 +30,7 @@ if not hasattr(inspect, "getargspec"):
     inspect.getargspec = inspect.getfullargspec
 
 from invoke import Context, task
+import contextlib
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -176,7 +177,7 @@ def tests(ctx: Context):
 
 
 @task(precommit, tests)
-def preflight(ctx: Context):
+def preflight(ctx: Context):  # noqa: ARG001
     """
     Perform the preflight tasks, i.e. *formatting* and *quality*.
 
@@ -291,7 +292,7 @@ def build_config_reference_analytical(ctx: Context):
 
 
 @task
-def update_mapping_file_reference(ctx: Context):
+def update_mapping_file_reference(ctx: Context):  # noqa: ARG001
     """
     Update the *aces-dev* reference *OpenColorIO* config mapping file.
 
@@ -320,7 +321,9 @@ def update_mapping_file_reference(ctx: Context):
 
     with open(filename, "w") as csv_file:
         csv_file.write(
-            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE).text
+            requests.get(
+                URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE, timeout=60
+            ).text
         )
 
 
@@ -341,7 +344,7 @@ def build_config_reference(ctx: Context):
 
 
 @task
-def update_mapping_file_cg(ctx: Context):
+def update_mapping_file_cg(ctx: Context):  # noqa: ARG001
     """
     Update the *ACES* Computer Graphics (CG) *OpenColorIO* mapping file.
 
@@ -371,7 +374,9 @@ def update_mapping_file_cg(ctx: Context):
 
     with open(filename, "w") as csv_file:
         csv_file.write(
-            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG).text
+            requests.get(
+                URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG, timeout=60
+            ).text
         )
 
 
@@ -394,7 +399,7 @@ def build_config_cg(ctx: Context):
 
 
 @task
-def update_mapping_file_studio(ctx: Context):
+def update_mapping_file_studio(ctx: Context):  # noqa: ARG001
     """
     Update the *ACES* Studio *OpenColorIO* mapping file.
 
@@ -405,7 +410,7 @@ def update_mapping_file_studio(ctx: Context):
     """
 
     message_box(
-        'Updating the "ACES" Studio "OpenColorIO" config ' "mapping file..."
+        'Updating the "ACES" Studio "OpenColorIO" config mapping file...'
     )
 
     title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO)
@@ -423,7 +428,9 @@ def update_mapping_file_studio(ctx: Context):
 
     with open(filename, "w") as csv_file:
         csv_file.write(
-            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO).text
+            requests.get(
+                URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO, timeout=60
+            ).text
         )
 
 
@@ -456,9 +463,18 @@ def requirements(ctx: Context):
 
     message_box('Exporting "requirements.txt" file...')
     ctx.run(
-        "poetry run pip list --format=freeze | "
-        'egrep -v "opencolorio-config-aces" '
-        "> requirements.txt"
+        "poetry export -f requirements.txt "
+        "--without-hashes "
+        "--with dev,docs,graphviz,optional "
+        "--output requirements.txt"
+    )
+
+    message_box('Exporting "docs/requirements.txt" file...')
+    ctx.run(
+        "poetry export -f requirements.txt "
+        "--without-hashes "
+        "--with docs,graphviz,optional "
+        "--output docs/requirements.txt"
     )
 
 
@@ -492,16 +508,12 @@ def docker_remove(ctx: Context):
     """
 
     message_box('Stopping "docker" container...')
-    try:
+    with contextlib.suppress(Failure):
         ctx.run(f"docker stop {CONTAINER}")
-    except Failure:
-        pass
 
     message_box('Removing "docker" container...')
-    try:
+    with contextlib.suppress(Failure):
         ctx.run(f"docker rm {CONTAINER}")
-    except Failure:
-        pass
 
 
 def run_in_container(ctx: Context, command: str):

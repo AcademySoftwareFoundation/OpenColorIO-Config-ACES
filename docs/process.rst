@@ -50,7 +50,7 @@ The repository contains code to generate, discover and classify the additional *
 CG Config Generation
 ^^^^^^^^^^^^^^^^^^^^
 
-The *CG* config generator also uses a *CSV* file generated from a `spreadsheet <https://docs.google.com/spreadsheets/d/1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V>`__ that expresses which ``ACEStransformID`` should be used from the `Reference` config and which ``CLFtransformID`` should be used from the shipped *CLF* transforms.
+The *CG* config generator also uses a *CSV* file generated from a `spreadsheet <https://docs.google.com/spreadsheets/d/1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4>`__ that expresses which ``ACEStransformID`` should be used from the `Reference` config and which ``CLFtransformID`` should be used from the shipped *CLF* transforms.
 
 -   :func:`opencolorio_config_aces.generate_config_cg`
 

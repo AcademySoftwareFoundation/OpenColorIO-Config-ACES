@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright Contributors to the OpenColorIO Project.
 
-from .profile_version import (
-    ProfileVersion,
+from .version import (
     PROFILE_VERSION_DEFAULT,
-    SUPPORTED_PROFILE_VERSIONS,
+    PROFILE_VERSIONS,
+    DependencyVersions,
+    DEPENDENCY_VERSIONS,
 )
 from .beautifiers import (
     SEPARATOR_COLORSPACE_NAME,
@@ -44,9 +45,10 @@ from .common import (
 )
 
 __all__ = [
-    "ProfileVersion",
     "PROFILE_VERSION_DEFAULT",
-    "SUPPORTED_PROFILE_VERSIONS",
+    "PROFILE_VERSIONS",
+    "DependencyVersions",
+    "DEPENDENCY_VERSIONS",
 ]
 __all__ += [
     "SEPARATOR_COLORSPACE_NAME",

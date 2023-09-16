@@ -51,7 +51,8 @@ VERSION = "1.0"
 
 def generate_clf_transforms_canon(output_directory):
     """
-    Make the CLF file for Canon C-Log3 Cinema Gamut plus matrix/curve CLFs.
+    Make the CLF file for Canon C-Log2 / C-Log3 Cinema Gamut plus matrix/curve
+    CLFs.
 
     Returns
     -------
@@ -78,12 +79,30 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
 
     aces_transform_id = (
         "urn:ampas:aces:transformId:v1.5:"
-        "ACEScsc.Academy.CLog3_CGamut_to_ACES.a1.1.0"
+        "ACEScsc.Academy.CLog2_CGamut_to_ACES.a1.1.0"
     )
 
-    # Generate full transform.
-    #     NB: This is being saved in CTF format to allow us of a Built-in Transform
-    #     and thus avoid the need for an external LUT file.
+    name = "CanonLog2_CinemaGamut-D55_to_ACES2065-1"
+    input_descriptor = "Canon Log 2 Cinema Gamut (Daylight)"
+    output_descriptor = "ACES2065-1"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    style = "CANON_CLOG2-CGAMUT_to_ACES2065-1"
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [{"transform_type": "BuiltinTransform", "style": style}],
+        clf_transform_id,
+        f"{input_descriptor} to {output_descriptor}",
+        input_descriptor,
+        output_descriptor,
+        aces_transform_id,
+        style=style,
+    )
+
+    aces_transform_id = (
+        "urn:ampas:aces:transformId:v1.5:"
+        "ACEScsc.Academy.CLog3_CGamut_to_ACES.a1.1.0"
+    )
 
     name = "CanonLog3_CinemaGamut-D55_to_ACES2065-1"
     input_descriptor = "Canon Log 3 Cinema Gamut (Daylight)"
@@ -120,8 +139,37 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
 
     # Generate `NamedTransform` for log curve only.
 
-    # TODO: This will have to wait for OCIO 2.2 in order to do this without
-    # requiring an external LUT file.
+    name = "CLog2-Curve_to_Linear"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    input_descriptor = "CLog2 Log (arbitrary primaries)"
+    output_descriptor = "CLog2 Linear (arbitrary primaries)"
+    filename = output_directory / clf_basename(clf_transform_id)
+    style = "CURVE - CANON_CLOG2_to_LINEAR"
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [{"transform_type": "BuiltinTransform", "style": style}],
+        clf_transform_id,
+        f'{input_descriptor.replace(" (arbitrary primaries)", "")} to Linear Curve',
+        input_descriptor,
+        output_descriptor,
+        style=style,
+    )
+
+    name = "CLog3-Curve_to_Linear"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    input_descriptor = "CLog3 Log (arbitrary primaries)"
+    output_descriptor = "CLog3 Linear (arbitrary primaries)"
+    filename = output_directory / clf_basename(clf_transform_id)
+    style = "CURVE - CANON_CLOG3_to_LINEAR"
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [{"transform_type": "BuiltinTransform", "style": style}],
+        clf_transform_id,
+        f'{input_descriptor.replace(" (arbitrary primaries)", "")} to Linear Curve',
+        input_descriptor,
+        output_descriptor,
+        style=style,
+    )
 
     return clf_transforms
 

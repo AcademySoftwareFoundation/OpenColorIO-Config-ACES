@@ -5,8 +5,8 @@
 Generation
 ==========
 
-Profile Version
----------------
+Version Utilities
+-----------------
 
 ``opencolorio_config_aces``
 
@@ -15,9 +15,10 @@ Profile Version
 .. autosummary::
     :toctree: generated/
 
-    ProfileVersion
     PROFILE_VERSION_DEFAULT
     SUPPORTED_PROFILE_VERSIONS
+    DependencyVersions
+    DEPENDENCY_VERSIONS
 
 Config Generation Common Objects
 --------------------------------
@@ -70,6 +71,7 @@ Reference Configuration
     classify_aces_ctl_transforms
     discover_aces_ctl_transforms
     filter_ctl_transforms
+    generate_amf_components
     print_aces_taxonomy
     unclassify_ctl_transforms
 
@@ -100,7 +102,7 @@ Reference Configuration
 .. autosummary::
     :toctree: generated/
 
-    ColorspaceDescriptionStyle
+    DescriptionStyle
     version_config_mapping_file
     generate_config_aces
 

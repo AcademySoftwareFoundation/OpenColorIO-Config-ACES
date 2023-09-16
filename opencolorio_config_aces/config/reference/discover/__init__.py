@@ -7,6 +7,7 @@ from .classify import (
     classify_aces_ctl_transforms,
     unclassify_ctl_transforms,
     filter_ctl_transforms,
+    generate_amf_components,
     print_aces_taxonomy,
 )
 from .graph import (
@@ -24,6 +25,7 @@ __all__ = [
     "classify_aces_ctl_transforms",
     "unclassify_ctl_transforms",
     "filter_ctl_transforms",
+    "generate_amf_components",
     "print_aces_taxonomy",
 ]
 __all__ += [

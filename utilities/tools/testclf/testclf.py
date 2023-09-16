@@ -15,6 +15,7 @@ supported by OpenColorIO, including CTF.
 """
 
 import argparse
+import logging
 import sys
 import traceback
 
@@ -30,6 +31,9 @@ __email__ = "ocio-dev@lists.aswf.io"
 __status__ = "Production"
 
 __all__ = ["test_clf"]
+
+
+logger = logging.getLogger(__name__)
 
 
 def test_clf(clf_path, input_data, output_path, inverse=False):
@@ -115,13 +119,17 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
     else:
         # Print pixel transformations
         for src_pixel, dst_pixel in zip(src_rgb, dst_rgb):
-            print(
-                f"{', '.join(map(str, src_pixel))} -> "
-                f"{', '.join(map(str, dst_pixel))}"
+            logging.info(
+                "%s -> %s",
+                ", ".join(map(str, src_pixel)),
+                ", ".join(map(str, dst_pixel)),
             )
 
 
 if __name__ == "__main__":
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
     # Tool interface
     parser = argparse.ArgumentParser(
         description="Apply a Common LUT Format (CLF) transform to input RGB data to "
@@ -163,6 +171,6 @@ if __name__ == "__main__":
         exit_code = 0
     except Exception as e:
         traceback.print_exc()
-        print(f"An error occurred: {e}")
+        logging.info("An error occurred: %s", e)
 
     sys.exit(exit_code)

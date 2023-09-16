@@ -2,13 +2,11 @@
 # Copyright Contributors to the OpenColorIO Project.
 
 from .config import (
-    ColorspaceDescriptionStyle,
-    version_config_mapping_file,
+    DescriptionStyle,
     generate_config_aces,
 )
 
 __all__ = [
-    "ColorspaceDescriptionStyle",
-    "version_config_mapping_file",
+    "DescriptionStyle",
     "generate_config_aces",
 ]

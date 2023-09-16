@@ -20,10 +20,11 @@ from .common import (
     git_describe,
     matrix_3x3_to_4x4,
     multi_replace,
-    regularise_version,
     validate_method,
     google_sheet_title,
     slugify,
+    attest,
+    timestamp,
 )
 
 __all__ = [
@@ -45,8 +46,9 @@ __all__ = [
     "git_describe",
     "matrix_3x3_to_4x4",
     "multi_replace",
-    "regularise_version",
     "validate_method",
     "google_sheet_title",
     "slugify",
+    "attest",
+    "timestamp",
 ]

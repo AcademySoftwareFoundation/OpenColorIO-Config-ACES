@@ -40,7 +40,7 @@ class TestConfigResources(unittest.TestCase):
             csv_local_content = csv_local_file.read()
 
         csv_remote_content = requests.get(
-            URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO
+            URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO, timeout=60
         ).text
 
         self.assertMultiLineEqual(

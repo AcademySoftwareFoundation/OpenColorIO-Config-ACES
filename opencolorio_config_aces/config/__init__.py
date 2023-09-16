@@ -13,10 +13,11 @@ from .generation import (
 )
 from .generation import (
     BUILTIN_TRANSFORMS,
+    DEPENDENCY_VERSIONS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
-    SUPPORTED_PROFILE_VERSIONS,
+    PROFILE_VERSIONS,
+    DependencyVersions,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -30,15 +31,15 @@ from .reference import (
     discover_aces_ctl_transforms,
     filter_ctl_transforms,
     filter_nodes,
+    generate_amf_components,
     node_to_ctl_transform,
     plot_aces_conversion_graph,
     print_aces_taxonomy,
     unclassify_ctl_transforms,
     version_aces_dev,
-    version_config_mapping_file,
 )
 from .reference import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
     generate_config_aces,
 )
 from .cg import generate_config_cg
@@ -56,10 +57,11 @@ __all__ = [
 ]
 __all__ += [
     "BUILTIN_TRANSFORMS",
+    "DEPENDENCY_VERSIONS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
-    "ProfileVersion",
-    "SUPPORTED_PROFILE_VERSIONS",
+    "PROFILE_VERSIONS",
+    "DependencyVersions",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",
@@ -73,15 +75,15 @@ __all__ += [
     "discover_aces_ctl_transforms",
     "filter_ctl_transforms",
     "filter_nodes",
+    "generate_amf_components",
     "node_to_ctl_transform",
     "plot_aces_conversion_graph",
     "print_aces_taxonomy",
     "unclassify_ctl_transforms",
     "version_aces_dev",
-    "version_config_mapping_file",
 ]
 __all__ += [
-    "ColorspaceDescriptionStyle",
+    "DescriptionStyle",
     "generate_config_aces",
 ]
 __all__ += ["generate_config_cg"]

@@ -34,8 +34,7 @@ from .config import (
     BUILTIN_TRANSFORMS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
-    SUPPORTED_PROFILE_VERSIONS,
+    PROFILE_VERSIONS,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -54,10 +53,9 @@ from .config import (
     print_aces_taxonomy,
     unclassify_ctl_transforms,
     version_aces_dev,
-    version_config_mapping_file,
 )
 from .config import (
-    ColorspaceDescriptionStyle,
+    DescriptionStyle,
     generate_config_aces,
 )
 from .config import generate_config_cg, generate_config_studio
@@ -91,8 +89,7 @@ __all__ += [
     "BUILTIN_TRANSFORMS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
-    "ProfileVersion",
-    "SUPPORTED_PROFILE_VERSIONS",
+    "PROFILE_VERSIONS",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",
@@ -114,7 +111,7 @@ __all__ += [
     "version_config_mapping_file",
 ]
 __all__ += [
-    "ColorspaceDescriptionStyle",
+    "DescriptionStyle",
     "generate_config_aces",
 ]
 __all__ += ["generate_config_cg", "generate_config_studio"]

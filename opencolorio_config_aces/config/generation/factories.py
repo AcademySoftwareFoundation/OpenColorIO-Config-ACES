@@ -20,14 +20,12 @@ import logging
 import PyOpenColorIO as ocio
 from pathlib import Path
 from pprint import pformat
+from semver import Version
 from textwrap import indent
-from typing import Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
-from opencolorio_config_aces.config.generation import (
-    PROFILE_VERSION_DEFAULT,
-    ProfileVersion,
-)
-from opencolorio_config_aces.utilities import DocstringDict
+from opencolorio_config_aces.config.generation import PROFILE_VERSION_DEFAULT
+from opencolorio_config_aces.utilities import DocstringDict, attest
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -66,9 +64,10 @@ BUILTIN_TRANSFORMS : dict
 
 BUILTIN_TRANSFORMS.update(
     {
-        "ACES-LMT - ACES 1.3 Reference Gamut Compression": ProfileVersion(
-            2, 1
-        ),
+        "ACES-LMT - ACES 1.3 Reference Gamut Compression": Version(2, 1),
+        "CURVE - CANON_CLOG2_to_LINEAR": Version(2, 2),
+        "CURVE - CANON_CLOG3_to_LINEAR": Version(2, 2),
+        "DISPLAY - CIE-XYZ-D65_to_DisplayP3": Version(2, 3),
     }
 )
 
@@ -89,8 +88,8 @@ def group_transform_factory(transforms):
     """
 
     logging.debug(
-        f'Producing a "GroupTransform" with the following transforms:\n'
-        f"{indent(pformat(locals()), '    ')}"
+        'Producing a "GroupTransform" with the following transforms:\n%s',
+        indent(pformat(locals()), "    "),
     )
 
     group_transform = ocio.GroupTransform()
@@ -116,7 +115,7 @@ def colorspace_factory(
     is_data=None,
     reference_space=None,
     base_colorspace=None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """
     *OpenColorIO* `Colorspace` factory.
@@ -166,8 +165,9 @@ def colorspace_factory(
     """
 
     logging.debug(
-        f'Producing "{name}" "ColorSpace" with the following parameters:\n'
-        f"{indent(pformat(locals()), '    ')}"
+        'Producing "%s" "ColorSpace" with the following parameters:\n%s',
+        name,
+        indent(pformat(locals()), "    "),
     )
 
     if bit_depth is None:
@@ -256,7 +256,7 @@ def named_transform_factory(
     forward_transform=None,
     inverse_transform=None,
     base_named_transform=None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """
     *OpenColorIO* `NamedTransform` factory.
@@ -295,8 +295,9 @@ def named_transform_factory(
     """
 
     logging.debug(
-        f'Producing "{name}" "NamedTransform" with the following parameters:\n'
-        f"{indent(pformat(locals()), '    ')}"
+        'Producing "%s" "NamedTransform" with the following parameters:\n%s',
+        name,
+        indent(pformat(locals()), "    "),
     )
 
     if base_named_transform is not None:
@@ -358,7 +359,7 @@ def view_transform_factory(
     from_reference=None,
     reference_space=None,
     base_view_transform=None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """
     *OpenColorIO* `ViewTransform` factory.
@@ -395,8 +396,9 @@ def view_transform_factory(
     """
 
     logging.debug(
-        f'Producing "{name}" "ViewTransform" with the following parameters:\n'
-        f"{indent(pformat(locals()), '    ')}"
+        'Producing "%s" "ViewTransform" with the following parameters:\n%s',
+        name,
+        indent(pformat(locals()), "    "),
     )
 
     if categories is None:
@@ -448,7 +450,7 @@ def look_factory(
     forward_transform=None,
     inverse_transform=None,
     base_look=None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """
     *OpenColorIO* `Look` factory.
@@ -481,8 +483,9 @@ def look_factory(
     """
 
     logging.debug(
-        f'Producing "{name}" "Look" with the following parameters:\n'
-        f"{indent(pformat(locals()), '    ')}"
+        'Producing "%s" "Look" with the following parameters:\n%s',
+        name,
+        indent(pformat(locals()), "    "),
     )
 
     if process_space is None:
@@ -538,9 +541,9 @@ def transform_factory_setter(**kwargs):
     kwargs.pop("transform_factory", None)
 
     logging.debug(
-        f'Producing a "{transform.__class__.__name__}" transform with the '
-        f"following parameters:\n"
-        f"{indent(pformat(kwargs), '    ')}"
+        'Producing a "%s" transform with the following parameters:\n%s',
+        transform.__class__.__name__,
+        indent(pformat(kwargs), "    "),
     )
 
     for kwarg, value in kwargs.items():
@@ -580,9 +583,9 @@ def transform_factory_constructor(**kwargs):
     kwargs.pop("transform_factory", None)
 
     logging.debug(
-        f'Producing a "{transform_type}" transform with the '
-        f"following parameters:\n"
-        f"{indent(pformat(kwargs), '    ')}"
+        'Producing a "%s" transform with the following parameters:\n%s',
+        transform_type,
+        indent(pformat(kwargs), "    "),
     )
 
     return transform(**kwargs)
@@ -607,12 +610,12 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
         *OpenColorIO* `GroupTransform`.
     """
 
-    assert kwargs["transform_type"] == "FileTransform"
-    assert Path(kwargs["src"]).exists()
+    attest(kwargs["transform_type"] == "FileTransform")
+    attest(Path(kwargs["src"]).exists())
 
     logging.debug(
-        f'Producing a "FileTransform" transform with the following parameters:\n'
-        f"{indent(pformat(kwargs), '    ')}"
+        'Producing a "FileTransform" transform with the following parameters:\n%s',
+        indent(pformat(kwargs), "    "),
     )
 
     raw_config = ocio.Config().CreateRaw()

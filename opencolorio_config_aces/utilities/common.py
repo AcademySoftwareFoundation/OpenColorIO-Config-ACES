@@ -7,7 +7,9 @@ Common Utilities
 Defines common utilities objects that don't fall in any specific category.
 """
 
+import datetime
 import functools
+import logging
 import os
 import re
 import requests
@@ -46,11 +48,14 @@ __all__ = [
     "git_describe",
     "matrix_3x3_to_4x4",
     "multi_replace",
-    "regularise_version",
     "validate_method",
     "google_sheet_title",
     "slugify",
+    "attest",
+    "timestamp",
 ]
+
+logger = logging.getLogger(__name__)
 
 
 # Monkey-patching the "PrettyPrinter" mapping to handle the "TypeError"
@@ -59,7 +64,7 @@ class _dispatch(dict):
     def get(self, key, default=None):
         try:
             return self.__get__(key, default)
-        except Exception:
+        except Exception as error:  # noqa: F841, S110
             pass
 
 
@@ -79,8 +84,6 @@ class DocstringDict(dict):
     A :class:`dict` sub-class that allows settings a docstring to :class:`dict`
     instances.
     """
-
-    pass
 
 
 def first_item(iterable, default=None):
@@ -105,6 +108,8 @@ def first_item(iterable, default=None):
 
     for item in iterable:
         return item
+
+    return None
 
 
 def common_ancestor(*args):
@@ -320,16 +325,16 @@ def is_colour_installed(raise_exception=False):
     """
 
     try:  # pragma: no cover
-        import colour  # noqa
+        import colour  # noqa: F401
 
         return True
     except ImportError as error:  # pragma: no cover
         if raise_exception:
             raise ImportError(
                 (
-                    '"Colour" related API features ' 'are not available: "{}".'
+                    '"Colour" related API features are not available: "{}".'
                 ).format(error)
-            )
+            ) from error
         return False
 
 
@@ -354,7 +359,7 @@ def is_jsonpickle_installed(raise_exception=False):
     """
 
     try:  # pragma: no cover
-        import jsonpickle  # noqa
+        import jsonpickle  # noqa: F401
 
         return True
     except ImportError as error:  # pragma: no cover
@@ -364,7 +369,7 @@ def is_jsonpickle_installed(raise_exception=False):
                     '"jsonpickle" related API features, e.g. serialization, '
                     'are not available: "{}".'
                 ).format(error)
-            )
+            ) from error
         return False
 
 
@@ -389,18 +394,16 @@ def is_networkx_installed(raise_exception=False):
     """
 
     try:  # pragma: no cover
-        # pylint: disable=W0612
-        import networkx  # noqa
+        import networkx  # noqa: F401
 
         return True
     except ImportError as error:  # pragma: no cover
         if raise_exception:
             raise ImportError(
                 (
-                    '"NetworkX" related API features '
-                    'are not available: "{}".'
+                    '"NetworkX" related API features are not available: "{}".'
                 ).format(error)
-            )
+            ) from error
         return False
 
 
@@ -473,7 +476,7 @@ def is_string(a):
     False
     """
 
-    return True if isinstance(a, str) else False
+    return isinstance(a, str)
 
 
 def is_iterable(a):
@@ -498,7 +501,7 @@ def is_iterable(a):
     False
     """
 
-    return is_string(a) or (True if getattr(a, "__iter__", False) else False)
+    return is_string(a) or (bool(getattr(a, "__iter__", False)))
 
 
 def git_describe():
@@ -515,7 +518,7 @@ def git_describe():
 
     try:  # pragma: no cover
         version = subprocess.check_output(
-            ["git", "describe"],
+            ["git", "describe"],  # noqa: S603, S607
             cwd=opencolorio_config_aces.__path__[0],
             stderr=subprocess.STDOUT,
         ).strip()
@@ -582,42 +585,6 @@ def multi_replace(name, patterns):
         name = re.sub(pattern, substitution, name)
 
     return name
-
-
-def regularise_version(version, add_v_prefix=True):
-    """
-    Regularise given version name by either adding or removing a *v* affixe.
-
-    Parameters
-    ----------
-    version : str
-        Version name to regularise.
-    add_v_prefix : bool, optional
-        Whether to add the *v* affixe.
-
-    Returns
-    -------
-    str
-        Regularise version name.
-
-    Examples
-    --------
-    >>> regularise_version("0.1.0")
-    'v0.1.0'
-    >>> regularise_version("v0.1.0")
-    'v0.1.0'
-    >>> regularise_version("v0.1.0", False)
-    '0.1.0'
-    >>> regularise_version("0.1.0", False)
-    '0.1.0'
-    """
-
-    version = re.sub("^v", "", version)
-
-    if add_v_prefix:
-        version = f"v{version}"
-
-    return version
 
 
 def validate_method(
@@ -696,7 +663,7 @@ def google_sheet_title(url):
             self.in_title = []
             self.title = None
 
-        def handle_starttag(self, tag, attrs):
+        def handle_starttag(self, tag, attrs):  # noqa: ARG002
             if tag == "title":
                 self.in_title.append(tag)
 
@@ -712,7 +679,7 @@ def google_sheet_title(url):
         url = url.split("export")[0]
 
     parser = Parser()
-    parser.feed(requests.get(url).text)
+    parser.feed(requests.get(url, timeout=60).text)
 
     return parser.title.rsplit("-", 1)[0].strip()
 
@@ -765,3 +732,40 @@ def slugify(object_, allow_unicode=False):
     value = re.sub(r"[^\w\s-]", "", value.lower())
 
     return re.sub(r"[-\s]+", "-", value).strip("-_")
+
+
+def attest(condition, message=""):
+    """
+    Provide the `assert` statement functionality without being disabled by
+    optimised Python execution.
+
+    Parameters
+    ----------
+    condition : bool
+        Condition to attest/assert.
+    message : str
+        Message to display when the assertion fails.
+    """
+
+    if not condition:
+        raise AssertionError(message)
+
+
+def timestamp():
+    """
+    Return a timestamp description.
+
+    Returns
+    -------
+    :class:`str`
+    """
+
+    now = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y/%m/%d at %H:%M"
+    )
+    timestamp = (
+        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
+        f"on the {now}."
+    )
+
+    return timestamp
