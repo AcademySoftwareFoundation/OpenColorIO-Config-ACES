@@ -3,7 +3,7 @@
 
 [tool.poetry]
 name = "opencolorio-config-aces"
-version = "1.0.0"
+version = "2.0.0"
 description = "OpenColorIO Configuration for ACES"
 authors = [ "OpenColorIO Contributors" ]
 maintainers = [ "OpenColorIO Contributors <ocio-dev@lists.aswf.io>" ]
@@ -37,7 +37,6 @@ coverage = "*"
 coveralls = "*"
 flynt = "*"
 invoke = "*"
-mypy = "*"
 pre-commit = "*"
 pydata-sphinx-theme = "*"
 pytest = "*"

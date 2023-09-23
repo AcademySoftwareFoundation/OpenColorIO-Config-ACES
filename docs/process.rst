@@ -25,6 +25,8 @@ Using ``ACES2065-1`` and ``OCES`` as connection spaces, it is possible to build 
 
     .. image:: _static/ACES_Conversion_Graph.svg
 
+An initial mapping of *ACES* **AMF** components is generated after the classification process. The mapping defines the ``ACEStransformID`` relationships. Its generation is automated but needs to be guided by an external file, i.e. `opencolorio_config_aces/config/reference/discover/resources/ACES_AMF_Components.json`, because a few relationships cannot be derived automatically.
+
 Analytical & Reference Configs Generation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
