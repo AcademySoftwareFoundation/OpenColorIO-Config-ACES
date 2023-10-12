@@ -39,6 +39,7 @@ flynt = "*"
 invoke = "*"
 pre-commit = "*"
 pydata-sphinx-theme = "*"
+pyright = "*"
 pytest = "*"
 pytest-cov = "*"
 restructuredtext-lint = "*"
@@ -64,6 +65,16 @@ exclude = '''
 
 [tool.flynt]
 line_length=999
+
+[tool.pyright]
+reportMissingImports = false
+reportMissingModuleSource = false
+reportUnboundVariable = false
+reportUnnecessaryCast = true
+reportUnnecessaryTypeIgnoreComment = true
+reportUnsupportedDunderAll = false
+reportUnusedExpression = false
+exclude = ["**/aces-dev"]
 
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"

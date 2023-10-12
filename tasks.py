@@ -48,6 +48,7 @@ __all__ = [
     "ORG",
     "CONTAINER",
     "clean",
+    "quality",
     "precommit",
     "tests",
     "preflight",
@@ -141,6 +142,28 @@ def clean(
 
 
 @task
+def quality(
+    ctx: Context,
+    pyright: bool = True,
+):
+    """
+    Check the codebase with *Pyright* and lints various *restructuredText*
+    files with *rst-lint*.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    pyright
+        Whether to check the codebase with *Pyright*.
+    """
+
+    if pyright:
+        message_box('Checking codebase with "Pyright"...')
+        ctx.run("pyright --skipunannotated --level warning")
+
+
+@task
 def precommit(ctx: Context):
     """
     Run the "pre-commit" hooks on the codebase.
@@ -176,7 +199,7 @@ def tests(ctx: Context):
     )
 
 
-@task(precommit, tests)
+@task(quality, precommit, tests)
 def preflight(ctx: Context):  # noqa: ARG001
     """
     Perform the preflight tasks, i.e. *formatting* and *quality*.
