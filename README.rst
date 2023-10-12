@@ -146,6 +146,7 @@ Development Dependencies
 -   `invoke <https://pypi.org/project/invoke>`__
 -   `pre-commit <https://pypi.org/project/pre-commit>`__
 -   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
+-   `pyright <https://pypi.org/project/pyright>`__
 -   `pytest <https://pypi.org/project/pytest>`__
 -   `pytest-cov <https://pypi.org/project/pytest-cov>`__
 -   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint>`__
