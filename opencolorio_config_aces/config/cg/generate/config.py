@@ -165,6 +165,7 @@ def clf_transform_to_description(
     clf_transform,
     describe=DescriptionStyle.LONG_UNION,
     amf_components=None,
+    inverse_direction=False,
 ):
     """
     Generate the *OpenColorIO* `Colorspace` or `NamedTransform` description for
@@ -180,6 +181,9 @@ def clf_transform_to_description(
     amf_components : mapping, optional
         *ACES* *AMF* components used to extend the *ACES* *CTL* transform
         description.
+    inverse_direction : bool, optional
+        Direction of transform -- determines order of transform descriptors.
+        Default: False (i.e., assume 'Forward' direction)
 
     Returns
     -------
@@ -200,10 +204,16 @@ def clf_transform_to_description(
             DescriptionStyle.SHORT_UNION,
         ):
             if clf_transform.description is not None:
-                description.append(
-                    f"Convert {clf_transform.input_descriptor} "
-                    f"to {clf_transform.output_descriptor}"
-                )
+                if inverse_direction:
+                    description.append(
+                        f"Convert {clf_transform.output_descriptor} "
+                        f"to {clf_transform.input_descriptor}"
+                    )
+                else:
+                    description.append(
+                        f"Convert {clf_transform.input_descriptor} "
+                        f"to {clf_transform.output_descriptor}"
+                    )
         elif describe in (  # noqa: SIM102
             DescriptionStyle.OPENCOLORIO,
             DescriptionStyle.LONG,
@@ -389,9 +399,6 @@ def clf_transform_to_named_transform(
     signature = {
         "name": clf_transform_to_colorspace_name(clf_transform),
         "family": clf_transform_to_family(clf_transform),
-        "description": clf_transform_to_description(
-            clf_transform, describe, amf_components
-        ),
     }
 
     file_transform = {
@@ -401,8 +408,14 @@ def clf_transform_to_named_transform(
     }
     if is_reference(clf_transform.source):
         signature["inverse_transform"] = file_transform
+        signature["description"] = clf_transform_to_description(
+            clf_transform, describe, amf_components, inverse_direction=True
+        )
     else:
         signature["forward_transform"] = file_transform
+        signature["description"] = clf_transform_to_description(
+            clf_transform, describe, amf_components, inverse_direction=False
+        )
 
     signature.update(kwargs)
 
