@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 
+import contextlib
 import requests
 from invoke.exceptions import Failure
 from pathlib import Path
@@ -27,10 +28,10 @@ from opencolorio_config_aces.utilities import google_sheet_title, message_box
 import inspect
 
 if not hasattr(inspect, "getargspec"):
-    inspect.getargspec = inspect.getfullargspec
+    inspect.getargspec = inspect.getfullargspec  # pyright: ignore
 
-from invoke import Context, task
-import contextlib
+from invoke.tasks import task
+from invoke.context import Context
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
