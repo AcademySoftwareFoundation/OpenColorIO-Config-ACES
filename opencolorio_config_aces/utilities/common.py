@@ -68,7 +68,7 @@ class _dispatch(dict):
             pass
 
 
-PrettyPrinter._dispatch = _dispatch()
+PrettyPrinter._dispatch = _dispatch()  # pyright: ignore
 
 
 ROOT_BUILD_DEFAULT = (Path(__file__) / ".." / ".." / ".." / "build").resolve()
