@@ -205,7 +205,7 @@ def clf_transform_to_description(
             DescriptionStyle.SHORT_UNION,
         ):
             if clf_transform.description is not None:
-                if direction == "Forward":
+                if direction.lower() == "forward":
                     description.append(
                         f"Convert {clf_transform.output_descriptor} "
                         f"to {clf_transform.input_descriptor}"
