@@ -165,7 +165,7 @@ def clf_transform_to_description(
     clf_transform,
     describe=DescriptionStyle.LONG_UNION,
     amf_components=None,
-    inverse_direction=False,
+    direction="Forward",
 ):
     """
     Generate the *OpenColorIO* `Colorspace` or `NamedTransform` description for
@@ -181,9 +181,10 @@ def clf_transform_to_description(
     amf_components : mapping, optional
         *ACES* *AMF* components used to extend the *ACES* *CTL* transform
         description.
-    inverse_direction : bool, optional
+    direction : str, optional
         Direction of transform -- determines order of transform descriptors.
-        Default: False (i.e., assume 'Forward' direction)
+        {"Forward", "Reverse"}
+        Default: "Forward" (i.e., assume 'Forward' direction)
 
     Returns
     -------
@@ -204,7 +205,7 @@ def clf_transform_to_description(
             DescriptionStyle.SHORT_UNION,
         ):
             if clf_transform.description is not None:
-                if inverse_direction:
+                if direction == "Forward":
                     description.append(
                         f"Convert {clf_transform.output_descriptor} "
                         f"to {clf_transform.input_descriptor}"
@@ -409,12 +410,12 @@ def clf_transform_to_named_transform(
     if is_reference(clf_transform.source):
         signature["inverse_transform"] = file_transform
         signature["description"] = clf_transform_to_description(
-            clf_transform, describe, amf_components, inverse_direction=True
+            clf_transform, describe, amf_components, direction="Reverse"
         )
     else:
         signature["forward_transform"] = file_transform
         signature["description"] = clf_transform_to_description(
-            clf_transform, describe, amf_components, inverse_direction=False
+            clf_transform, describe, amf_components, direction="Forward"
         )
 
     signature.update(kwargs)
