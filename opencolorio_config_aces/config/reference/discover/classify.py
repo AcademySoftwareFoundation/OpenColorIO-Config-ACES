@@ -136,7 +136,7 @@ TRANSFORM_FAMILIES_CTL = {
     "lib": "lib",
     "lmt": "lmt",
     "odt": "output_transform",
-    "outputTransforms": "output_transform",
+    "outputTransform": "output_transform",
     "rrt": "rrt",
     "utilities": "utility",
 }
