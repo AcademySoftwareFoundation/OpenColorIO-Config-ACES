@@ -975,7 +975,7 @@ def generate_config_cg(
 
     logger.info("Implicit transforms: %s.", implicit_transforms)
 
-    def implicit_filterer(transform):
+    def implicit_transform_filterer(transform):
         """Return whether given transform is an implicit transform."""
 
         return transform.get("name") in implicit_transforms
@@ -1003,20 +1003,23 @@ def generate_config_cg(
 
         return filtered
 
-    colorspace_filterers = [implicit_filterer, transform_filterer]
+    colorspace_filterers = [implicit_transform_filterer, transform_filterer]
     data.colorspaces = multi_filters(data.colorspaces, colorspace_filterers)
     logger.info(
         'Filtered "Colorspace" transforms: %s.',
         [a["name"] for a in data.colorspaces],
     )
 
-    look_filterers = [implicit_filterer, transform_filterer]
+    look_filterers = [implicit_transform_filterer, transform_filterer]
     data.looks = multi_filters(data.looks, look_filterers)
     logger.info(
         'Filtered "Look" transforms: %s ', [a["name"] for a in data.looks]
     )
 
-    view_transform_filterers = [implicit_filterer, transform_filterer]
+    view_transform_filterers = [
+        implicit_transform_filterer,
+        transform_filterer,
+    ]
     data.view_transforms = multi_filters(
         data.view_transforms, view_transform_filterers
     )
@@ -1030,8 +1033,8 @@ def generate_config_cg(
         a["name"] for a in data.colorspaces if a.get("family") == "Display"
     ]
 
-    def implicit_filterer(transform):
-        """Return whether given transform is an implicit transform."""
+    def implicit_view_filterer(transform):
+        """Return whether given transform is an implicit view."""
 
         return all(
             [
@@ -1052,14 +1055,14 @@ def generate_config_cg(
 
         return False
 
-    shared_view_filterers = [implicit_filterer, view_filterer]
+    shared_view_filterers = [implicit_view_filterer, view_filterer]
     data.shared_views = multi_filters(data.shared_views, shared_view_filterers)
     logger.info(
         'Filtered shared "View(s)": %s.',
         [a["view"] for a in data.shared_views],
     )
 
-    view_filterers = [implicit_filterer, view_filterer]
+    view_filterers = [implicit_view_filterer, view_filterer]
     data.views = multi_filters(data.views, view_filterers)
     logger.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
 

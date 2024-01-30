@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 
+import contextlib
 import requests
 from invoke.exceptions import Failure
 from pathlib import Path
@@ -27,10 +28,10 @@ from opencolorio_config_aces.utilities import google_sheet_title, message_box
 import inspect
 
 if not hasattr(inspect, "getargspec"):
-    inspect.getargspec = inspect.getfullargspec
+    inspect.getargspec = inspect.getfullargspec  # pyright: ignore
 
-from invoke import Context, task
-import contextlib
+from invoke.tasks import task
+from invoke.context import Context
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -48,6 +49,7 @@ __all__ = [
     "ORG",
     "CONTAINER",
     "clean",
+    "quality",
     "precommit",
     "tests",
     "preflight",
@@ -141,6 +143,28 @@ def clean(
 
 
 @task
+def quality(
+    ctx: Context,
+    pyright: bool = True,
+):
+    """
+    Check the codebase with *Pyright* and lints various *restructuredText*
+    files with *rst-lint*.
+
+    Parameters
+    ----------
+    ctx
+        Context.
+    pyright
+        Whether to check the codebase with *Pyright*.
+    """
+
+    if pyright:
+        message_box('Checking codebase with "Pyright"...')
+        ctx.run("pyright --skipunannotated --level warning")
+
+
+@task
 def precommit(ctx: Context):
     """
     Run the "pre-commit" hooks on the codebase.
@@ -176,7 +200,7 @@ def tests(ctx: Context):
     )
 
 
-@task(precommit, tests)
+@task(quality, precommit, tests)
 def preflight(ctx: Context):  # noqa: ARG001
     """
     Perform the preflight tasks, i.e. *formatting* and *quality*.

@@ -53,7 +53,7 @@ __all__ = [
 BUILTIN_TRANSFORMS = DocstringDict(
     {
         builtin: PROFILE_VERSION_DEFAULT
-        for builtin in ocio.BuiltinTransformRegistry()
+        for builtin in ocio.BuiltinTransformRegistry()  # pyright: ignore
     }
 )
 BUILTIN_TRANSFORMS.__doc__ = """
