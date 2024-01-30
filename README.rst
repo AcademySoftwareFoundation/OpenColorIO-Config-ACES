@@ -231,7 +231,7 @@ CG Config
 | Updating Mapping File | `invoke update-mapping-file-cg`     |
 +-----------------------+-------------------------------------+
 
-Reference Config
+Studio Config
 ****************
 
 +-----------------------+-----------------------------------------+
