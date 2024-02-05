@@ -68,6 +68,8 @@ BUILTIN_TRANSFORMS.update(
         "CURVE - CANON_CLOG2_to_LINEAR": Version(2, 2),
         "CURVE - CANON_CLOG3_to_LINEAR": Version(2, 2),
         "DISPLAY - CIE-XYZ-D65_to_DisplayP3": Version(2, 3),
+        "APPLE_LOG_to_ACES2065-1": Version(2, 4),
+        "CURVE - APPLE_LOG_to_LINEAR": Version(2, 4),
     }
 )
 
