@@ -228,6 +228,7 @@ def build_clf_transforms(ctx: Context):
 
     message_box('Building the "CLF" transform files...')
     for family in [
+        "apple",
         "arri",
         "blackmagic",
         "canon",
