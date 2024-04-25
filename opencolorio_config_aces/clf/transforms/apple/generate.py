@@ -4,10 +4,10 @@
 *Apple* CLF Transforms Generation
 =================================
 
-Defines procedures for generating Canon *Common LUT Format* (CLF)
+Defines procedures for generating Apple *Common LUT Format* (CLF)
 transforms:
 
--   :func:`opencolorio_config_aces.clf.generate_clf_transforms_canon`
+-   :func:`opencolorio_config_aces.clf.generate_clf_transforms_apple`
 """
 
 from pathlib import Path
