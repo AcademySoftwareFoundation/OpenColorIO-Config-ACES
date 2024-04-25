@@ -15,7 +15,7 @@ from pathlib import Path
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
     format_clf_transform_id,
-    generate_clf_transform
+    generate_clf_transform,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -74,8 +74,7 @@ def generate_clf_transforms_apple(output_directory):
     clf_transforms = {}
 
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:"
-        "IDT.Apple.AppleLog_BT2020.a1.v1"
+        "urn:ampas:aces:transformId:v1.5:" "IDT.Apple.AppleLog_BT2020.a1.v1"
     )
 
     name = "Apple_Log_to_ACES2065-1"
@@ -92,7 +91,7 @@ def generate_clf_transforms_apple(output_directory):
         input_descriptor,
         output_descriptor,
         aces_transform_id=aces_transform_id,
-        style=style
+        style=style,
     )
 
     # Generate `NamedTransform` for log curve only.
@@ -110,7 +109,7 @@ def generate_clf_transforms_apple(output_directory):
         f'{input_descriptor.replace(" (arbitrary primaries)", "")} to Linear Curve',
         input_descriptor,
         output_descriptor,
-        style=style
+        style=style,
     )
 
     return clf_transforms
