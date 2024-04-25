@@ -74,7 +74,7 @@ def generate_clf_transforms_apple(output_directory):
     clf_transforms = {}
 
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:" "IDT.Apple.AppleLog_BT2020.a1.v1"
+        "urn:ampas:aces:transformId:v1.5:IDT.Apple.AppleLog_BT2020.a1.v1"
     )
 
     name = "Apple_Log_to_ACES2065-1"
