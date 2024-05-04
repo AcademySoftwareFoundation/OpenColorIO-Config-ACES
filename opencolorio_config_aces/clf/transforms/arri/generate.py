@@ -39,7 +39,7 @@ __all__ = [
     "generate_clf_transforms_arri",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 FAMILY = "ARRI"
@@ -137,14 +137,14 @@ def _build_logc3_curve(ei=800, info=False):
         # follows CLF 6.6 Log specification
         f = c * log10(a * cut + b) + d
 
-        logger.info("White Paper Values for EI%s", ei)
-        logger.info("cut: {%.6f} :: {%.15f}", cut, cut)
-        logger.info("a:   {%.6f} :: {%.15f}", a, a)
-        logger.info("b:   {%.6f} :: {%.15f}", b, b)
-        logger.info("c:   {%.6f} :: {%.15f}", c, c)
-        logger.info("d:   {%.6f} :: {%.15f}", d, d)
-        logger.info("e:   {%.6f} :: {%.15f}", e, e)
-        logger.info("f:   {%.6f} :: {%.15f}", f, f)
+        LOGGER.info("White Paper Values for EI%s", ei)
+        LOGGER.info("cut: {%.6f} :: {%.15f}", cut, cut)
+        LOGGER.info("a:   {%.6f} :: {%.15f}", a, a)
+        LOGGER.info("b:   {%.6f} :: {%.15f}", b, b)
+        LOGGER.info("c:   {%.6f} :: {%.15f}", c, c)
+        LOGGER.info("d:   {%.6f} :: {%.15f}", d, d)
+        LOGGER.info("e:   {%.6f} :: {%.15f}", e, e)
+        LOGGER.info("f:   {%.6f} :: {%.15f}", f, f)
 
     # OCIO LogCameraTransform translation variables
     base = 10.0
@@ -334,7 +334,7 @@ def _generate_logc4_transforms(output_directory):
 
     # Generate ARRI LogC4 to ACES 2065-1 Transform
     name = "ARRI_LogC4_to_ACES2065-1"
-    aces_id = "urn:ampas:aces:transformId:v1.5:IDT.ARRI.ARRI-LogC4.a1.v1"
+    aces_id = "urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv4_to_ACES.a2.v1"
     input_descriptor = "ARRI LogC4"
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)

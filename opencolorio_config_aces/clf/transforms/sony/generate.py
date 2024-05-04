@@ -220,7 +220,7 @@ def generate_clf_transforms_sony(output_directory):
         f"{input_descriptor} to {output_descriptor}",
         input_descriptor,
         output_descriptor,
-        "urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3.a1.v1",
+        "urn:ampas:aces:transformId:v2.0:CSC.Sony.SLog3_SGamut3_to_ACES.a2.v1",
     )
 
     # Generate the Linear S-Gamut3 transform.
@@ -253,7 +253,7 @@ def generate_clf_transforms_sony(output_directory):
         f"{input_descriptor} to {output_descriptor}",
         input_descriptor,
         output_descriptor,
-        "urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3Cine.a1.v1",
+        "urn:ampas:aces:transformId:v2.0:CSC.Sony.SLog3_SGamut3Cine_to_ACES.a2.v1",
     )
 
     # Generate the Linear S-Gamut3.Cine transform.
@@ -286,7 +286,7 @@ def generate_clf_transforms_sony(output_directory):
         f"{input_descriptor} to {output_descriptor}",
         input_descriptor,
         output_descriptor,
-        "urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1",
+        "urn:ampas:aces:transformId:v2.0:CSC.Sony.Venice_SLog3_SGamut3_to_ACES.a2.v1",
     )
 
     # Generate the Linear Venice S-Gamut3 transform.
@@ -319,7 +319,7 @@ def generate_clf_transforms_sony(output_directory):
         f"{input_descriptor} to {output_descriptor}",
         input_descriptor,
         output_descriptor,
-        "urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1",
+        "urn:ampas:aces:transformId:v2.0:CSC.Sony.Venice_SLog3_SGamut3Cine_to_ACES.a2.v1",
     )
 
     # Generate the Linear Venice S-Gamut3.Cine transform.

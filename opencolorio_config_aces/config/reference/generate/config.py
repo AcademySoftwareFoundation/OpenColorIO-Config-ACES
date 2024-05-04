@@ -62,7 +62,6 @@ __all__ = [
     "URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE",
     "PATH_TRANSFORMS_MAPPING_FILE_REFERENCE",
     "COLORSPACE_SCENE_ENCODING_REFERENCE",
-    "COLORSPACE_OUTPUT_ENCODING_REFERENCE",
     "FAMILY_DISPLAY_REFERENCE",
     "TEMPLATE_ACES_TRANSFORM_ID",
     "HEADER_AMF_COMPONENTS",
@@ -83,11 +82,11 @@ __all__ = [
     "generate_config_aces",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE = (
     "https://docs.google.com/spreadsheets/d/"
-    "1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg/"
+    "1z3xsy3sF0I-8AN_tkMOEjHlAs13ba7VAVhrE8v4WIyo/"
     "export?format=csv&gid=273921464"
 )
 """
@@ -110,13 +109,6 @@ COLORSPACE_SCENE_ENCODING_REFERENCE = "ACES2065-1"
 *OpenColorIO* config reference colorspace.
 
 COLORSPACE_SCENE_ENCODING_REFERENCE : unicode
-"""
-
-COLORSPACE_OUTPUT_ENCODING_REFERENCE = "OCES"
-"""
-*OpenColorIO* config output encoding colorspace.
-
-COLORSPACE_OUTPUT_ENCODING_REFERENCE : unicode
 """
 
 FAMILY_DISPLAY_REFERENCE = "Display"
@@ -241,10 +233,7 @@ def ctl_transform_to_colorspace_name(ctl_transform):
         *OpenColorIO* `Colorspace` name.
     """
 
-    if ctl_transform.source in (
-        COLORSPACE_SCENE_ENCODING_REFERENCE,
-        COLORSPACE_OUTPUT_ENCODING_REFERENCE,
-    ):
+    if ctl_transform.source == COLORSPACE_SCENE_ENCODING_REFERENCE:
         name = ctl_transform.target
     else:
         name = ctl_transform.source
@@ -268,15 +257,7 @@ def ctl_transform_to_look_name(ctl_transform):
         *OpenColorIO* `Look` name.
     """
 
-    if ctl_transform.source in (
-        COLORSPACE_SCENE_ENCODING_REFERENCE,
-        COLORSPACE_OUTPUT_ENCODING_REFERENCE,
-    ):
-        name = ctl_transform.target
-    else:
-        name = ctl_transform.source
-
-    return beautify_look_name(name)
+    return beautify_look_name(ctl_transform.user_name)
 
 
 def ctl_transform_to_transform_family(ctl_transform, analytical=True):
@@ -301,26 +282,22 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
     """
 
     if analytical:
-        if ctl_transform.family == "csc" and ctl_transform.namespace == "Academy":
+        if ctl_transform.family == "csc":
             family = "CSC"
-        elif ctl_transform.family == "input_transform":
-            family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
         elif ctl_transform.family == "output_transform":
             family = "Output"
-        elif ctl_transform.family == "lmt":
-            family = "LMT"
+        elif ctl_transform.family == "look":
+            family = "Look"
     else:  # noqa: PLR5501
-        if ctl_transform.family == "csc" and ctl_transform.namespace == "Academy":
+        if ctl_transform.family == "csc":
             if re.match("ACES|ADX", ctl_transform.name):
                 family = "ACES"
             else:
                 family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
-        elif ctl_transform.family == "input_transform":
-            family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
         elif ctl_transform.family == "output_transform":
             family = "Output"
-        elif ctl_transform.family == "lmt":
-            family = "LMT"
+        elif ctl_transform.family == "look":
+            family = "Look"
 
     return beautify_transform_family(family)
 
@@ -1003,21 +980,21 @@ def generate_config_aces(
         *CTL* transforms and *ACES* *AMF* components.
     """
 
-    logger.info(
+    LOGGER.info(
         'Generating "%s" config...',
         config_name_aces(dependency_versions),
     )
 
-    logger.debug('Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys()))
+    LOGGER.debug('Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys()))
 
     ctl_transforms = unclassify_ctl_transforms(
         classify_aces_ctl_transforms(discover_aces_ctl_transforms())
     )
     amf_components = generate_amf_components(ctl_transforms)
 
-    logger.debug('Using %s "CTL" transforms...', ctl_transforms)
+    LOGGER.debug('Using %s "CTL" transforms...', ctl_transforms)
 
-    logger.info('Parsing "%s" config mapping file...', config_mapping_file_path)
+    LOGGER.info('Parsing "%s" config mapping file...', config_mapping_file_path)
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -1051,7 +1028,7 @@ def generate_config_aces(
                 )
 
                 if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
-                    logger.warning(
+                    LOGGER.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
@@ -1069,7 +1046,7 @@ def generate_config_aces(
                 )
 
                 if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
-                    logger.warning(
+                    LOGGER.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
@@ -1175,11 +1152,11 @@ def generate_config_aces(
         raw_colorspace,
     ]
 
-    logger.info('Implicit colorspaces: "%s"', [a["name"] for a in colorspaces])
+    LOGGER.info('Implicit colorspaces: "%s"', [a["name"] for a in colorspaces])
 
     for style, transforms_data in config_mapping.items():
         if transforms_data[0]["interface"] == "ViewTransform":
-            logger.info('Creating a "View" transform for "%s" style...', style)
+            LOGGER.info('Creating a "View" transform for "%s" style...', style)
             view_transform = style_to_view_transform(
                 style,
                 [transform_data["ctl_transform"] for transform_data in transforms_data],
@@ -1220,18 +1197,19 @@ def generate_config_aces(
                     "view": view_transform_name,
                     "view_transform": view_transform_name,
                 }
-                logger.info(
-                    'Adding "%s" shared view to "%s" display.',
-                    shared_view["view"],
-                    display_name,
-                )
-                shared_views.append(shared_view)
+                if shared_view not in shared_views:
+                    LOGGER.info(
+                        'Adding "%s" shared view to "%s" display.',
+                        shared_view["view"],
+                        display_name,
+                    )
+                    shared_views.append(shared_view)
         else:
             for transform_data in transforms_data:
                 ctl_transform = transform_data["ctl_transform"]
 
                 if transform_data["interface"] == "Look":
-                    logger.info('Creating a "Look" transform for "%s" style...', style)
+                    LOGGER.info('Creating a "Look" transform for "%s" style...', style)
                     look = ctl_transform_to_look(
                         ctl_transform,
                         describe,
@@ -1246,9 +1224,10 @@ def generate_config_aces(
                         process_space=scene_reference_colorspace["name"],
                     )
                     look["transforms_data"] = [transform_data]
-                    looks.append(look)
+                    if look not in looks:
+                        looks.append(look)
                 else:
-                    logger.info(
+                    LOGGER.info(
                         'Creating a "Colorspace" transform for "%s" style...',
                         style,
                     )
@@ -1269,7 +1248,8 @@ def generate_config_aces(
                         aliases=transform_data_aliases(transform_data),
                     )
                     colorspace["transforms_data"] = [transform_data]
-                    colorspaces.append(colorspace)
+                    if colorspace not in colorspaces:
+                        colorspaces.append(colorspace)
 
     untonemapped_view_transform = {
         "name": "Un-tone-mapped",
@@ -1284,12 +1264,13 @@ def generate_config_aces(
             "view": untonemapped_view_transform["name"],
             "view_transform": untonemapped_view_transform["name"],
         }
-        logger.info(
+        LOGGER.info(
             'Adding "%s" shared view to "%s" display.',
             untonemapped_shared_view["view"],
             display_name,
         )
-        shared_views.append(untonemapped_shared_view)
+        if untonemapped_shared_view not in shared_views:
+            shared_views.append(untonemapped_shared_view)
 
     for display_name in display_names:
         raw_view = {
@@ -1297,8 +1278,9 @@ def generate_config_aces(
             "view": "Raw",
             "colorspace": raw_colorspace["name"],
         }
-        logger.info('Adding "%s" view to "%s" display.', raw_view["view"], display_name)
-        views.append(raw_view)
+        LOGGER.info('Adding "%s" view to "%s" display.', raw_view["view"], display_name)
+        if raw_view not in views:
+            views.append(raw_view)
 
     data = ConfigData(
         name=re.sub(
@@ -1343,7 +1325,7 @@ def generate_config_aces(
 
     config = generate_config(data, config_name, validate)
 
-    logger.info(
+    LOGGER.info(
         '"%s" config generation complete!',
         config_name_aces(dependency_versions),
     )
@@ -1363,7 +1345,7 @@ if __name__ == "__main__":
 
     build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "reference").resolve()
 
-    logger.info('Using "%s" build directory...', build_directory)
+    LOGGER.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
@@ -1388,4 +1370,4 @@ if __name__ == "__main__":
                 data, build_directory / config_basename.replace("ocio", "json")
             )
         except TypeError as error:
-            logger.critical(error)
+            LOGGER.critical(error)
