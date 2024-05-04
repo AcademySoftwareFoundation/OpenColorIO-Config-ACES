@@ -3,7 +3,7 @@
     <InputDescriptor>Blackmagic Film Wide Gamut (Gen 5)</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
-        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.BlackmagicDesign.BMDFilm_WideGamut_Gen5.a1.v1</ACEStransformID>
+        <ACEStransformID>urn:ampas:aces:transformId:v2.0:CSC.Blackmagic.BMDFilm_WideGamut_Gen5_to_ACES.a2.v1</ACEStransformID>
     </Info>
     <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
         <LogParams base="2.71828182845905" linSideSlope="1" linSideOffset="0.00549407243225781" logSideSlope="0.0869287606549122" logSideOffset="0.530013339229194" linSideBreak="0.005" />

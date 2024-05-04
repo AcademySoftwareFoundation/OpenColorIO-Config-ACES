@@ -84,23 +84,8 @@ class DependencyVersions:
 
 DEPENDENCY_VERSIONS = [
     DependencyVersions(
-        aces=Version(1, 3),
-        colorspaces=Version(2, 1, 0),
-        ocio=Version(2, 1),
-    ),
-    DependencyVersions(
-        aces=Version(1, 3),
-        colorspaces=Version(2, 1, 0),
-        ocio=Version(2, 2),
-    ),
-    DependencyVersions(
-        aces=Version(1, 3),
-        colorspaces=Version(2, 2, 0),
-        ocio=Version(2, 3),
-    ),
-    DependencyVersions(
-        aces=Version(1, 3),
-        colorspaces=Version(2, 2, 0),
+        aces=Version(2, 0),
+        colorspaces=Version(2, 3, 0),
         ocio=Version(2, 4),
     ),
 ]

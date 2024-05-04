@@ -25,6 +25,7 @@ from .common import (
     slugify,
     attest,
     timestamp,
+    as_bool,
 )
 
 __all__ = [
@@ -51,4 +52,5 @@ __all__ = [
     "slugify",
     "attest",
     "timestamp",
+    "as_bool",
 ]

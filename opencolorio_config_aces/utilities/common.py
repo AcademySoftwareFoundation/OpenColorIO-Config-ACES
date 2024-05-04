@@ -54,9 +54,10 @@ __all__ = [
     "slugify",
     "attest",
     "timestamp",
+    "as_bool",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 # Monkey-patching the "PrettyPrinter" mapping to handle the "TypeError"
@@ -754,3 +755,38 @@ def timestamp():
     )
 
     return timestamp
+
+
+def as_bool(a: str) -> bool:
+    """
+    Convert given string to bool.
+
+    The following string values evaluate to *True*: "1", "On", and "True".
+
+    Parameters
+    ----------
+    a
+        String to convert to bool.
+
+    Returns
+    -------
+    :class:`bool`
+        Whether the given string is *True*.
+
+    Examples
+    --------
+    >>> as_bool("1")
+    True
+    >>> as_bool("On")
+    True
+    >>> as_bool("True")
+    True
+    >>> as_bool("0")
+    False
+    >>> as_bool("Off")
+    False
+    >>> as_bool("False")
+    False
+    """
+
+    return a.lower() in ["1", "on", "true"]

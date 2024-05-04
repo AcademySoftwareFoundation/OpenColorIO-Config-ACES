@@ -48,11 +48,11 @@ __all__ = [
     "generate_config_studio",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO = (
     "https://docs.google.com/spreadsheets/d/"
-    "1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4/"
+    "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
     "export?format=csv&gid=1155125238"
 )
 """
@@ -224,7 +224,7 @@ def generate_config_studio(
         *CTL* transforms, *CLF* transforms and *ACES* *AMF* components.
     """
 
-    logger.info(
+    LOGGER.info(
         'Generating "%s" config...',
         config_name_studio(dependency_versions),
     )
@@ -254,7 +254,7 @@ def generate_config_studio(
     data.description = config_description_studio(dependency_versions, describe)
     config = generate_config(data, config_name, validate)
 
-    logger.info(
+    LOGGER.info(
         '"%s" config generation complete!',
         config_name_studio(dependency_versions),
     )

@@ -40,7 +40,6 @@ from opencolorio_config_aces.config.reference.discover.graph import (
     SEPARATOR_NODE_NAME_CTL,
 )
 from opencolorio_config_aces.config.reference.generate.config import (
-    COLORSPACE_OUTPUT_ENCODING_REFERENCE,
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     ctl_transform_to_colorspace,
 )
@@ -65,7 +64,7 @@ __all__ = [
     "generate_config_aces",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 PATTERNS_VIEW_NAME_REFERENCE = {
     "\\(100 nits\\) dim": "",
@@ -132,13 +131,13 @@ def create_builtin_transform(style, profile_version=PROFILE_VERSION_DEFAULT):
         builtin_transform.setStyle(style)
     except (ValueError, ocio.Exception) as error:
         if isinstance(error, ValueError):
-            logger.warning(
+            LOGGER.warning(
                 '"%s" style is unavailable for "%s" profile version!',
                 style,
                 profile_version,
             )
         else:
-            logger.warning(
+            LOGGER.warning(
                 '"%s" style is either undefined using a placeholder '
                 '"FileTransform" instead!',
                 style,
@@ -190,7 +189,7 @@ def node_to_builtin_transform(
             return None
 
         verbose_path = " --> ".join(dict.fromkeys(itertools.chain.from_iterable(path)))
-        logger.debug('Creating "BuiltinTransform" with "%s" path.', verbose_path)
+        LOGGER.debug('Creating "BuiltinTransform" with "%s" path.', verbose_path)
 
         for edge in path:
             source, target = edge
@@ -216,7 +215,7 @@ def node_to_builtin_transform(
             return group_transform
 
     except NetworkXNoPath:
-        logger.debug(
+        LOGGER.debug(
             'No path to "%s" for "%s" node!',
             COLORSPACE_SCENE_ENCODING_REFERENCE,
             node,
@@ -367,8 +366,7 @@ def generate_config_aces(
     The config generation is driven entirely from the *aces-dev* conversion
     graph. The config generated, while not usable because of the missing
     *OpenColorIO* *BuiltinTransforms*, provides an exact mapping with the
-    *aces-dev* *CTL* transforms, and, for example, uses the
-    *Output Color Encoding Specification* (OCES) colourspace.
+    *aces-dev* *CTL* transforms.
 
     Parameters
     ----------
@@ -399,7 +397,7 @@ def generate_config_aces(
         instances.
     """
 
-    logger.info('Generating "%s" config...', config_name_aces(dependency_versions))
+    LOGGER.info('Generating "%s" config...', config_name_aces(dependency_versions))
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
@@ -420,15 +418,6 @@ def generate_config_aces(
         description='The "Academy Color Encoding System" reference colorspace.',
     )
 
-    display_reference_colorspace = colorspace_factory(
-        f"CSC - {COLORSPACE_OUTPUT_ENCODING_REFERENCE}",
-        "ACES",
-        description='The "Output Color Encoding Specification" colorspace.',
-        from_reference=node_to_builtin_transform(
-            graph, COLORSPACE_OUTPUT_ENCODING_REFERENCE, "Reverse"
-        ),
-    )
-
     raw_colorspace = colorspace_factory(
         "Utility - Raw",
         "Utility",
@@ -438,22 +427,18 @@ def generate_config_aces(
 
     colorspaces += [
         scene_reference_colorspace,
-        display_reference_colorspace,
         raw_colorspace,
     ]
 
-    logger.info('Implicit colorspaces: "%s"', [a.getName() for a in colorspaces])
+    LOGGER.info('Implicit colorspaces: "%s"', [a.getName() for a in colorspaces])
 
     for family in ("csc", "input_transform", "lmt", "output_transform"):
         family_colourspaces = []
         for node in filter_nodes(graph, [lambda x, family=family: x.family == family]):
-            if node in (
-                COLORSPACE_SCENE_ENCODING_REFERENCE,
-                COLORSPACE_OUTPUT_ENCODING_REFERENCE,
-            ):
+            if node == COLORSPACE_SCENE_ENCODING_REFERENCE:
                 continue
 
-            logger.info('Creating a colorspace for "%s" node...', node)
+            LOGGER.info('Creating a colorspace for "%s" node...', node)
             colorspace = node_to_colorspace(
                 graph, node, dependency_versions.ocio, describe
             )
@@ -490,7 +475,7 @@ def generate_config_aces(
 
     for display_name in display_names:
         view = beautify_view_name(raw_colorspace.getName())
-        logger.info('Adding "%s" view to "%s" display.', view, display_name)
+        LOGGER.info('Adding "%s" view to "%s" display.', view, display_name)
         views.append(
             {
                 "display": display_name,
@@ -515,7 +500,7 @@ def generate_config_aces(
 
     config = generate_config(data, config_name, validate)
 
-    logger.info(
+    LOGGER.info(
         '"%s" config generation complete!',
         config_name_aces(dependency_versions),
     )
@@ -535,7 +520,7 @@ if __name__ == "__main__":
 
     build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "analytical").resolve()
 
-    logger.info('Using "%s" build directory...', build_directory)
+    LOGGER.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
@@ -548,7 +533,7 @@ if __name__ == "__main__":
         )
 
         for ctl_transform in colorspaces.values():
-            logger.info(ctl_transform.aces_transform_id)
+            LOGGER.info(ctl_transform.aces_transform_id)
 
         # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
         # versions.
@@ -557,4 +542,4 @@ if __name__ == "__main__":
                 data, build_directory / config_basename.replace("ocio", "json")
             )
         except TypeError as error:
-            logger.critical(error)
+            LOGGER.critical(error)

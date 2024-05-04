@@ -79,11 +79,11 @@ __all__ = [
     "generate_config_cg",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG = (
     "https://docs.google.com/spreadsheets/d/"
-    "1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4/"
+    "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
     "export?format=csv&gid=365242296"
 )
 """
@@ -816,7 +816,7 @@ def generate_config_cg(
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
-    logger.info(
+    LOGGER.info(
         'Generating "%s" config...',
         config_name_cg(dependency_versions),
     )
@@ -825,14 +825,14 @@ def generate_config_cg(
         classify_clf_transforms(discover_clf_transforms())
     )
 
-    logger.debug('Using %s "CLF" transforms...', clf_transforms)
+    LOGGER.debug('Using %s "CLF" transforms...', clf_transforms)
 
     if data is None:
         _config, data, ctl_transforms, amf_components = generate_config_aces(
             dependency_versions=dependency_versions,
             describe=describe,
-            analytical=False,
             scheme=scheme,
+            analytical=False,
             additional_data=True,
         )
 
@@ -849,7 +849,7 @@ def generate_config_cg(
 
         clf_transform = next(iter(filtered_clf_transforms), None)
 
-        logger.debug(
+        LOGGER.debug(
             'Filtered "CLF" transform with "%s" "CLFtransformID": %s.',
             clf_transform_id,
             clf_transform,
@@ -868,7 +868,7 @@ def generate_config_cg(
 
         clf_transform = next(iter(filtered_clf_transforms), None)
 
-        logger.debug(
+        LOGGER.debug(
             'Filtered "CLF" transform with "%s" style: %s.',
             style,
             clf_transform,
@@ -876,7 +876,7 @@ def generate_config_cg(
 
         return clf_transform
 
-    logger.info('Parsing "%s" config mapping file...', config_mapping_file_path)
+    LOGGER.info('Parsing "%s" config mapping file...', config_mapping_file_path)
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -910,7 +910,7 @@ def generate_config_cg(
                 )
 
                 if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
-                    logger.warning(
+                    LOGGER.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
@@ -963,7 +963,7 @@ def generate_config_cg(
         a["name"] for a in transforms if a.get("transforms_data") is None
     ]
 
-    logger.info("Implicit transforms: %s.", implicit_transforms)
+    LOGGER.info("Implicit transforms: %s.", implicit_transforms)
 
     def implicit_transform_filterer(transform):
         """Return whether given transform is an implicit transform."""
@@ -974,11 +974,11 @@ def generate_config_cg(
         """Return whether given transform must be included."""
 
         for transform_data in yield_from_config_mapping():
-            for data in transform["transforms_data"]:
-                aces_transform_id = transform_data["aces_transform_id"]
-                if not aces_transform_id:
-                    continue
+            aces_transform_id = transform_data["aces_transform_id"]
+            if not aces_transform_id:
+                continue
 
+            for data in transform["transforms_data"]:
                 if aces_transform_id == data.get("aces_transform_id"):
                     return True
 
@@ -993,21 +993,22 @@ def generate_config_cg(
 
     colorspace_filterers = [implicit_transform_filterer, transform_filterer]
     data.colorspaces = multi_filters(data.colorspaces, colorspace_filterers)
-    logger.info(
+
+    LOGGER.info(
         'Filtered "Colorspace" transforms: %s.',
         [a["name"] for a in data.colorspaces],
     )
 
     look_filterers = [implicit_transform_filterer, transform_filterer]
     data.looks = multi_filters(data.looks, look_filterers)
-    logger.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
+    LOGGER.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
 
     view_transform_filterers = [
         implicit_transform_filterer,
         transform_filterer,
     ]
     data.view_transforms = multi_filters(data.view_transforms, view_transform_filterers)
-    logger.info(
+    LOGGER.info(
         'Filtered "View" transforms: %s.',
         [a["name"] for a in data.view_transforms],
     )
@@ -1041,23 +1042,23 @@ def generate_config_cg(
 
     shared_view_filterers = [implicit_view_filterer, view_filterer]
     data.shared_views = multi_filters(data.shared_views, shared_view_filterers)
-    logger.info(
+    LOGGER.info(
         'Filtered shared "View(s)": %s.',
         [a["view"] for a in data.shared_views],
     )
 
     view_filterers = [implicit_view_filterer, view_filterer]
     data.views = multi_filters(data.views, view_filterers)
-    logger.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
+    LOGGER.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
 
     # Active Displays Filtering
     data.active_displays = [a for a in data.active_displays if a in display_names]
-    logger.info("Filtered active displays: %s.", data.active_displays)
+    LOGGER.info("Filtered active displays: %s.", data.active_displays)
 
     # Active Views Filtering
     views = [view["view"] for view in data.views]
     data.active_views = [view for view in data.active_views if view in views]
-    logger.info("Filtered active views: %s.", data.active_views)
+    LOGGER.info("Filtered active views: %s.", data.active_views)
 
     # CLF Transforms & BuiltinTransform Creation
     for transform_data in yield_from_config_mapping():
@@ -1089,7 +1090,7 @@ def generate_config_cg(
             )
 
             if transform_data["interface"] == "ColorSpace":
-                logger.info(
+                LOGGER.info(
                     'Creating a "Colorspace" transform for "%s" style...',
                     style,
                 )
@@ -1098,7 +1099,7 @@ def generate_config_cg(
                 colorspace["transforms_data"] = [transform_data]
                 data.colorspaces.append(colorspace)
             elif transform_data["interface"] == "NamedTransform":
-                logger.info(
+                LOGGER.info(
                     'Creating a "NamedTransform" transform for "%s" style...',
                     style,
                 )
@@ -1108,7 +1109,7 @@ def generate_config_cg(
                 data.named_transforms.append(colorspace)
 
             if style and clf_transform_id:
-                logger.warning(
+                LOGGER.warning(
                     '"%s" style was defined along side a "CTLtransformID", '
                     "hybrid transform generation was used!",
                     style,
@@ -1126,7 +1127,7 @@ def generate_config_cg(
             kwargs["clf_transform"] = clf_transform
 
             if transform_data["interface"] == "NamedTransform":
-                logger.info(
+                LOGGER.info(
                     'Adding "%s" "CLF" transform as a "Named" transform.',
                     clf_transform_id,
                 )
@@ -1135,7 +1136,7 @@ def generate_config_cg(
                 named_transform["transforms_data"] = [transform_data]
                 data.named_transforms.append(named_transform)
             else:
-                logger.info(
+                LOGGER.info(
                     'Adding "%s" "CLF" transform as a "Colorspace" transform.',
                     clf_transform_id,
                 )
@@ -1156,7 +1157,7 @@ def generate_config_cg(
     inactive_colorspaces = []
     for colorspace in data.inactive_colorspaces:
         if colorspace not in colorspace_named_transform_names:
-            logger.info('Removing "%s" inactive colorspace.', colorspace)
+            LOGGER.info('Removing "%s" inactive colorspace.', colorspace)
             continue
 
         inactive_colorspaces.append(colorspace)
@@ -1174,7 +1175,7 @@ def generate_config_cg(
         # A config contains multiple possible "Rendering" color spaces.
         ocio.ROLE_RENDERING,
     ):
-        logger.info('Removing "%s" role.', role)
+        LOGGER.info('Removing "%s" role.', role)
 
         data.roles.pop(role)
 
@@ -1200,7 +1201,7 @@ def generate_config_cg(
 
     config = generate_config(data, config_name, validate)
 
-    logger.info(
+    LOGGER.info(
         '"%s" config generation complete!',
         config_name_cg(dependency_versions),
     )

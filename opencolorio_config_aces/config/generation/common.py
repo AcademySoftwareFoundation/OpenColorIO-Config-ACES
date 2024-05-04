@@ -44,7 +44,7 @@ __all__ = [
     "generate_config",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -207,7 +207,7 @@ def validate_config(config):
         config.validate()
         return True
     except Exception as error:
-        logger.critical(error)
+        LOGGER.critical(error)
         return False
 
 
@@ -233,7 +233,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         *OpenColorIO* config.
     """
 
-    logger.debug("Config data:\n%s", data)
+    LOGGER.debug("Config data:\n%s", data)
 
     if base_config is not None:
         config = base_config
@@ -248,43 +248,43 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         config.setDescription(data.description)
 
     for search_path in data.search_path:
-        logger.debug('Adding "%s".', search_path)
+        LOGGER.debug('Adding "%s".', search_path)
         config.addSearchPath(search_path)
 
     for role, colorspace in data.roles.items():
-        logger.debug('Adding "%s" colorspace as "%s" role.', colorspace, role)
+        LOGGER.debug('Adding "%s" colorspace as "%s" role.', colorspace, role)
         config.setRole(role, colorspace)
 
     for colorspace in data.colorspaces:
         if isinstance(colorspace, Mapping):
             colorspace = colorspace_factory(**colorspace)  # noqa: PLW2901
 
-        logger.debug('Adding "%s" colorspace.', colorspace.getName())
+        LOGGER.debug('Adding "%s" colorspace.', colorspace.getName())
         config.addColorSpace(colorspace)
 
     for named_transform in data.named_transforms:
         if isinstance(named_transform, Mapping):
             named_transform = named_transform_factory(**named_transform)  # noqa: PLW2901
 
-        logger.debug('Adding "%s" named transform.', named_transform.getName())
+        LOGGER.debug('Adding "%s" named transform.', named_transform.getName())
         config.addNamedTransform(named_transform)
 
     for view_transform in data.view_transforms:
         if isinstance(view_transform, Mapping):
             view_transform = view_transform_factory(**view_transform)  # noqa: PLW2901
 
-        logger.debug('Adding "%s" view transform.', view_transform.getName())
+        LOGGER.debug('Adding "%s" view transform.', view_transform.getName())
         config.addViewTransform(view_transform)
 
     for look in data.looks:
         if isinstance(look, Mapping):
             look = look_factory(**look)  # noqa: PLW2901
 
-        logger.debug('Adding "%s" look.', look.getName())
+        LOGGER.debug('Adding "%s" look.', look.getName())
         config.addLook(look)
 
     if data.profile_version.major >= 2:
-        logger.debug('Disabling "%s" colorspaces.', data.inactive_colorspaces)
+        LOGGER.debug('Disabling "%s" colorspaces.', data.inactive_colorspaces)
         config.setInactiveColorSpaces(",".join(data.inactive_colorspaces))
 
     for shared_view in data.shared_views:
@@ -294,7 +294,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         rule = shared_view.get("rule")
         description = shared_view.get("description")
         view = shared_view["view"]
-        logger.debug(
+        LOGGER.debug(
             'Adding "%s" shared view using "%s" view transform, "%s" display '
             'colorspace, "%s" looks, "%s" rule and "%s" description.',
             view,
@@ -319,7 +319,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         description = view.get("description")
         view = view["view"]  # noqa: PLW2901
         if colorspace is not None:
-            logger.debug(
+            LOGGER.debug(
                 'Adding "%s" view to "%s" display using "%s" colorspace.',
                 view,
                 display,
@@ -328,7 +328,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
 
             config.addDisplayView(display, view, colorspace, looks)
         elif view_transform is not None and display_colorspace is not None:
-            logger.debug(
+            LOGGER.debug(
                 'Adding "%s" view to "%s" display using "%s" view transform, '
                 '"%s" display colorspace, "%s" rule and "%s" description.',
                 view,
@@ -349,15 +349,15 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
                 description,
             )
         else:
-            logger.debug('Adding "%s" view to "%s" display.', view, display)
+            LOGGER.debug('Adding "%s" view to "%s" display.', view, display)
             config.addDisplaySharedView(display, view)
 
     if data.active_displays:
-        logger.debug('Activating "%s" displays.', data.active_displays)
+        LOGGER.debug('Activating "%s" displays.', data.active_displays)
         config.setActiveDisplays(",".join(data.active_displays))
 
     if data.active_views:
-        logger.debug('Activating "%s" views.', data.active_views)
+        LOGGER.debug('Activating "%s" views.', data.active_views)
         config.setActiveViews(",".join(data.active_views))
 
     if data.file_rules:
@@ -370,14 +370,14 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
             pattern = file_rule.get("pattern")
             extension = file_rule.get("extension")
             if name == "Default":
-                logger.debug(
+                LOGGER.debug(
                     'Setting "%s" file rule with "%s" colorspace.',
                     name,
                     colorspace,
                 )
                 file_rules.setDefaultRuleColorSpace(colorspace)
             elif regex:
-                logger.debug(
+                LOGGER.debug(
                     'Adding "%s" file rule with "%s" regex pattern for "%s" '
                     "colorspace.",
                     name,
@@ -387,7 +387,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
                 file_rules.insertRule(rule_index, name, colorspace, regex)
                 rule_index += 1
             else:
-                logger.debug(
+                LOGGER.debug(
                     'Adding "%s" file rule with "%s" pattern and "%s" '
                     'extension for "%s" colorspace.',
                     name,
@@ -402,7 +402,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
     if data.viewing_rules:
         viewing_rules = ocio.ViewingRules()
         for _i, _viewing_rule in enumerate(reversed(data.viewing_rules)):
-            logger.warning("Inserting a viewing rule is not supported yet!")
+            LOGGER.warning("Inserting a viewing rule is not supported yet!")
             # viewing_rules.insertRule()
         config.setViewingRules(viewing_rules)
 
@@ -419,7 +419,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
             except Exception as error:
                 json_name = str(config_name).replace("ocio", "json")
                 serialize_config_data(data, json_name)
-                logger.critical('The config data was serialised to: "%s"', json_name)
+                LOGGER.critical('The config data was serialised to: "%s"', json_name)
                 raise Exception from error  # noqa: TRY002
 
     return config
@@ -433,7 +433,7 @@ if __name__ == "__main__":
 
     build_directory = (ROOT_BUILD_DEFAULT / "config" / "common" / "tests").resolve()
 
-    logger.info('Using "%s" build directory...', build_directory)
+    LOGGER.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
@@ -530,7 +530,7 @@ if __name__ == "__main__":
     try:
         serialize_config_data(data, build_directory / "config-v1.json")
     except TypeError as error:
-        logger.critical(error)
+        LOGGER.critical(error)
 
     # "OpenColorIO 2" configuration.
     colorspace_1 = {
@@ -725,7 +725,7 @@ if __name__ == "__main__":
     try:
         serialize_config_data(data, build_directory / "config-v2.json")
     except TypeError as error:
-        logger.critical(error)
+        LOGGER.critical(error)
 
     named_transform_2 = {
         "name": "-1 Stop",
@@ -768,4 +768,4 @@ if __name__ == "__main__":
             data, build_directory / "config-v2-with-named-transform.json"
         )
     except TypeError as error:
-        logger.critical(error)
+        LOGGER.critical(error)

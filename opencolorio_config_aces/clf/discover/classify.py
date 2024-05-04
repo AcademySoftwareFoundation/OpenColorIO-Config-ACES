@@ -65,7 +65,7 @@ __all__ = [
     "print_clf_taxonomy",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 URN_CLF: str = "urn:aswf:ocio:transformId:1.0"
 """
@@ -1061,7 +1061,7 @@ def discover_clf_transforms(
 
             clf_transform = os.path.join(directory, filename)
 
-            logger.debug(
+            LOGGER.debug(
                 '"%s" CLF transform was found!',
                 clf_transform_relative_path(clf_transform),
             )
@@ -1139,7 +1139,7 @@ CLFTransform(\
                     genus,
                 )
 
-                logger.debug('Classifying "%s" under "%s".', clf_transform, genus)
+                LOGGER.debug('Classifying "%s" under "%s".', clf_transform, genus)
 
                 classified_clf_transforms[family][genus][basename] = clf_transform
 
@@ -1155,7 +1155,7 @@ CLFTransform(\
                     forward_clf_transform, inverse_clf_transform
                 )
 
-                logger.debug('Classifying "%s" under "%s".', clf_transform, genus)
+                LOGGER.debug('Classifying "%s" under "%s".', clf_transform, genus)
 
                 classified_clf_transforms[family][genus][basename] = clf_transform
 
@@ -1281,35 +1281,35 @@ reference.ROOT_TRANSFORMS_CLF` attribute using the
     classified_clf_transforms = classify_clf_transforms(discover_clf_transforms())
 
     for family, genera in classified_clf_transforms.items():
-        message_box(family, print_callable=logger.info)
+        message_box(family, print_callable=LOGGER.info)
         for genus, clf_transforms in genera.items():
-            logger.info("[ %s ]", genus)
+            LOGGER.info("[ %s ]", genus)
             for name, clf_transform in clf_transforms.items():
-                logger.info("\t( %s )", name)
+                LOGGER.info("\t( %s )", name)
                 if isinstance(clf_transform, CLFTransform):
-                    logger.info(
+                    LOGGER.info(
                         '\t\t"%s" --> "%s"',
                         clf_transform.source,
                         clf_transform.target,
                     )
                     if clf_transform.clf_transform_id is not None:
-                        logger.info(
+                        LOGGER.info(
                             '\t\tCLFtransformID : "%s"',
                             clf_transform.clf_transform_id.clf_transform_id,
                         )
                 elif isinstance(clf_transform, CLFTransformPair):
-                    logger.info(
+                    LOGGER.info(
                         '\t\t"%s" <--> "%s"',
                         clf_transform.forward_transform.source,
                         clf_transform.forward_transform.target,
                     )
                     if clf_transform.forward_transform.clf_transform_id is not None:
-                        logger.info(
+                        LOGGER.info(
                             '\t\tACEStransformID : "%s"',
                             clf_transform.forward_transform.clf_transform_id.clf_transform_id,
                         )
                     if clf_transform.inverse_transform.clf_transform_id is not None:
-                        logger.info(
+                        LOGGER.info(
                             '\t\tACEStransformID : "%s"',
                             clf_transform.inverse_transform.clf_transform_id.clf_transform_id,
                         )

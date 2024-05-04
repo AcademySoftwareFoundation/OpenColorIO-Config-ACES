@@ -33,7 +33,7 @@ __status__ = "Production"
 __all__ = ["test_clf"]
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def test_clf(clf_path, input_data, output_path, inverse=False):
