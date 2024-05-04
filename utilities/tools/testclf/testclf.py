@@ -19,8 +19,8 @@ import logging
 import sys
 import traceback
 
-import numpy as np
 import imageio
+import numpy as np
 import PyOpenColorIO as ocio
 
 __author__ = "OpenColorIO Contributors"
@@ -48,7 +48,7 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
     input_data : list[str]
         Single input image file path or one or more "," delimited RGB
         float triplet strings
-        (e.g. ["1.0,0.0,0.0", "0.0,0.1,0.0", "0,0,1"]).
+        (e.g., ["1.0,0.0,0.0", "0.0,0.1,0.0", "0,0,1"]).
     output_path : str, optional
         Output image file path, required when an input image file is
         specified.
@@ -92,9 +92,7 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
     file_tf = ocio.FileTransform(
         src=clf_path,
         interpolation=ocio.INTERP_BEST,
-        direction=ocio.TRANSFORM_DIR_INVERSE
-        if inverse
-        else ocio.TRANSFORM_DIR_FORWARD,
+        direction=ocio.TRANSFORM_DIR_INVERSE if inverse else ocio.TRANSFORM_DIR_FORWARD,
     )
     proc = config.getProcessor(file_tf)
     cpu_proc = proc.getDefaultCPUProcessor()
@@ -145,7 +143,7 @@ if __name__ == "__main__":
         type=str,
         nargs="+",
         help="Input image file or one or more ',' delimited RGB float triplets "
-        "(e.g. 1.0,0.0,0.0 0.0,0.1,0.0 0,0,1).",
+        "(e.g., 1.0,0.0,0.0 0.0,0.1,0.0 0,0,1).",
     )
     parser.add_argument(
         "-o",

@@ -15,14 +15,15 @@ Defines various *OpenColorIO* transform factories:
 -   :func:`opencolorio_config_aces.produce_transform`
 """
 
-import re
 import logging
-import PyOpenColorIO as ocio
+import re
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from pprint import pformat
-from semver import Version
 from textwrap import indent
-from collections.abc import Mapping, Sequence
+
+import PyOpenColorIO as ocio
+from semver import Version
 
 from opencolorio_config_aces.config.generation import PROFILE_VERSION_DEFAULT
 from opencolorio_config_aces.utilities import DocstringDict, attest
@@ -115,7 +116,7 @@ def colorspace_factory(
     is_data=None,
     reference_space=None,
     base_colorspace=None,
-    **kwargs,  # noqa: ARG001
+    **kwargs,
 ):
     """
     *OpenColorIO* `Colorspace` factory.
@@ -256,7 +257,7 @@ def named_transform_factory(
     forward_transform=None,
     inverse_transform=None,
     base_named_transform=None,
-    **kwargs,  # noqa: ARG001
+    **kwargs,
 ):
     """
     *OpenColorIO* `NamedTransform` factory.
@@ -302,9 +303,7 @@ def named_transform_factory(
 
     if base_named_transform is not None:
         if isinstance(base_named_transform, Mapping):
-            base_named_transform = named_transform_factory(
-                **base_named_transform
-            )
+            base_named_transform = named_transform_factory(**base_named_transform)
 
         named_transform = base_named_transform
     else:
@@ -359,7 +358,7 @@ def view_transform_factory(
     from_reference=None,
     reference_space=None,
     base_view_transform=None,
-    **kwargs,  # noqa: ARG001
+    **kwargs,
 ):
     """
     *OpenColorIO* `ViewTransform` factory.
@@ -450,7 +449,7 @@ def look_factory(
     forward_transform=None,
     inverse_transform=None,
     base_look=None,
-    **kwargs,  # noqa: ARG001
+    **kwargs,
 ):
     """
     *OpenColorIO* `Look` factory.
@@ -460,7 +459,7 @@ def look_factory(
     name : unicode
         *OpenColorIO* `Look` name.
     process_space : unicode, optional
-        *OpenColorIO* `Look` process space, e.g. *OpenColorIO* `Colorspace` or
+        *OpenColorIO* `Look` process space, e.g., *OpenColorIO* `Colorspace` or
         role name.
     description : unicode, optional
         *OpenColorIO* `Look` description.
@@ -524,10 +523,10 @@ def transform_factory_setter(**kwargs):
     Other Parameters
     ----------------
     name : unicode
-        *OpenColorIO* transform class/type name, e.g. ``CDLTransform``.
+        *OpenColorIO* transform class/type name, e.g., ``CDLTransform``.
     \\**kwargs : dict, optional
         Setter keywords arguments. They are converted to *camelCase* with *set*
-        prepended, e.g. `base_colorspace` is transformed into
+        prepended, e.g., `base_colorspace` is transformed into
         `setBaseColorspace`.
 
     Returns
@@ -547,9 +546,7 @@ def transform_factory_setter(**kwargs):
     )
 
     for kwarg, value in kwargs.items():
-        method = re.sub(
-            r"(?!^)_([a-zA-Z])", lambda m: m.group(1).upper(), kwarg
-        )
+        method = re.sub(r"(?!^)_([a-zA-Z])", lambda m: m.group(1).upper(), kwarg)
         method = f"set{method[0].upper()}{method[1:]}"
         if hasattr(transform, method):
             getattr(transform, method)(value)
@@ -566,7 +563,7 @@ def transform_factory_constructor(**kwargs):
     Other Parameters
     ----------------
     name : unicode
-        *OpenColorIO* transform class/type name, e.g. ``CDLTransform``.
+        *OpenColorIO* transform class/type name, e.g., ``CDLTransform``.
     \\**kwargs : dict, optional
         Keywords arguments that are evaluated directly in the constructor.
 

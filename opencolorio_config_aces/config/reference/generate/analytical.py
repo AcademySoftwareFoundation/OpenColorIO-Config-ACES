@@ -10,23 +10,21 @@ reference *OpenColorIO* config.
 
 import itertools
 import logging
+
 import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.config.generation import (
     BUILTIN_TRANSFORMS,
     DEPENDENCY_VERSIONS,
-    ConfigData,
     PROFILE_VERSION_DEFAULT,
     SEPARATOR_BUILTIN_TRANSFORM_NAME,
     SEPARATOR_COLORSPACE_NAME,
-    beautify_display_name,
+    ConfigData,
     DependencyVersions,
+    beautify_display_name,
     beautify_name,
     colorspace_factory,
     generate_config,
-)
-from opencolorio_config_aces.config.reference.discover.graph import (
-    SEPARATOR_NODE_NAME_CTL,
 )
 from opencolorio_config_aces.config.reference import (
     DescriptionStyle,
@@ -34,9 +32,12 @@ from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms,
     conversion_path,
     discover_aces_ctl_transforms,
-    filter_nodes,
     filter_ctl_transforms,
+    filter_nodes,
     node_to_ctl_transform,
+)
+from opencolorio_config_aces.config.reference.discover.graph import (
+    SEPARATOR_NODE_NAME_CTL,
 )
 from opencolorio_config_aces.config.reference.generate.config import (
     COLORSPACE_OUTPUT_ENCODING_REFERENCE,
@@ -124,10 +125,7 @@ def create_builtin_transform(style, profile_version=PROFILE_VERSION_DEFAULT):
     """
 
     try:
-        if (
-            BUILTIN_TRANSFORMS.get(style, PROFILE_VERSION_DEFAULT)
-            > profile_version
-        ):
+        if BUILTIN_TRANSFORMS.get(style, PROFILE_VERSION_DEFAULT) > profile_version:
             raise ValueError()  # noqa: TRY301
 
         builtin_transform = ocio.BuiltinTransform()
@@ -191,12 +189,8 @@ def node_to_builtin_transform(
         if not path:
             return None
 
-        verbose_path = " --> ".join(
-            dict.fromkeys(itertools.chain.from_iterable(path))
-        )
-        logger.debug(
-            'Creating "BuiltinTransform" with "%s" path.', verbose_path
-        )
+        verbose_path = " --> ".join(dict.fromkeys(itertools.chain.from_iterable(path)))
+        logger.debug('Creating "BuiltinTransform" with "%s" path.', verbose_path)
 
         for edge in path:
             source, target = edge
@@ -263,9 +257,7 @@ def node_to_colorspace(
         ctl_transform,
         describe=describe,
         scheme="Legacy",
-        to_reference=node_to_builtin_transform(
-            graph, node, profile_version, "Forward"
-        ),
+        to_reference=node_to_builtin_transform(graph, node, profile_version, "Forward"),
         from_reference=node_to_builtin_transform(
             graph, node, profile_version, "Reverse"
         ),
@@ -283,7 +275,7 @@ def config_basename_aces(dependency_versions):
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -305,7 +297,7 @@ def config_name_aces(dependency_versions):
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -321,9 +313,7 @@ def config_name_aces(dependency_versions):
     ).format(**dependency_versions.to_regularised_versions())
 
 
-def config_description_aces(
-    dependency_versions, describe=DescriptionStyle.SHORT_UNION
-):
+def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT_UNION):
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method description.
@@ -331,7 +321,7 @@ def config_description_aces(
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -386,7 +376,7 @@ def generate_config_aces(
         *OpenColorIO* config file name, if given the config will be written to
         disk.
     dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -409,9 +399,7 @@ def generate_config_aces(
         instances.
     """
 
-    logger.info(
-        'Generating "%s" config...', config_name_aces(dependency_versions)
-    )
+    logger.info('Generating "%s" config...', config_name_aces(dependency_versions))
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
@@ -454,15 +442,11 @@ def generate_config_aces(
         raw_colorspace,
     ]
 
-    logger.info(
-        'Implicit colorspaces: "%s"', [a.getName() for a in colorspaces]
-    )
+    logger.info('Implicit colorspaces: "%s"', [a.getName() for a in colorspaces])
 
     for family in ("csc", "input_transform", "lmt", "output_transform"):
         family_colourspaces = []
-        for node in filter_nodes(
-            graph, [lambda x, family=family: x.family == family]
-        ):
+        for node in filter_nodes(graph, [lambda x, family=family: x.family == family]):
             if node in (
                 COLORSPACE_SCENE_ENCODING_REFERENCE,
                 COLORSPACE_OUTPUT_ENCODING_REFERENCE,
@@ -493,9 +477,9 @@ def generate_config_aces(
                 )
 
             if additional_data:
-                colorspaces_to_ctl_transforms[
-                    colorspace
-                ] = node_to_ctl_transform(graph, node)
+                colorspaces_to_ctl_transforms[colorspace] = node_to_ctl_transform(
+                    graph, node
+                )
 
         colorspaces += family_colourspaces
 
@@ -549,9 +533,7 @@ if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = (
-        ROOT_BUILD_DEFAULT / "config" / "aces" / "analytical"
-    ).resolve()
+    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "analytical").resolve()
 
     logger.info('Using "%s" build directory...', build_directory)
 

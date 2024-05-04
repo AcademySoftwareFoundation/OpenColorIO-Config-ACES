@@ -105,13 +105,10 @@ def build_aces_conversion_graph(ctl_transforms):
 
         # Without enforcing a preferred source and target colourspaces, the
         # nodes do not necessarily have predictable source and target
-        # colourspaces which might be confusing, e.g. a node for an
+        # colourspaces which might be confusing, e.g., a node for an
         # "Output Transform" might have an "RGBmonitor_100nits_dim" source and
         # a "OCES" target.
-        if (
-            family in ("csc", "input_transform", "lmt")
-            and source == "ACES2065-1"
-        ):
+        if family in ("csc", "input_transform", "lmt") and source == "ACES2065-1":
             logger.debug(
                 '"%s" ctl transform from the "%s" family uses "%s" '
                 "as source, skipping!",
@@ -143,9 +140,7 @@ def build_aces_conversion_graph(ctl_transforms):
         )
 
         # Serializing the data for "Graphviz AGraph".
-        serialized = codecs.encode(
-            pickle.dumps(ctl_transform, 4), "base64"
-        ).decode()
+        serialized = codecs.encode(pickle.dumps(ctl_transform, 4), "base64").decode()
 
         for node in (source, target):
             if node not in graph.nodes():
@@ -248,7 +243,7 @@ def filter_nodes(graph, filterers=None):
     ...     discover_aces_ctl_transforms())
     >>> graph = build_aces_conversion_graph(ctl_transforms)
     >>> sorted(filter_nodes(graph, [lambda x: x.genus == 'p3']))[0]
-    'InvRRTODT/P3D65_1000nits_15nits_ST2084'
+    'ODT/P3D60_48nits'
     """
 
     if filterers is None:
@@ -300,7 +295,7 @@ def conversion_path(graph, source, target):
 
     path = nx.shortest_path(graph, source, target)
 
-    return [(a, b) for a, b in zip(path[:-1], path[1:])]
+    return list(zip(path[:-1], path[1:]))
 
 
 @required("NetworkX")
@@ -371,23 +366,15 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
             node.attr.update(color="#4BA3C7", fillcolor="#81D4FA")
             ctl_transforms_lmt.append(node)
 
-    agraph.add_subgraph(
-        ctl_transforms_csc, name="cluster_ACEScsc", color="#00BCD4FF"
-    )
-    agraph.add_subgraph(
-        ctl_transforms_idt, name="cluster_IDT", color="#B3BC6D"
-    )
-    agraph.add_subgraph(
-        ctl_transforms_odt, name="cluster_ODT", color="#CA9B52"
-    )
+    agraph.add_subgraph(ctl_transforms_csc, name="cluster_ACEScsc", color="#00BCD4FF")
+    agraph.add_subgraph(ctl_transforms_idt, name="cluster_IDT", color="#B3BC6D")
+    agraph.add_subgraph(ctl_transforms_odt, name="cluster_ODT", color="#CA9B52")
     agraph.add_subgraph(
         ctl_transforms_output_transform,
         name="cluster_OutputTransform",
         color="#C88719",
     )
-    agraph.add_subgraph(
-        ctl_transforms_lmt, name="cluster_LMT", color="#4BA3C7"
-    )
+    agraph.add_subgraph(ctl_transforms_lmt, name="cluster_LMT", color="#4BA3C7")
 
     agraph.edge_attr.update(color="#26323870")
     agraph.draw(filename, prog=prog, args=args)
@@ -396,9 +383,9 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
 
 
 if __name__ == "__main__":
-    from opencolorio_config_aces.utilities import message_box
-    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
     from pprint import pformat
+
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT, message_box
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
@@ -423,9 +410,7 @@ if __name__ == "__main__":
 
     message_box('Retrieving a Node from a "CTL" Transform')
     logger.info(
-        ctl_transform_to_node(
-            graph, node_to_ctl_transform(graph, "ODT/P3D60_48nits")
-        )
+        ctl_transform_to_node(graph, node_to_ctl_transform(graph, "ODT/P3D60_48nits"))
     )
 
     message_box('Filtering "output_transform" Family')

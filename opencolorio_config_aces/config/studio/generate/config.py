@@ -14,6 +14,9 @@ import logging
 import re
 from pathlib import Path
 
+from opencolorio_config_aces.config.cg import (
+    generate_config_cg,
+)
 from opencolorio_config_aces.config.generation import (
     DEPENDENCY_VERSIONS,
     DependencyVersions,
@@ -21,9 +24,6 @@ from opencolorio_config_aces.config.generation import (
 )
 from opencolorio_config_aces.config.reference import (
     DescriptionStyle,
-)
-from opencolorio_config_aces.config.cg import (
-    generate_config_cg,
 )
 from opencolorio_config_aces.utilities import (
     timestamp,
@@ -71,13 +71,13 @@ PATH_TRANSFORMS_MAPPING_FILE_STUDIO : unicode
 
 def config_basename_studio(dependency_versions):
     """
-    Generate the ACES* Studio *OpenColorIO* config basename, i.e. the filename
+    Generate the ACES* Studio *OpenColorIO* config basename, i.e., the filename
     devoid of directory affixe.
 
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -102,7 +102,7 @@ def config_name_studio(dependency_versions):
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -134,7 +134,7 @@ def config_description_studio(
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -200,7 +200,7 @@ def generate_config_studio(
         *OpenColorIO* config file name, if given the config will be written to
         disk.
     dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -270,9 +270,7 @@ if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = (
-        ROOT_BUILD_DEFAULT / "config" / "aces" / "studio"
-    ).resolve()
+    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "studio").resolve()
 
     logging.info('Using "%s" build directory...', build_directory)
 
