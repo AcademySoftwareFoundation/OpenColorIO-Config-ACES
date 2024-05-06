@@ -113,7 +113,7 @@ names.
 
 TRANSFORM_GENUS_DEFAULT_CLF: str = "undefined"
 """
-*CLF* transform default genus, i.e. *undefined*.
+*CLF* transform default genus, i.e., *undefined*.
 """
 
 TRANSFORM_FILTERERS_DEFAULT_CLF: list = []
@@ -171,7 +171,7 @@ class CLFTransformID:
     Parameters
     ----------
     clf_transform_id
-        *CLFtransformID*, e.g.
+        *CLFtransformID*, e.g.,
         *urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1*.
 
     Attributes
@@ -211,7 +211,7 @@ class CLFTransformID:
     @property
     def clf_transform_id(self) -> str | None:
         """
-        Getter property for the *CLFtransformID*, e.g.
+        Getter property for the *CLFtransformID*, e.g.,
         *urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1*.
 
         Returns
@@ -230,7 +230,7 @@ class CLFTransformID:
     def urn(self) -> str | None:
         """
         Getter property for the *CLFtransformID* Uniform Resource Name (*URN*),
-        e.g. *urn:aswf:ocio:transformId:v1.0*.
+        e.g., *urn:aswf:ocio:transformId:v1.0*.
 
         Returns
         -------
@@ -245,9 +245,9 @@ class CLFTransformID:
         return self._urn
 
     @property
-    def type(self) -> str | None:  # noqa: A003
+    def type(self) -> str | None:
         """
-        Getter property for the *CLFtransformID* type, e.g. *ACES*.
+        Getter property for the *CLFtransformID* type, e.g., *ACES*.
 
         Returns
         -------
@@ -264,7 +264,7 @@ class CLFTransformID:
     @property
     def namespace(self) -> str | None:
         """
-        Getter property for the *CLFtransformID* namespace, e.g. *OCIO*.
+        Getter property for the *CLFtransformID* namespace, e.g., *OCIO*.
 
         Returns
         -------
@@ -281,7 +281,7 @@ class CLFTransformID:
     @property
     def name(self) -> str | None:
         """
-        Getter property for the *CLFtransformID* name, e.g.
+        Getter property for the *CLFtransformID* name, e.g.,
         *AP0_to_AP1-Gamma2pnt2*.
 
         Returns
@@ -299,7 +299,7 @@ class CLFTransformID:
     @property
     def major_version(self) -> str | None:
         """
-        Getter property for the *CLFtransformID* major version number, e.g. *c1*.
+        Getter property for the *CLFtransformID* major version number, e.g., *c1*.
 
         Returns
         -------
@@ -316,7 +316,7 @@ class CLFTransformID:
     @property
     def minor_version(self) -> str | None:
         """
-        Getter property for the *CLFtransformID* minor version number, e.g. *v1*.
+        Getter property for the *CLFtransformID* minor version number, e.g., *v1*.
 
         Returns
         -------
@@ -458,11 +458,11 @@ class CLFTransform:
     path
         *CLF* transform path.
     family
-        *CLF* transform family, e.g. *aces*
+        *CLF* transform family, e.g., *aces*
     genus
-        *CLF* transform genus, e.g. *undefined*
+        *CLF* transform genus, e.g., *undefined*
     siblings
-        *CLF* transform siblings, e.g. inverse transform.
+        *CLF* transform siblings, e.g., inverse transform.
 
     Attributes
     ----------
@@ -531,7 +531,7 @@ class CLFTransform:
     @property
     def code(self) -> str | None:
         """
-        Getter property for the *CLF* transform code, i.e. the *CLF* transform
+        Getter property for the *CLF* transform code, i.e., the *CLF* transform
         file content.
 
         Returns
@@ -542,7 +542,7 @@ class CLFTransform:
         Notes
         -----
         -   This property is read only.
-        -   This property contains the entire file content, i.e. the code along
+        -   This property contains the entire file content, i.e., the code along
             with the comments.
         """
 
@@ -657,7 +657,7 @@ class CLFTransform:
     @property
     def family(self) -> str | None:
         """
-        Getter property for the *CLF* transform family, e.g. *aces*, a value in
+        Getter property for the *CLF* transform family, e.g., *aces*, a value in
         :attr:`opencolorio_config_aces.clf.reference.\
 TRANSFORM_FAMILIES_CLF` attribute dictionary.
 
@@ -676,7 +676,7 @@ TRANSFORM_FAMILIES_CLF` attribute dictionary.
     @property
     def genus(self) -> str | None:
         """
-        Getter property for the *CLF* transform genus, e.g. *undefined*.
+        Getter property for the *CLF* transform genus, e.g., *undefined*.
 
         Returns
         -------
@@ -693,7 +693,7 @@ TRANSFORM_FAMILIES_CLF` attribute dictionary.
     @property
     def siblings(self) -> Sequence | None:
         """
-        Getter property for the *CLF* transform siblings, e.g. inverse
+        Getter property for the *CLF* transform siblings, e.g., inverse
         transform.
 
         Returns
@@ -813,9 +813,7 @@ CLFTransform` class are tried on the underlying
         if input_descriptor is not None:
             self._input_descriptor = input_descriptor.text
 
-        output_descriptor = next(
-            iter(root.findall("./OutputDescriptor")), None
-        )
+        output_descriptor = next(iter(root.findall("./OutputDescriptor")), None)
         if output_descriptor is not None:
             self._output_descriptor = output_descriptor.text
 
@@ -1011,9 +1009,7 @@ def find_clf_transform_pairs(
         basename = stem(clf_transforms[0])
         clf_transform_pairs[basename]["forward_transform"] = clf_transforms[0]
         if len(clf_transforms) > 1:
-            clf_transform_pairs[basename][
-                "inverse_transform"
-            ] = clf_transforms[1]
+            clf_transform_pairs[basename]["inverse_transform"] = clf_transforms[1]
             clf_transform_pairs[basename]["forward_transform"].siblings.append(
                 clf_transform_pairs[basename]["inverse_transform"]
             )
@@ -1081,7 +1077,7 @@ TypeClassifiedCLFTransforms = dict[
 
 
 def classify_clf_transforms(
-    unclassified_clf_transforms: defaultdict[str, list[str]]
+    unclassified_clf_transforms: defaultdict[str, list[str]],
 ) -> TypeClassifiedCLFTransforms:
     """
     Classify given *CLF* transforms.
@@ -1135,9 +1131,7 @@ CLFTransform(\
 
         genus = TRANSFORM_GENUS_DEFAULT_CLF if not genus else "/".join(genus)
 
-        for basename, pairs in find_clf_transform_pairs(
-            clf_transforms
-        ).items():
+        for basename, pairs in find_clf_transform_pairs(clf_transforms).items():
             if len(pairs) == 1:
                 clf_transform = CLFTransform(
                     cast(str, next(iter(pairs.values()))),
@@ -1145,13 +1139,9 @@ CLFTransform(\
                     genus,
                 )
 
-                logger.debug(
-                    'Classifying "%s" under "%s".', clf_transform, genus
-                )
+                logger.debug('Classifying "%s" under "%s".', clf_transform, genus)
 
-                classified_clf_transforms[family][genus][
-                    basename
-                ] = clf_transform
+                classified_clf_transforms[family][genus][basename] = clf_transform
 
             elif len(pairs) == 2:
                 forward_clf_transform = CLFTransform(
@@ -1165,13 +1155,9 @@ CLFTransform(\
                     forward_clf_transform, inverse_clf_transform
                 )
 
-                logger.debug(
-                    'Classifying "%s" under "%s".', clf_transform, genus
-                )
+                logger.debug('Classifying "%s" under "%s".', clf_transform, genus)
 
-                classified_clf_transforms[family][genus][
-                    basename
-                ] = clf_transform
+                classified_clf_transforms[family][genus][basename] = clf_transform
 
     return vivified_to_dict(classified_clf_transforms)
 
@@ -1213,19 +1199,14 @@ def unclassify_clf_transforms(
                 if isinstance(clf_transform, CLFTransform):
                     unclassified_clf_transforms.append(clf_transform)
                 elif isinstance(clf_transform, CLFTransformPair):
-                    unclassified_clf_transforms.append(
-                        clf_transform.forward_transform
-                    )
-                    unclassified_clf_transforms.append(
-                        clf_transform.inverse_transform
-                    )
+                    unclassified_clf_transforms.append(clf_transform.forward_transform)
+                    unclassified_clf_transforms.append(clf_transform.inverse_transform)
 
     return unclassified_clf_transforms
 
 
 def filter_clf_transforms(
-    clf_transforms: TypeClassifiedCLFTransforms
-    | TypeUnclassifiedCLFTransforms,
+    clf_transforms: TypeClassifiedCLFTransforms | TypeUnclassifiedCLFTransforms,
     filterers: Sequence[Callable] | None = None,
 ) -> list[CLFTransform]:
     """
@@ -1292,15 +1273,13 @@ def print_clf_taxonomy() -> None:
         by the :attr:`opencolorio_config_aces.clf.\
 reference.ROOT_TRANSFORMS_CLF` attribute using the
         :func:`opencolorio_config_aces.discover_clf_transforms` definition.
-    -   The *CLF* transforms are classified by *family* e.g. *aces*, and
-        *genus* e.g. *undefined* using the
+    -   The *CLF* transforms are classified by *family* e.g., *aces*, and
+        *genus* e.g., *undefined* using the
         :func:`opencolorio_config_aces.classify_clf_transforms` definition.
     -   The resulting data structure is printed.
     """
 
-    classified_clf_transforms = classify_clf_transforms(
-        discover_clf_transforms()
-    )
+    classified_clf_transforms = classify_clf_transforms(discover_clf_transforms())
 
     for family, genera in classified_clf_transforms.items():
         message_box(family, print_callable=logger.info)
@@ -1325,18 +1304,12 @@ reference.ROOT_TRANSFORMS_CLF` attribute using the
                         clf_transform.forward_transform.source,
                         clf_transform.forward_transform.target,
                     )
-                    if (
-                        clf_transform.forward_transform.clf_transform_id
-                        is not None
-                    ):
+                    if clf_transform.forward_transform.clf_transform_id is not None:
                         logger.info(
                             '\t\tACEStransformID : "%s"',
                             clf_transform.forward_transform.clf_transform_id.clf_transform_id,
                         )
-                    if (
-                        clf_transform.inverse_transform.clf_transform_id
-                        is not None
-                    ):
+                    if clf_transform.inverse_transform.clf_transform_id is not None:
                         logger.info(
                             '\t\tACEStransformID : "%s"',
                             clf_transform.inverse_transform.clf_transform_id.clf_transform_id,

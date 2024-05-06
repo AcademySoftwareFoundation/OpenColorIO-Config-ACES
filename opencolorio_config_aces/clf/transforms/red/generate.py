@@ -10,8 +10,9 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_red`
 """
 
-import PyOpenColorIO as ocio
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -95,13 +96,10 @@ white-paper-on-redwidegamutrgb-and-log3g10
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
-    mtx = matrix_RGB_to_RGB_transform(
-        "REDWideGamutRGB", "ACES2065-1", "Bradford"
-    )
+    mtx = matrix_RGB_to_RGB_transform("REDWideGamutRGB", "ACES2065-1", "Bradford")
 
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:"
-        "IDT.RED.Log3G10_REDWideGamutRGB.a1.v1"
+        "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_REDWideGamutRGB.a1.v1"
     )
 
     # Generate full transform.

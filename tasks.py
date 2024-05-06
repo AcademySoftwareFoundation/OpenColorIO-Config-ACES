@@ -7,31 +7,31 @@ Invoke - Tasks
 
 from __future__ import annotations
 
-import os
-
 import contextlib
+import inspect
+import os
+from pathlib import Path
+
 import requests
 from invoke.exceptions import Failure
-from pathlib import Path
+
 import opencolorio_config_aces
-from opencolorio_config_aces.config.reference.generate.config import (
-    URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE,
-)
 from opencolorio_config_aces.config.cg.generate.config import (
     URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG,
+)
+from opencolorio_config_aces.config.reference.generate.config import (
+    URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE,
 )
 from opencolorio_config_aces.config.studio.generate.config import (
     URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO,
 )
 from opencolorio_config_aces.utilities import google_sheet_title, message_box
 
-import inspect
-
 if not hasattr(inspect, "getargspec"):
     inspect.getargspec = inspect.getfullargspec  # pyright: ignore
 
-from invoke.tasks import task
 from invoke.context import Context
+from invoke.tasks import task
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -113,7 +113,7 @@ def clean(
     docs
         Whether to clean the *docs* directory.
     bytecode
-        Whether to clean the bytecode files, e.g. *.pyc* files.
+        Whether to clean the bytecode files, e.g., *.pyc* files.
     mypy
         Whether to clean the *Mypy* cache directory.
     pytest
@@ -203,7 +203,7 @@ def tests(ctx: Context):
 @task(quality, precommit, tests)
 def preflight(ctx: Context):  # noqa: ARG001
     """
-    Perform the preflight tasks, i.e. *formatting* and *quality*.
+    Perform the preflight tasks, i.e., *formatting* and *quality*.
 
     Parameters
     ----------
@@ -308,9 +308,7 @@ def build_config_reference_analytical(ctx: Context):
         Context.
     """
 
-    message_box(
-        'Building the "aces-dev" reference analytical "OpenColorIO" config...'
-    )
+    message_box('Building the "aces-dev" reference analytical "OpenColorIO" config...')
     with ctx.cd("opencolorio_config_aces/config/reference/generate"):
         ctx.run("python analytical.py")
 
@@ -339,15 +337,13 @@ def update_mapping_file_reference(ctx: Context):  # noqa: ARG001
     for csv_file in directory.glob("*Mapping.csv"):
         os.remove(csv_file)
 
-    filename = str(
-        directory / f"{title} - Reference Config - Mapping.csv"
-    ).replace('"', "")
+    filename = str(directory / f"{title} - Reference Config - Mapping.csv").replace(
+        '"', ""
+    )
 
     with open(filename, "w") as csv_file:
         csv_file.write(
-            requests.get(
-                URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE, timeout=60
-            ).text
+            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE, timeout=60).text
         )
 
 
@@ -385,22 +381,16 @@ def update_mapping_file_cg(ctx: Context):  # noqa: ARG001
 
     title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG)
 
-    directory = Path(
-        "opencolorio_config_aces/config/cg/generate/resources/"
-    ).absolute()
+    directory = Path("opencolorio_config_aces/config/cg/generate/resources/").absolute()
 
     for csv_file in directory.glob("*Mapping.csv"):
         os.remove(csv_file)
 
-    filename = str(directory / f"{title} - CG Config - Mapping.csv").replace(
-        '"', ""
-    )
+    filename = str(directory / f"{title} - CG Config - Mapping.csv").replace('"', "")
 
     with open(filename, "w") as csv_file:
         csv_file.write(
-            requests.get(
-                URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG, timeout=60
-            ).text
+            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG, timeout=60).text
         )
 
 
@@ -415,9 +405,7 @@ def build_config_cg(ctx: Context):
         Context.
     """
 
-    message_box(
-        'Building the "ACES" Computer Graphics (CG) "OpenColorIO" config...'
-    )
+    message_box('Building the "ACES" Computer Graphics (CG) "OpenColorIO" config...')
     with ctx.cd("opencolorio_config_aces/config/cg/generate"):
         ctx.run("python config.py")
 
@@ -433,9 +421,7 @@ def update_mapping_file_studio(ctx: Context):  # noqa: ARG001
         Context.
     """
 
-    message_box(
-        'Updating the "ACES" Studio "OpenColorIO" config mapping file...'
-    )
+    message_box('Updating the "ACES" Studio "OpenColorIO" config mapping file...')
 
     title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO)
 
@@ -446,15 +432,13 @@ def update_mapping_file_studio(ctx: Context):  # noqa: ARG001
     for csv_file in directory.glob("*Mapping.csv"):
         os.remove(csv_file)
 
-    filename = str(
-        directory / f"{title} - Studio Config - Mapping.csv"
-    ).replace('"', "")
+    filename = str(directory / f"{title} - Studio Config - Mapping.csv").replace(
+        '"', ""
+    )
 
     with open(filename, "w") as csv_file:
         csv_file.write(
-            requests.get(
-                URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO, timeout=60
-            ).text
+            requests.get(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO, timeout=60).text
         )
 
 
@@ -489,7 +473,8 @@ def requirements(ctx: Context):
     ctx.run(
         "poetry export -f requirements.txt "
         "--without-hashes "
-        "--with dev,docs,graphviz,optional "
+        # TODO: Reinstate "graphviz".
+        "--with dev,docs,optional "
         "--output requirements.txt"
     )
 
@@ -497,7 +482,8 @@ def requirements(ctx: Context):
     ctx.run(
         "poetry export -f requirements.txt "
         "--without-hashes "
-        "--with docs,graphviz,optional "
+        # TODO: Reinstate "graphviz".
+        "--with docs,optional "
         "--output docs/requirements.txt"
     )
 

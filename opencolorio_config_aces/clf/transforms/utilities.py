@@ -8,16 +8,17 @@ Defines various utility functions for generating *Common LUT Format*
 (CLF) transforms.
 """
 
-import PyOpenColorIO as ocio
 import logging
 import re
 
-from opencolorio_config_aces.config import produce_transform, transform_factory
+import PyOpenColorIO as ocio
+
 from opencolorio_config_aces.clf.discover.classify import (
     EXTENSION_CLF,
     SEPARATOR_ID_CLF,
     URN_CLF,
 )
+from opencolorio_config_aces.config import produce_transform, transform_factory
 from opencolorio_config_aces.utilities import required
 
 __author__ = "OpenColorIO Contributors"
@@ -242,9 +243,7 @@ def generate_clf_transform(
         if style:
             info.addChildElement("BuiltinTransform", style)
 
-    logger.info(
-        'Writing "%s" "CLF" transform to "%s".', clf_transform_id, filename
-    )
+    logger.info('Writing "%s" "CLF" transform to "%s".', clf_transform_id, filename)
 
     group_tf.write(
         formatName="Academy/ASC Common LUT Format",
@@ -305,9 +304,9 @@ def clf_basename(clf_transform_id):
     'OCIO.Input.AP0_to_sRGB-Rec709.clf'
     """
 
-    tokens = clf_transform_id.replace(
-        f"{URN_CLF}{SEPARATOR_ID_CLF}", ""
-    ).split(SEPARATOR_ID_CLF)
+    tokens = clf_transform_id.replace(f"{URN_CLF}{SEPARATOR_ID_CLF}", "").split(
+        SEPARATOR_ID_CLF
+    )
 
     stem = ".".join(tokens[:-1])
     stem = re.sub(r"\.Linear_to_", ".", stem)

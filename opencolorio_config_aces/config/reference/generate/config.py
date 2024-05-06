@@ -12,19 +12,20 @@ Defines various objects related to the generation of the *aces-dev* reference
 
 import csv
 import logging
-import PyOpenColorIO as ocio
 import re
 from collections import defaultdict
 from enum import Flag, auto
 from pathlib import Path
 
+import PyOpenColorIO as ocio
+
 from opencolorio_config_aces.config.generation import (
     BUILTIN_TRANSFORMS,
-    ConfigData,
     DEPENDENCY_VERSIONS,
-    DependencyVersions,
     SEPARATOR_COLORSPACE_FAMILY,
     SEPARATOR_COLORSPACE_NAME,
+    ConfigData,
+    DependencyVersions,
     beautify_alias,
     beautify_colorspace_name,
     beautify_display_name,
@@ -46,8 +47,8 @@ from opencolorio_config_aces.config.reference import (
 )
 from opencolorio_config_aces.utilities import (
     attest,
-    validate_method,
     timestamp,
+    validate_method,
 )
 
 __author__ = "OpenColorIO Contributors"
@@ -184,11 +185,7 @@ def format_optional_prefix(name, prefix, scheme="Modern 1"):
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
-    return (
-        f"{prefix}{SEPARATOR_COLORSPACE_NAME}{name}"
-        if scheme == "legacy"
-        else name
-    )
+    return f"{prefix}{SEPARATOR_COLORSPACE_NAME}{name}" if scheme == "legacy" else name
 
 
 def format_swapped_affix(name, affix, scheme="Modern 1"):
@@ -294,7 +291,7 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
         for.
     analytical : bool, optional
         Whether to generate the *OpenColorIO* transform family that
-        analytically matches the given *ACES* *CTL* transform, i.e. true to
+        analytically matches the given *ACES* *CTL* transform, i.e., true to
         the *aces-dev* reference but not necessarily user-friendly.
 
     Returns
@@ -304,10 +301,7 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
     """
 
     if analytical:
-        if (
-            ctl_transform.family == "csc"
-            and ctl_transform.namespace == "Academy"
-        ):
+        if ctl_transform.family == "csc" and ctl_transform.namespace == "Academy":
             family = "CSC"
         elif ctl_transform.family == "input_transform":
             family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
@@ -315,18 +309,12 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
             family = "Output"
         elif ctl_transform.family == "lmt":
             family = "LMT"
-    else:
-        if (  # noqa: PLR5501
-            ctl_transform.family == "csc"
-            and ctl_transform.namespace == "Academy"
-        ):
+    else:  # noqa: PLR5501
+        if ctl_transform.family == "csc" and ctl_transform.namespace == "Academy":
             if re.match("ACES|ADX", ctl_transform.name):
                 family = "ACES"
             else:
-                family = (
-                    f"Input{SEPARATOR_COLORSPACE_FAMILY}"
-                    f"{ctl_transform.genus}"
-                )
+                family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
         elif ctl_transform.family == "input_transform":
             family = f"Input{SEPARATOR_COLORSPACE_FAMILY}{ctl_transform.genus}"
         elif ctl_transform.family == "output_transform":
@@ -415,25 +403,19 @@ def ctl_transform_to_description(
             if len(description) > 0:
                 description.append("")
 
-            aces_transform_id = (
-                ctl_transform.aces_transform_id.aces_transform_id
-            )
+            aces_transform_id = ctl_transform.aces_transform_id.aces_transform_id
 
             if describe in (
                 DescriptionStyle.ACES,
                 DescriptionStyle.ACES | DescriptionStyle.SHORT,
                 DescriptionStyle.SHORT_UNION,
             ):
-                description.append(
-                    TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id)
-                )
+                description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
             else:
                 description.append("CTL Transform")
                 description.append(f'{"=" * len(description[-1])}\n')
                 description.append(f"{ctl_transform.description}\n")
-                description.append(
-                    TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id)
-                )
+                description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
 
             if describe in (
                 DescriptionStyle.AMF,
@@ -481,10 +463,10 @@ def ctl_transform_to_colorspace(
         description.
     analytical : bool, optional
         Whether to generate the *OpenColorIO* transform family that
-        analytically matches the given *ACES* *CTL* transform, i.e. true to
+        analytically matches the given *ACES* *CTL* transform, i.e., true to
         the *aces-dev* reference but not necessarily user-friendly.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* `Colorspace` signature only, i.e.
+        Whether to return the *OpenColorIO* `Colorspace` signature only, i.e.,
         the arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
@@ -509,18 +491,14 @@ def ctl_transform_to_colorspace(
     )
 
     signature = {
-        "name": format_optional_prefix(
-            name, beautify_colorspace_name(family), scheme
-        ),
+        "name": format_optional_prefix(name, beautify_colorspace_name(family), scheme),
         "family": family,
         "description": description,
     }
     signature.update(kwargs)
 
     signature["aliases"] = list(
-        dict.fromkeys(
-            [beautify_alias(signature["name"])] + signature["aliases"]
-        )
+        dict.fromkeys([beautify_alias(signature["name"])] + signature["aliases"])
     )
 
     if signature_only:
@@ -556,10 +534,10 @@ def ctl_transform_to_look(
         description.
     analytical : bool, optional
         Whether to generate the *OpenColorIO* transform family that
-        analytically matches the given *ACES* *CTL* transform, i.e. true to
+        analytically matches the given *ACES* *CTL* transform, i.e., true to
         the *aces-dev* reference but not necessarily user-friendly.
     signature_only : bool, optional
-        Whether to return the *OpenColorIO* `Look` signature only, i.e. the
+        Whether to return the *OpenColorIO* `Look` signature only, i.e., the
         arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
@@ -584,9 +562,7 @@ def ctl_transform_to_look(
     )
 
     signature = {
-        "name": format_optional_prefix(
-            name, beautify_colorspace_name(family), scheme
-        ),
+        "name": format_optional_prefix(name, beautify_colorspace_name(family), scheme),
         "description": description,
     }
     signature.update(kwargs)
@@ -626,7 +602,7 @@ def style_to_view_transform(
         description.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* `ViewTransform` signature only,
-        i.e. the arguments for its instantiation.
+        i.e., the arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
@@ -688,8 +664,7 @@ def style_to_view_transform(
                 )
             else:
                 description.append(
-                    f"CTL Transform"
-                    f'{"s" if len(aces_transform_ids) >= 2 else ""}'
+                    f'CTL Transform{"s" if len(aces_transform_ids) >= 2 else ""}'
                 )
                 description.append(f'{"=" * len(description[-1])}\n')
 
@@ -700,9 +675,7 @@ def style_to_view_transform(
                                 f"{aces_descriptions[i]}\n\n"
                                 f"ACEStransformID: {aces_transform_id}\n"
                             )
-                            for i, aces_transform_id in enumerate(
-                                aces_transform_ids
-                            )
+                            for i, aces_transform_id in enumerate(aces_transform_ids)
                         ]
                     )
                 )
@@ -716,9 +689,7 @@ def style_to_view_transform(
                 for aces_transform_id in aces_transform_ids:
                     amf_components_description.extend(
                         [
-                            TEMPLATE_ACES_TRANSFORM_ID.format(
-                                amf_aces_transform_id
-                            )
+                            TEMPLATE_ACES_TRANSFORM_ID.format(amf_aces_transform_id)
                             for amf_aces_transform_id in amf_components.get(
                                 aces_transform_id, []
                             )
@@ -779,7 +750,7 @@ def style_to_display_colorspace(
         `Colorspace` description.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* display `Colorspace` signature only,
-        i.e. the arguments for its instantiation.
+        i.e., the arguments for its instantiation.
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
@@ -840,9 +811,7 @@ def style_to_display_colorspace(
     signature.update(kwargs)
 
     signature["aliases"] = list(
-        dict.fromkeys(
-            [beautify_alias(signature["name"])] + signature["aliases"]
-        )
+        dict.fromkeys([beautify_alias(signature["name"])] + signature["aliases"])
     )
 
     if signature_only:
@@ -887,12 +856,12 @@ def transform_data_aliases(transform_data):
 def config_basename_aces(dependency_versions):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
-    basename, i.e. the filename devoid of directory affixe.
+    basename, i.e., the filename devoid of directory affixe.
 
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -905,9 +874,9 @@ def config_basename_aces(dependency_versions):
     'reference-config-v2.0.0_aces-v1.3_ocio-v2.0.ocio'
     """
 
-    return (
-        "reference-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio"
-    ).format(**dependency_versions.to_regularised_versions())
+    return ("reference-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
+        **dependency_versions.to_regularised_versions()
+    )
 
 
 def config_name_aces(dependency_versions):
@@ -917,7 +886,7 @@ def config_name_aces(dependency_versions):
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
 
     Returns
     -------
@@ -939,9 +908,7 @@ def config_name_aces(dependency_versions):
     ).format(**dependency_versions.to_regularised_versions())
 
 
-def config_description_aces(
-    dependency_versions, describe=DescriptionStyle.SHORT_UNION
-):
+def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT_UNION):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     description.
@@ -949,7 +916,7 @@ def config_description_aces(
     Parameters
     ----------
     dependency_versions: DependencyVersions
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -1010,7 +977,7 @@ def generate_config_aces(
         *OpenColorIO* config file name, if given the config will be written to
         disk.
     dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g. *aces-dev*, *colorspaces*, and *OpenColorIO*.
+        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -1020,7 +987,7 @@ def generate_config_aces(
         Path to the *CSV* mapping file used by the *Mapping* method.
     analytical : bool, optional
         Whether to generate *OpenColorIO* transform families that analytically
-        match the given *ACES* *CTL* transform, i.e. true to the *aces-dev*
+        match the given *ACES* *CTL* transform, i.e., true to the *aces-dev*
         reference but not necessarily user-friendly.
     scheme : str, optional
         {"Legacy", "Modern 1"},
@@ -1041,9 +1008,7 @@ def generate_config_aces(
         config_name_aces(dependency_versions),
     )
 
-    logger.debug(
-        'Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys())
-    )
+    logger.debug('Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys()))
 
     ctl_transforms = unclassify_ctl_transforms(
         classify_aces_ctl_transforms(discover_aces_ctl_transforms())
@@ -1052,9 +1017,7 @@ def generate_config_aces(
 
     logger.debug('Using %s "CTL" transforms...', ctl_transforms)
 
-    logger.info(
-        'Parsing "%s" config mapping file...', config_mapping_file_path
-    )
+    logger.info('Parsing "%s" config mapping file...', config_mapping_file_path)
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -1214,10 +1177,7 @@ def generate_config_aces(
             logger.info('Creating a "View" transform for "%s" style...', style)
             view_transform = style_to_view_transform(
                 style,
-                [
-                    transform_data["ctl_transform"]
-                    for transform_data in transforms_data
-                ],
+                [transform_data["ctl_transform"] for transform_data in transforms_data],
                 describe,
                 amf_components,
                 signature_only=True,
@@ -1229,9 +1189,7 @@ def generate_config_aces(
             view_transform_names.append(view_transform_name)
 
             for transform_data in transforms_data:
-                display_style = transform_data[
-                    "linked_display_colorspace_style"
-                ]
+                display_style = transform_data["linked_display_colorspace_style"]
 
                 display = style_to_display_colorspace(
                     display_style,
@@ -1268,9 +1226,7 @@ def generate_config_aces(
                 ctl_transform = transform_data["ctl_transform"]
 
                 if transform_data["interface"] == "Look":
-                    logger.info(
-                        'Creating a "Look" transform for "%s" style...', style
-                    )
+                    logger.info('Creating a "Look" transform for "%s" style...', style)
                     look = ctl_transform_to_look(
                         ctl_transform,
                         describe,
@@ -1336,9 +1292,7 @@ def generate_config_aces(
             "view": "Raw",
             "colorspace": raw_colorspace["name"],
         }
-        logger.info(
-            'Adding "%s" view to "%s" display.', raw_view["view"], display_name
-        )
+        logger.info('Adding "%s" view to "%s" display.', raw_view["view"], display_name)
         views.append(raw_view)
 
     data = ConfigData(
@@ -1356,9 +1310,7 @@ def generate_config_aces(
                 "ACEScct", aces_family_prefix, scheme
             ),
             ocio.ROLE_DATA: raw_colorspace["name"],
-            ocio.ROLE_INTERCHANGE_DISPLAY: display_reference_colorspace[
-                "name"
-            ],
+            ocio.ROLE_INTERCHANGE_DISPLAY: display_reference_colorspace["name"],
             ocio.ROLE_INTERCHANGE_SCENE: scene_reference_colorspace["name"],
             ocio.ROLE_RENDERING: format_optional_prefix(
                 "ACEScg", aces_family_prefix, scheme
@@ -1405,9 +1357,7 @@ if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
 
-    build_directory = (
-        ROOT_BUILD_DEFAULT / "config" / "aces" / "reference"
-    ).resolve()
+    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "reference").resolve()
 
     logger.info('Using "%s" build directory...', build_directory)
 
@@ -1415,7 +1365,12 @@ if __name__ == "__main__":
 
     for dependency_versions in DEPENDENCY_VERSIONS:
         config_basename = config_basename_aces(dependency_versions)
-        (config, data, ctl_transforms, amf_components,) = generate_config_aces(
+        (
+            config,
+            data,
+            ctl_transforms,
+            amf_components,
+        ) = generate_config_aces(
             config_name=build_directory / config_basename,
             dependency_versions=dependency_versions,
             analytical=False,

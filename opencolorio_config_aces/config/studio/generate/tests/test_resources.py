@@ -7,11 +7,12 @@ Defines the unit tests for the
 
 
 import unittest
+
 import requests
 
 from opencolorio_config_aces.config.studio.generate.config import (
-    URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO,
     PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
+    URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO,
 )
 
 __author__ = "OpenColorIO Contributors"

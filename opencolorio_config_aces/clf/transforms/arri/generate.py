@@ -11,10 +11,11 @@ transforms:
 """
 
 import logging
-import PyOpenColorIO as ocio
 import sys
 from math import log, log10
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -70,9 +71,7 @@ def _build_awg3_mtx():
          *OpenColorIO* `MatrixTransform`.
     """
 
-    mtx = matrix_RGB_to_RGB_transform(
-        "ALEXA Wide Gamut", "ACES2065-1", "CAT02"
-    )
+    mtx = matrix_RGB_to_RGB_transform("ALEXA Wide Gamut", "ACES2065-1", "CAT02")
     return mtx
 
 
@@ -101,9 +100,7 @@ def _build_logc3_curve(ei=800, info=False):
     """
 
     if not (160 <= ei <= 1280):
-        raise ValueError(
-            f"Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280"
-        )
+        raise ValueError(f"Unsupported EI{ei:d} requested, must be 160 <= EI <= 1280")
 
     # v3_IDT_maker.py parameters
     nominalEI = 400
@@ -118,7 +115,7 @@ def _build_logc3_curve(ei=800, info=False):
     encGain = (log(gain) / log(2) * (0.89 - 1) / 3 + 1) * encodingGain
     encOffset = encodingOffset
 
-    for _ in range(0, 3):
+    for _ in range(3):
         nz = ((95 / 1023 - encOffset) / encGain - offset) / slope
         encOffset = encodingOffset - log10(1 + nz) * encGain
 
@@ -273,9 +270,7 @@ def _generate_logc3_transforms(output_directory, ei_list=(800,)):
         aces_id = f"urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI{ei}.a1.v2"
         input_descriptor = f"ARRI LogC3 (EI{ei})"
         output_descriptor = "ACES2065-1"
-        clf_transform_id = format_clf_transform_id(
-            FAMILY, GENUS, name, VERSION
-        )
+        clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
         filename = output_directory / clf_basename(clf_transform_id)
         transforms[filename] = generate_clf_transform(
             filename,
@@ -291,9 +286,7 @@ def _generate_logc3_transforms(output_directory, ei_list=(800,)):
         name = f"ARRI_LogC3_Curve_EI{ei:d}_to_Linear"
         input_descriptor = f"ARRI LogC3 Curve (EI{ei:d})"
         output_descriptor = "Relative Scene Linear"
-        clf_transform_id = format_clf_transform_id(
-            FAMILY, GENUS, name, VERSION
-        )
+        clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
         filename = output_directory / clf_basename(clf_transform_id)
         transforms[filename] = generate_clf_transform(
             filename,
@@ -411,9 +404,7 @@ def generate_clf_transforms_arri(output_directory):
 
     output_directory.mkdir(parents=True, exist_ok=True)
 
-    logc3_transforms = _generate_logc3_transforms(
-        output_directory, ei_list=[800]
-    )
+    logc3_transforms = _generate_logc3_transforms(output_directory, ei_list=[800])
     logc4_transforms = _generate_logc4_transforms(output_directory)
 
     clf_transforms = {**logc3_transforms, **logc4_transforms}

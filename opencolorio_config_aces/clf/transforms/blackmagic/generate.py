@@ -11,15 +11,16 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_davinci`
 """
 
-import PyOpenColorIO as ocio
-from pathlib import Path
 import math
+from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
-    matrix_RGB_to_RGB_transform,
     format_clf_transform_id,
     generate_clf_transform,
+    matrix_RGB_to_RGB_transform,
 )
 from opencolorio_config_aces.config import transform_factory
 
@@ -114,9 +115,7 @@ def generate_clf_transforms_bmdfilm(output_directory):
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
-    mtx = matrix_RGB_to_RGB_transform(
-        "Blackmagic Wide Gamut", "ACES2065-1", "CAT02"
-    )
+    mtx = matrix_RGB_to_RGB_transform("Blackmagic Wide Gamut", "ACES2065-1", "CAT02")
 
     # Taking the color space name and IDT transform ID from:
     #   https://github.com/ampas/aces-dev/pull/126/files
@@ -234,9 +233,7 @@ DaVinci_Resolve_17_Wide_Gamut_Intermediate.pdf?_v=1607414410000
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
 
-    mtx = matrix_RGB_to_RGB_transform(
-        "DaVinci Wide Gamut", "ACES2065-1", "CAT02"
-    )
+    mtx = matrix_RGB_to_RGB_transform("DaVinci Wide Gamut", "ACES2065-1", "CAT02")
 
     # This transform is not yet part of aces-dev, but an ID will be needed for AMF.
     # Proposing the following ID:

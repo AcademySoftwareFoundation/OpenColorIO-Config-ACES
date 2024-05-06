@@ -5,8 +5,8 @@
 name = "opencolorio-config-aces"
 version = "2.0.0"
 description = "OpenColorIO Configuration for ACES"
-authors = [ "OpenColorIO Contributors" ]
-maintainers = [ "OpenColorIO Contributors <ocio-dev@lists.aswf.io>" ]
+authors = ["OpenColorIO Contributors"]
+maintainers = ["OpenColorIO Contributors <ocio-dev@lists.aswf.io>"]
 license = "BSD-3-Clause"
 readme = 'README.rst'
 repository = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES"
@@ -32,10 +32,8 @@ networkx = "*"
 pygraphviz = "*"
 
 [tool.poetry.group.dev.dependencies]
-black = "*"
 coverage = "*"
 coveralls = "*"
-flynt = "*"
 invoke = "*"
 pre-commit = "*"
 pydata-sphinx-theme = "*"
@@ -43,7 +41,6 @@ pyright = "*"
 pytest = "*"
 pytest-cov = "*"
 restructuredtext-lint = "*"
-ruff = "*"
 sphinx = ">= 4, < 5"
 twine = "*"
 
@@ -51,20 +48,18 @@ twine = "*"
 pydata-sphinx-theme = "*"
 sphinx = ">= 4, < 5"
 
-[tool.black]
-line-length = 79
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | build
-  | dist
-  | opencolorio_config_aces/config/reference/aces-dev
-)/
-'''
-
 [tool.flynt]
-line_length=999
+line_length = 999
+
+[tool.isort]
+ensure_newline_before_comments = true
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+skip = ["__init__.py"]
+split_on_trailing_comma = true
+use_parentheses = true
 
 [tool.pyright]
 reportMissingImports = false
@@ -76,54 +71,50 @@ reportUnsupportedDunderAll = false
 reportUnusedExpression = false
 exclude = ["**/aces-dev"]
 
-[tool.mypy]
-plugins = "numpy.typing.mypy_plugin"
-ignore_missing_imports = true
-
 [tool.ruff]
 target-version = "py39"
 line-length = 88
 select = [
-    "A",      # flake8-builtins
-    "ARG",    # flake8-unused-arguments
+    "A", # flake8-builtins
+    "ARG", # flake8-unused-arguments
     # "ANN",  # flake8-annotations
-    "B",      # flake8-bugbear
+    "B", # flake8-bugbear
     # "BLE",  # flake8-blind-except
-    "C4",   # flake8-comprehensions
+    "C4", # flake8-comprehensions
     # "C90",  # mccabe
     # "COM",  # flake8-commas
-    "DTZ",    # flake8-datetimez
-    "D",      # pydocstyle
-    "E",      # pydocstyle
+    "DTZ", # flake8-datetimez
+    "D", # pydocstyle
+    "E", # pydocstyle
     # "ERA",  # eradicate
     # "EM",   # flake8-errmsg
-    "EXE",    # flake8-executable
-    "F",      # flake8
+    "EXE", # flake8-executable
+    "F", # flake8
     # "FBT",  # flake8-boolean-trap
-    "G",      # flake8-logging-format
-    "I",      # isort
-    "ICN",    # flake8-import-conventions
-    "INP",    # flake8-no-pep420
-    "ISC",    # flake8-implicit-str-concat
-    "N",      # pep8-naming
+    "G", # flake8-logging-format
+    "I", # isort
+    "ICN", # flake8-import-conventions
+    "INP", # flake8-no-pep420
+    "ISC", # flake8-implicit-str-concat
+    "N", # pep8-naming
     # "PD",   # pandas-vet
-    "PIE",    # flake8-pie
-    "PGH",    # pygrep-hooks
-    "PL",     # pylint
+    "PIE", # flake8-pie
+    "PGH", # pygrep-hooks
+    "PL", # pylint
     # "PT",   # flake8-pytest-style
     # "PTH",  # flake8-use-pathlib          [Enable]
-    "Q",      # flake8-quotes
-    "RET",    # flake8-return
-    "RUF",    # Ruff
-    "S",      # flake8-bandit
-    "SIM",    # flake8-simplify
-    "T10",    # flake8-debugger
-    "T20",    # flake8-print
+    "Q", # flake8-quotes
+    "RET", # flake8-return
+    "RUF", # Ruff
+    "S", # flake8-bandit
+    "SIM", # flake8-simplify
+    "T10", # flake8-debugger
+    "T20", # flake8-print
     # "TCH",  # flake8-type-checking
-    "TID",    # flake8-tidy-imports
-    "TRY",    # tryceratops
-    "UP",     # pyupgrade
-    "W",      # pydocstyle
+    "TID", # flake8-tidy-imports
+    "TRY", # tryceratops
+    "UP", # pyupgrade
+    "W", # pydocstyle
     "YTT"     # flake8-2020
 ]
 ignore = [
@@ -170,5 +161,5 @@ convention = "numpy"
 "utilities/*" = ["EXE001", "INP"]
 
 [build-system]
-requires = [ "poetry>=0.12" ]
+requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
