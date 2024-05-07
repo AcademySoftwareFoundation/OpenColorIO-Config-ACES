@@ -17,9 +17,14 @@ keywords = [
     "OCIO"
 ]
 
+[[tool.poetry.source]]
+name = "test-pypi"
+url = "https://test.pypi.org/simple/"
+priority = "explicit"
+
 [tool.poetry.dependencies]
 python = ">= 3.9, < 3.12"
-opencolorio = ">= 2, < 3"
+opencolorio = {version = ">= 2, < 3", source = "test-pypi"}
 requests = ">= 2, < 3"
 semver = ">= 3, < 4"
 

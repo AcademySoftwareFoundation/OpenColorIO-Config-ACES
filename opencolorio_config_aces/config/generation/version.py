@@ -37,7 +37,7 @@ Default *OpenColorIO* profile version.
 PROFILE_VERSION_DEFAULT : Version
 """
 
-PROFILE_VERSIONS = [Version(i, j) for i in range(2, 3) for j in range(1, 4)]
+PROFILE_VERSIONS = [Version(i, j) for i in range(2, 3) for j in range(1, 5)]
 
 """
 *OpenColorIO* profile versions.
@@ -97,6 +97,11 @@ DEPENDENCY_VERSIONS = [
         aces=Version(1, 3),
         colorspaces=Version(2, 1, 0),
         ocio=Version(2, 3),
+    ),
+    DependencyVersions(
+        aces=Version(1, 3),
+        colorspaces=Version(2, 1, 0),
+        ocio=Version(2, 4),
     ),
 ]
 """
