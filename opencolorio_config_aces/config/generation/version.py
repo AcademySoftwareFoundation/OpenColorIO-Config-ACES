@@ -12,8 +12,9 @@ Defines various objects related to *OpenColorIO* config version handling:
 -   :attr:`opencolorio_config_aces.DEPENDENCY_VERSIONS`
 """
 
-from semver import Version
 from dataclasses import dataclass, field
+
+from semver import Version
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."

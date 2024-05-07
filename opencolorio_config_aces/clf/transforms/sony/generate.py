@@ -10,8 +10,9 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_sony`
 """
 
-import PyOpenColorIO as ocio
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -64,8 +65,7 @@ def _build_slog2_curve():
     base = 10.0
     logSideBreak = ab
     linSideBreak = (
-        pow(base, (logSideBreak - logSideOffset) / logSideSlope)
-        - linSideOffset
+        pow(base, (logSideBreak - logSideOffset) / logSideSlope) - linSideOffset
     ) / linSideSlope
 
     lct = transform_factory(
@@ -134,9 +134,7 @@ def _build_venice_sgamut3_mtx():
 
 def _build_venice_sgamut3_cine_mtx():
     """Build the `MatrixTransform` for the Venice S-Gamut3.Cine primaries."""
-    mtx = matrix_RGB_to_RGB_transform(
-        "Venice S-Gamut3.Cine", "ACES2065-1", "CAT02"
-    )
+    mtx = matrix_RGB_to_RGB_transform("Venice S-Gamut3.Cine", "ACES2065-1", "CAT02")
     return mtx
 
 

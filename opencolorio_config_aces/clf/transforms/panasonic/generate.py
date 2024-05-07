@@ -10,8 +10,9 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_panasonic`
 """
 
-import PyOpenColorIO as ocio
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -105,8 +106,7 @@ VARICAM_V-Log_V-Gamut.pdf
     # Using the CSC ID here because there is a slight discrepancy between the matrix
     # coefficients of the CSC and IDT CTL and the CLF matches the CSC transform.
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:"
-        "ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0"
+        "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0"
     )
 
     # Generate full transform.

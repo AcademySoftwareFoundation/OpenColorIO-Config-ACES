@@ -20,7 +20,6 @@ from opencolorio_config_aces.clf.transforms import (
     matrix_RGB_to_RGB_transform,
 )
 
-
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
 __license__ = "New BSD License - https://opensource.org/licenses/BSD-3-Clause"

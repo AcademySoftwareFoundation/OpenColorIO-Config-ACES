@@ -108,7 +108,6 @@ __all__ += [
     "print_aces_taxonomy",
     "unclassify_ctl_transforms",
     "version_aces_dev",
-    "version_config_mapping_file",
 ]
 __all__ += [
     "DescriptionStyle",
@@ -129,6 +128,4 @@ __application_name__ = "OpenColorIO Configuration for ACES"
 __major_version__ = "2"
 __minor_version__ = "0"
 __change_version__ = "0"
-__version__ = ".".join(
-    (__major_version__, __minor_version__, __change_version__)
-)
+__version__ = ".".join((__major_version__, __minor_version__, __change_version__))

@@ -25,7 +25,7 @@ Using ``ACES2065-1`` and ``OCES`` as connection spaces, it is possible to build 
 
     .. image:: _static/ACES_Conversion_Graph.svg
 
-An initial mapping of *ACES* **AMF** components is generated after the classification process. The mapping defines the ``ACEStransformID`` relationships. Its generation is automated but needs to be guided by an external file, i.e. `opencolorio_config_aces/config/reference/discover/resources/ACES_AMF_Components.json`, because a few relationships cannot be derived automatically.
+An initial mapping of *ACES* **AMF** components is generated after the classification process. The mapping defines the ``ACEStransformID`` relationships. Its generation is automated but needs to be guided by an external file, i.e., ``opencolorio_config_aces/config/reference/discover/resources/ACES_AMF_Components.json``, because a few relationships cannot be derived automatically.
 
 Analytical & Reference Configs Generation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -52,7 +52,7 @@ The repository contains code to generate, discover and classify the additional *
 CG Config Generation
 ^^^^^^^^^^^^^^^^^^^^
 
-The *CG* config generator also uses a *CSV* file generated from a `spreadsheet <https://docs.google.com/spreadsheets/d/1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4>`__ that expresses which ``ACEStransformID`` should be used from the `Reference` config and which ``CLFtransformID`` should be used from the shipped *CLF* transforms.
+The *CG* config generator also uses a *CSV* file generated from a `spreadsheet <https://docs.google.com/spreadsheets/d/1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4>`__ that expresses which ``ACEStransformID`` should be used from the ``Reference`` config and which ``CLFtransformID`` should be used from the shipped *CLF* transforms.
 
 -   :func:`opencolorio_config_aces.generate_config_cg`
 

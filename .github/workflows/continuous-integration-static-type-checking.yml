@@ -1,0 +1,29 @@
+name: Continuous Integration - Static Type Checking
+
+on: [push, pull_request]
+
+jobs:
+  continuous-integration-static-type-checking:
+    name: ${{ matrix.os }} - Python ${{ matrix.python-version }}
+    strategy:
+      matrix:
+        os: [macOS-13]
+        python-version: [3.11]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Environment Variables
+        run: |
+          echo "CI_PACKAGE=opencolorio_config_aces" >> $GITHUB_ENV
+        shell: bash
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Package Dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Static Type Checking
+        run: |
+          pyright --skipunannotated

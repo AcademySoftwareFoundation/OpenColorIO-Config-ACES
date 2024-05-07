@@ -12,7 +12,6 @@ import functools
 import logging
 import os
 import re
-import requests
 import subprocess
 import unicodedata
 from collections import defaultdict
@@ -21,6 +20,8 @@ from itertools import chain
 from pathlib import Path
 from pprint import PrettyPrinter
 from textwrap import TextWrapper
+
+import requests
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -68,8 +69,7 @@ class _dispatch(dict):
             pass
 
 
-PrettyPrinter._dispatch = _dispatch()
-
+PrettyPrinter._dispatch = _dispatch()  # pyright: ignore
 
 ROOT_BUILD_DEFAULT = (Path(__file__) / ".." / ".." / ".." / "build").resolve()
 """
@@ -166,9 +166,7 @@ def paths_common_ancestor(*args):
     '/Users/JohnDoe/Documents'
     """
 
-    path_ancestor = os.sep.join(
-        common_ancestor(*[path.split(os.sep) for path in args])
-    )
+    path_ancestor = os.sep.join(common_ancestor(*[path.split(os.sep) for path in args]))
 
     return path_ancestor
 
@@ -217,9 +215,7 @@ def vivified_to_dict(vivified):
     """
 
     if isinstance(vivified, defaultdict):
-        vivified = {
-            key: vivified_to_dict(value) for key, value in vivified.items()
-        }
+        vivified = {key: vivified_to_dict(value) for key, value in vivified.items()}
     return vivified
 
 
@@ -331,9 +327,7 @@ def is_colour_installed(raise_exception=False):
     except ImportError as error:  # pragma: no cover
         if raise_exception:
             raise ImportError(
-                (
-                    '"Colour" related API features are not available: "{}".'
-                ).format(error)
+                f'"Colour" related API features are not available: "{error}".'
             ) from error
         return False
 
@@ -365,10 +359,8 @@ def is_jsonpickle_installed(raise_exception=False):
     except ImportError as error:  # pragma: no cover
         if raise_exception:
             raise ImportError(
-                (
-                    '"jsonpickle" related API features, e.g. serialization, '
-                    'are not available: "{}".'
-                ).format(error)
+                f'"jsonpickle" related API features, '
+                f'e.g., serialization, are not available: "{error}".'
             ) from error
         return False
 
@@ -394,15 +386,13 @@ def is_networkx_installed(raise_exception=False):
     """
 
     try:  # pragma: no cover
-        import networkx  # noqa: F401
+        import networkx as nx  # noqa: F401
 
         return True
     except ImportError as error:  # pragma: no cover
         if raise_exception:
             raise ImportError(
-                (
-                    '"NetworkX" related API features are not available: "{}".'
-                ).format(error)
+                f'"NetworkX" related API features are not available: "{error}".'
             ) from error
         return False
 
@@ -624,9 +614,7 @@ def validate_method(
     valid_methods = [str(valid_method) for valid_method in valid_methods]
 
     method_lower = method.lower()
-    if method_lower not in [
-        valid_method.lower() for valid_method in valid_methods
-    ]:
+    if method_lower not in [valid_method.lower() for valid_method in valid_methods]:
         raise ValueError(message.format(method, valid_methods))
 
     return method_lower
@@ -760,12 +748,9 @@ def timestamp():
     :class:`str`
     """
 
-    now = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y/%m/%d at %H:%M"
-    )
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y/%m/%d at %H:%M")
     timestamp = (
-        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} '
-        f"on the {now}."
+        f'Generated with "OpenColorIO-Config-ACES" {git_describe()} on the {now}.'
     )
 
     return timestamp

@@ -65,7 +65,7 @@ thus cloning the repository requires initializing them::
 
     git clone --recursive https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES.git
 
-If you have already cloned the repository and forgot the `--recursive`
+If you have already cloned the repository and forgot the ``--recursive``
 argument, it is possible to initialize the submodules as follows::
 
     git submodule update --init --recursive
@@ -139,17 +139,15 @@ Optional Dependencies
 Development Dependencies
 ************************
 
--   `black <https://pypi.org/project/black>`__
 -   `coverage <https://pypi.org/project/coverage>`__
 -   `coveralls <https://pypi.org/project/coveralls>`__
--   `flynt <https://pypi.org/project/flynt>`__
 -   `invoke <https://pypi.org/project/invoke>`__
 -   `pre-commit <https://pypi.org/project/pre-commit>`__
 -   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
+-   `pyright <https://pypi.org/project/pyright>`__
 -   `pytest <https://pypi.org/project/pytest>`__
 -   `pytest-cov <https://pypi.org/project/pytest-cov>`__
 -   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint>`__
--   `ruff <https://pypi.org/project/ruff>`__
 -   `sphinx >= 4, < 5 <https://pypi.org/project/sphinx>`__
 -   `twine <https://pypi.org/project/twine>`__
 
@@ -208,41 +206,41 @@ Listing the tasks is done as follows::
 Reference Config
 ****************
 
-+-----------------------+--------------------------------------------+
-| Task                  | Command                                    |
-+-----------------------+--------------------------------------------+
-| Build                 | `invoke build-config-reference`            |
-+-----------------------+--------------------------------------------+
-| Build (Docker)        | `invoke docker-run-build-config-reference` |
-+-----------------------+--------------------------------------------+
-| Updating Mapping File | `invoke update-mapping-file-reference`     |
-+-----------------------+--------------------------------------------+
++-----------------------+----------------------------------------------+
+| Task                  | Command                                      |
++-----------------------+----------------------------------------------+
+| Build                 | ``invoke build-config-reference``            |
++-----------------------+----------------------------------------------+
+| Build (Docker)        | ``invoke docker-run-build-config-reference`` |
++-----------------------+----------------------------------------------+
+| Updating Mapping File | ``invoke update-mapping-file-reference``     |
++-----------------------+----------------------------------------------+
 
 CG Config
 *********
 
-+-----------------------+-------------------------------------+
-| Task                  | Command                             |
-+-----------------------+-------------------------------------+
-| Build                 | `invoke build-config-cg`            |
-+-----------------------+-------------------------------------+
-| Build (Docker)        | `invoke docker-run-build-config-cg` |
-+-----------------------+-------------------------------------+
-| Updating Mapping File | `invoke update-mapping-file-cg`     |
-+-----------------------+-------------------------------------+
++-----------------------+---------------------------------------+
+| Task                  | Command                               |
++-----------------------+---------------------------------------+
+| Build                 | ``invoke build-config-cg``            |
++-----------------------+---------------------------------------+
+| Build (Docker)        | ``invoke docker-run-build-config-cg`` |
++-----------------------+---------------------------------------+
+| Updating Mapping File | ``invoke update-mapping-file-cg``     |
++-----------------------+---------------------------------------+
 
 Studio Config
-****************
+*************
 
-+-----------------------+-----------------------------------------+
-| Task                  | Command                                 |
-+-----------------------+-----------------------------------------+
-| Build                 | `invoke build-config-studio`            |
-+-----------------------+-----------------------------------------+
-| Build (Docker)        | `invoke docker-run-build-config-studio` |
-+-----------------------+-----------------------------------------+
-| Updating Mapping File | `invoke update-mapping-file-studio`     |
-+-----------------------+-----------------------------------------+
++-----------------------+-------------------------------------------+
+| Task                  | Command                                   |
++-----------------------+-------------------------------------------+
+| Build                 | ``invoke build-config-studio``            |
++-----------------------+-------------------------------------------+
+| Build (Docker)        | ``invoke docker-run-build-config-studio`` |
++-----------------------+-------------------------------------------+
+| Updating Mapping File | ``invoke update-mapping-file-studio``     |
++-----------------------+-------------------------------------------+
 
 API Reference
 -------------

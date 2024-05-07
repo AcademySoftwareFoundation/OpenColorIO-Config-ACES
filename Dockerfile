@@ -12,7 +12,7 @@ RUN yum install --setopt=tsflags=nodocs -y \
 # OpenColorIO Build
 WORKDIR /tmp
 ARG OCIO_INSTALL_DIRECTORY=/usr/local
-RUN git clone https://github.com/AcademySoftwareFoundation/OpenColorIO \
+RUN git clone --depth 1 https://github.com/AcademySoftwareFoundation/OpenColorIO \
     && cd OpenColorIO \
     && mkdir build \
     && mkdir -p ${OCIO_INSTALL_DIRECTORY} \
