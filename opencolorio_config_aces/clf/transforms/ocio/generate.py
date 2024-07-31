@@ -12,6 +12,8 @@ transforms:
 
 from pathlib import Path
 
+import numpy as np
+
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
     format_clf_transform_id,
@@ -19,6 +21,7 @@ from opencolorio_config_aces.clf.transforms import (
     generate_clf_transform,
     matrix_RGB_to_RGB_transform,
 )
+from opencolorio_config_aces.utilities import required
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -50,8 +53,11 @@ VERSION = "1.0"
 """
 
 
+@required("Colour")
 def generate_clf_transforms_ocio(output_directory):
     """Generate OCIO Utility CLF transforms."""
+
+    import colour
 
     output_directory.mkdir(parents=True, exist_ok=True)
 
@@ -93,6 +99,26 @@ def generate_clf_transforms_ocio(output_directory):
         "generic linear RGB",
         "generic ST.2084 (PQ) encoded RGB mapping 1.0 to 100nits",
         style=style,
+    )
+
+    name = "AP0_to_CIE-XYZ-D65-Scene-referred"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    colour.RGB_COLOURSPACES["CIE-XYZ-D65"] = colour.RGB_Colourspace(
+        "CIE-XYZ-D65",
+        colour.XYZ_to_xy(np.identity(3)),
+        colour.CCS_ILLUMINANTS["CIE 1931 2 Degree Standard Observer"]["D65"],
+        "D65",
+        use_derived_matrix_RGB_to_XYZ=True,
+        use_derived_matrix_XYZ_to_RGB=True,
+    )
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [matrix_RGB_to_RGB_transform("ACES2065-1", "CIE-XYZ-D65")],
+        clf_transform_id,
+        "AP0 to CIE-XYZ-D65",
+        "ACES2065-1",
+        "CIE XYZ, D65 white point",
     )
 
     name = "AP0_to_Linear_P3-D65"
