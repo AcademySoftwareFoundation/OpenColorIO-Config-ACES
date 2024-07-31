@@ -1169,7 +1169,7 @@ def generate_config_cg(
 
     data.roles.update(
         {
-            ocio.ROLE_COLOR_PICKING: "sRGB - Texture",
+            ocio.ROLE_COLOR_PICKING: "sRGB - Scene-referred",
             ocio.ROLE_COLOR_TIMING: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_COMPOSITING_LOG: format_optional_prefix(
                 "ACEScct", "ACES", scheme
@@ -1181,7 +1181,7 @@ def generate_config_cg(
             ),
             ocio.ROLE_MATTE_PAINT: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_SCENE_LINEAR: format_optional_prefix("ACEScg", "ACES", scheme),
-            ocio.ROLE_TEXTURE_PAINT: "sRGB - Texture",
+            ocio.ROLE_TEXTURE_PAINT: "sRGB - Scene-referred",
         }
     )
 

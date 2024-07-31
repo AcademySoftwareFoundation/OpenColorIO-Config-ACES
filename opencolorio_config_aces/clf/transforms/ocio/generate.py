@@ -131,7 +131,7 @@ def generate_clf_transforms_ocio(output_directory):
         "linear Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_sRGB-Texture"
+    name = "AP0_to_sRGB-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -146,7 +146,7 @@ def generate_clf_transforms_ocio(output_directory):
         "sRGB",
     )
 
-    name = "AP0_to_Gamma1.8_Rec709-Texture"
+    name = "AP0_to_Gamma1.8_Rec709-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -156,12 +156,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(1.8),
         ],
         clf_transform_id,
-        "AP0 to Gamma 1.8 Rec.709 - Texture",
+        "AP0 to Gamma 1.8 Rec.709 - Scene-referred",
         "ACES2065-1",
         "1.8 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_Gamma2.2_Rec709-Texture"
+    name = "AP0_to_Gamma2.2_Rec709-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -171,12 +171,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(2.2),
         ],
         clf_transform_id,
-        "AP0 to Gamma 2.2 Rec.709 - Texture",
+        "AP0 to Gamma 2.2 Rec.709 - Scene-referred",
         "ACES2065-1",
         "2.2 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_Gamma2.4_Rec709-Texture"
+    name = "AP0_to_Gamma2.4_Rec709-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -186,12 +186,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(2.4),
         ],
         clf_transform_id,
-        "AP0 to Gamma 2.4 Rec.709 - Texture",
+        "AP0 to Gamma 2.4 Rec.709 - Scene-referred",
         "ACES2065-1",
         "2.4 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_Gamma2.2_AP1-Texture"
+    name = "AP0_to_Gamma2.2_AP1-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -201,12 +201,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(2.2),
         ],
         clf_transform_id,
-        "AP0 to Gamma 2.2 AP1 - Texture",
+        "AP0 to Gamma 2.2 AP1 - Scene-referred",
         "ACES2065-1",
         "2.2 gamma-corrected AP1 primaries, ACES ~=D60 white point",
     )
 
-    name = "AP0_to_sRGB_Encoded_AP1-Texture"
+    name = "AP0_to_sRGB_Encoded_AP1-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -216,12 +216,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform("sRGB"),
         ],
         clf_transform_id,
-        "AP0 to sRGB Encoded AP1 - Texture",
+        "AP0 to sRGB Encoded AP1 - Scene-referred",
         "ACES2065-1",
         "sRGB Encoded AP1 primaries, ACES ~=D60 white point",
     )
 
-    name = "AP0_to_sRGB_Encoded_P3-D65-Texture"
+    name = "AP0_to_sRGB_Encoded_P3-D65-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -231,7 +231,7 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform("sRGB"),
         ],
         clf_transform_id,
-        "AP0 to sRGB Encoded P3-D65 - Texture",
+        "AP0 to sRGB Encoded P3-D65 - Scene-referred",
         "ACES2065-1",
         "sRGB Encoded P3-D65 primaries, D65 white point",
     )

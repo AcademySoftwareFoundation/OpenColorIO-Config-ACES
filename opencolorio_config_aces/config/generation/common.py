@@ -414,7 +414,13 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
 
     if config_name is not None:
         with open(config_name, "w") as file:
-            file.write(config.serialize())
+            try:
+                file.write(config.serialize())
+            except Exception as error:
+                json_name = str(config_name).replace("ocio", "json")
+                serialize_config_data(data, json_name)
+                logger.critical('The config data was serialised to: "%s"', json_name)
+                raise Exception from error  # noqa: TRY002
 
     return config
 
