@@ -4,20 +4,18 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 100,ACES - ACEScg,TRUE,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,ColorSpace,ACEScg_to_ACES2065-1,"acescg,lin_ap1",scene-linear,"file-io,working-space,texture"
 200,Input - ADX - ADX10,TRUE,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX10_to_ACES.a1.0.3,,ColorSpace,ADX10_to_ACES2065-1,adx10,log,file-io
 200,Input - ADX - ADX16,TRUE,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX16_to_ACES.a1.0.3,,ColorSpace,ADX16_to_ACES2065-1,adx16,log,file-io
-201,Input - Apple - Curve - Apple Log,FALSE,,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log-Curve_to_Linear:1.0,NamedTransform,CURVE - APPLE_LOG_to_LINEAR,,log,file-io
-201,Input - Apple Log,FALSE,urn:ampas:aces:transformId:v1.5:IDT.Apple.AppleLog_BT2020.a1.v1,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log_to_ACES2065-1:1.0,ColorSpace,APPLE_LOG_to_ACES2065-1,,log,file-io
+201,Apple Log,FALSE,urn:ampas:aces:transformId:v1.5:IDT.Apple.AppleLog_BT2020.a1.v1,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log_to_ACES2065-1:1.0,ColorSpace,APPLE_LOG_to_ACES2065-1,,log,file-io
+201,Apple Log - Curve,FALSE,,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log-Curve_to_Linear:1.0,NamedTransform,CURVE - APPLE_LOG_to_LINEAR,,log,file-io
 203,Input - ARRI - Curve - V3 LogC (EI800),TRUE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_Curve_EI800_to_Linear:1.0,NamedTransform,,crv_logc3ei800,log,file-io
 203,Input - ARRI - Linear - ALEXA Wide Gamut,TRUE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_3_to_ACES2065-1:1.0,ColorSpace,,lin_alexawide,scene-linear,file-io
 203,Input - ARRI - V3 LogC (EI800) - Wide Gamut,TRUE,urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI800.a1.v2,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_EI800_to_ACES2065-1:1.0,ColorSpace,,logc3ei800_alexawide,log,file-io
-204,Input - ARRI - Curve - LogC4,FALSE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_Curve_to_Linear:1.0,NamedTransform,,,log,file-io
-204,Input - ARRI - Linear - ARRI Wide Gamut 4,FALSE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_4_to_ACES2065-1:1.0,ColorSpace,,lin_awg4,scene-linear,file-io
-204,Input - ARRI LogC4,FALSE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
-210,Input - Blackmagic - Blackmagic Film Wide Gamut (Gen 5),FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:BMDFilm_WideGamut_Gen5_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
-210,Input - Blackmagic - Curve - Blackmagic Film (Gen 5),FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:BMDFilm_Gen5_Log-Curve_to_Linear:1.0,NamedTransform,,,log,file-io
-210,Input - Blackmagic - Curve - DaVinci Intermediate,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_Log-Curve_to_Linear:1.0,NamedTransform,,,log,file-io
-210,Input - Blackmagic - DaVinci Intermediate - DaVinci Wide Gamut,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
-210,Input - Blackmagic - Linear - Blackmagic Wide Gamut (Gen 5),FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1:1.0,ColorSpace,,,scene-linear,file-io
-210,Input - Blackmagic - Linear - DaVinci Wide Gamut,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1:1.0,ColorSpace,,,scene-linear,file-io
+204,ARRI LogC4,FALSE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
+204,ARRI LogC4 - Curve,FALSE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_Curve_to_Linear:1.0,NamedTransform,,,log,file-io
+204,Linear ARRI Wide Gamut 4,FALSE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_4_to_ACES2065-1:1.0,ColorSpace,,lin_awg4,scene-linear,file-io
+210,BMDFilm Gen5 Log - Curve,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:BMDFilm_Gen5_Log-Curve_to_Linear:1.0,NamedTransform,,,log,file-io
+210,BMDFilm WideGamut Gen5,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:BMDFilm_WideGamut_Gen5_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
+210,DaVinci Intermediate Log - Curve,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_Log-Curve_to_Linear:1.0,NamedTransform,,,log,file-io
+210,DaVinci Intermediate WideGamut,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:DaVinci_Intermediate_WideGamut_to_ACES2065-1:1.0,ColorSpace,,,log,file-io
 210,Input - Canon - Canon-Log2 - Cinema Gamut Daylight,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CanonLog2_CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,CANON_CLOG2-CGAMUT_to_ACES2065-1,canonlog2_cgamutday,log,file-io
 210,Input - Canon - Canon-Log3 - Cinema Gamut Daylight,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CanonLog3_CinemaGamut-D55_to_ACES2065-1:1.0,ColorSpace,CANON_CLOG3-CGAMUT_to_ACES2065-1,canonlog3_cgamutday,log,file-io
 210,Input - Canon - Curve - Canon-Log2,TRUE,,urn:aswf:ocio:transformId:1.0:Canon:Input:CLog2-Curve_to_Linear:1.0,NamedTransform,CURVE - CANON_CLOG2_to_LINEAR,crv_canonlog2,log,file-io
@@ -38,6 +36,8 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 210,Input - Sony - S-Log3 - S-Gamut3.Cine,TRUE,urn:ampas:aces:transformId:v1.5:IDT.Sony.SLog3_SGamut3Cine.a1.v1,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_SGamut3Cine_to_ACES2065-1:1.0,ColorSpace,,slog3_sgamutcine,log,file-io
 210,Input - Sony - S-Log3 - Venice S-Gamut3,TRUE,urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3.a1.v1,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_Venice_SGamut3_to_ACES2065-1:1.0,ColorSpace,,slog3_venice_sgamut3,log,file-io
 210,Input - Sony - S-Log3 - Venice S-Gamut3.Cine,TRUE,urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1,urn:aswf:ocio:transformId:1.0:Sony:Input:SLog3_Venice_SGamut3Cine_to_ACES2065-1:1.0,ColorSpace,,slog3_venice_sgamutcine,log,file-io
+210,Linear BMD WideGamut Gen5,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_BMD_WideGamut_Gen5_to_ACES2065-1:1.0,ColorSpace,,,scene-linear,file-io
+210,Linear DaVinci WideGamut,FALSE,,urn:aswf:ocio:transformId:1.0:BlackmagicDesign:Input:Linear_DaVinci_WideGamut_to_ACES2065-1:1.0,ColorSpace,,,scene-linear,file-io
 210,Utility - Rec.709 - Camera,TRUE,,urn:aswf:ocio:transformId:1.0:ITU:Utility:AP0_to_Camera_Rec709:1.0,ColorSpace,,rec709_camera,sdr-video,file-io
 300,Output - DisplayP3,TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.DisplayP3_dim.a1.0.0,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,,sdr-video,file-io
 300,Output - DisplayP3 (D60 sim.),TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.DisplayP3_D60sim_dim.a1.0.0,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,,sdr-video,file-io
@@ -62,19 +62,21 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 300,Output - Rec.709 (D60 sim.),TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.Rec709_D60sim_100nits_dim.a1.0.3,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,,sdr-video,file-io
 300,Output - sRGB,TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO_1.0,,sdr-video,file-io
 300,Output - sRGB (D60 sim.),TRUE,urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_D60sim_100nits_dim.a1.0.3,,ViewTransform,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - SDR-VIDEO-D60sim-D65_1.0,,sdr-video,file-io
+400,ST-2084 - Curve,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_ST2084-Curve:1.0,NamedTransform,CURVE - LINEAR_to_ST-2084,,hdr-video,file-io
 400,Utility - Curve - Rec.1886,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_Rec1886-Curve:1.0,NamedTransform,,crv_rec1886,sdr-video,file-io
 400,Utility - Curve - Rec.709,TRUE,,urn:aswf:ocio:transformId:1.0:ITU:Utility:Linear_to_Rec709-Curve:1.0,NamedTransform,,crv_rec709,sdr-video,file-io
 400,Utility - Curve - sRGB,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_sRGB-Curve:1.0,NamedTransform,,crv_srgb,sdr-video,file-io
-400,Utility - Curve - ST2084,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:Linear_to_ST2084-Curve:1.0,NamedTransform,CURVE - LINEAR_to_ST-2084,,hdr-video,file-io
 410,Utility - Linear - P3-D65,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_P3-D65:1.0,ColorSpace,,"lin_p3d65,lin_displayp3,Linear Display P3",scene-linear,"file-io,working-space,texture"
 410,Utility - Linear - Rec.2020,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec2020:1.0,ColorSpace,,lin_rec2020,scene-linear,"file-io,texture"
 410,Utility - Linear - Rec.709,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_Rec709:1.0,ColorSpace,,"lin_rec709,lin_srgb,Utility - Linear - sRGB",scene-linear,"file-io,working-space,texture"
 410,Utility - Linear - RIMM ROMM (ProPhoto),TRUE,,,ColorSpace,,"lin_prophoto,lin_rimm",scene-linear,file-io
+420,AdobeRGB - Scene-referred,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_AdobeRGB-Scene-referred:1.0,ColorSpace,,adobergb,sdr-video,"file-io,texture"
+420,Gamma 2.2 AP1 - Scene-referred,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_AP1-Scene-referred:1.0,ColorSpace,,"g22_ap1,Gamma 2.2 AP1 - Texture,g22_ap1_tx",sdr-video,"file-io,texture"
+420,Gamma 2.4 Rec.709 - Scene-referred,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Scene-referred:1.0,ColorSpace,,"g24_rec709,rec709_display,Utility - Rec.709 - Display,Gamma 2.4 Rec.709 - Texture,g24_rec709_tx",sdr-video,"file-io,texture"
+420,Linear AdobeRGB,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Linear_AdobeRGB:1.0,ColorSpace,,lin_adobergb,scene-linear,file-io
+420,sRGB Encoded AP1 - Scene-referred,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_AP1-Scene-referred:1.0,ColorSpace,,"srgb_ap1,sRGB Encoded AP1 - Texture,srgb_encoded_ap1_tx",sdr-video,"file-io,texture"
+420,sRGB Encoded P3-D65 - Scene-referred,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_P3-D65-Scene-referred:1.0,ColorSpace,,"srgb_p3d65,srgb_displayp3,sRGB Encoded P3-D65 - Texture,srgb_encoded_p3d65_tx",sdr-video,"file-io,texture"
 420,Utility - Gamma 1.8 - Rec.709 - Texture,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma1.8_Rec709-Scene-referred:1.0,ColorSpace,,"g18_rec709,Gamma 1.8 Rec.709 - Texture,g18_rec709_tx",sdr-video,"file-io,texture"
-420,Utility - Gamma 2.2 - AP1 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_AP1-Scene-referred:1.0,ColorSpace,,"g22_ap1,Gamma 2.2 AP1 - Texture,g22_ap1_tx",sdr-video,"file-io,texture"
 420,Utility - Gamma 2.2 - Rec.709 - Texture,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_Rec709-Scene-referred:1.0,ColorSpace,,"g22_rec709,Gamma 2.2 - Rec.709 - Texture,g22_rec709_tx",sdr-video,"file-io,texture"
-420,Utility - Gamma 2.4 - Rec.709 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.4_Rec709-Scene-referred:1.0,ColorSpace,,"g24_rec709,rec709_display,Utility - Rec.709 - Display,Gamma 2.4 Rec.709 - Texture,g24_rec709_tx",sdr-video,"file-io,texture"
-420,Utility - sRGB - AP1 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_AP1-Scene-referred:1.0,ColorSpace,,"srgb_ap1,sRGB Encoded AP1 - Texture,srgb_encoded_ap1_tx",sdr-video,"file-io,texture"
-420,Utility - sRGB - P3-D65 - Texture,FALSE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_P3-D65-Scene-referred:1.0,ColorSpace,,"srgb_p3d65,srgb_displayp3,sRGB Encoded P3-D65 - Texture,srgb_encoded_p3d65_tx",sdr-video,"file-io,texture"
 420,Utility - sRGB - Texture,TRUE,,urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB-Scene-referred:1.0,ColorSpace,,"srgb_texture,Input - Generic - sRGB - Texture,sRGB - Texture,srgb_tx",,"file-io,texture"
 500,Utility - Look - Gamut Compress,FALSE,urn:ampas:aces:transformId:v1.5:LMT.Academy.ReferenceGamutCompress.a1.v1.0,,Look,,,,

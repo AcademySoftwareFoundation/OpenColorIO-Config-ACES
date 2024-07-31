@@ -131,6 +131,18 @@ def generate_clf_transforms_ocio(output_directory):
         "linear Rec.709 primaries, D65 white point",
     )
 
+    name = "AP0_to_Linear_AdobeRGB"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [matrix_RGB_to_RGB_transform("ACES2065-1", "Adobe RGB (1998)")],
+        clf_transform_id,
+        "AP0 to Linear Adobe RGB (1998)",
+        "ACES2065-1",
+        "linear Adobe RGB (1998) primaries, D65 white point",
+    )
+
     name = "AP0_to_sRGB-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
@@ -234,6 +246,21 @@ def generate_clf_transforms_ocio(output_directory):
         "AP0 to sRGB Encoded P3-D65 - Scene-referred",
         "ACES2065-1",
         "sRGB Encoded P3-D65 primaries, D65 white point",
+    )
+
+    name = "AP0_to_AdobeRGB-Scene-referred"
+    clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
+    filename = output_directory / clf_basename(clf_transform_id)
+    clf_transforms[filename] = generate_clf_transform(
+        filename,
+        [
+            matrix_RGB_to_RGB_transform("ACES2065-1", "Adobe RGB (1998)"),
+            gamma_transform(563 / 256),
+        ],
+        clf_transform_id,
+        "AP0 to Adobe RGB (1998) - Scene-referred",
+        "ACES2065-1",
+        "Adobe RGB (1998) primaries, D65 white point",
     )
 
     return clf_transforms
