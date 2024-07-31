@@ -4,8 +4,8 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 100,ACES - ACEScg,TRUE,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,,ColorSpace,ACEScg_to_ACES2065-1,"acescg,lin_ap1",scene-linear,"file-io,working-space,texture"
 200,Input - ADX - ADX10,TRUE,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX10_to_ACES.a1.0.3,,ColorSpace,ADX10_to_ACES2065-1,adx10,log,file-io
 200,Input - ADX - ADX16,TRUE,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX16_to_ACES.a1.0.3,,ColorSpace,ADX16_to_ACES2065-1,adx16,log,file-io
-201,Input - Apple - Apple Log,FALSE,urn:ampas:aces:transformId:v1.5:IDT.Apple.AppleLog_BT2020.a1.v1,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log_to_ACES2065-1:1.0,ColorSpace,APPLE_LOG_to_ACES2065-1,,log,file-io
 201,Input - Apple - Curve - Apple Log,FALSE,,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log-Curve_to_Linear:1.0,NamedTransform,CURVE - APPLE_LOG_to_LINEAR,,log,file-io
+201,Input - Apple Log,FALSE,urn:ampas:aces:transformId:v1.5:IDT.Apple.AppleLog_BT2020.a1.v1,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log_to_ACES2065-1:1.0,ColorSpace,APPLE_LOG_to_ACES2065-1,,log,file-io
 203,Input - ARRI - Curve - V3 LogC (EI800),TRUE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_Curve_EI800_to_Linear:1.0,NamedTransform,,crv_logc3ei800,log,file-io
 203,Input - ARRI - Linear - ALEXA Wide Gamut,TRUE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_3_to_ACES2065-1:1.0,ColorSpace,,lin_alexawide,scene-linear,file-io
 203,Input - ARRI - V3 LogC (EI800) - Wide Gamut,TRUE,urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI800.a1.v2,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_EI800_to_ACES2065-1:1.0,ColorSpace,,logc3ei800_alexawide,log,file-io
