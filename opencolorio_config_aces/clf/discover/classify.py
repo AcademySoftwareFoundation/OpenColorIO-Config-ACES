@@ -1188,8 +1188,7 @@ def unclassify_clf_transforms(
     ...     discover_clf_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_clf_transforms(clf_transforms), key=lambda x: x.path)[0]
-    CLFTransform(\
-'arri...input...ARRI.Input.ARRI_LogC3_Curve_EI800.clf')
+    CLFTransform('apple...input...Apple.Input.Apple_Log-Curve.clf')
     """
 
     unclassified_clf_transforms = []

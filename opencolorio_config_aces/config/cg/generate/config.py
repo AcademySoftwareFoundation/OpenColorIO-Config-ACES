@@ -83,7 +83,7 @@ logger = logging.getLogger(__name__)
 
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG = (
     "https://docs.google.com/spreadsheets/d/"
-    "1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4/"
+    "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
     "export?format=csv&gid=365242296"
 )
 """
@@ -1169,7 +1169,7 @@ def generate_config_cg(
 
     data.roles.update(
         {
-            ocio.ROLE_COLOR_PICKING: "sRGB - Texture",
+            ocio.ROLE_COLOR_PICKING: "sRGB - Scene-referred",
             ocio.ROLE_COLOR_TIMING: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_COMPOSITING_LOG: format_optional_prefix(
                 "ACEScct", "ACES", scheme
@@ -1181,7 +1181,7 @@ def generate_config_cg(
             ),
             ocio.ROLE_MATTE_PAINT: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_SCENE_LINEAR: format_optional_prefix("ACEScg", "ACES", scheme),
-            ocio.ROLE_TEXTURE_PAINT: "sRGB - Texture",
+            ocio.ROLE_TEXTURE_PAINT: "sRGB - Scene-referred",
         }
     )
 

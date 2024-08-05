@@ -26,10 +26,10 @@ The following features are available:
 
     -   Discovery of *aces-dev* *CTL* transforms.
     -   Generation of the *CTL* transforms graph.
-    -   `Spreadsheet <https://docs.google.com/spreadsheets/d/1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg>`__-driven generation.
+    -   `Spreadsheet <https://docs.google.com/spreadsheets/d/1z3xsy3sF0I-8AN_tkMOEjHlAs13ba7VAVhrE8v4WIyo>`__-driven generation.
 
 -   Generators producing the *OCIO* **CG** and **Studio** configurations.
-    -   `Spreadsheet <https://docs.google.com/spreadsheets/d/1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4>`__-driven generation.
+    -   `Spreadsheet <https://docs.google.com/spreadsheets/d/1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A>`__-driven generation.
 
 -   Included *CLF* transforms along with generator and discovery support.
 
