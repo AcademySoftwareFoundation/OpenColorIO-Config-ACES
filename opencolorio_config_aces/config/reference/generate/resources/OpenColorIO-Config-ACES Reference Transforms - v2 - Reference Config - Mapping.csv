@@ -1,7 +1,7 @@
 Ordering,ACEStransformID,Colorspace,Legacy,BuiltinTransform Style,Linked DisplayColorSpace Style,Interface,Encoding,Categories,Aliases
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScc_to_ACES.a1.0.3,ACES - ACEScc,TRUE,ACEScc_to_ACES2065-1,,ColorSpace,log,file-io,"acescc,acescc_ap1"
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScct_to_ACES.a1.0.3,ACES - ACEScct,TRUE,ACEScct_to_ACES2065-1,,ColorSpace,log,"file-io,working-space","acescct,acescct_ap1"
-100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,ACES - ACEScg,TRUE,ACEScg_to_ACES2065-1,,ColorSpace,scene-linear,"file-io,working-space,texture","acescg,lin_ap1"
+100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ACEScg_to_ACES.a1.0.3,ACES - ACEScg,TRUE,ACEScg_to_ACES2065-1,,ColorSpace,scene-linear,"file-io,working-space,texture","acescg,lin_ap1,lin_ap1_scene"
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX10_to_ACES.a1.0.3,Input - ADX - ADX10,TRUE,ADX10_to_ACES2065-1,,ColorSpace,log,file-io,adx10
 100,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.ADX16_to_ACES.a1.0.3,Input - ADX - ADX16,TRUE,ADX16_to_ACES2065-1,,ColorSpace,log,file-io,adx16
 120,urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog2_CGamut_to_ACES.a1.1.0,,FALSE,CANON_CLOG2-CGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,canonlog2_cgamutday

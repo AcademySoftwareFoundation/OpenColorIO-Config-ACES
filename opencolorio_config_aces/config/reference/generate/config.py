@@ -1138,14 +1138,17 @@ def generate_config_aces(
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
+        "aces",
         "ACES - ACES2065-1",
         "lin_ap0",
+        "lin_ap0_scene",
     ]
 
     display_reference_colorspace = {
-        "name": "CIE-XYZ-D65",
+        "name": "CIE-XYZ-D65 - Display-referred",
         "description": 'The "CIE XYZ (D65)" display connection colorspace.',
         "reference_space": "REFERENCE_SPACE_DISPLAY",
+        "encoding": "display-linear",
     }
     display_reference_colorspace["aliases"] = [
         beautify_alias(display_reference_colorspace["name"])
@@ -1157,6 +1160,7 @@ def generate_config_aces(
         "description": 'The utility "Raw" colorspace.',
         "is_data": True,
         "categories": ["file-io", "texture"],
+        "encoding": "data",
     }
     raw_colorspace["aliases"] = [
         beautify_alias(raw_colorspace["name"]),

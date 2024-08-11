@@ -207,13 +207,13 @@ def clf_transform_to_description(
             if clf_transform.description is not None:
                 if direction.lower() == "forward":
                     description.append(
-                        f"Convert {clf_transform.output_descriptor} "
-                        f"to {clf_transform.input_descriptor}"
+                        f"Convert {clf_transform.input_descriptor} "
+                        f"to {clf_transform.output_descriptor}"
                     )
                 else:
                     description.append(
-                        f"Convert {clf_transform.input_descriptor} "
-                        f"to {clf_transform.output_descriptor}"
+                        f"Convert {clf_transform.output_descriptor} "
+                        f"to {clf_transform.input_descriptor}"
                     )
         elif describe in (  # noqa: SIM102
             DescriptionStyle.OPENCOLORIO,
@@ -328,7 +328,9 @@ def clf_transform_to_colorspace(
         "name": clf_transform_to_colorspace_name(clf_transform),
         "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(
-            clf_transform, describe, amf_components
+            clf_transform,
+            describe,
+            amf_components,
         ),
     }
 
@@ -1156,7 +1158,10 @@ def generate_config_cg(
 
         inactive_colorspaces.append(colorspace)
 
-    data.inactive_colorspaces = inactive_colorspaces
+    data.inactive_colorspaces = [
+        *inactive_colorspaces,
+        "CIE-XYZ-D65 - Display-referred",
+    ]
 
     # Roles Filtering & Update
     for role in (
@@ -1175,7 +1180,7 @@ def generate_config_cg(
                 "ACEScct", "ACES", scheme
             ),
             ocio.ROLE_DATA: "Raw",
-            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65",
+            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65 - Display-referred",
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme
             ),
