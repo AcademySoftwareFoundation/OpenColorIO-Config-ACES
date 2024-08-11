@@ -1281,7 +1281,7 @@ def generate_config_aces(
             untonemapped_shared_view["view"],
             display_name,
         )
-        shared_views.insert(0, untonemapped_shared_view)
+        shared_views.append(untonemapped_shared_view)
 
     for display_name in display_names:
         raw_view = {
@@ -1318,11 +1318,11 @@ def generate_config_aces(
         },
         colorspaces=colorspaces + displays,
         looks=looks,
-        view_transforms=[untonemapped_view_transform, *view_transforms],
+        view_transforms=[*view_transforms, untonemapped_view_transform],
         shared_views=shared_views,
         views=shared_views + views,
         active_displays=display_names,
-        active_views=["Un-tone-mapped", *view_transform_names, "Raw"],
+        active_views=[*view_transform_names, "Un-tone-mapped", "Raw"],
         file_rules=[
             {
                 "name": "Default",
