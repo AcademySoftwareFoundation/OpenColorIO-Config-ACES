@@ -328,9 +328,7 @@ def clf_transform_to_colorspace(
         "name": clf_transform_to_colorspace_name(clf_transform),
         "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(
-            clf_transform,
-            describe,
-            amf_components,
+            clf_transform, describe, amf_components, "Forward"
         ),
     }
 
@@ -600,10 +598,15 @@ def style_to_named_transform(
         colorspace_signature = clf_transform_to_colorspace(
             clf_transform, describe, amf_components, True, **kwargs
         )
-        description = colorspace_signature["description"]
         signature.update(colorspace_signature)
         signature.pop("from_reference", None)
         source = clf_transform.source
+        description = clf_transform_to_description(
+            clf_transform,
+            describe,
+            amf_components,
+            "Reverse" if is_reference(source) else "Forward",
+        )
     else:
         # TODO: Implement solid "BuiltinTransform" source detection.
         source = (
