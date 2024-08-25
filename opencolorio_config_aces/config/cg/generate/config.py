@@ -207,13 +207,13 @@ def clf_transform_to_description(
             if clf_transform.description is not None:
                 if direction.lower() == "forward":
                     description.append(
-                        f"Convert {clf_transform.output_descriptor} "
-                        f"to {clf_transform.input_descriptor}"
+                        f"Convert {clf_transform.input_descriptor} "
+                        f"to {clf_transform.output_descriptor}"
                     )
                 else:
                     description.append(
-                        f"Convert {clf_transform.input_descriptor} "
-                        f"to {clf_transform.output_descriptor}"
+                        f"Convert {clf_transform.output_descriptor} "
+                        f"to {clf_transform.input_descriptor}"
                     )
         elif describe in (  # noqa: SIM102
             DescriptionStyle.OPENCOLORIO,
@@ -328,7 +328,7 @@ def clf_transform_to_colorspace(
         "name": clf_transform_to_colorspace_name(clf_transform),
         "family": clf_transform_to_family(clf_transform),
         "description": clf_transform_to_description(
-            clf_transform, describe, amf_components
+            clf_transform, describe, amf_components, "Forward"
         ),
     }
 
@@ -598,10 +598,15 @@ def style_to_named_transform(
         colorspace_signature = clf_transform_to_colorspace(
             clf_transform, describe, amf_components, True, **kwargs
         )
-        description = colorspace_signature["description"]
         signature.update(colorspace_signature)
         signature.pop("from_reference", None)
         source = clf_transform.source
+        description = clf_transform_to_description(
+            clf_transform,
+            describe,
+            amf_components,
+            "Reverse" if is_reference(source) else "Forward",
+        )
     else:
         # TODO: Implement solid "BuiltinTransform" source detection.
         source = (
@@ -1156,7 +1161,10 @@ def generate_config_cg(
 
         inactive_colorspaces.append(colorspace)
 
-    data.inactive_colorspaces = inactive_colorspaces
+    data.inactive_colorspaces = [
+        *inactive_colorspaces,
+        "CIE-XYZ-D65 - Display-referred",
+    ]
 
     # Roles Filtering & Update
     for role in (
@@ -1169,19 +1177,19 @@ def generate_config_cg(
 
     data.roles.update(
         {
-            ocio.ROLE_COLOR_PICKING: "sRGB - Texture",
+            ocio.ROLE_COLOR_PICKING: "sRGB - Scene-referred",
             ocio.ROLE_COLOR_TIMING: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_COMPOSITING_LOG: format_optional_prefix(
                 "ACEScct", "ACES", scheme
             ),
             ocio.ROLE_DATA: "Raw",
-            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65",
+            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65 - Display-referred",
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme
             ),
             ocio.ROLE_MATTE_PAINT: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_SCENE_LINEAR: format_optional_prefix("ACEScg", "ACES", scheme),
-            ocio.ROLE_TEXTURE_PAINT: "sRGB - Texture",
+            ocio.ROLE_TEXTURE_PAINT: "sRGB - Scene-referred",
         }
     )
 

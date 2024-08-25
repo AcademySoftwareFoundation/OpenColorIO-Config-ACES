@@ -1134,21 +1134,25 @@ def generate_config_aces(
         "family": "ACES",
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
-        "categories": ["file-io"],
+        "categories": ["file-io", "texture"],
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
+        "aces",
         "ACES - ACES2065-1",
         "lin_ap0",
+        "lin_ap0_scene",
     ]
 
     display_reference_colorspace = {
-        "name": "CIE-XYZ-D65",
+        "name": "CIE-XYZ-D65 - Display-referred",
         "description": 'The "CIE XYZ (D65)" display connection colorspace.',
         "reference_space": "REFERENCE_SPACE_DISPLAY",
+        "encoding": "display-linear",
     }
     display_reference_colorspace["aliases"] = [
-        beautify_alias(display_reference_colorspace["name"])
+        beautify_alias(display_reference_colorspace["name"]),
+        "CIE-XYZ-D65",
     ]
 
     raw_colorspace = {
@@ -1157,10 +1161,12 @@ def generate_config_aces(
         "description": 'The utility "Raw" colorspace.',
         "is_data": True,
         "categories": ["file-io", "texture"],
+        "encoding": "data",
     }
     raw_colorspace["aliases"] = [
         beautify_alias(raw_colorspace["name"]),
         "Utility - Raw",
+        "none",
     ]
 
     colorspaces += [
@@ -1168,7 +1174,6 @@ def generate_config_aces(
         display_reference_colorspace,
         raw_colorspace,
     ]
-    inactive_colorspaces = [display_reference_colorspace["name"]]
 
     logger.info('Implicit colorspaces: "%s"', [a["name"] for a in colorspaces])
 
@@ -1203,8 +1208,6 @@ def generate_config_aces(
                 )
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
-                if display_name not in inactive_colorspaces:
-                    inactive_colorspaces.append(display_name)
 
                 if display_name not in display_names:
                     displays.append(display)
@@ -1332,7 +1335,6 @@ def generate_config_aces(
                 "colorspace": scene_reference_colorspace["name"],
             }
         ],
-        inactive_colorspaces=inactive_colorspaces,
         default_view_transform=untonemapped_view_transform["name"],
         profile_version=dependency_versions.ocio,
     )
