@@ -1134,7 +1134,7 @@ def generate_config_aces(
         "family": "ACES",
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
-        "categories": ["file-io"],
+        "categories": ["file-io", "texture"],
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
@@ -1151,7 +1151,8 @@ def generate_config_aces(
         "encoding": "display-linear",
     }
     display_reference_colorspace["aliases"] = [
-        beautify_alias(display_reference_colorspace["name"])
+        beautify_alias(display_reference_colorspace["name"]),
+        "CIE-XYZ-D65",
     ]
 
     raw_colorspace = {
@@ -1165,6 +1166,7 @@ def generate_config_aces(
     raw_colorspace["aliases"] = [
         beautify_alias(raw_colorspace["name"]),
         "Utility - Raw",
+        "none",
     ]
 
     colorspaces += [
