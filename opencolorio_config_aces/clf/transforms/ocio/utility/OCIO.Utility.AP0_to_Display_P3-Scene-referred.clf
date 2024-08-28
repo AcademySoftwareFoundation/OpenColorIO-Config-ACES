@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_sRGB_Encoded_P3-D65-Scene-referred:1.0" name="AP0 to sRGB Encoded P3-D65 - Scene-referred">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Display_P3-Scene-referred:1.0" name="AP0 to Display P3 - Scene-referred">
     <InputDescriptor>ACES2065-1</InputDescriptor>
-    <OutputDescriptor>sRGB Encoded P3-D65 primaries, D65 white point</OutputDescriptor>
+    <OutputDescriptor>Display P3 primaries, D65 white point</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">
         <Array dim="3 3">
    2.02490528596679  -0.689069761034766  -0.335835524932019

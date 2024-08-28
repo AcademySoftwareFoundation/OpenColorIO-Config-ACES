@@ -261,19 +261,19 @@ def generate_clf_transforms_ocio(output_directory):
         "sRGB Encoded AP1 primaries, ACES ~=D60 white point",
     )
 
-    name = "AP0_to_sRGB_Encoded_P3-D65-Scene-referred"
+    name = "AP0_to_Display_P3-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
         filename,
         [
-            matrix_RGB_to_RGB_transform("ACES2065-1", "P3-D65"),
+            matrix_RGB_to_RGB_transform("ACES2065-1", "Display P3"),
             gamma_transform("sRGB"),
         ],
         clf_transform_id,
-        "AP0 to sRGB Encoded P3-D65 - Scene-referred",
+        "AP0 to Display P3 - Scene-referred",
         "ACES2065-1",
-        "sRGB Encoded P3-D65 primaries, D65 white point",
+        "Display P3 primaries, D65 white point",
     )
 
     name = "AP0_to_AdobeRGB-Scene-referred"
