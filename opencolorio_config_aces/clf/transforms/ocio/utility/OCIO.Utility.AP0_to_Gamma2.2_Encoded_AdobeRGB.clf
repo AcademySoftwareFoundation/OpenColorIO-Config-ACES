@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_AdobeRGB-Scene-referred:1.0" name="AP0 to Adobe RGB (1998) - Scene-referred">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_Gamma2.2_Encoded_AdobeRGB:1.0" name="AP0 to Gamma 2.2 Encoded AdobeRGB">
     <InputDescriptor>ACES2065-1</InputDescriptor>
-    <OutputDescriptor>Adobe RGB (1998) primaries, D65 white point</OutputDescriptor>
+    <OutputDescriptor>2.2 gamma-corrected AdobeRGB primaries, D65 white point</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">
         <Array dim="3 3">
    1.72456031681181  -0.419993594161504  -0.304566722650304

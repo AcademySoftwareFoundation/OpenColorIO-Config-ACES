@@ -88,6 +88,7 @@ PATTERNS_COLORSPACE_NAME = {
     "Cine\\b": ".Cine",
     "EI800": "(EI800)",
     "Linear Rec.709": "Linear Rec.709 (sRGB)",
+    "sRGB Encoded Rec.709": "sRGB Encoded Rec.709 (sRGB)",
 }
 """
 *OpenColorIO* colorspace name substitution patterns.

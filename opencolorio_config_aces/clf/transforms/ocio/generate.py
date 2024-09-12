@@ -171,7 +171,7 @@ def generate_clf_transforms_ocio(output_directory):
         "linear Adobe RGB (1998) primaries, D65 white point",
     )
 
-    name = "AP0_to_sRGB-Scene-referred"
+    name = "AP0_to_sRGB-Encoded-Rec709"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -181,12 +181,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform("sRGB"),
         ],
         clf_transform_id,
-        "AP0 to sRGB Rec.709",
+        "AP0 to sRGB Encoded Rec.709 (sRGB)",
         "ACES2065-1",
         "sRGB",
     )
 
-    name = "AP0_to_Gamma1.8_Rec709-Scene-referred"
+    name = "AP0_to_Gamma1.8_Encoded_Rec709"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -196,12 +196,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(1.8),
         ],
         clf_transform_id,
-        "AP0 to Gamma 1.8 Rec.709 - Scene-referred",
+        "AP0 to Gamma 1.8 Encoded Rec.709",
         "ACES2065-1",
         "1.8 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_Gamma2.2_Rec709-Scene-referred"
+    name = "AP0_to_Gamma2.2_Encoded_Rec709"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -211,12 +211,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(2.2),
         ],
         clf_transform_id,
-        "AP0 to Gamma 2.2 Rec.709 - Scene-referred",
+        "AP0 to Gamma 2.2 Encoded Rec.709",
         "ACES2065-1",
         "2.2 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_Gamma2.4_Rec709-Scene-referred"
+    name = "AP0_to_Gamma2.4_Encoded_Rec709"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -226,12 +226,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(2.4),
         ],
         clf_transform_id,
-        "AP0 to Gamma 2.4 Rec.709 - Scene-referred",
+        "AP0 to Gamma 2.4 Encoded Rec.709",
         "ACES2065-1",
         "2.4 gamma-corrected Rec.709 primaries, D65 white point",
     )
 
-    name = "AP0_to_Gamma2.2_AP1-Scene-referred"
+    name = "AP0_to_Gamma2.2_Encoded_AP1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -241,12 +241,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(2.2),
         ],
         clf_transform_id,
-        "AP0 to Gamma 2.2 AP1 - Scene-referred",
+        "AP0 to Gamma 2.2 Encoded AP1",
         "ACES2065-1",
         "2.2 gamma-corrected AP1 primaries, ACES ~=D60 white point",
     )
 
-    name = "AP0_to_sRGB_Encoded_AP1-Scene-referred"
+    name = "AP0_to_sRGB_Encoded_AP1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -256,12 +256,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform("sRGB"),
         ],
         clf_transform_id,
-        "AP0 to sRGB Encoded AP1 - Scene-referred",
+        "AP0 to sRGB Encoded AP1",
         "ACES2065-1",
         "sRGB Encoded AP1 primaries, ACES ~=D60 white point",
     )
 
-    name = "AP0_to_Display_P3-Scene-referred"
+    name = "AP0_to_sRGB_Encoded_P3-D65"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -271,12 +271,12 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform("sRGB"),
         ],
         clf_transform_id,
-        "AP0 to Display P3 - Scene-referred",
+        "AP0 to sRGB Encoded P3-D65",
         "ACES2065-1",
-        "Display P3 primaries, D65 white point",
+        "sRGB Encoded P3-D65 primaries, D65 white point",
     )
 
-    name = "AP0_to_AdobeRGB-Scene-referred"
+    name = "AP0_to_Gamma2.2_Encoded_AdobeRGB"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     clf_transforms[filename] = generate_clf_transform(
@@ -286,9 +286,9 @@ def generate_clf_transforms_ocio(output_directory):
             gamma_transform(563 / 256),
         ],
         clf_transform_id,
-        "AP0 to Adobe RGB (1998) - Scene-referred",
+        "AP0 to Gamma 2.2 Encoded AdobeRGB",
         "ACES2065-1",
-        "Adobe RGB (1998) primaries, D65 white point",
+        "2.2 gamma-corrected AdobeRGB primaries, D65 white point",
     )
 
     return clf_transforms
