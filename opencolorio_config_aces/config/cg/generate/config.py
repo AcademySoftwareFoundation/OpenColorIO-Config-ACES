@@ -1163,7 +1163,7 @@ def generate_config_cg(
 
     data.inactive_colorspaces = [
         *inactive_colorspaces,
-        "CIE-XYZ-D65 - Display-referred",
+        "CIE XYZ-D65 - Display-referred",
     ]
 
     # Roles Filtering & Update
@@ -1183,7 +1183,7 @@ def generate_config_cg(
                 "ACEScct", "ACES", scheme
             ),
             ocio.ROLE_DATA: "Raw",
-            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65 - Display-referred",
+            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE XYZ-D65 - Display-referred",
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme
             ),

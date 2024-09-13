@@ -1151,9 +1151,8 @@ def generate_config_aces(
         "encoding": "display-linear",
     }
     display_reference_colorspace["aliases"] = [
-        beautify_alias(display_reference_colorspace["name"]),
-        "CIE-XYZ-D65",
-        "CIE-XYZ-D65 - Display-referred",
+        "cie_xyz_d65_display",
+        "lin_ciexyzd65_display",
     ]
 
     raw_colorspace = {

@@ -72,7 +72,7 @@ PATTERNS_COLORSPACE_NAME = {
     "\\b(\\d+)nits\\b": "(\\1 nits)",
     "RGBmonitor": "sRGB",
     "\\bP3 D": "P3-D",
-    "CIE XYZ D65": "CIE-XYZ-D65",
+    "CIE XYZ D65": "CIE XYZ-D65",
     "Gamma1": "Gamma 1",
     "Gamma2": "Gamma 2",
     "Rec1886": "Rec.1886",

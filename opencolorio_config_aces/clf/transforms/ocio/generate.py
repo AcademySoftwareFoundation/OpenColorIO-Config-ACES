@@ -100,7 +100,7 @@ def generate_clf_transforms_ocio(output_directory):
         style=style,
     )
 
-    name = "AP0_to_CIE-XYZ-D65-Scene-referred"
+    name = "AP0_to_CIE_XYZ-D65-Scene-referred"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
     filename = output_directory / clf_basename(clf_transform_id)
     M_ACES = colour.RGB_COLOURSPACES["ACES2065-1"].matrix_RGB_to_XYZ
@@ -118,7 +118,7 @@ def generate_clf_transforms_ocio(output_directory):
         filename,
         [matrix_transform(M_XYZ)],
         clf_transform_id,
-        "AP0 to CIE-XYZ-D65",
+        "AP0 to CIE XYZ-D65",
         "ACES2065-1",
         "CIE XYZ, D65 white point",
     )

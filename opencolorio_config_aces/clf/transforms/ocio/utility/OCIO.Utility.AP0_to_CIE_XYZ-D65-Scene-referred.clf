@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_CIE-XYZ-D65-Scene-referred:1.0" name="AP0 to CIE-XYZ-D65">
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:OCIO:Utility:AP0_to_CIE_XYZ-D65-Scene-referred:1.0" name="AP0 to CIE XYZ-D65">
     <InputDescriptor>ACES2065-1</InputDescriptor>
     <OutputDescriptor>CIE XYZ, D65 white point</OutputDescriptor>
     <Matrix inBitDepth="32f" outBitDepth="32f">

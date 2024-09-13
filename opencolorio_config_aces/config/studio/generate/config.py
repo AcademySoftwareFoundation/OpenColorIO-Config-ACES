@@ -14,6 +14,8 @@ import logging
 import re
 from pathlib import Path
 
+import PyOpenColorIO as ocio
+
 from opencolorio_config_aces.config.cg import (
     generate_config_cg,
 )
@@ -298,3 +300,16 @@ if __name__ == "__main__":
             )
         except TypeError as error:
             logging.critical(error)
+
+        if dependency_versions.ocio.minor <= 3:
+            config = ocio.Config.CreateFromFile(  # pyright:ignore
+                str(build_directory / config_basename)
+            )
+            view_transforms = list(config.getViewTransforms())
+            view_transforms = [view_transforms[-1], *view_transforms[:-1]]
+            config.clearViewTransforms()
+            for view_transform in view_transforms:
+                config.addViewTransform(view_transform)
+
+            with open(build_directory / config_basename, "w") as file:
+                file.write(config.serialize())
