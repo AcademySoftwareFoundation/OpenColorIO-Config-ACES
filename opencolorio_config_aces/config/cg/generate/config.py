@@ -1163,7 +1163,7 @@ def generate_config_cg(
 
     data.inactive_colorspaces = [
         *inactive_colorspaces,
-        "CIE-XYZ-D65 - Display-referred",
+        "CIE XYZ-D65 - Display-referred",
     ]
 
     # Roles Filtering & Update
@@ -1177,19 +1177,19 @@ def generate_config_cg(
 
     data.roles.update(
         {
-            ocio.ROLE_COLOR_PICKING: "sRGB - Scene-referred",
+            ocio.ROLE_COLOR_PICKING: "sRGB Encoded Rec.709 (sRGB)",
             ocio.ROLE_COLOR_TIMING: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_COMPOSITING_LOG: format_optional_prefix(
                 "ACEScct", "ACES", scheme
             ),
             ocio.ROLE_DATA: "Raw",
-            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE-XYZ-D65 - Display-referred",
+            ocio.ROLE_INTERCHANGE_DISPLAY: "CIE XYZ-D65 - Display-referred",
             ocio.ROLE_INTERCHANGE_SCENE: format_optional_prefix(
                 "ACES2065-1", "ACES", scheme
             ),
             ocio.ROLE_MATTE_PAINT: format_optional_prefix("ACEScct", "ACES", scheme),
             ocio.ROLE_SCENE_LINEAR: format_optional_prefix("ACEScg", "ACES", scheme),
-            ocio.ROLE_TEXTURE_PAINT: "sRGB - Scene-referred",
+            ocio.ROLE_TEXTURE_PAINT: "sRGB Encoded Rec.709 (sRGB)",
         }
     )
 
@@ -1234,7 +1234,6 @@ if __name__ == "__main__":
             dependency_versions=dependency_versions,
             additional_data=True,
         )
-
         # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
         # versions.
         try:
@@ -1243,3 +1242,16 @@ if __name__ == "__main__":
             )
         except TypeError as error:
             logging.critical(error)
+
+        if dependency_versions.ocio.minor <= 3:
+            config = ocio.Config.CreateFromFile(  # pyright:ignore
+                str(build_directory / config_basename)
+            )
+            view_transforms = list(config.getViewTransforms())
+            view_transforms = [view_transforms[-1], *view_transforms[:-1]]
+            config.clearViewTransforms()
+            for view_transform in view_transforms:
+                config.addViewTransform(view_transform)
+
+            with open(build_directory / config_basename, "w") as file:
+                file.write(config.serialize())

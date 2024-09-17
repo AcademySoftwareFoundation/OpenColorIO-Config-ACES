@@ -1145,14 +1145,14 @@ def generate_config_aces(
     ]
 
     display_reference_colorspace = {
-        "name": "CIE-XYZ-D65 - Display-referred",
+        "name": "CIE XYZ-D65 - Display-referred",
         "description": 'The "CIE XYZ (D65)" display connection colorspace.',
         "reference_space": "REFERENCE_SPACE_DISPLAY",
         "encoding": "display-linear",
     }
     display_reference_colorspace["aliases"] = [
-        beautify_alias(display_reference_colorspace["name"]),
-        "CIE-XYZ-D65",
+        "cie_xyz_d65_display",
+        "lin_ciexyzd65_display",
     ]
 
     raw_colorspace = {
@@ -1209,8 +1209,10 @@ def generate_config_aces(
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
 
-                if display_name not in display_names:
+                if display not in displays:
                     displays.append(display)
+
+                if display_name not in display_names:
                     display_names.append(display_name)
 
                 shared_view = {
