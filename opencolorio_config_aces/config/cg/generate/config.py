@@ -1163,7 +1163,10 @@ def generate_config_cg(
 
     data.inactive_colorspaces = [
         *inactive_colorspaces,
+        # TODO: Consider handling inactivation of following colorspaces via
+        # spreadsheet.
         "CIE XYZ-D65 - Display-referred",
+        "CIE XYZ-D65 - Scene-referred",
     ]
 
     # Roles Filtering & Update
