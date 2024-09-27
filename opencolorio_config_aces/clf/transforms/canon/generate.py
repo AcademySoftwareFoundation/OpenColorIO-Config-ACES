@@ -78,7 +78,7 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
     mtx = matrix_RGB_to_RGB_transform("Cinema Gamut", "ACES2065-1", "CAT02")
 
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog2_CGamut_to_ACES.a1.1.0"
+        "urn:ampas:aces:transformId:v2.0:CSC.Canon.CLog2_CGamut_to_ACES.a1.v1"
     )
 
     name = "CanonLog2_CinemaGamut-D55_to_ACES2065-1"
@@ -99,7 +99,7 @@ white-papers/cinema-eos/white-paper-canon-log-gamma-curves.pdf
     )
 
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.CLog3_CGamut_to_ACES.a1.1.0"
+        "urn:ampas:aces:transformId:v2.0:CSC.Canon.CLog3_CGamut_to_ACES.a1.v1"
     )
 
     name = "CanonLog3_CinemaGamut-D55_to_ACES2065-1"

@@ -99,7 +99,7 @@ white-paper-on-redwidegamutrgb-and-log3g10
     mtx = matrix_RGB_to_RGB_transform("REDWideGamutRGB", "ACES2065-1", "Bradford")
 
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:IDT.RED.Log3G10_REDWideGamutRGB.a1.v1"
+        "urn:ampas:aces:transformId:v2.0:CSC.Red.Log3G10_RWG_to_ACES.a2.v1"
     )
 
     # Generate full transform.

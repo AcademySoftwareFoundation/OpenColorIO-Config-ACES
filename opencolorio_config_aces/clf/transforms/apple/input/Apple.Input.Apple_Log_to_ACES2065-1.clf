@@ -3,7 +3,7 @@
     <InputDescriptor>Apple Log</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
-        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.Apple.AppleLog_BT2020.a1.v1</ACEStransformID>
+        <ACEStransformID>urn:ampas:aces:transformId:v2.0:CSC.Apple.AppleLog_BT2020_to_ACES.a2.v1</ACEStransformID>
         <BuiltinTransform>APPLE_LOG_to_ACES2065-1</BuiltinTransform>
     </Info>
     <LUT1D inBitDepth="32f" outBitDepth="32f" interpolation="linear" halfDomain="true">

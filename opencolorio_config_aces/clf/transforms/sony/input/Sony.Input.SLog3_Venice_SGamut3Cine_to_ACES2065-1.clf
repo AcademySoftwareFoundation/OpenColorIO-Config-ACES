@@ -3,7 +3,7 @@
     <InputDescriptor>Sony S-Log3 Venice S-Gamut3.Cine</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
-        <ACEStransformID>urn:ampas:aces:transformId:v1.5:IDT.Sony.Venice_SLog3_SGamut3Cine.a1.v1</ACEStransformID>
+        <ACEStransformID>urn:ampas:aces:transformId:v2.0:CSC.Sony.Venice_SLog3_SGamut3Cine_to_ACES.a2.v1</ACEStransformID>
     </Info>
     <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
         <LogParams base="10" linSideSlope="5.26315789473684" linSideOffset="0.0526315789473684" logSideSlope="0.255620723362659" logSideOffset="0.410557184750733" linSideBreak="0.01125" linearSlope="6.62194371177582" />

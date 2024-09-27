@@ -74,6 +74,12 @@ BUILTIN_TRANSFORMS.update(
     }
 )
 
+for _builtin_transform, _profile in BUILTIN_TRANSFORMS.items():
+    if re.match("^ACES-OUTPUT - .*_2.0$", _builtin_transform):
+        BUILTIN_TRANSFORMS[_builtin_transform] = Version(2, 4)
+
+del _builtin_transform, _profile
+
 
 def group_transform_factory(transforms):
     """

@@ -56,7 +56,7 @@ __all__ = [
     "timestamp",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 # Monkey-patching the "PrettyPrinter" mapping to handle the "TypeError"

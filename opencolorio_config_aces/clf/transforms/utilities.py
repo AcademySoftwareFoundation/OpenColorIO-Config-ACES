@@ -37,7 +37,7 @@ __all__ = [
     "clf_basename",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @required("Colour")
@@ -223,7 +223,7 @@ def generate_clf_transform(
         Updated `GroupTransform`.
     """
 
-    logger.info('Creating "%s" "CLF" transform...', clf_transform_id)
+    LOGGER.info('Creating "%s" "CLF" transform...', clf_transform_id)
 
     group_tf = produce_transform(transforms)
 
@@ -243,7 +243,7 @@ def generate_clf_transform(
         if style:
             info.addChildElement("BuiltinTransform", style)
 
-    logger.info('Writing "%s" "CLF" transform to "%s".', clf_transform_id, filename)
+    LOGGER.info('Writing "%s" "CLF" transform to "%s".', clf_transform_id, filename)
 
     group_tf.write(
         formatName="Academy/ASC Common LUT Format",
