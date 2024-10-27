@@ -28,7 +28,7 @@ from opencolorio_config_aces.config.reference.discover.classify import (
     filter_ctl_transforms,
     unclassify_ctl_transforms,
 )
-from opencolorio_config_aces.utilities import required
+from opencolorio_config_aces.utilities import optional, required
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -237,8 +237,7 @@ def filter_nodes(graph, filterers=None):
     'Output/P3-D65_1000nit_in_P3-D65_ST2084'
     """
 
-    if filterers is None:
-        filterers = []
+    filterers = optional(filterers, [])
 
     filtered_nodes = []
     for node in graph.nodes:

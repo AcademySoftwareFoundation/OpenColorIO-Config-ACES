@@ -26,6 +26,7 @@ from .common import (
     attest,
     timestamp,
     as_bool,
+    optional,
 )
 
 __all__ = [
@@ -53,4 +54,5 @@ __all__ = [
     "attest",
     "timestamp",
     "as_bool",
+    "optional",
 ]

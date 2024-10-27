@@ -40,3 +40,4 @@ Common
     attest
     timestamp
     as_bool
+    optional

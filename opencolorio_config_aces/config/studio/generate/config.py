@@ -14,8 +14,6 @@ import logging
 import re
 from pathlib import Path
 
-import PyOpenColorIO as ocio
-
 from opencolorio_config_aces.config.cg import (
     generate_config_cg,
 )
@@ -173,6 +171,7 @@ def generate_config_studio(
     describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
     scheme="Modern 1",
+    additional_filterers=None,
     additional_data=False,
 ):
     """
@@ -213,6 +212,20 @@ def generate_config_studio(
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
+    additional_filterers : dict, optional
+        Additional filterers to further include or exclude transforms from the
+        generated config.
+
+        .. code-block:: python
+
+            {
+                "any": {},
+                "all": {
+                    "view_transform_filterers": [lambda x: "D60" not in x["name"]],
+                    "view_filterers": [lambda x: "D60" not in x["view"]],
+                },
+            },
+
     additional_data : bool, optional
         Whether to return additional data.
 
@@ -243,6 +256,7 @@ def generate_config_studio(
             describe=describe,
             scheme=scheme,
             config_mapping_file_path=config_mapping_file_path,
+            additional_filterers=additional_filterers,
             additional_data=True,
         )
 
@@ -289,27 +303,22 @@ if __name__ == "__main__":
         ) = generate_config_studio(
             config_name=build_directory / config_basename,
             dependency_versions=dependency_versions,
+            # additional_filterers={
+            #     "any": {},
+            #     "all": {
+            #         "view_transform_filterers": [lambda x: "D60" not in x["name"]],
+            #         "shared_view_filterers": [
+            #             lambda x: "D60" not in x["view_transform"]
+            #         ],
+            #         "view_filterers": [lambda x: "D60" not in x["view"]],
+            #     },
+            # },
             additional_data=True,
         )
 
-        # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
-        # versions.
         try:
             serialize_config_data(
                 data, build_directory / config_basename.replace("ocio", "json")
             )
         except TypeError as error:
             logging.critical(error)
-
-        if dependency_versions.ocio.minor <= 3:
-            config = ocio.Config.CreateFromFile(  # pyright:ignore
-                str(build_directory / config_basename)
-            )
-            view_transforms = list(config.getViewTransforms())
-            view_transforms = [view_transforms[-1], *view_transforms[:-1]]
-            config.clearViewTransforms()
-            for view_transform in view_transforms:
-                config.addViewTransform(view_transform)
-
-            with open(build_directory / config_basename, "w") as file:
-                file.write(config.serialize())

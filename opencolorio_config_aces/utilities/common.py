@@ -20,6 +20,7 @@ from itertools import chain
 from pathlib import Path
 from pprint import PrettyPrinter
 from textwrap import TextWrapper
+from typing import TypeVar
 
 import requests
 
@@ -55,6 +56,7 @@ __all__ = [
     "attest",
     "timestamp",
     "as_bool",
+    "optional",
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -790,3 +792,36 @@ def as_bool(a: str) -> bool:
     """
 
     return a.lower() in ["1", "on", "true"]
+
+
+T = TypeVar("T")
+
+
+def optional(value: T | None, default: T) -> T:
+    """
+    Handle optional argument value by providing a default value.
+
+    Parameters
+    ----------
+    value
+        Optional argument value.
+    default
+        Default argument value if ``value`` is *None*.
+
+    Returns
+    -------
+    T
+        Argument value.
+
+    Examples
+    --------
+    >>> optional("Foo", "Bar")
+    'Foo'
+    >>> optional(None, "Bar")
+    'Bar'
+    """
+
+    if value is None:
+        return default
+    else:
+        return value

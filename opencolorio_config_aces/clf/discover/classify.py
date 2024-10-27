@@ -30,6 +30,7 @@ from opencolorio_config_aces.config.reference.discover.classify import (
 from opencolorio_config_aces.utilities import (
     attest,
     message_box,
+    optional,
     paths_common_ancestor,
     vivified_to_dict,
 )
@@ -492,8 +493,7 @@ class CLFTransform:
         genus: str | None = None,
         siblings: Sequence | None = None,
     ) -> None:
-        if siblings is None:
-            siblings = []
+        siblings = optional(siblings, [])
 
         self._path: str = os.path.abspath(os.path.normpath(path))
 
@@ -1246,8 +1246,7 @@ def filter_clf_transforms(
 'blackmagic...input...BlackmagicDesign.Input.BMDFilm_Gen5_Log-Curve.clf')
     """
 
-    if filterers is None:
-        filterers = TRANSFORM_FILTERERS_DEFAULT_CLF
+    filterers = optional(filterers, TRANSFORM_FILTERERS_DEFAULT_CLF)
 
     if isinstance(clf_transforms, Mapping):
         clf_transforms = unclassify_clf_transforms(clf_transforms)

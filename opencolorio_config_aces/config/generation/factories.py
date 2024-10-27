@@ -26,7 +26,7 @@ import PyOpenColorIO as ocio
 from semver import Version
 
 from opencolorio_config_aces.config.generation import PROFILE_VERSION_DEFAULT
-from opencolorio_config_aces.utilities import DocstringDict, attest
+from opencolorio_config_aces.utilities import DocstringDict, attest, optional
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -179,8 +179,7 @@ def colorspace_factory(
         indent(pformat(locals()), "    "),
     )
 
-    if bit_depth is None:
-        bit_depth = ocio.BIT_DEPTH_F32
+    bit_depth = optional(bit_depth, ocio.BIT_DEPTH_F32)
 
     if reference_space is None:
         reference_space = ocio.REFERENCE_SPACE_SCENE
@@ -408,8 +407,7 @@ def view_transform_factory(
         indent(pformat(locals()), "    "),
     )
 
-    if categories is None:
-        categories = []
+    categories = optional(categories, [])
 
     if reference_space is None:
         reference_space = ocio.REFERENCE_SPACE_SCENE
@@ -495,8 +493,7 @@ def look_factory(
         indent(pformat(locals()), "    "),
     )
 
-    if process_space is None:
-        process_space = ocio.ROLE_SCENE_LINEAR
+    process_space = optional(process_space, ocio.ROLE_SCENE_LINEAR)
 
     if base_look is not None:
         if isinstance(base_look, Mapping):

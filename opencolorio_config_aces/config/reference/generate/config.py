@@ -48,6 +48,7 @@ from opencolorio_config_aces.config.reference import (
 from opencolorio_config_aces.utilities import (
     as_bool,
     attest,
+    optional,
     timestamp,
     validate_method,
 )
@@ -340,8 +341,7 @@ def ctl_transform_to_description(
         *OpenColorIO* `Colorspace` or `Look` description.
     """
 
-    if amf_components is None:
-        amf_components = {}
+    amf_components = optional(amf_components, {})
 
     description = None
     if describe != DescriptionStyle.NONE:

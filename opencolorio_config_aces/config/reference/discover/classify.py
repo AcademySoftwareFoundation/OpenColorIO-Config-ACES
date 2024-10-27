@@ -30,6 +30,7 @@ from semver import Version
 from opencolorio_config_aces.utilities import (
     attest,
     message_box,
+    optional,
     paths_common_ancestor,
     vivified_to_dict,
 )
@@ -660,8 +661,7 @@ class CTLTransform:
     """
 
     def __init__(self, path, family=None, genus=None, siblings=None):
-        if siblings is None:
-            siblings = []
+        siblings = optional(siblings, [])
 
         self._path = os.path.abspath(os.path.normpath(path))
 
@@ -1362,8 +1362,7 @@ def filter_ctl_transforms(ctl_transforms, filterers=None):
 P3-D65_1000nit_in_P3-D65_ST2084.ctl')
     """
 
-    if filterers is None:
-        filterers = TRANSFORM_FILTERERS_DEFAULT_CTL
+    filterers = optional(filterers, TRANSFORM_FILTERERS_DEFAULT_CTL)
 
     if isinstance(ctl_transforms, Mapping):
         ctl_transforms = unclassify_ctl_transforms(ctl_transforms)

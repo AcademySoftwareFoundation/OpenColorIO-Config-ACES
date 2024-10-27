@@ -49,6 +49,7 @@ from opencolorio_config_aces.config.reference.generate.config import (
 )
 from opencolorio_config_aces.utilities import (
     attest,
+    optional,
     timestamp,
     validate_method,
 )
@@ -192,8 +193,7 @@ def clf_transform_to_description(
         *OpenColorIO* `Colorspace` or `NamedTransform` description.
     """
 
-    if amf_components is None:
-        amf_components = {}
+    amf_components = optional(amf_components, {})
 
     description = None
     if describe != DescriptionStyle.NONE:
@@ -755,6 +755,7 @@ def generate_config_cg(
     describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
     scheme="Modern 1",
+    additional_filterers=None,
     additional_data=False,
 ):
     """
@@ -803,6 +804,20 @@ def generate_config_cg(
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
+    additional_filterers : dict, optional
+        Additional filterers to further include or exclude transforms from the
+        generated config.
+
+        .. code-block:: python
+
+            {
+                "any": {},
+                "all": {
+                    "view_transform_filterers": [lambda x: "D60" not in x["name"]],
+                    "view_filterers": [lambda x: "D60" not in x["view"]],
+                },
+            },
+
     additional_data : bool, optional
         Whether to return additional data.
 
@@ -815,6 +830,8 @@ def generate_config_cg(
     """
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
+
+    additional_filterers = optional(additional_filterers, {"any": {}, "all": {}})
 
     LOGGER.info(
         'Generating "%s" config...',
@@ -978,42 +995,74 @@ def generate_config_cg(
             if not aces_transform_id:
                 continue
 
-            for data in transform["transforms_data"]:
+            for data in transform.get("transforms_data", []):
                 if aces_transform_id == data.get("aces_transform_id"):
                     return True
 
         return False
 
-    def multi_filters(array, filterers):
-        """Apply given filterers on given array."""
+    def filter_any(array, filterers):
+        """Filter array elements passing any of the filterers."""
 
         filtered = [a for a in array if any(filterer(a) for filterer in filterers)]
 
         return filtered
 
-    colorspace_filterers = [implicit_transform_filterer, transform_filterer]
-    data.colorspaces = multi_filters(data.colorspaces, colorspace_filterers)
+    def filter_all(array, filterers):
+        """Filter array elements passing all of the filterers."""
 
+        filtered = [a for a in array if all(filterer(a) for filterer in filterers)]
+
+        return filtered
+
+    # "Colorspaces" Filtering
+    any_colorspace_filterers = [
+        implicit_transform_filterer,
+        transform_filterer,
+        *additional_filterers["any"].get("colorspace_filterers", []),
+    ]
+    data.colorspaces = filter_any(data.colorspaces, any_colorspace_filterers)
+    all_colorspace_filterers = [
+        *additional_filterers["all"].get("colorspace_filterers", [])
+    ]
+    data.colorspaces = filter_all(data.colorspaces, all_colorspace_filterers)
     LOGGER.info(
         'Filtered "Colorspace" transforms: %s.',
         [a["name"] for a in data.colorspaces],
     )
 
-    look_filterers = [implicit_transform_filterer, transform_filterer]
-    data.looks = multi_filters(data.looks, look_filterers)
-    LOGGER.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
-
-    view_transform_filterers = [
+    # "Looks" Filtering
+    any_look_filterers = [
         implicit_transform_filterer,
         transform_filterer,
+        *additional_filterers["any"].get("look_filterers", []),
     ]
-    data.view_transforms = multi_filters(data.view_transforms, view_transform_filterers)
+    data.looks = filter_any(data.looks, any_look_filterers)
+    all_look_filterers = [*additional_filterers["all"].get("look_filterers", [])]
+    data.looks = filter_all(data.looks, all_look_filterers)
+    LOGGER.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
+
+    # "View Transform" Filtering
+    any_view_transform_filterers = [
+        implicit_transform_filterer,
+        transform_filterer,
+        *additional_filterers["any"].get("view_transform_filterers", []),
+    ]
+    data.view_transforms = filter_any(
+        data.view_transforms, any_view_transform_filterers
+    )
+    all_view_transform_filterers = [
+        *additional_filterers["all"].get("view_transform_filterers", [])
+    ]
+    data.view_transforms = filter_all(
+        data.view_transforms, all_view_transform_filterers
+    )
     LOGGER.info(
         'Filtered "View" transforms: %s.',
         [a["name"] for a in data.view_transforms],
     )
 
-    # Views Filtering
+    # "Views & Shared Views" Filtering
     display_names = [
         a["name"] for a in data.colorspaces if a.get("family") == "Display"
     ]
@@ -1040,22 +1089,37 @@ def generate_config_cg(
 
         return False
 
-    shared_view_filterers = [implicit_view_filterer, view_filterer]
-    data.shared_views = multi_filters(data.shared_views, shared_view_filterers)
+    # "Shared Views" Filtering
+    any_shared_view_filterers = [
+        implicit_view_filterer,
+        view_filterer,
+        *additional_filterers["any"].get("shared_view_filterers", []),
+    ]
+    data.shared_views = filter_any(data.shared_views, any_shared_view_filterers)
+    all_shared_view_filterers = [
+        *additional_filterers["all"].get("shared_view_filterers", [])
+    ]
+    data.shared_views = filter_all(data.shared_views, all_shared_view_filterers)
     LOGGER.info(
         'Filtered shared "View(s)": %s.',
         [a["view"] for a in data.shared_views],
     )
 
-    view_filterers = [implicit_view_filterer, view_filterer]
-    data.views = multi_filters(data.views, view_filterers)
+    any_view_filterers = [
+        implicit_view_filterer,
+        view_filterer,
+        *additional_filterers["any"].get("view_filterers", []),
+    ]
+    data.views = filter_any(data.views, any_view_filterers)
+    all_view_filterers = [*additional_filterers["all"].get("view_filterers", [])]
+    data.views = filter_all(data.views, all_view_filterers)
     LOGGER.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
 
-    # Active Displays Filtering
+    # "Active Displays" Filtering
     data.active_displays = [a for a in data.active_displays if a in display_names]
     LOGGER.info("Filtered active displays: %s.", data.active_displays)
 
-    # Active Views Filtering
+    # "Active Views" Filtering
     views = [view["view"] for view in data.views]
     data.active_views = [view for view in data.active_views if view in views]
     LOGGER.info("Filtered active views: %s.", data.active_views)
@@ -1238,24 +1302,10 @@ if __name__ == "__main__":
             dependency_versions=dependency_versions,
             additional_data=True,
         )
-        # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
-        # versions.
+
         try:
             serialize_config_data(
                 data, build_directory / config_basename.replace("ocio", "json")
             )
         except TypeError as error:
             logging.critical(error)
-
-        if dependency_versions.ocio.minor <= 3:
-            config = ocio.Config.CreateFromFile(  # pyright:ignore
-                str(build_directory / config_basename)
-            )
-            view_transforms = list(config.getViewTransforms())
-            view_transforms = [view_transforms[-1], *view_transforms[:-1]]
-            config.clearViewTransforms()
-            for view_transform in view_transforms:
-                config.addViewTransform(view_transform)
-
-            with open(build_directory / config_basename, "w") as file:
-                file.write(config.serialize())
