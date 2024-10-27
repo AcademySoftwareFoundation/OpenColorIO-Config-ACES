@@ -53,10 +53,7 @@ __all__ = [
 LOGGER = logging.getLogger(__name__)
 
 BUILTIN_TRANSFORMS = DocstringDict(
-    {
-        builtin: PROFILE_VERSION_DEFAULT
-        for builtin in ocio.BuiltinTransformRegistry()  # pyright: ignore
-    }
+    {builtin: PROFILE_VERSION_DEFAULT for builtin in ocio.BuiltinTransformRegistry()}
 )
 BUILTIN_TRANSFORMS.__doc__ = """
 Mapping of *OpenColorIO* builtintransforms to their profile version.

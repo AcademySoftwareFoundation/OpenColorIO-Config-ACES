@@ -10,6 +10,8 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_sony`
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import PyOpenColorIO as ocio
@@ -36,24 +38,32 @@ __all__ = [
     "generate_clf_transforms_sony",
 ]
 
-FAMILY = "Sony"
+FAMILY: str = "Sony"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Input"
+GENUS: str = "Input"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
-def _build_slog2_curve():
-    """Build the Log transform for the S-Log2 curve."""
+def _build_slog2_curve() -> ocio.LogCameraTransform:
+    """
+    Build the Log transform for the *Sony* *S-Log2* curve.
+
+    Returns
+    -------
+    :class:`ocio.LogCameraTransform`
+         *OpenColorIO* `LogCameraTransform`.
+    """
+
     b = 64.0 / 1023.0
     w = 940.0 / 1023.0
     ab = 90.0 / 1023.0
@@ -80,11 +90,20 @@ def _build_slog2_curve():
         linearSlope=[linearSlope] * 3,
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
+
     return lct
 
 
-def _build_slog3_curve():
-    """Build the Log transform for the S-Log3 curve."""
+def _build_slog3_curve() -> ocio.LogCameraTransform:
+    """
+    Build the Log transform for the Sony* *S-Log3* curve.
+
+    Returns
+    -------
+    :class:`ocio.LogCameraTransform`
+         *OpenColorIO* `LogCameraTransform`.
+    """
+
     linSideSlope = 1.0 / (0.18 + 0.01)
     linSideOffset = 0.01 / (0.18 + 0.01)
     logSideSlope = 261.5 / 1023.0
@@ -105,46 +124,89 @@ def _build_slog3_curve():
         linearSlope=[linearSlope] * 3,
         direction=ocio.TRANSFORM_DIR_INVERSE,
     )
+
     return lct
 
 
-def _build_sgamut_mtx():
-    """Build the `MatrixTransform` for the S-Gamut primaries."""
-    mtx = matrix_RGB_to_RGB_transform("S-Gamut", "ACES2065-1", "CAT02")
-    return mtx
-
-
-def _build_sgamut3_mtx():
-    """Build the `MatrixTransform` for the S-Gamut3 primaries."""
-    mtx = matrix_RGB_to_RGB_transform("S-Gamut3", "ACES2065-1", "CAT02")
-    return mtx
-
-
-def _build_sgamut3_cine_mtx():
-    """Build the `MatrixTransform` for the S-Gamut3.Cine primaries."""
-    mtx = matrix_RGB_to_RGB_transform("S-Gamut3.Cine", "ACES2065-1", "CAT02")
-    return mtx
-
-
-def _build_venice_sgamut3_mtx():
-    """Build the `MatrixTransform` for the Venice S-Gamut3 primaries."""
-    mtx = matrix_RGB_to_RGB_transform("Venice S-Gamut3", "ACES2065-1", "CAT02")
-    return mtx
-
-
-def _build_venice_sgamut3_cine_mtx():
-    """Build the `MatrixTransform` for the Venice S-Gamut3.Cine primaries."""
-    mtx = matrix_RGB_to_RGB_transform("Venice S-Gamut3.Cine", "ACES2065-1", "CAT02")
-    return mtx
-
-
-def generate_clf_transforms_sony(output_directory):
+def _build_sgamut_mtx() -> ocio.MatrixTransform:
     """
-    Make all the Sony CLFs.
+    Build the `MatrixTransform` for the *Sony* *S-Gamut* primaries.
 
     Returns
     -------
-    dict
+    :class:`ocio.MatrixTransform`
+         *OpenColorIO* `MatrixTransform`.
+    """
+
+    return matrix_RGB_to_RGB_transform("S-Gamut", "ACES2065-1", "CAT02")
+
+
+def _build_sgamut3_mtx() -> ocio.MatrixTransform:
+    """
+    Build the `MatrixTransform` for the *Sony* *S-Gamut3* primaries.
+
+    Returns
+    -------
+    :class:`ocio.MatrixTransform`
+         *OpenColorIO* `MatrixTransform`.
+    """
+
+    return matrix_RGB_to_RGB_transform("S-Gamut3", "ACES2065-1", "CAT02")
+
+
+def _build_sgamut3_cine_mtx() -> ocio.MatrixTransform:
+    """
+    Build the `MatrixTransform` for the *Sony* *S-Gamut3.Cine* primaries.
+
+    Returns
+    -------
+    :class:`ocio.MatrixTransform`
+         *OpenColorIO* `MatrixTransform`.
+    """
+
+    return matrix_RGB_to_RGB_transform("S-Gamut3.Cine", "ACES2065-1", "CAT02")
+
+
+def _build_venice_sgamut3_mtx() -> ocio.MatrixTransform:
+    """
+    Build the `MatrixTransform` for the *Sony* *Venice S-Gamut3* primaries.
+
+    Returns
+    -------
+    :class:`ocio.MatrixTransform`
+         *OpenColorIO* `MatrixTransform`.
+    """
+
+    return matrix_RGB_to_RGB_transform("Venice S-Gamut3", "ACES2065-1", "CAT02")
+
+
+def _build_venice_sgamut3_cine_mtx() -> ocio.MatrixTransform:
+    """
+    Build the `MatrixTransform` for the *Sony* *Venice S-Gamut3.Cine* primaries.
+
+    Returns
+    -------
+    :class:`ocio.MatrixTransform`
+         *OpenColorIO* `MatrixTransform`.
+    """
+
+    return matrix_RGB_to_RGB_transform("Venice S-Gamut3.Cine", "ACES2065-1", "CAT02")
+
+
+def generate_clf_transforms_sony(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
+    """
+    Generate the *CLF* transforms for *Sony*.
+
+    Parameters
+    ----------
+    output_directory
+        Directory to write the *CLF* transform(s) to.
+
+    Returns
+    -------
+    :class:`dict`
         Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
         instances.
 

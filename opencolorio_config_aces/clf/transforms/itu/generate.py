@@ -10,7 +10,11 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_itu`
 """
 
+from __future__ import annotations
+
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -34,24 +38,39 @@ __all__ = [
     "generate_clf_transforms_itu",
 ]
 
-FAMILY = "ITU"
+FAMILY: str = "ITU"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Utility"
+GENUS: str = "Utility"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
-def generate_clf_transforms_itu(output_directory):
-    """Generate OCIO Utility CLF transforms."""
+def generate_clf_transforms_itu(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
+    """
+    Generate the *ITU* Utility *CLF* transforms.
+
+    Parameters
+    ----------
+    output_directory
+        Directory to write the *CLF* transform(s) to.
+
+    Returns
+    -------
+    :class:`dict`
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
+    """
 
     output_directory.mkdir(parents=True, exist_ok=True)
 

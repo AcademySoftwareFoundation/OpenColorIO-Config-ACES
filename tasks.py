@@ -28,7 +28,7 @@ from opencolorio_config_aces.config.studio.generate.config import (
 from opencolorio_config_aces.utilities import google_sheet_title, message_box
 
 if not hasattr(inspect, "getargspec"):
-    inspect.getargspec = inspect.getfullargspec  # pyright: ignore
+    inspect.getargspec = inspect.getfullargspec
 
 from invoke.context import Context
 from invoke.tasks import task

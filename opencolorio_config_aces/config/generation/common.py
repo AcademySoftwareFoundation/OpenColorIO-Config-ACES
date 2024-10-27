@@ -463,7 +463,7 @@ if __name__ == "__main__":
         **{"name": "Utility - Raw", "family": "Utility", "is_data": True}
     )
 
-    _red_cdl_transform = ocio.CDLTransform()  # pyright: ignore
+    _red_cdl_transform = ocio.CDLTransform()
     _red_cdl_transform.setSlope([0, 0, 0])
     _red_cdl_transform.setOffset([1, 0, 0])
     look_1 = look_factory("Look - Red", forward_transform=_red_cdl_transform)
@@ -475,7 +475,7 @@ if __name__ == "__main__":
             "offset": [0, 1, 0],
         },
     }
-    _gain_cdl_transform = ocio.CDLTransform()  # pyright: ignore
+    _gain_cdl_transform = ocio.CDLTransform()
     _gain_cdl_transform.setSlope([0.5, 0.5, 0.5])
     look_3 = {
         "name": "Look - Quarter Blue",
@@ -498,7 +498,7 @@ if __name__ == "__main__":
     }
 
     data = ConfigData(
-        roles={ocio.ROLE_SCENE_LINEAR: "Gamut - sRGB"},  # pyright: ignore
+        roles={ocio.ROLE_SCENE_LINEAR: "Gamut - sRGB"},
         colorspaces=[
             colorspace_1,
             colorspace_2,
@@ -672,8 +672,8 @@ if __name__ == "__main__":
         roles={
             "aces_interchange": "ACES - ACES2065-1",
             "cie_xyz_d65_interchange": "CIE-XYZ D65",
-            ocio.ROLE_DEFAULT: "ACES - ACES2065-1",  # pyright: ignore
-            ocio.ROLE_SCENE_LINEAR: colorspace_2["name"],  # pyright: ignore
+            ocio.ROLE_DEFAULT: "ACES - ACES2065-1",
+            ocio.ROLE_SCENE_LINEAR: colorspace_2["name"],
         },
         colorspaces=[
             colorspace_1,

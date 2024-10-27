@@ -10,6 +10,8 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_panasonic`
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import PyOpenColorIO as ocio
@@ -36,29 +38,36 @@ __all__ = [
     "generate_clf_transforms_panasonic",
 ]
 
-FAMILY = "Panasonic"
+FAMILY: str = "Panasonic"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Input"
+GENUS: str = "Input"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
-def generate_clf_transforms_panasonic(output_directory):
+def generate_clf_transforms_panasonic(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Make the CLF file for V-Log - V-Gamut plus matrix/curve CLFs.
+    Generate the *CLF* transforms for *V-Log - V-Gamut* plus matrix/curve.
+
+    Parameters
+    ----------
+    output_directory
+        Directory to write the *CLF* transform(s) to.
 
     Returns
     -------
-    dict
+    :class:`dict`
         Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
         instances.
 

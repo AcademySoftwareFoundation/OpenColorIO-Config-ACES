@@ -10,7 +10,11 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_apple`
 """
 
+from __future__ import annotations
+
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -32,29 +36,36 @@ __all__ = [
     "generate_clf_transforms_apple",
 ]
 
-FAMILY = "Apple"
+FAMILY: str = "Apple"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Input"
+GENUS: str = "Input"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
-def generate_clf_transforms_apple(output_directory):
+def generate_clf_transforms_apple(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Make the CLF file for Apple Log and for Apple Log curve CLF.
+    Generate the *CLF* transforms for *Apple Log* and for *Apple Log* curve.
+
+    Parameters
+    ----------
+    output_directory
+        Directory to write the *CLF* transform(s) to.
 
     Returns
     -------
-    dict
+    :class:`dict`
         Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
         instances.
 

@@ -8,10 +8,16 @@ Defines various utility functions for generating *Common LUT Format*
 (CLF) transforms.
 """
 
+from __future__ import annotations
+
 import logging
 import re
+from pathlib import Path
+from typing import Literal
 
+import numpy as np
 import PyOpenColorIO as ocio
+from numpy.typing import ArrayLike
 
 from opencolorio_config_aces.clf.discover.classify import (
     EXTENSION_CLF,
@@ -41,29 +47,29 @@ LOGGER = logging.getLogger(__name__)
 
 
 @required("Colour")
-def matrix_transform(matrix, offset=None):
+def matrix_transform(
+    matrix: ArrayLike, offset: ArrayLike | None = None
+) -> ocio.MatrixTransform:
     """
     Convert given *NumPy* array into an *OpenColorIO* `MatrixTransform`.
 
     Parameters
     ----------
-    matrix : array_like
+    matrix
         3x3 matrix.
-    offset : array_like
+    offset
         Optional RGB offsets.
 
     Returns
     -------
-    ocio.MatrixTransform
+    :class:`ocio.MatrixTransform`
         `MatrixTransform` representation of provided array(s).
     """
-
-    import numpy as np
 
     matrix44 = np.zeros((4, 4))
     matrix44[3, 3] = 1.0
     for i in range(3):
-        matrix44[i, 0:3] = matrix[i, :]
+        matrix44[i, 0:3] = matrix[i, :]  # pyright: ignore
 
     offset4 = np.zeros(4)
     if offset is not None:
@@ -78,25 +84,27 @@ def matrix_transform(matrix, offset=None):
 
 @required("Colour")
 def matrix_RGB_to_RGB_transform(
-    input_primaries, output_primaries, adaptation="Bradford"
-):
+    input_primaries: str,
+    output_primaries: str,
+    adaptation: colour.hints.LiteralChromaticAdaptationTransform = "Bradford",  # noqa: F821  # pyright: ignore
+) -> ocio.MatrixTransform:
     """
     Calculate the *RGB* to *RGB* matrix for a pair of primaries and produce an
     *OpenColorIO* `MatrixTransform`.
 
     Parameters
     ----------
-    input_primaries : str
+    input_primaries
         Input RGB colourspace name, as defined by colour-science.
-    output_primaries : str
+    output_primaries
         Output RGB colourspace name, as defined by colour-science.
-    adaptation : str
+    adaptation
         Chromatic adaptation method to use, as defined by colour-science.
         Defaults to "Bradford" to match what is most commonly used in ACES.
 
     Returns
     -------
-    ocio.MatrixTransform
+    :class:`ocio.MatrixTransform`
         *OpenColorIO* `MatrixTransform`.
     """
 
@@ -116,24 +124,24 @@ def matrix_RGB_to_RGB_transform(
     )
 
 
-def gamma_transform(gamma):
+def gamma_transform(
+    gamma: float | Literal["sRGB", "Rec709"],
+) -> ocio.ExponentTransform | ocio.ExponentWithLinearTransform:
     """
     Convert a gamma value into an *OpenColorIO* `ExponentTransform` or
     `ExponentWithLinearTransform`.
 
     Parameters
     ----------
-    gamma : float | str
+    gamma
         Exponent value or special gamma keyword (currently only 'sRGB' is
         supported).
 
     Returns
     -------
-    ocio.ExponentTransform or ocio.ExponentWithLinearTransform
+    :class:`ocio.ExponentTransform` or :class:`ocio.ExponentWithLinearTransform`
          *OpenColorIO* `ExponentTransform` or `ExponentWithLinearTransform`.
     """
-
-    import numpy as np
 
     # NB: Preference of working group during 2021-11-23 mtg was *not* to clamp.
     direction = ocio.TRANSFORM_DIR_INVERSE
@@ -185,41 +193,41 @@ def gamma_transform(gamma):
 
 
 def generate_clf_transform(
-    filename,
-    transforms,
-    clf_transform_id,
-    name,
-    input_desc,
-    output_desc,
-    aces_transform_id=None,
-    style=None,
-):
+    filename: Path | str,
+    transforms: list,
+    clf_transform_id: str,
+    name: str,
+    input_desc: str,
+    output_desc: str,
+    aces_transform_id: str | None = None,
+    style: str | None = None,
+) -> ocio.GroupTransform:
     """
     Take a list of transforms and some metadata and write a *CLF* transform
     file.
 
     Parameters
     ----------
-    filename : str
+    filename
         *CLF* filename.
-    transforms : list
+    transforms
         Transforms to generate the *CLF* transform file for.
-    clf_transform_id : str
+    clf_transform_id
         *CLFtransformID*.
-    name : str
+    name
         *CLF* transform name.
-    input_desc : str
+    input_desc
         *CLF* input descriptor.
-    output_desc : str
+    output_desc
         *CLF* output descriptor.
-    aces_transform_id : str, optional
+    aces_transform_id
         *ACEStransformID*.
-    style : str, optional
+    style
         *OpenColorIO* builtin transform style.
 
     Returns
     -------
-    ocio.GroupTransform
+    :class:`ocio.GroupTransform`
         Updated `GroupTransform`.
     """
 
@@ -254,24 +262,24 @@ def generate_clf_transform(
     return group_tf
 
 
-def format_clf_transform_id(family, genus, name, version):
+def format_clf_transform_id(family: str, genus: str, name: str, version: str) -> str:
     """
     Format given *CLF* transform attributes to produce a *CLFtransformID*.
 
     Parameters
     ----------
-    family : unicode
+    family
         *CLF* transform family.
-    genus : unicode
+    genus
         *CLF* transform genus.
-    name : unicode
+    name
         *CLF* transform name.
-    version : unicode
+    version
         *CLF* transform version.
 
     Returns
     -------
-    unicode
+    :class:`str`
         *CLFtransformID*.
 
     Examples
@@ -283,18 +291,18 @@ def format_clf_transform_id(family, genus, name, version):
     return SEPARATOR_ID_CLF.join([URN_CLF, family, genus, name, version])
 
 
-def clf_basename(clf_transform_id):
+def clf_basename(clf_transform_id: str) -> str:
     """
     Generate a *CLF* basename from given *CLFtransformID*.
 
     Parameters
     ----------
-    clf_transform_id : unicode
+    clf_transform_id
         *CLFtransformID*
 
     Returns
     -------
-    unicode
+    :class:`str`
         *CLF* transform filename.
 
     Examples

@@ -10,7 +10,11 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_ocio`
 """
 
+from __future__ import annotations
+
 from pathlib import Path
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.clf.transforms import (
     clf_basename,
@@ -36,25 +40,40 @@ __all__ = [
     "generate_clf_transforms_ocio",
 ]
 
-FAMILY = "OCIO"
+FAMILY: str = "OCIO"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Utility"
+GENUS: str = "Utility"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
 @required("Colour")
-def generate_clf_transforms_ocio(output_directory):
-    """Generate OCIO Utility CLF transforms."""
+def generate_clf_transforms_ocio(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
+    """
+    Generate the *OpenColorIO* Utility *CLF* transforms.
+
+    Parameters
+    ----------
+    output_directory
+        Directory to write the *CLF* transform(s) to.
+
+    Returns
+    -------
+    :class:`dict`
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
+    """
 
     import colour
 
@@ -108,7 +127,7 @@ def generate_clf_transforms_ocio(output_directory):
     XYZ_D65 = colour.xy_to_XYZ(
         colour.CCS_ILLUMINANTS["CIE 1931 2 Degree Standard Observer"]["D65"]
     )
-    M_XYZ = colour.algebra.matrix_dot(
+    M_XYZ = colour.algebra.vecmul(
         colour.adaptation.matrix_chromatic_adaptation_VonKries(
             XYZ_ACES, XYZ_D65, "Bradford"
         ),

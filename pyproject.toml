@@ -107,6 +107,7 @@ reportUnnecessaryCast = true
 reportUnnecessaryTypeIgnoreComment = true
 reportUnsupportedDunderAll = false
 reportUnusedExpression = false
+reportAttributeAccessIssue = false  # OpenColorIO does not have typing stubs.
 exclude = ["**/aces-dev"]
 
 [tool.ruff]
