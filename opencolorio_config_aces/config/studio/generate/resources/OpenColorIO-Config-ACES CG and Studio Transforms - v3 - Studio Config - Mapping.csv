@@ -6,6 +6,7 @@ Ordering,Colorspace,Legacy,ACEStransformID,CLFtransformID,Interface,BuiltinTrans
 100,Input - ADX - ADX16,TRUE,urn:ampas:aces:transformId:v2.0:CSC.Academy.ADX16_to_ACES.a2.v1,,ColorSpace,ADX16_to_ACES2065-1,"adx16,Input - ADX - ADX16",log,file-io
 105,Apple Log,FALSE,urn:ampas:aces:transformId:v2.0:CSC.Apple.AppleLog_BT2020_to_ACES.a2.v1,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log_to_ACES2065-1:1.0,ColorSpace,APPLE_LOG_to_ACES2065-1,,log,file-io
 105,Apple Log - Curve,FALSE,,urn:aswf:ocio:transformId:1.0:Apple:Input:Apple_Log-Curve_to_Linear:1.0,NamedTransform,CURVE - APPLE_LOG_to_LINEAR,,log,file-io
+110,ARRI LogC3 - Curve (EI800),TRUE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_Curve_EI800_to_Linear:1.0,NamedTransform,,crv_logc3ei800,log,file-io
 110,ARRI LogC3 (EI800),TRUE,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv3_to_ACES.a2.v1,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC3_EI800_to_ACES2065-1:1.0,ColorSpace,,"logc3ei800_alexawide,Input - ARRI - V3 LogC (EI800) - Wide Gamut",log,file-io
 110,Linear ARRI Wide Gamut 3,TRUE,,urn:aswf:ocio:transformId:1.0:ARRI:Input:Linear_ARRI_Wide_Gamut_3_to_ACES2065-1:1.0,ColorSpace,,"lin_alexawide,Input - ARRI - Linear - ALEXA Wide Gamut",scene-linear,file-io
 111,ARRI LogC4,FALSE,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv4_to_ACES.a2.v1,urn:aswf:ocio:transformId:1.0:ARRI:Input:ARRI_LogC4_to_ACES2065-1:1.0,ColorSpace,,,log,file-io

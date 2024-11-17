@@ -4,8 +4,11 @@
 from .version import (
     PROFILE_VERSION_DEFAULT,
     PROFILE_VERSIONS,
-    DependencyVersions,
-    DEPENDENCY_VERSIONS,
+)
+from .configuration import (
+    BuildConfiguration,
+    BUILD_CONFIGURATIONS,
+    BUILD_VARIANT_FILTERERS,
 )
 from .beautifiers import (
     SEPARATOR_COLORSPACE_NAME,
@@ -47,8 +50,11 @@ from .common import (
 __all__ = [
     "PROFILE_VERSION_DEFAULT",
     "PROFILE_VERSIONS",
-    "DependencyVersions",
-    "DEPENDENCY_VERSIONS",
+]
+__all__ += [
+    "BuildConfiguration",
+    "BUILD_CONFIGURATIONS",
+    "BUILD_VARIANT_FILTERERS",
 ]
 __all__ += [
     "SEPARATOR_COLORSPACE_NAME",

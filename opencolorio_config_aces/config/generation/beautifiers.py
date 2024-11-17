@@ -177,8 +177,7 @@ PATTERNS_DISPLAY_NAME = {
     "REC.2100": "Rec.2100",
     "-Rec.": " Rec.",
     "-1000nit": "",
-    "hdr-video": "HDR",
-    "sdr-video": "SDR",
+    "P3-HDR": "P3 HDR",
     # Legacy Substitutions
     "dcdm": "DCDM",
     "p3": "P3",

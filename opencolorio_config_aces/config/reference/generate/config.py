@@ -20,12 +20,12 @@ from pathlib import Path
 import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.config.generation import (
+    BUILD_CONFIGURATIONS,
     BUILTIN_TRANSFORMS,
-    DEPENDENCY_VERSIONS,
     SEPARATOR_COLORSPACE_FAMILY,
     SEPARATOR_COLORSPACE_NAME,
+    BuildConfiguration,
     ConfigData,
-    DependencyVersions,
     beautify_alias,
     beautify_colorspace_name,
     beautify_display_name,
@@ -82,6 +82,7 @@ __all__ = [
     "config_basename_aces",
     "config_description_aces",
     "generate_config_aces",
+    "main",
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -710,7 +711,6 @@ def style_to_display_colorspace(
     amf_components=None,
     signature_only=False,
     scheme="Modern 1",
-    encoding_in_name=False,
     **kwargs,
 ):
     """
@@ -733,9 +733,6 @@ def style_to_display_colorspace(
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
-    encoding_in_name : bool, optional
-        Whether to use the encoding in the *OpenColorIO* display `Colorspace`
-        name.
 
     Other Parameters
     ----------------
@@ -751,9 +748,7 @@ def style_to_display_colorspace(
 
     kwargs.setdefault("family", FAMILY_DISPLAY_REFERENCE)
 
-    name = beautify_display_name(
-        f'{style} - {kwargs.get("encoding")}' if encoding_in_name else style
-    )
+    name = beautify_display_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
 
     description = None
@@ -837,15 +832,15 @@ def transform_data_aliases(transform_data):
         return aliases
 
 
-def config_basename_aces(dependency_versions):
+def config_basename_aces(build_configuration):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     basename, i.e., the filename devoid of directory affixe.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -859,18 +854,18 @@ def config_basename_aces(dependency_versions):
     """
 
     return ("reference-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
-        **dependency_versions.to_regularised_versions()
+        **build_configuration.compact_fields()
     )
 
 
-def config_name_aces(dependency_versions):
+def config_name_aces(build_configuration):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config name.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -879,7 +874,7 @@ def config_name_aces(dependency_versions):
 
     Examples
     --------
-    >>> config_name_aces(DependencyVersions())
+    >>> config_name_aces(BuildConfiguration())
     'Academy Color Encoding System - Reference Config [COLORSPACES v0.0.0] \
 [ACES v0.0] [OCIO v2.0]'
     """
@@ -889,18 +884,18 @@ def config_name_aces(dependency_versions):
         "[COLORSPACES {colorspaces}] "
         "[ACES {aces}] "
         "[OCIO {ocio}]"
-    ).format(**dependency_versions.to_regularised_versions())
+    ).format(**build_configuration.compact_fields())
 
 
-def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT_UNION):
+def config_description_aces(build_configuration, describe=DescriptionStyle.SHORT_UNION):
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     description.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -911,7 +906,7 @@ def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT
         *aces-dev* reference implementation *OpenColorIO* config description.
     """
 
-    name = config_name_aces(dependency_versions)
+    name = config_name_aces(build_configuration)
 
     underline = "-" * len(name)
 
@@ -933,7 +928,7 @@ def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT
 
 def generate_config_aces(
     config_name=None,
-    dependency_versions=DependencyVersions(),
+    build_configuration=BuildConfiguration(),
     validate=True,
     describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
@@ -960,8 +955,8 @@ def generate_config_aces(
     config_name : unicode, optional
         *OpenColorIO* config file name, if given the config will be written to
         disk.
-    dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration, optional
+        Build configuration.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -989,7 +984,7 @@ def generate_config_aces(
 
     LOGGER.info(
         'Generating "%s" config...',
-        config_name_aces(dependency_versions),
+        config_name_aces(build_configuration),
     )
 
     LOGGER.debug('Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys()))
@@ -1015,7 +1010,6 @@ def generate_config_aces(
                 "legacy",
                 "builtin_transform_style",
                 "linked_display_colorspace_style",
-                "encoding_in_display_color_space_name",
                 "interface",
                 "encoding",
                 "categories",
@@ -1035,12 +1029,12 @@ def generate_config_aces(
                     f'"{style}" "BuiltinTransform" style does not exist!',
                 )
 
-                if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
+                if BUILTIN_TRANSFORMS[style] > build_configuration.ocio:
                     LOGGER.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
-                        dependency_versions.ocio,
+                        build_configuration.ocio,
                     )
                     continue
 
@@ -1053,12 +1047,12 @@ def generate_config_aces(
                     f'"{style}" "BuiltinTransform" style does not exist!"',
                 )
 
-                if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
+                if BUILTIN_TRANSFORMS[style] > build_configuration.ocio:
                     LOGGER.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
-                        dependency_versions.ocio,
+                        build_configuration.ocio,
                     )
                     continue
 
@@ -1180,9 +1174,6 @@ def generate_config_aces(
 
             for transform_data in transforms_data:
                 display_style = transform_data["linked_display_colorspace_style"]
-                encoding_in_name = as_bool(
-                    transform_data.get("encoding_in_display_color_space_name", "FALSE")
-                )
 
                 display = style_to_display_colorspace(
                     display_style,
@@ -1190,7 +1181,6 @@ def generate_config_aces(
                     amf_components,
                     signature_only=True,
                     scheme=scheme,
-                    encoding_in_name=encoding_in_name,
                     encoding=transform_data.get("encoding"),
                     categories=transform_data.get("categories"),
                     aliases=transform_data_aliases(transform_data),
@@ -1298,9 +1288,9 @@ def generate_config_aces(
         name=re.sub(
             r"\.ocio$",
             "",
-            config_basename_aces(dependency_versions),
+            config_basename_aces(build_configuration),
         ),
-        description=config_description_aces(dependency_versions, describe),
+        description=config_description_aces(build_configuration, describe),
         roles={
             ocio.ROLE_COLOR_TIMING: format_optional_prefix(
                 "ACEScct", aces_family_prefix, scheme
@@ -1332,14 +1322,14 @@ def generate_config_aces(
             }
         ],
         default_view_transform=untonemapped_view_transform["name"],
-        profile_version=dependency_versions.ocio,
+        profile_version=build_configuration.ocio,
     )
 
     config = generate_config(data, config_name, validate)
 
     LOGGER.info(
         '"%s" config generation complete!',
-        config_name_aces(dependency_versions),
+        config_name_aces(build_configuration),
     )
 
     if additional_data:
@@ -1348,21 +1338,28 @@ def generate_config_aces(
         return config
 
 
-if __name__ == "__main__":
-    from opencolorio_config_aces import serialize_config_data
-    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+def main(build_directory):
+    """
+    Define the main entry point for the generation of all the *aces-dev*
+    reference implementation *OpenColorIO* config versions and variants.
 
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.INFO)
+    Parameters
+    ----------
+    build_directory : Path
+        Build directory.
 
-    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "reference").resolve()
+    Returns
+    -------
+    :class:`int`
+        Return code.
+    """
 
     LOGGER.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
-    for dependency_versions in DEPENDENCY_VERSIONS:
-        config_basename = config_basename_aces(dependency_versions)
+    for build_configuration in BUILD_CONFIGURATIONS:
+        config_basename = config_basename_aces(build_configuration)
         (
             config,
             data,
@@ -1370,7 +1367,7 @@ if __name__ == "__main__":
             amf_components,
         ) = generate_config_aces(
             config_name=build_directory / config_basename,
-            dependency_versions=dependency_versions,
+            build_configuration=build_configuration,
             analytical=False,
             additional_data=True,
         )
@@ -1383,3 +1380,17 @@ if __name__ == "__main__":
             )
         except TypeError as error:
             LOGGER.critical(error)
+
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+
+    from opencolorio_config_aces import serialize_config_data
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
+    sys.exit(main((ROOT_BUILD_DEFAULT / "config" / "aces" / "reference").resolve()))

@@ -13,11 +13,11 @@ from .generation import (
 )
 from .generation import (
     BUILTIN_TRANSFORMS,
-    DEPENDENCY_VERSIONS,
+    BUILD_CONFIGURATIONS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
     PROFILE_VERSIONS,
-    DependencyVersions,
+    BuildConfiguration,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -57,11 +57,11 @@ __all__ = [
 ]
 __all__ += [
     "BUILTIN_TRANSFORMS",
-    "DEPENDENCY_VERSIONS",
+    "BUILD_CONFIGURATIONS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
     "PROFILE_VERSIONS",
-    "DependencyVersions",
+    "BuildConfiguration",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",

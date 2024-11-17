@@ -18,8 +18,9 @@ from opencolorio_config_aces.config.cg import (
     generate_config_cg,
 )
 from opencolorio_config_aces.config.generation import (
-    DEPENDENCY_VERSIONS,
-    DependencyVersions,
+    BUILD_CONFIGURATIONS,
+    BUILD_VARIANT_FILTERERS,
+    BuildConfiguration,
     generate_config,
 )
 from opencolorio_config_aces.config.reference import (
@@ -44,6 +45,7 @@ __all__ = [
     "config_name_studio",
     "config_description_studio",
     "generate_config_studio",
+    "main",
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -69,15 +71,15 @@ PATH_TRANSFORMS_MAPPING_FILE_STUDIO : unicode
 """
 
 
-def config_basename_studio(dependency_versions):
+def config_basename_studio(build_configuration):
     """
     Generate the ACES* Studio *OpenColorIO* config basename, i.e., the filename
     devoid of directory affixe.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -86,23 +88,25 @@ def config_basename_studio(dependency_versions):
 
     Examples
     --------
-    >>> config_basename_studio(DependencyVersions())
+    >>> config_basename_studio(BuildConfiguration())
     'studio-config-v0.0.0_aces-v0.0_ocio-v2.0.ocio'
     """
 
-    return ("studio-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
-        **dependency_versions.to_regularised_versions()
+    return (
+        ("studio-config-{variant}-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio")
+        .format(**build_configuration.compact_fields())
+        .replace("--", "-")
     )
 
 
-def config_name_studio(dependency_versions):
+def config_name_studio(build_configuration):
     """
     Generate the ACES* Studio *OpenColorIO* config name.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -111,21 +115,25 @@ def config_name_studio(dependency_versions):
 
     Examples
     --------
-    >>> config_name_studio(DependencyVersions())
+    >>> config_name_studio(BuildConfiguration())
     'Academy Color Encoding System - Studio Config [COLORSPACES v0.0.0] \
 [ACES v0.0] [OCIO v2.0]'
     """
 
     return (
-        "Academy Color Encoding System - Studio Config "
-        "[COLORSPACES {colorspaces}] "
-        "[ACES {aces}] "
-        "[OCIO {ocio}]"
-    ).format(**dependency_versions.to_regularised_versions())
+        (
+            "Academy Color Encoding System - Studio Config {variant}"
+            "[COLORSPACES {colorspaces}] "
+            "[ACES {aces}] "
+            "[OCIO {ocio}]"
+        )
+        .format(**build_configuration.extended_fields())
+        .replace(")[", ") [")
+    )
 
 
 def config_description_studio(
-    dependency_versions,
+    build_configuration,
     describe=DescriptionStyle.SHORT_UNION,
 ):
     """
@@ -133,8 +141,8 @@ def config_description_studio(
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -145,7 +153,7 @@ def config_description_studio(
         ACES* Studio *OpenColorIO* config description.
     """
 
-    name = config_name_studio(dependency_versions)
+    name = config_name_studio(build_configuration)
 
     underline = "-" * len(name)
 
@@ -166,7 +174,7 @@ def config_description_studio(
 def generate_config_studio(
     data=None,
     config_name=None,
-    dependency_versions=DependencyVersions(),
+    build_configuration=BuildConfiguration(),
     validate=True,
     describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
@@ -200,8 +208,8 @@ def generate_config_studio(
     config_name : unicode, optional
         *OpenColorIO* config file name, if given the config will be written to
         disk.
-    dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration, optional
+        Build configuration.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -239,7 +247,7 @@ def generate_config_studio(
 
     LOGGER.info(
         'Generating "%s" config...',
-        config_name_studio(dependency_versions),
+        config_name_studio(build_configuration),
     )
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
@@ -252,7 +260,7 @@ def generate_config_studio(
             clf_transforms,
             amf_components,
         ) = generate_config_cg(
-            dependency_versions=dependency_versions,
+            build_configuration=build_configuration,
             describe=describe,
             scheme=scheme,
             config_mapping_file_path=config_mapping_file_path,
@@ -263,14 +271,14 @@ def generate_config_studio(
     data.name = re.sub(
         r"\.ocio$",
         "",
-        config_basename_studio(dependency_versions),
+        config_basename_studio(build_configuration),
     )
-    data.description = config_description_studio(dependency_versions, describe)
+    data.description = config_description_studio(build_configuration, describe)
     config = generate_config(data, config_name, validate)
 
     LOGGER.info(
         '"%s" config generation complete!',
-        config_name_studio(dependency_versions),
+        config_name_studio(build_configuration),
     )
 
     if additional_data:
@@ -279,21 +287,28 @@ def generate_config_studio(
         return config
 
 
-if __name__ == "__main__":
-    from opencolorio_config_aces import serialize_config_data
-    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+def main(build_directory):
+    """
+    Define the main entry point for the generation of all the *ACES* Studio
+    *OpenColorIO* config versions and variants.
 
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.INFO)
+    Parameters
+    ----------
+    build_directory : Path
+        Build directory.
 
-    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "studio").resolve()
+    Returns
+    -------
+    :class:`int`
+        Return code.
+    """
 
     logging.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
-    for dependency_versions in DEPENDENCY_VERSIONS:
-        config_basename = config_basename_studio(dependency_versions)
+    for build_configuration in BUILD_CONFIGURATIONS:
+        config_basename = config_basename_studio(build_configuration)
         (
             config,
             data,
@@ -302,17 +317,8 @@ if __name__ == "__main__":
             amf_components,
         ) = generate_config_studio(
             config_name=build_directory / config_basename,
-            dependency_versions=dependency_versions,
-            # additional_filterers={
-            #     "any": {},
-            #     "all": {
-            #         "view_transform_filterers": [lambda x: "D60" not in x["name"]],
-            #         "shared_view_filterers": [
-            #             lambda x: "D60" not in x["view_transform"]
-            #         ],
-            #         "view_filterers": [lambda x: "D60" not in x["view"]],
-            #     },
-            # },
+            build_configuration=build_configuration,
+            additional_filterers=BUILD_VARIANT_FILTERERS[build_configuration.variant],
             additional_data=True,
         )
 
@@ -322,3 +328,17 @@ if __name__ == "__main__":
             )
         except TypeError as error:
             logging.critical(error)
+
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+
+    from opencolorio_config_aces import serialize_config_data
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
+    sys.exit(main((ROOT_BUILD_DEFAULT / "config" / "aces" / "studio").resolve()))
