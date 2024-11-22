@@ -35,10 +35,9 @@ as follows::
     poetry install --with optional
 
 The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <https://graphviz.org>`__
-to be installed on the system and having installed the optional `pygraphviz <https://pypi.org/project/pygraphviz>`__:
-python package::
+to be installed on the system::
 
-    poetry install --with graphviz,optional
+    poetry install --with optional
 
 Docker
 ------
@@ -82,7 +81,7 @@ Optional Dependencies
 -   `graphviz <https://www.graphviz.org>`__
 -   `jsonpickle <https://jsonpickle.github.io>`__
 -   `networkx <https://pypi.org/project/networkx>`__
--   `pygraphviz <https://pypi.org/project/pygraphviz>`__
+-   `pydot <https://pypi.org/project/pydot>`__
 
 Development Dependencies
 ************************

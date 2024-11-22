@@ -32,9 +32,7 @@ semver = ">= 3, < 4"
 colour-science = ">= 0.4.3"
 jsonpickle = ">= 2, < 3"
 networkx = "*"
-
-[tool.poetry.group.graphviz.dependencies]
-pygraphviz = "*"
+pydot = ">= 3, 4"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "*"
