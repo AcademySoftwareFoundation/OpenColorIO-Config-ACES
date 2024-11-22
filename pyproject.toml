@@ -1,55 +1,90 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright Contributors to the OpenColorIO Project.
 
-[tool.poetry]
+[project]
 name = "opencolorio-config-aces"
-version = "2.0.0"
+version = "2024.0.0"
 description = "OpenColorIO Configuration for ACES"
-authors = ["OpenColorIO Contributors"]
-maintainers = ["OpenColorIO Contributors <ocio-dev@lists.aswf.io>"]
-license = "BSD-3-Clause"
-readme = 'README.rst'
-repository = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES"
+readme = "README.rst"
+requires-python = ">=3.10,<3.14"
+authors = [
+    { name = "OpenColorIO Contributors", email = "ocio-dev@lists.aswf.io" },
+]
+maintainers = [
+    { name = "OpenColorIO Contributors", email = "ocio-dev@lists.aswf.io" },
+]
+license = { text = "BSD-3-Clause" }
 homepage = "https://www.colour-science.org/"
 keywords = [
     "ACES",
     "OpenColorIO",
     "OCIO"
 ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development"
+]
+dependencies = [
+    "opencolorio",
+    "requests>=2,<3",
+    "semver>=3,<4",
+]
 
-[[tool.poetry.source]]
+[tool.uv.sources]
+opencolorio = { index = "test-pypi" }
+
+[[tool.uv.index]]
 name = "test-pypi"
 url = "https://test.pypi.org/simple/"
-priority = "explicit"
+explicit = true
 
-[tool.poetry.dependencies]
-python = ">= 3.9, < 3.12"
-opencolorio = {version = ">= 2, < 3", source = "test-pypi"}
-requests = ">= 2, < 3"
-semver = ">= 3, < 4"
+[project.optional-dependencies]
+optional = [
+    "colour-science>=0.4.3",
+    "jsonpickle",
+    "networkx",
+    "pydot",
+]
+docs = [
+    "pydata-sphinx-theme",
+    "sphinx",
+]
 
-[tool.poetry.group.optional.dependencies]
-colour-science = ">= 0.4.3"
-jsonpickle = ">= 2, < 3"
-networkx = "*"
-pydot = ">= 3, 4"
+[project.urls]
+Homepage = "https://opencolorio.org"
+Documentation = "https://opencolorio.readthedocs.io"
+Repository = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES"
+Issues = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/issues"
+Changelog = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases"
 
-[tool.poetry.group.dev.dependencies]
-coverage = "*"
-coveralls = "*"
-invoke = "*"
-pre-commit = "*"
-pydata-sphinx-theme = "*"
-pyright = "*"
-pytest = "*"
-pytest-cov = "*"
-restructuredtext-lint = "*"
-sphinx = ">= 4, < 5"
-twine = "*"
+[tool.uv]
+package = true
+dev-dependencies = [
+    "coverage",
+    "coveralls",
+    "hatch",
+    "invoke",
+    "pre-commit",
+    "pyright",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+]
 
-[tool.poetry.group.docs.dependencies]
-pydata-sphinx-theme = "*"
-sphinx = ">= 4, < 5"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "opencolorio_config_aces" ]
 
 [tool.flynt]
 line_length = 999
@@ -75,37 +110,37 @@ reportUnusedExpression = false
 exclude = ["**/aces-dev"]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 88
 select = [
     "A", # flake8-builtins
     "ARG", # flake8-unused-arguments
-    # "ANN",  # flake8-annotations
+    # "ANN", # flake8-annotations
     "B", # flake8-bugbear
-    # "BLE",  # flake8-blind-except
+    # "BLE", # flake8-blind-except
     "C4", # flake8-comprehensions
-    # "C90",  # mccabe
-    # "COM",  # flake8-commas
+    # "C90", # mccabe
+    # "COM", # flake8-commas
     "DTZ", # flake8-datetimez
     "D", # pydocstyle
     "E", # pydocstyle
-    # "ERA",  # eradicate
-    # "EM",   # flake8-errmsg
+    # "ERA", # eradicate
+    # "EM", # flake8-errmsg
     "EXE", # flake8-executable
     "F", # flake8
-    # "FBT",  # flake8-boolean-trap
+    # "FBT", # flake8-boolean-trap
     "G", # flake8-logging-format
     "I", # isort
     "ICN", # flake8-import-conventions
     "INP", # flake8-no-pep420
     "ISC", # flake8-implicit-str-concat
     "N", # pep8-naming
-    # "PD",   # pandas-vet
+    # "PD", # pandas-vet
     "PIE", # flake8-pie
     "PGH", # pygrep-hooks
     "PL", # pylint
-    # "PT",   # flake8-pytest-style
-    # "PTH",  # flake8-use-pathlib          [Enable]
+    # "PT", # flake8-pytest-style
+    # "PTH", # flake8-use-pathlib [Enable]
     "Q", # flake8-quotes
     "RET", # flake8-return
     "RUF", # Ruff
@@ -113,12 +148,12 @@ select = [
     "SIM", # flake8-simplify
     "T10", # flake8-debugger
     "T20", # flake8-print
-    # "TCH",  # flake8-type-checking
+    # "TCH", # flake8-type-checking
     "TID", # flake8-tidy-imports
     "TRY", # tryceratops
     "UP", # pyupgrade
     "W", # pydocstyle
-    "YTT"     # flake8-2020
+    "YTT", # flake8-2020
 ]
 ignore = [
     "B008",
@@ -140,11 +175,11 @@ ignore = [
     "PGH003",
     "PIE804",
     "PLE0605",
+    "PLR0911",
     "PLR0912",
     "PLR0913",
     "PLR0915",
     "PLR2004",
-    "PLW2901",
     "RET504",
     "RET505",
     "RET506",
@@ -152,6 +187,7 @@ ignore = [
     "RET508",
     "TRY003",
     "TRY300",
+    "UP038",
 ]
 fixable = ["B", "C", "E", "F", "PIE", "RUF", "SIM", "UP", "W"]
 
@@ -162,7 +198,3 @@ convention = "numpy"
 "docs/*" = ["INP"]
 "tasks.py" = ["INP"]
 "utilities/*" = ["EXE001", "INP"]
-
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"

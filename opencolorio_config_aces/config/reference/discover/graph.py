@@ -16,6 +16,7 @@ conversion graph:
 """
 
 import codecs
+import itertools
 import logging
 import os
 import pickle
@@ -296,7 +297,7 @@ def conversion_path(graph, source, target):
 
     path = nx.shortest_path(graph, source, target)
 
-    return list(zip(path[:-1], path[1:]))
+    return list(itertools.pairwise(path))
 
 
 @required("NetworkX")

@@ -18,26 +18,24 @@ argument, it is possible to initialize the submodules as follows::
 
     git submodule update --init --recursive
 
-Poetry
-------
+uv
+~~
 
-The *OpenColorIO Configuration for ACES* repository adopts `Poetry <https://poetry.eustace.io>`__
+The *OpenColorIO Configuration for ACES* repository adopts `uv <https://github.com/astral-sh/uv>`__
 to help managing its dependencies, this is the recommended way to get started
 with development.
 
-Assuming `python >= 3.9 <https://www.python.org/download/releases>`__ is
-available on your system along with `OpenColorIO >= 2 <https://opencolorio.org>`__,
-the development dependencies are installed with `Poetry <https://poetry.eustace.io>`__
+Assuming `python >= 3.10 <https://www.python.org/download/releases>`__ is
+available on your system along with `OpenColorIO <https://opencolorio.org>`__,
+the development dependencies are installed with `uv <https://github.com/astral-sh/uv>`__
 as follows::
 
     git clone --recursive https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES.git
     cd OpenColorIO-Config-ACES
-    poetry install --with optional
+    uv sync --all-extras
 
 The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <https://graphviz.org>`__
-to be installed on the system::
-
-    poetry install --with optional
+to be installed on the system.
 
 Docker
 ------
@@ -69,7 +67,7 @@ dependencies in order to run and be able to generate the *OCIO* configurations:
 Primary Dependencies
 ********************
 
--   `python >= 3.9, < 3.11 <https://www.python.org/download/releases>`__
+-   `python >= 3.10, < 3.14 <https://www.python.org/download/releases>`__
 -   `opencolorio <https://pypi.org/project/opencolorio>`__
 -   `requests <https://pypi.org/project/requests>`__
 -   `semver <https://pypi.org/project/semver>`__
@@ -83,17 +81,21 @@ Optional Dependencies
 -   `networkx <https://pypi.org/project/networkx>`__
 -   `pydot <https://pypi.org/project/pydot>`__
 
+Docs Dependencies
+*****************
+
+-   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
+-   `sphinx <https://pypi.org/project/sphinx>`__
+
 Development Dependencies
 ************************
 
 -   `coverage <https://pypi.org/project/coverage>`__
 -   `coveralls <https://pypi.org/project/coveralls>`__
+-   `hatch <https://pypi.org/project/hatch>`__
 -   `invoke <https://pypi.org/project/invoke>`__
 -   `pre-commit <https://pypi.org/project/pre-commit>`__
--   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
 -   `pyright <https://pypi.org/project/pyright>`__
 -   `pytest <https://pypi.org/project/pytest>`__
 -   `pytest-cov <https://pypi.org/project/pytest-cov>`__
--   `restructuredtext-lint <https://pypi.org/project/restructuredtext-lint>`__
--   `sphinx >= 4, < 5 <https://pypi.org/project/sphinx>`__
--   `twine <https://pypi.org/project/twine>`__
+-   `pytest-xdist <https://pypi.org/project/pytest-xdist>`__

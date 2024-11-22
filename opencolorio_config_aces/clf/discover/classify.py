@@ -21,8 +21,8 @@ import logging
 import os
 import xml.etree.ElementTree
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
-from typing import Any, Callable, cast
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, cast
 
 from opencolorio_config_aces.config.reference.discover.classify import (
     ACESTransformID,
