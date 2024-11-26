@@ -160,7 +160,7 @@ toml==0.10.2
 tomli==2.1.0 ; python_full_version <= '3.11'
 tomli-w==1.1.0
 tomlkit==0.13.2
-tornado==6.4.1
+tornado==6.4.2
 traitlets==5.14.3
 trove-classifiers==2024.10.21.16
 twine==5.1.1
