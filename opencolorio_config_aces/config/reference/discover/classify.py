@@ -991,10 +991,10 @@ CTLTransform` class are tried on the underlying
                 continue
 
             if line.startswith("//"):
-                line = line[2:].strip()
+                line = line[2:].strip()  # noqa: PLW2901
 
                 for pattern, substitution in PATTERNS_DESCRIPTION_CTL.items():
-                    line = re.sub(pattern, substitution, line)
+                    line = re.sub(pattern, substitution, line)  # noqa: PLW2901
 
                 self._description += line
                 self._description += "\n"

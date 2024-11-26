@@ -16,7 +16,9 @@ conversion graph:
 """
 
 import codecs
+import itertools
 import logging
+import os
 import pickle
 
 from opencolorio_config_aces.config.reference.discover.classify import (
@@ -295,15 +297,15 @@ def conversion_path(graph, source, target):
 
     path = nx.shortest_path(graph, source, target)
 
-    return list(zip(path[:-1], path[1:]))
+    return list(itertools.pairwise(path))
 
 
 @required("NetworkX")
-def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
+def plot_aces_conversion_graph(graph, filename, prog="dot"):
     """
     Plot given *aces-dev* conversion graph using
     `Graphviz <https://www.graphviz.org/>`__ and
-    `pyraphviz <https://pygraphviz.github.io>`__.
+    `Pydot <https://pypi.org/project/pydot/>`__.
 
     Parameters
     ----------
@@ -314,22 +316,17 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
     prog : unicode, optional
         {'neato', 'dot', 'twopi', 'circo', 'fdp', 'nop'},
         *Graphviz* layout method.
-    args : unicode, optional
-         Additional arguments for *Graphviz*.
 
     Returns
     -------
-    AGraph
-        *PyGraphviz* graph.
+    Dot
+        *Pydot* graph.
     """
 
     import networkx as nx
+    from pydot import Subgraph
 
-    agraph = nx.nx_agraph.to_agraph(graph)
-
-    agraph.node_attr.update(
-        style="filled", shape="circle", fontname="Helvetica", fontsize=20
-    )
+    dot = nx.drawing.nx_pydot.to_pydot(graph)
 
     ctl_transforms_csc = []
     ctl_transforms_idt = []
@@ -337,49 +334,78 @@ def plot_aces_conversion_graph(graph, filename, prog="dot", args=""):
     ctl_transforms_output_transform = []
     ctl_transforms_lmt = []
 
-    for node in agraph.nodes():
+    for node in dot.get_nodes():
+        node.set_style("filled")
+        node.set_shape("circle")
+        node.set_fontname("Helvetica")
+        node.set_fontsize(20)
+
         unserialized = pickle.loads(  # noqa: S301
-            codecs.decode(node.attr["serialized"].encode(), "base64")
+            codecs.decode(node.get_attributes()["serialized"].encode(), "base64")
         )
 
         ctl_transform_type = unserialized.type
         if node in ("ACES2065-1", "OCES"):
-            node.attr.update(
-                shape="doublecircle",
-                color="#673AB7FF",
-                fillcolor="#673AB770",
-                fontsize=30,
-            )
+            node.set_shape("doublecircle")
+            node.set_color("#673AB7FF")
+            node.set_fillcolor("#673AB7FF")
+            node.set_fontsize(30)
         elif ctl_transform_type == "ACEScsc":
-            node.attr.update(color="#00BCD4FF", fillcolor="#00BCD470")
+            node.set_color("#00BCD4FF")
+            node.set_fillcolor("#00BCD470")
             ctl_transforms_csc.append(node)
         elif ctl_transform_type == "IDT":
-            node.attr.update(color="#B3BC6D", fillcolor="#E6EE9C")
+            node.set_color("#B3BC6D")
+            node.set_fillcolor("#E6EE9C")
             ctl_transforms_idt.append(node)
         elif ctl_transform_type in ("ODT", "InvODT"):
-            node.attr.update(color="#CA9B52", fillcolor="#FFCC80")
+            node.set_color("#CA9B52")
+            node.set_fillcolor("#FFCC80")
             ctl_transforms_odt.append(node)
         elif ctl_transform_type in ("RRTODT", "InvRRTODT"):
-            node.attr.update(color="#C88719", fillcolor="#FFB74D")
+            node.set_color("#C88719")
+            node.set_fillcolor("#FFB74D")
             ctl_transforms_output_transform.append(node)
         elif ctl_transform_type == "LMT":
-            node.attr.update(color="#4BA3C7", fillcolor="#81D4FA")
+            node.set_color("#4BA3C7")
+            node.set_fillcolor("#81D4FA")
             ctl_transforms_lmt.append(node)
 
-    agraph.add_subgraph(ctl_transforms_csc, name="cluster_ACEScsc", color="#00BCD4FF")
-    agraph.add_subgraph(ctl_transforms_idt, name="cluster_IDT", color="#B3BC6D")
-    agraph.add_subgraph(ctl_transforms_odt, name="cluster_ODT", color="#CA9B52")
-    agraph.add_subgraph(
-        ctl_transforms_output_transform,
-        name="cluster_OutputTransform",
-        color="#C88719",
+    ctl_transforms_csc_subgraph = Subgraph(name="cluster_ACEScsc", color="#00BCD4FF")
+    for node in ctl_transforms_csc:
+        ctl_transforms_csc_subgraph.add_node(node)
+    dot.add_subgraph(ctl_transforms_csc_subgraph)
+
+    ctl_transforms_idt_subgraph = Subgraph(name="cluster_IDT", color="#B3BC6D")
+    for node in ctl_transforms_idt:
+        ctl_transforms_idt_subgraph.add_node(node)
+    dot.add_subgraph(ctl_transforms_idt_subgraph)
+
+    ctl_transforms_odt_subgraph = Subgraph(name="cluster_ODT", color="#CA9B52")
+    for node in ctl_transforms_odt:
+        ctl_transforms_odt_subgraph.add_node(node)
+    dot.add_subgraph(ctl_transforms_odt_subgraph)
+
+    ctl_transforms_output_transform_subgraph = Subgraph(
+        name="cluster_OutputTransform", color="#C88719"
     )
-    agraph.add_subgraph(ctl_transforms_lmt, name="cluster_LMT", color="#4BA3C7")
+    for node in ctl_transforms_output_transform:
+        ctl_transforms_output_transform_subgraph.add_node(node)
+    dot.add_subgraph(ctl_transforms_output_transform_subgraph)
 
-    agraph.edge_attr.update(color="#26323870")
-    agraph.draw(filename, prog=prog, args=args)
+    ctl_transforms_lmt_subgraph = Subgraph(name="cluster_LMT", color="#4BA3C7")
+    for node in ctl_transforms_lmt:
+        ctl_transforms_lmt_subgraph.add_node(node)
+    dot.add_subgraph(ctl_transforms_lmt_subgraph)
 
-    return agraph
+    for edge in dot.get_edges():
+        edge.set_color("#26323870")
+
+    file_format = os.path.splitext(filename)[-1][1:]
+    write_method = getattr(dot, f"write_{file_format}")
+    write_method(filename, prog=prog, f=file_format)
+
+    return dot
 
 
 if __name__ == "__main__":

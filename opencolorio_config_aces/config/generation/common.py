@@ -257,28 +257,28 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
 
     for colorspace in data.colorspaces:
         if isinstance(colorspace, Mapping):
-            colorspace = colorspace_factory(**colorspace)
+            colorspace = colorspace_factory(**colorspace)  # noqa: PLW2901
 
         logger.debug('Adding "%s" colorspace.', colorspace.getName())
         config.addColorSpace(colorspace)
 
     for named_transform in data.named_transforms:
         if isinstance(named_transform, Mapping):
-            named_transform = named_transform_factory(**named_transform)
+            named_transform = named_transform_factory(**named_transform)  # noqa: PLW2901
 
         logger.debug('Adding "%s" named transform.', named_transform.getName())
         config.addNamedTransform(named_transform)
 
     for view_transform in data.view_transforms:
         if isinstance(view_transform, Mapping):
-            view_transform = view_transform_factory(**view_transform)
+            view_transform = view_transform_factory(**view_transform)  # noqa: PLW2901
 
         logger.debug('Adding "%s" view transform.', view_transform.getName())
         config.addViewTransform(view_transform)
 
     for look in data.looks:
         if isinstance(look, Mapping):
-            look = look_factory(**look)
+            look = look_factory(**look)  # noqa: PLW2901
 
         logger.debug('Adding "%s" look.', look.getName())
         config.addLook(look)
@@ -317,7 +317,7 @@ def generate_config(data, config_name=None, validate=True, base_config=None):
         display_colorspace = view.get("display_colorspace")
         rule = view.get("rule")
         description = view.get("description")
-        view = view["view"]
+        view = view["view"]  # noqa: PLW2901
         if colorspace is not None:
             logger.debug(
                 'Adding "%s" view to "%s" display using "%s" colorspace.',

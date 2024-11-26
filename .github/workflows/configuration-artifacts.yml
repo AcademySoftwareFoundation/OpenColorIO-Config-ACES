@@ -28,19 +28,18 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get --yes install graphviz graphviz-dev
-      - name: Install Poetry
+      - name: Install uv
         run: |
-          curl -sSL https://install.python-poetry.org | POETRY_HOME=$HOME/.poetry python3 -
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+          pip install uv
         shell: bash
       - name: Install Package Dependencies
         run: |
-          poetry run python -m pip install --upgrade pip
-          poetry install
+          uv sync --all-extras --no-dev
+          uv run python -c "import imageio;imageio.plugins.freeimage.download()"
         shell: bash
       - name: ACES - Conversion Graph
         run: |
-          poetry run invoke build-aces-conversion-graph
+          uv run invoke build-aces-conversion-graph
         shell: bash
       - uses: actions/upload-artifact@v4
         with:
@@ -49,7 +48,7 @@ jobs:
             build/aces/graph/
       - name: Generation - Config - Common Tests
         run: |
-          poetry run invoke build-config-common-tests
+          uv run invoke build-config-common-tests
         shell: bash
       - uses: actions/upload-artifact@v4
         with:
@@ -58,7 +57,7 @@ jobs:
             build/config/common/tests/
       - name: Generation - Config - ACES Reference (Analytical)
         run: |
-          poetry run invoke build-config-reference-analytical
+          uv run invoke build-config-reference-analytical
         shell: bash
       - uses: actions/upload-artifact@v4
         with:
@@ -67,7 +66,7 @@ jobs:
             build/config/aces/analytical/
       - name: Generation - Config - ACES Reference
         run: |
-          poetry run invoke build-config-reference
+          uv run invoke build-config-reference
         shell: bash
       - uses: actions/upload-artifact@v4
         with:
@@ -76,7 +75,7 @@ jobs:
             build/config/aces/reference/
       - name: Generation - Config - ACES CG
         run: |
-          poetry run invoke build-config-cg
+          uv run invoke build-config-cg
         shell: bash
       - uses: actions/upload-artifact@v4
         with:
@@ -85,7 +84,7 @@ jobs:
             build/config/aces/cg/
       - name: Generation - Config - ACES Studio
         run: |
-          poetry run invoke build-config-studio
+          uv run invoke build-config-studio
         shell: bash
       - uses: actions/upload-artifact@v4
         with:

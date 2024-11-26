@@ -5,9 +5,10 @@
 .coverage
 .dmypy.json
 .idea
+.venv
 __pycache__
 build
 dist
 docs/_build
 docs/generated
-poetry.lock
+uv.lock
