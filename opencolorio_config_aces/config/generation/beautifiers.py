@@ -91,6 +91,8 @@ PATTERNS_COLORSPACE_NAME = {
     "sRGB Encoded Rec.709": "sRGB Encoded Rec.709 (sRGB)",
     "^LogC3": "ARRI LogC3 (EI800)",
     "^LogC4": "ARRI LogC4",
+    "AppleLog BT2020": "Apple Log",
+    "Log3G10 RWG": "Log3G10 REDWideGamutRGB",
     "Venice S-Log3": "S-Log3 Venice",
 }
 """
