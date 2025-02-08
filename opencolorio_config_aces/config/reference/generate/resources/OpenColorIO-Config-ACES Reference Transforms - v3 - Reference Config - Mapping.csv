@@ -4,15 +4,6 @@ Ordering,ACEStransformID,Colorspace,Legacy,BuiltinTransform Style,Linked Display
 100,urn:ampas:aces:transformId:v2.0:CSC.Academy.ACEScg_to_ACES.a2.v1,ACES - ACEScg,TRUE,ACEScg_to_ACES2065-1,,ColorSpace,scene-linear,"file-io,working-space,texture","acescg,lin_ap1,lin_ap1_scene,ACES - ACEScg"
 100,urn:ampas:aces:transformId:v2.0:CSC.Academy.ADX10_to_ACES.a2.v1,Input - ADX - ADX10,TRUE,ADX10_to_ACES2065-1,,ColorSpace,log,file-io,adx10
 100,urn:ampas:aces:transformId:v2.0:CSC.Academy.ADX16_to_ACES.a2.v1,Input - ADX - ADX16,TRUE,ADX16_to_ACES2065-1,,ColorSpace,log,file-io,adx16
-105,urn:ampas:aces:transformId:v2.0:CSC.Apple.AppleLog_BT2020_to_ACES.a2.v1,,FALSE,APPLE_LOG_to_ACES2065-1,,ColorSpace,log,file-io,
-110,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv3_to_ACES.a2.v1,,FALSE,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace,log,file-io,logc3ei800_alexawide
-110,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv4_to_ACES.a2.v1,,FALSE,ARRI_LOGC4_to_ACES2065-1,,ColorSpace,log,file-io,
-130,urn:ampas:aces:transformId:v2.0:CSC.Panasonic.VLog_VGamut_to_ACES.a2.v1,,FALSE,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,vlog_vgamut
-135,urn:ampas:aces:transformId:v2.0:CSC.Red.Log3G10_RWG_to_ACES.a2.v1,,FALSE,RED_LOG3G10-RWG_to_ACES2065-1,,ColorSpace,log,file-io,log3g10_rwg
-140,urn:ampas:aces:transformId:v2.0:CSC.Sony.SLog3_SGamut3_to_ACES.a2.v1,,FALSE,SONY_SLOG3-SGAMUT3_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3
-140,urn:ampas:aces:transformId:v2.0:CSC.Sony.SLog3_SGamut3Cine_to_ACES.a2.v1,,FALSE,SONY_SLOG3-SGAMUT3.CINE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3cine
-140,urn:ampas:aces:transformId:v2.0:CSC.Sony.Venice_SLog3_SGamut3_to_ACES.a2.v1,,FALSE,SONY_SLOG3-SGAMUT3-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3
-140,urn:ampas:aces:transformId:v2.0:CSC.Sony.Venice_SLog3_SGamut3Cine_to_ACES.a2.v1,,FALSE,SONY_SLOG3-SGAMUT3.CINE-VENICE_to_ACES2065-1,,ColorSpace,log,file-io,slog3_venice_sgamut3cine
 300,urn:ampas:aces:transformId:v2.0:Look.Academy.ReferenceGamutCompress.a2.v1,,FALSE,ACES-LMT - ACES 1.3 Reference Gamut Compression,,Look,,,
 400,urn:ampas:aces:transformId:v2.0:Output.Academy.P3-D65_108nit_in_P3-D65_ST2084.a2.v1,,FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-108nit-P3-D65_2.0,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform,hdr-video,file-io,
 400,urn:ampas:aces:transformId:v2.0:Output.Academy.P3-D65_2000nit_in_P3-D65_ST2084.a2.v1,,FALSE,ACES-OUTPUT - ACES2065-1_to_CIE-XYZ-D65 - HDR-2000nit-P3-D65_2.0,DISPLAY - CIE-XYZ-D65_to_ST2084-P3-D65,ViewTransform,hdr-video,file-io,
