@@ -24,7 +24,7 @@ colour-science==0.4.6
 comm==0.2.2
 coverage==7.6.7
 coveralls==4.0.1
-cryptography==43.0.3 ; sys_platform == 'linux'
+cryptography==44.0.1 ; sys_platform == 'linux'
 debugpy==1.8.8
 decorator==5.1.1
 defusedxml==0.7.1
