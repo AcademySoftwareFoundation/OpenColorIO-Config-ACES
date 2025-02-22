@@ -1253,6 +1253,18 @@ def generate_config_aces(
                     if colorspace not in colorspaces:
                         colorspaces.append(colorspace)
 
+    # Ordering displays, "sRGB" first and then shared views.
+    display_names = sorted(display_names)
+    for i, display_name in enumerate(display_names[:]):
+        if display_name.startswith("sRGB"):
+            display_names.insert(0, display_names.pop(i))
+
+    shared_views, unordered_shared_views = [], shared_views
+    for display_name in display_names:
+        for shared_view in unordered_shared_views:
+            if shared_view["display"] == display_name:
+                shared_views.append(shared_view)
+
     untonemapped_view_transform = {
         "name": "Un-tone-mapped",
         "from_reference": {
@@ -1271,16 +1283,17 @@ def generate_config_aces(
             untonemapped_shared_view["view"],
             display_name,
         )
+
         if untonemapped_shared_view not in shared_views:
             shared_views.append(untonemapped_shared_view)
 
-    for display_name in display_names:
         raw_view = {
             "display": display_name,
             "view": "Raw",
             "colorspace": raw_colorspace["name"],
         }
         LOGGER.info('Adding "%s" view to "%s" display.', raw_view["view"], display_name)
+
         if raw_view not in views:
             views.append(raw_view)
 

@@ -983,6 +983,7 @@ def generate_config_cg(
     data.description = config_description_cg(build_configuration, describe)
 
     # Colorspaces, Looks and View Transforms Filtering
+    # ================================================
     transforms = data.colorspaces + data.view_transforms
     implicit_transforms = [
         a["name"] for a in transforms if a.get("transforms_data") is None
@@ -1024,6 +1025,7 @@ def generate_config_cg(
         return filtered
 
     # "Colorspaces" Filtering
+    # =======================
     any_colorspace_filterers = [
         implicit_transform_filterer,
         transform_filterer,
@@ -1040,6 +1042,7 @@ def generate_config_cg(
     )
 
     # "Looks" Filtering
+    # =================
     any_look_filterers = [
         implicit_transform_filterer,
         transform_filterer,
@@ -1051,6 +1054,7 @@ def generate_config_cg(
     LOGGER.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
 
     # "View Transform" Filtering
+    # ==========================
     any_view_transform_filterers = [
         implicit_transform_filterer,
         transform_filterer,
@@ -1071,6 +1075,7 @@ def generate_config_cg(
     )
 
     # "Views & Shared Views" Filtering
+    # ================================
     display_names = [
         a["name"] for a in data.colorspaces if a.get("family") == "Display"
     ]
@@ -1098,6 +1103,7 @@ def generate_config_cg(
         return False
 
     # "Shared Views" Filtering
+    # ========================
     any_shared_view_filterers = [
         implicit_view_filterer,
         view_filterer,
@@ -1124,15 +1130,18 @@ def generate_config_cg(
     LOGGER.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
 
     # "Active Displays" Filtering
+    # ===========================
     data.active_displays = [a for a in data.active_displays if a in display_names]
     LOGGER.info("Filtered active displays: %s.", data.active_displays)
 
     # "Active Views" Filtering
+    # ========================
     views = [view["view"] for view in data.views]
     data.active_views = [view for view in data.active_views if view in views]
     LOGGER.info("Filtered active views: %s.", data.active_views)
 
     # CLF Transforms & BuiltinTransform Creation
+    # ==========================================
     for transform_data in yield_from_config_mapping():
         # Inherited from the "Reference" config.
         if (
@@ -1217,14 +1226,8 @@ def generate_config_cg(
                 colorspace["transforms_data"] = [transform_data]
                 data.colorspaces.append(colorspace)
 
-    # Reordering the "Raw" colorspace for aesthetics.
-    data.colorspaces.extend(
-        data.colorspaces.pop(i)
-        for i, a in enumerate(data.colorspaces[:])
-        if a["name"] == "Raw"
-    )
-
     # Inactive Colorspaces Filtering
+    # ==============================
     colorspace_named_transform_names = [a["name"] for a in data.colorspaces]
     inactive_colorspaces = []
     for colorspace in data.inactive_colorspaces:
@@ -1243,6 +1246,7 @@ def generate_config_cg(
     ]
 
     # Roles Filtering & Update
+    # ========================
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
         ocio.ROLE_RENDERING,
@@ -1268,6 +1272,25 @@ def generate_config_cg(
             ocio.ROLE_TEXTURE_PAINT: "sRGB Encoded Rec.709 (sRGB)",
         }
     )
+
+    # Ordering
+    # ========
+    def ordering(element):
+        """Return the ordering key for given element."""
+
+        return int(
+            next(iter(element.get("transforms_data", [{"ordering": 0}])))["ordering"]
+        )
+
+    data.colorspaces = sorted(data.colorspaces, key=lambda x: ordering(x))
+    data.colorspaces.extend(
+        data.colorspaces.pop(i)
+        for i, a in enumerate(data.colorspaces[:])
+        if a["name"] == "Raw"
+    )
+    data.named_transforms = sorted(data.named_transforms, key=lambda x: ordering(x))
+    data.view_transforms = sorted(data.view_transforms, key=lambda x: ordering(x))
+    data.looks = sorted(data.looks, key=lambda x: ordering(x))
 
     data.profile_version = build_configuration.ocio
 
