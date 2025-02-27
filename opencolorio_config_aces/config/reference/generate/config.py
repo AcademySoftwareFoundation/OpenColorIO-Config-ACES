@@ -1188,11 +1188,13 @@ def generate_config_aces(
                 display["transforms_data"] = [transform_data]
                 display_name = display["name"]
 
-                if display not in displays:
-                    displays.append(display)
-
-                if display_name not in display_names:
+                if display_name in display_names:
+                    for existing_display in displays:
+                        if existing_display["name"] == display_name:
+                            existing_display["transforms_data"].append(transform_data)
+                else:
                     display_names.append(display_name)
+                    displays.append(display)
 
                 shared_view = {
                     "display": display_name,

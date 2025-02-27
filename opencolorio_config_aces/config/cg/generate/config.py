@@ -1142,6 +1142,32 @@ def generate_config_cg(
 
     # CLF Transforms & BuiltinTransform Creation
     # ==========================================
+    def remove_existing_colorspace(name):
+        """Remove given existing *ColorSpace* from the current config data."""
+
+        for i, colorspace in enumerate(data.colorspaces[:]):
+            if colorspace["name"] == name:
+                LOGGER.info(
+                    'Removing existing "%s" "ColorSpace" transform from '
+                    "current config data.",
+                    name,
+                )
+
+                data.colorspaces.pop(i)
+
+    def remove_existing_named_transform(name):
+        """Remove given existing *NamedTransform* from the current config data."""
+
+        for i, named_transform in enumerate(data.named_transforms[:]):
+            if named_transform["name"] == name:
+                LOGGER.info(
+                    'Removing existing "%s" "NamedTransform" transform from '
+                    "current config data.",
+                    name,
+                )
+
+                data.named_transforms.pop(i)
+
     for transform_data in yield_from_config_mapping():
         # Inherited from the "Reference" config.
         if (
@@ -1178,6 +1204,9 @@ def generate_config_cg(
 
                 colorspace = style_to_colorspace(**kwargs)
                 colorspace["transforms_data"] = [transform_data]
+
+                remove_existing_colorspace(colorspace["name"])
+
                 data.colorspaces.append(colorspace)
             elif transform_data["interface"] == "NamedTransform":
                 LOGGER.info(
@@ -1185,9 +1214,12 @@ def generate_config_cg(
                     style,
                 )
 
-                colorspace = style_to_named_transform(**kwargs)
-                colorspace["transforms_data"] = [transform_data]
-                data.named_transforms.append(colorspace)
+                named_transform = style_to_named_transform(**kwargs)
+                named_transform["transforms_data"] = [transform_data]
+
+                remove_existing_named_transform(named_transform["name"])
+
+                data.named_transforms.append(named_transform)
 
             if style and clf_transform_id:
                 LOGGER.warning(
@@ -1215,6 +1247,9 @@ def generate_config_cg(
 
                 named_transform = clf_transform_to_named_transform(**kwargs)
                 named_transform["transforms_data"] = [transform_data]
+
+                remove_existing_named_transform(named_transform["name"])
+
                 data.named_transforms.append(named_transform)
             else:
                 LOGGER.info(
@@ -1224,6 +1259,9 @@ def generate_config_cg(
 
                 colorspace = clf_transform_to_colorspace(**kwargs)
                 colorspace["transforms_data"] = [transform_data]
+
+                remove_existing_colorspace(colorspace["name"])
+
                 data.colorspaces.append(colorspace)
 
     # Inactive Colorspaces Filtering
@@ -1291,6 +1329,12 @@ def generate_config_cg(
     data.named_transforms = sorted(data.named_transforms, key=lambda x: ordering(x))
     data.view_transforms = sorted(data.view_transforms, key=lambda x: ordering(x))
     data.looks = sorted(data.looks, key=lambda x: ordering(x))
+
+    for active_view in data.active_views[:]:
+        for pattern in ("SDR", "Un-tone-mapped", "Raw"):
+            if pattern in active_view:
+                data.active_views.remove(active_view)
+                data.active_views.append(active_view)
 
     data.profile_version = build_configuration.ocio
 
