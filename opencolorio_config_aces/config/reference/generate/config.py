@@ -1095,9 +1095,7 @@ def generate_config_aces(
                 ]
             )
 
-            config_mapping[transform_data["builtin_transform_style"]].append(
-                transform_data
-            )
+            config_mapping[transform_data["colorspace"]].append(transform_data)
 
     colorspaces = []
     looks = []
@@ -1156,23 +1154,31 @@ def generate_config_aces(
 
     LOGGER.info('Implicit colorspaces: "%s"', [a["name"] for a in colorspaces])
 
-    for style, transforms_data in config_mapping.items():
-        if transforms_data[0]["interface"] == "ViewTransform":
-            LOGGER.info('Creating a "View" transform for "%s" style...', style)
-            view_transform = style_to_view_transform(
-                style,
-                [transform_data["ctl_transform"] for transform_data in transforms_data],
-                describe,
-                amf_components,
-                signature_only=True,
-                scheme=scheme,
-            )
-            view_transform["transforms_data"] = transforms_data
-            view_transforms.append(view_transform)
-            view_transform_name = view_transform["name"]
-            view_transform_names.append(view_transform_name)
+    for transforms_data in config_mapping.values():
+        for transform_data in transforms_data:
+            ctl_transform = transform_data["ctl_transform"]
+            style = transform_data["builtin_transform_style"]
 
-            for transform_data in transforms_data:
+            if transform_data["interface"] == "ViewTransform":
+                LOGGER.info('Creating a "View" transform for "%s" style...', style)
+                view_transform = style_to_view_transform(
+                    style,
+                    [
+                        transform_data["ctl_transform"]
+                        for transform_data in transforms_data
+                    ],
+                    describe,
+                    amf_components,
+                    signature_only=True,
+                    scheme=scheme,
+                )
+                view_transform["transforms_data"] = transforms_data
+                view_transforms.append(view_transform)
+                view_transform_name = view_transform["name"]
+
+                if view_transform_name not in view_transform_names:
+                    view_transform_names.append(view_transform_name)
+
                 display_style = transform_data["linked_display_colorspace_style"]
 
                 display = style_to_display_colorspace(
@@ -1208,52 +1214,49 @@ def generate_config_aces(
                         display_name,
                     )
                     shared_views.append(shared_view)
-        else:
-            for transform_data in transforms_data:
-                ctl_transform = transform_data["ctl_transform"]
 
-                if transform_data["interface"] == "Look":
-                    LOGGER.info('Creating a "Look" transform for "%s" style...', style)
-                    look = ctl_transform_to_look(
-                        ctl_transform,
-                        describe,
-                        amf_components,
-                        signature_only=True,
-                        scheme=scheme,
-                        analytical=analytical,
-                        forward_transform={
-                            "transform_type": "BuiltinTransform",
-                            "style": style,
-                        },
-                        process_space=scene_reference_colorspace["name"],
-                    )
-                    look["transforms_data"] = [transform_data]
-                    if look not in looks:
-                        looks.append(look)
-                else:
-                    LOGGER.info(
-                        'Creating a "Colorspace" transform for "%s" style...',
-                        style,
-                    )
+            elif transform_data["interface"] == "Look":
+                LOGGER.info('Creating a "Look" transform for "%s" style...', style)
+                look = ctl_transform_to_look(
+                    ctl_transform,
+                    describe,
+                    amf_components,
+                    signature_only=True,
+                    scheme=scheme,
+                    analytical=analytical,
+                    forward_transform={
+                        "transform_type": "BuiltinTransform",
+                        "style": style,
+                    },
+                    process_space=scene_reference_colorspace["name"],
+                )
+                look["transforms_data"] = [transform_data]
+                if look not in looks:
+                    looks.append(look)
+            else:
+                LOGGER.info(
+                    'Creating a "Colorspace" transform for "%s" style...',
+                    style,
+                )
 
-                    colorspace = ctl_transform_to_colorspace(
-                        ctl_transform,
-                        describe,
-                        amf_components,
-                        signature_only=True,
-                        scheme=scheme,
-                        analytical=analytical,
-                        to_reference={
-                            "transform_type": "BuiltinTransform",
-                            "style": style,
-                        },
-                        encoding=transform_data.get("encoding"),
-                        categories=transform_data.get("categories"),
-                        aliases=transform_data_aliases(transform_data),
-                    )
-                    colorspace["transforms_data"] = [transform_data]
-                    if colorspace not in colorspaces:
-                        colorspaces.append(colorspace)
+                colorspace = ctl_transform_to_colorspace(
+                    ctl_transform,
+                    describe,
+                    amf_components,
+                    signature_only=True,
+                    scheme=scheme,
+                    analytical=analytical,
+                    to_reference={
+                        "transform_type": "BuiltinTransform",
+                        "style": style,
+                    },
+                    encoding=transform_data.get("encoding"),
+                    categories=transform_data.get("categories"),
+                    aliases=transform_data_aliases(transform_data),
+                )
+                colorspace["transforms_data"] = [transform_data]
+                if colorspace not in colorspaces:
+                    colorspaces.append(colorspace)
 
     # Ordering displays, "sRGB" first and then shared views.
     display_names = sorted(display_names)
@@ -1261,11 +1264,28 @@ def generate_config_aces(
         if display_name.startswith("sRGB"):
             display_names.insert(0, display_names.pop(i))
 
-    shared_views, unordered_shared_views = [], shared_views
-    for display_name in display_names:
-        for shared_view in unordered_shared_views:
-            if shared_view["display"] == display_name:
-                shared_views.append(shared_view)
+    # Ordering active views by luminance, whitepoint, and, dynamic range.
+    def ordering(element):
+        """Return the ordering key for given element."""
+
+        score = 0
+
+        if match := re.search(r"(\w+)\snits", element):
+            score += int(match.group(1))
+
+        if "D60 in" in element:
+            score += 1
+
+        if "SDR" in element:
+            score += 1e16
+
+        return score
+
+    active_views = sorted(view_transform_names, key=ordering)
+    for active_view in active_views[:]:
+        if "SDR" in active_view:
+            active_views.remove(active_view)
+            active_views.append(active_view)
 
     untonemapped_view_transform = {
         "name": "Un-tone-mapped",
@@ -1329,7 +1349,7 @@ def generate_config_aces(
         shared_views=shared_views,
         views=shared_views + views,
         active_displays=display_names,
-        active_views=[*view_transform_names, "Un-tone-mapped", "Raw"],
+        active_views=[*active_views, "Un-tone-mapped", "Raw"],
         file_rules=[
             {
                 "name": "Default",

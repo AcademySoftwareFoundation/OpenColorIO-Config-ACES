@@ -50,6 +50,7 @@ __all__ = [
     "produce_transform",
 ]
 
+LOGGER = logging.getLogger(__name__)
 
 BUILTIN_TRANSFORMS = DocstringDict(
     {
@@ -96,7 +97,7 @@ def group_transform_factory(transforms):
         *OpenColorIO* `GroupTransform`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "GroupTransform" with the following transforms:\n%s',
         indent(pformat(locals()), "    "),
     )
@@ -173,7 +174,7 @@ def colorspace_factory(
         *OpenColorIO* colorspace.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "ColorSpace" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
@@ -302,7 +303,7 @@ def named_transform_factory(
         *OpenColorIO* `NamedTransform`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "NamedTransform" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
@@ -401,7 +402,7 @@ def view_transform_factory(
         *OpenColorIO* `ViewTransform`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "ViewTransform" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
@@ -487,7 +488,7 @@ def look_factory(
         *OpenColorIO* `Look`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "Look" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
@@ -544,7 +545,7 @@ def transform_factory_setter(**kwargs):
 
     kwargs.pop("transform_factory", None)
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "%s" transform with the following parameters:\n%s',
         transform.__class__.__name__,
         indent(pformat(kwargs), "    "),
@@ -584,7 +585,7 @@ def transform_factory_constructor(**kwargs):
 
     kwargs.pop("transform_factory", None)
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "%s" transform with the following parameters:\n%s',
         transform_type,
         indent(pformat(kwargs), "    "),
@@ -615,7 +616,7 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
     attest(kwargs["transform_type"] == "FileTransform")
     attest(Path(kwargs["src"]).exists())
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "FileTransform" transform with the following parameters:\n%s',
         indent(pformat(kwargs), "    "),
     )

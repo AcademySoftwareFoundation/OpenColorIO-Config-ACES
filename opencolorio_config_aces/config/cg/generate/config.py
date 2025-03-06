@@ -1320,21 +1320,15 @@ def generate_config_cg(
             next(iter(element.get("transforms_data", [{"ordering": 0}])))["ordering"]
         )
 
-    data.colorspaces = sorted(data.colorspaces, key=lambda x: ordering(x))
+    data.colorspaces = sorted(data.colorspaces, key=ordering)
     data.colorspaces.extend(
         data.colorspaces.pop(i)
         for i, a in enumerate(data.colorspaces[:])
         if a["name"] == "Raw"
     )
-    data.named_transforms = sorted(data.named_transforms, key=lambda x: ordering(x))
-    data.view_transforms = sorted(data.view_transforms, key=lambda x: ordering(x))
-    data.looks = sorted(data.looks, key=lambda x: ordering(x))
-
-    for active_view in data.active_views[:]:
-        for pattern in ("SDR", "Un-tone-mapped", "Raw"):
-            if pattern in active_view:
-                data.active_views.remove(active_view)
-                data.active_views.append(active_view)
+    data.named_transforms = sorted(data.named_transforms, key=ordering)
+    data.view_transforms = sorted(data.view_transforms, key=ordering)
+    data.looks = sorted(data.looks, key=ordering)
 
     data.profile_version = build_configuration.ocio
 
