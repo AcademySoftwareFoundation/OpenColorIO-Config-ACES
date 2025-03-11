@@ -115,16 +115,28 @@ BUILD_VARIANT_FILTERERS = {
         "any": {},
         "all": {
             "view_transform_filterers": [lambda x: "D60 in" not in x["name"]],
-            "shared_view_filterers": [lambda x: "DD60 in60" not in x["view_transform"]],
+            "shared_view_filterers": [lambda x: "D60 in" not in x["view_transform"]],
             "view_filterers": [lambda x: "D60 in" not in x["view"]],
         },
     },
     "D60 Views": {
         "any": {},
         "all": {
-            "view_transform_filterers": [lambda x: "D60 in" in x["name"]],
-            "shared_view_filterers": [lambda x: "D60 in" in x["view_transform"]],
-            "view_filterers": [lambda x: "D60 in" in x["view"]],
+            "view_transform_filterers": [
+                lambda x: "D60 in" in x["name"]
+                or x["name"] == "Un-tone-mapped"
+                or x["name"] == "Raw"
+            ],
+            "shared_view_filterers": [
+                lambda x: "D60 in" in x["view_transform"]
+                or x["view_transform"] == "Un-tone-mapped"
+                or x["view_transform"] == "Raw"
+            ],
+            "view_filterers": [
+                lambda x: "D60 in" in x["view"]
+                or x["view"] == "Un-tone-mapped"
+                or x["view"] == "Raw"
+            ],
         },
     },
     "All Views": {"any": {}, "all": {}},
