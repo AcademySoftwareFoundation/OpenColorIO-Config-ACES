@@ -1366,6 +1366,10 @@ def main(build_directory):
     build_directory.mkdir(parents=True, exist_ok=True)
 
     for build_configuration in BUILD_CONFIGURATIONS:
+        # Only building the D65 variant of the CG config.
+        if build_configuration.variant in ("D60 Views", "All Views"):
+            continue
+
         config_basename = config_basename_cg(build_configuration)
         (
             config,
