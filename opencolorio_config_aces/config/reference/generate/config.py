@@ -13,7 +13,6 @@ Defines various objects related to the generation of the *aces-dev* reference
 import csv
 import logging
 import re
-from collections import defaultdict
 from enum import Flag, auto
 from pathlib import Path
 
@@ -998,7 +997,7 @@ def generate_config_aces(
 
     LOGGER.info('Parsing "%s" config mapping file...', config_mapping_file_path)
 
-    config_mapping = defaultdict(list)
+    config_mapping = {}
     with open(config_mapping_file_path) as csv_file:
         dict_reader = csv.DictReader(
             csv_file,
@@ -1095,7 +1094,7 @@ def generate_config_aces(
                 ]
             )
 
-            config_mapping[transform_data["colorspace"]].append(transform_data)
+            config_mapping[transform_data["aces_transform_id"]] = transform_data
 
     colorspaces = []
     looks = []
@@ -1154,109 +1153,106 @@ def generate_config_aces(
 
     LOGGER.info('Implicit colorspaces: "%s"', [a["name"] for a in colorspaces])
 
-    for transforms_data in config_mapping.values():
-        for transform_data in transforms_data:
-            ctl_transform = transform_data["ctl_transform"]
-            style = transform_data["builtin_transform_style"]
+    for transform_data in config_mapping.values():
+        ctl_transform = transform_data["ctl_transform"]
+        style = transform_data["builtin_transform_style"]
 
-            if transform_data["interface"] == "ViewTransform":
-                LOGGER.info('Creating a "View" transform for "%s" style...', style)
-                view_transform = style_to_view_transform(
-                    style,
-                    [
-                        transform_data["ctl_transform"]
-                        for transform_data in transforms_data
-                    ],
-                    describe,
-                    amf_components,
-                    signature_only=True,
-                    scheme=scheme,
-                )
-                view_transform["transforms_data"] = transforms_data
-                view_transforms.append(view_transform)
-                view_transform_name = view_transform["name"]
+        if transform_data["interface"] == "ViewTransform":
+            LOGGER.info('Creating a "View" transform for "%s" style...', style)
 
-                if view_transform_name not in view_transform_names:
-                    view_transform_names.append(view_transform_name)
+            view_transform = style_to_view_transform(
+                style,
+                [transform_data["ctl_transform"]],
+                describe,
+                amf_components,
+                signature_only=True,
+                scheme=scheme,
+            )
+            view_transform["transforms_data"] = [transform_data]
+            view_transforms.append(view_transform)
+            view_transform_name = view_transform["name"]
 
-                display_style = transform_data["linked_display_colorspace_style"]
+            if view_transform_name not in view_transform_names:
+                view_transform_names.append(view_transform_name)
 
-                display = style_to_display_colorspace(
-                    display_style,
-                    describe,
-                    amf_components,
-                    signature_only=True,
-                    scheme=scheme,
-                    encoding=transform_data.get("encoding"),
-                    categories=transform_data.get("categories"),
-                    aliases=transform_data_aliases(transform_data),
-                )
-                display["transforms_data"] = [transform_data]
-                display_name = display["name"]
+            display_style = transform_data["linked_display_colorspace_style"]
 
-                if display_name in display_names:
-                    for existing_display in displays:
-                        if existing_display["name"] == display_name:
-                            existing_display["transforms_data"].append(transform_data)
-                else:
-                    display_names.append(display_name)
-                    displays.append(display)
+            display = style_to_display_colorspace(
+                display_style,
+                describe,
+                amf_components,
+                signature_only=True,
+                scheme=scheme,
+                encoding=transform_data.get("encoding"),
+                categories=transform_data.get("categories"),
+                aliases=transform_data_aliases(transform_data),
+            )
+            display["transforms_data"] = [transform_data]
+            display_name = display["name"]
 
-                shared_view = {
-                    "display": display_name,
-                    "view": view_transform_name,
-                    "view_transform": view_transform_name,
-                }
-                if shared_view not in shared_views:
-                    LOGGER.info(
-                        'Adding "%s" shared view to "%s" display.',
-                        shared_view["view"],
-                        display_name,
-                    )
-                    shared_views.append(shared_view)
-
-            elif transform_data["interface"] == "Look":
-                LOGGER.info('Creating a "Look" transform for "%s" style...', style)
-                look = ctl_transform_to_look(
-                    ctl_transform,
-                    describe,
-                    amf_components,
-                    signature_only=True,
-                    scheme=scheme,
-                    analytical=analytical,
-                    forward_transform={
-                        "transform_type": "BuiltinTransform",
-                        "style": style,
-                    },
-                    process_space=scene_reference_colorspace["name"],
-                )
-                look["transforms_data"] = [transform_data]
-                if look not in looks:
-                    looks.append(look)
+            if display_name in display_names:
+                for existing_display in displays:
+                    if existing_display["name"] == display_name:
+                        existing_display["transforms_data"].append(transform_data)
             else:
-                LOGGER.info(
-                    'Creating a "Colorspace" transform for "%s" style...',
-                    style,
-                )
+                display_names.append(display_name)
+                displays.append(display)
 
-                colorspace = ctl_transform_to_colorspace(
-                    ctl_transform,
-                    describe,
-                    amf_components,
-                    signature_only=True,
-                    scheme=scheme,
-                    analytical=analytical,
-                    to_reference={
-                        "transform_type": "BuiltinTransform",
-                        "style": style,
-                    },
-                    encoding=transform_data.get("encoding"),
-                    categories=transform_data.get("categories"),
-                    aliases=transform_data_aliases(transform_data),
+            shared_view = {
+                "display": display_name,
+                "view": view_transform_name,
+                "view_transform": view_transform_name,
+            }
+            if shared_view not in shared_views:
+                LOGGER.info(
+                    'Adding "%s" shared view to "%s" display.',
+                    shared_view["view"],
+                    display_name,
                 )
-                colorspace["transforms_data"] = [transform_data]
-                if colorspace not in colorspaces:
-                    colorspaces.append(colorspace)
+                shared_views.append(shared_view)
+
+        elif transform_data["interface"] == "Look":
+            LOGGER.info('Creating a "Look" transform for "%s" style...', style)
+            look = ctl_transform_to_look(
+                ctl_transform,
+                describe,
+                amf_components,
+                signature_only=True,
+                scheme=scheme,
+                analytical=analytical,
+                forward_transform={
+                    "transform_type": "BuiltinTransform",
+                    "style": style,
+                },
+                process_space=scene_reference_colorspace["name"],
+            )
+            look["transforms_data"] = [transform_data]
+            if look not in looks:
+                looks.append(look)
+        else:
+            LOGGER.info(
+                'Creating a "Colorspace" transform for "%s" style...',
+                style,
+            )
+
+            colorspace = ctl_transform_to_colorspace(
+                ctl_transform,
+                describe,
+                amf_components,
+                signature_only=True,
+                scheme=scheme,
+                analytical=analytical,
+                to_reference={
+                    "transform_type": "BuiltinTransform",
+                    "style": style,
+                },
+                encoding=transform_data.get("encoding"),
+                categories=transform_data.get("categories"),
+                aliases=transform_data_aliases(transform_data),
+            )
+            colorspace["transforms_data"] = [transform_data]
+            if colorspace not in colorspaces:
+                colorspaces.append(colorspace)
 
     # Ordering displays, "sRGB" first and then shared views.
     display_names = sorted(display_names)
