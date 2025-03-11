@@ -1267,21 +1267,44 @@ def generate_config_aces(
         score = 0
 
         if match := re.search(r"(\w+)\snits", element):
-            score += int(match.group(1))
+            nits = int(match.group(1))
+            score += nits
+
+            if nits == 500:
+                score += 100000
+
+            if nits == 300:
+                score += 1000000
+
+            if nits == 108:
+                score += 10000000
 
         if "D60 in" in element:
             score += 1
 
+        if "in Rec.2020" in element:
+            score += 1
+
+        if "in Rec.2020" in element:
+            score += 2
+
+        if "in Rec.709" in element:
+            score += 50000
+
+        if "Rec.709" in element:
+            score += 50000000
+
         if "SDR" in element:
-            score += 1e16
+            score += 100000000
+
+            if "XYZ" in element:
+                score += 100000000
+
+        LOGGER.info("Element: %s, Score: %s", element, score)
 
         return score
 
     active_views = sorted(view_transform_names, key=ordering)
-    for active_view in active_views[:]:
-        if "SDR" in active_view:
-            active_views.remove(active_view)
-            active_views.append(active_view)
 
     untonemapped_view_transform = {
         "name": "Un-tone-mapped",
