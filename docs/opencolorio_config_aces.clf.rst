@@ -12,11 +12,11 @@ Common LUT Format Discovery
 .. autosummary::
     :toctree: generated/
 
-    classify_clf_transforms
     discover_clf_transforms
+    classify_clf_transforms
+    unclassify_clf_transforms
     filter_clf_transforms
     print_clf_taxonomy
-    unclassify_clf_transforms
 
 Common LUT Format Generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

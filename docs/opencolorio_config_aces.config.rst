@@ -16,7 +16,7 @@ Version Utilities
     :toctree: generated/
 
     PROFILE_VERSION_DEFAULT
-    SUPPORTED_PROFILE_VERSIONS
+    PROFILE_VERSIONS
 
 Build Configuration Utilities
 -----------------------------
@@ -28,9 +28,9 @@ Build Configuration Utilities
 .. autosummary::
     :toctree: generated/
 
-    BuildConfiguration
     BUILD_CONFIGURATIONS
     BUILD_VARIANT_FILTERERS
+    BuildConfiguration
 
 Config Generation Common Objects
 --------------------------------
@@ -115,7 +115,6 @@ Reference Configuration
     :toctree: generated/
 
     DescriptionStyle
-    version_config_mapping_file
     generate_config_aces
 
 *ACES* Computer Graphics (CG) Config Generator
@@ -141,3 +140,13 @@ Reference Configuration
     :toctree: generated/
 
     generate_config_studio
+
+Generation Utilities
+~~~~~~~~~~~~~~~~~~~~
+
+``opencolorio_config_aces``
+
+.. autosummary::
+    :toctree: generated/
+
+    BUILTIN_TRANSFORMS

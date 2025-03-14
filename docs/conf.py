@@ -6,7 +6,12 @@ OpenColorIO Configuration for ACES - Documentation Configuration
 ================================================================
 """
 
-import opencolorio_config_aces as package
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent))
+
+import opencolorio_config_aces as package  # noqa: E402
 
 basename = package.__name__.replace("_", "-")
 
@@ -23,7 +28,7 @@ extensions = [
     "sphinx.ext.mathjax",
 ]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3.8", None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3.13", None)}
 
 autosummary_generate = True
 
@@ -36,7 +41,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 project = package.__application_name__
-copyright = package.__copyright__.replace("Copyright (C)", "")  # noqa: A001
+copyright = package.__copyright__  # noqa: A001
 version = f"{package.__major_version__}.{package.__minor_version__}"
 release = package.__version__
 
