@@ -24,12 +24,13 @@ from opencolorio_config_aces.clf import (
     unclassify_clf_transforms,
 )
 from opencolorio_config_aces.config.generation import (
+    BUILD_CONFIGURATIONS,
+    BUILD_VARIANT_FILTERERS,
     BUILTIN_TRANSFORMS,
-    DEPENDENCY_VERSIONS,
     SEPARATOR_BUILTIN_TRANSFORM_NAME,
     SEPARATOR_COLORSPACE_FAMILY,
     SEPARATOR_COLORSPACE_NAME,
-    DependencyVersions,
+    BuildConfiguration,
     beautify_alias,
     beautify_colorspace_name,
     colorspace_factory,
@@ -49,6 +50,7 @@ from opencolorio_config_aces.config.reference.generate.config import (
 )
 from opencolorio_config_aces.utilities import (
     attest,
+    optional,
     timestamp,
     validate_method,
 )
@@ -77,13 +79,14 @@ __all__ = [
     "config_name_cg",
     "config_description_cg",
     "generate_config_cg",
+    "main",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG = (
     "https://docs.google.com/spreadsheets/d/"
-    "1nE95DEVtxtEkcIEaJk0WekyEH0Rcs8z_3fdwUtqP8V4/"
+    "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
     "export?format=csv&gid=365242296"
 )
 """
@@ -192,8 +195,7 @@ def clf_transform_to_description(
         *OpenColorIO* `Colorspace` or `NamedTransform` description.
     """
 
-    if amf_components is None:
-        amf_components = {}
+    amf_components = optional(amf_components, {})
 
     description = None
     if describe != DescriptionStyle.NONE:
@@ -652,15 +654,15 @@ def style_to_named_transform(
         return colorspace
 
 
-def config_basename_cg(dependency_versions):
+def config_basename_cg(build_configuration):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
     basename, i.e., the filename devoid of directory affix.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -669,23 +671,25 @@ def config_basename_cg(dependency_versions):
 
     Examples
     --------
-    >>> config_basename_cg(DependencyVersions())
+    >>> config_basename_cg(BuildConfiguration())
     'cg-config-v0.0.0_aces-v0.0_ocio-v2.0.ocio'
     """
 
-    return ("cg-config-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio").format(
-        **dependency_versions.to_regularised_versions()
+    return (
+        ("cg-config-{variant}-{colorspaces}_aces-{aces}_ocio-{ocio}.ocio")
+        .format(**build_configuration.compact_fields())
+        .replace("--", "-")
     )
 
 
-def config_name_cg(dependency_versions):
+def config_name_cg(build_configuration):
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config name.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -694,21 +698,25 @@ def config_name_cg(dependency_versions):
 
     Examples
     --------
-    >>> config_name_cg(DependencyVersions())
+    >>> config_name_cg(BuildConfiguration())
     'Academy Color Encoding System - CG Config [COLORSPACES v0.0.0] \
 [ACES v0.0] [OCIO v2.0]'
     """
 
     return (
-        "Academy Color Encoding System - CG Config "
-        "[COLORSPACES {colorspaces}] "
-        "[ACES {aces}] "
-        "[OCIO {ocio}]"
-    ).format(**dependency_versions.to_regularised_versions())
+        (
+            "Academy Color Encoding System - CG Config {variant}"
+            "[COLORSPACES {colorspaces}] "
+            "[ACES {aces}] "
+            "[OCIO {ocio}]"
+        )
+        .format(**build_configuration.extended_fields())
+        .replace(")[", ") [")
+    )
 
 
 def config_description_cg(
-    dependency_versions,
+    build_configuration,
     describe=DescriptionStyle.SHORT_UNION,
 ):
     """
@@ -717,8 +725,8 @@ def config_description_cg(
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -729,7 +737,7 @@ def config_description_cg(
         ACES* Computer Graphics (CG) *OpenColorIO* config description.
     """
 
-    name = config_name_cg(dependency_versions)
+    name = config_name_cg(build_configuration)
 
     underline = "-" * len(name)
 
@@ -750,11 +758,12 @@ def config_description_cg(
 def generate_config_cg(
     data=None,
     config_name=None,
-    dependency_versions=DependencyVersions(),
+    build_configuration=BuildConfiguration(),
     validate=True,
     describe=DescriptionStyle.SHORT_UNION,
     config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
     scheme="Modern 1",
+    additional_filterers=None,
     additional_data=False,
 ):
     """
@@ -791,8 +800,8 @@ def generate_config_cg(
     config_name : unicode, optional
         *OpenColorIO* config file name, if given the config will be written to
         disk.
-    dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration, optional
+        Build configuration.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -803,6 +812,20 @@ def generate_config_cg(
     scheme : str, optional
         {"Legacy", "Modern 1"},
         Naming convention scheme to use.
+    additional_filterers : dict, optional
+        Additional filterers to further include or exclude transforms from the
+        generated config.
+
+        .. code-block:: python
+
+            {
+                "any": {},
+                "all": {
+                    "view_transform_filterers": [lambda x: "D60" not in x["name"]],
+                    "view_filterers": [lambda x: "D60" not in x["view"]],
+                },
+            },
+
     additional_data : bool, optional
         Whether to return additional data.
 
@@ -816,23 +839,25 @@ def generate_config_cg(
 
     scheme = validate_method(scheme, ["Legacy", "Modern 1"])
 
-    logger.info(
+    additional_filterers = optional(additional_filterers, {"any": {}, "all": {}})
+
+    LOGGER.info(
         'Generating "%s" config...',
-        config_name_cg(dependency_versions),
+        config_name_cg(build_configuration),
     )
 
     clf_transforms = unclassify_clf_transforms(
         classify_clf_transforms(discover_clf_transforms())
     )
 
-    logger.debug('Using %s "CLF" transforms...', clf_transforms)
+    LOGGER.debug('Using %s "CLF" transforms...', clf_transforms)
 
     if data is None:
         _config, data, ctl_transforms, amf_components = generate_config_aces(
-            dependency_versions=dependency_versions,
+            build_configuration=build_configuration,
             describe=describe,
-            analytical=False,
             scheme=scheme,
+            analytical=False,
             additional_data=True,
         )
 
@@ -849,7 +874,7 @@ def generate_config_cg(
 
         clf_transform = next(iter(filtered_clf_transforms), None)
 
-        logger.debug(
+        LOGGER.debug(
             'Filtered "CLF" transform with "%s" "CLFtransformID": %s.',
             clf_transform_id,
             clf_transform,
@@ -868,7 +893,7 @@ def generate_config_cg(
 
         clf_transform = next(iter(filtered_clf_transforms), None)
 
-        logger.debug(
+        LOGGER.debug(
             'Filtered "CLF" transform with "%s" style: %s.',
             style,
             clf_transform,
@@ -876,7 +901,7 @@ def generate_config_cg(
 
         return clf_transform
 
-    logger.info('Parsing "%s" config mapping file...', config_mapping_file_path)
+    LOGGER.info('Parsing "%s" config mapping file...', config_mapping_file_path)
 
     config_mapping = defaultdict(list)
     with open(config_mapping_file_path) as csv_file:
@@ -909,12 +934,12 @@ def generate_config_cg(
                     f'"{style}" "BuiltinTransform" style does not exist!',
                 )
 
-                if BUILTIN_TRANSFORMS[style] > dependency_versions.ocio:
-                    logger.warning(
+                if BUILTIN_TRANSFORMS[style] > build_configuration.ocio:
+                    LOGGER.warning(
                         '"%s" style is unavailable for "%s" profile version, '
                         "skipping transform!",
                         style,
-                        dependency_versions.ocio,
+                        build_configuration.ocio,
                     )
                     continue
 
@@ -953,17 +978,18 @@ def generate_config_cg(
     data.name = re.sub(
         r"\.ocio$",
         "",
-        config_basename_cg(dependency_versions),
+        config_basename_cg(build_configuration),
     )
-    data.description = config_description_cg(dependency_versions, describe)
+    data.description = config_description_cg(build_configuration, describe)
 
     # Colorspaces, Looks and View Transforms Filtering
+    # ================================================
     transforms = data.colorspaces + data.view_transforms
     implicit_transforms = [
         a["name"] for a in transforms if a.get("transforms_data") is None
     ]
 
-    logger.info("Implicit transforms: %s.", implicit_transforms)
+    LOGGER.info("Implicit transforms: %s.", implicit_transforms)
 
     def implicit_transform_filterer(transform):
         """Return whether given transform is an implicit transform."""
@@ -974,45 +1000,82 @@ def generate_config_cg(
         """Return whether given transform must be included."""
 
         for transform_data in yield_from_config_mapping():
-            for data in transform["transforms_data"]:
-                aces_transform_id = transform_data["aces_transform_id"]
-                if not aces_transform_id:
-                    continue
+            aces_transform_id = transform_data["aces_transform_id"]
+            if not aces_transform_id:
+                continue
 
+            for data in transform.get("transforms_data", []):
                 if aces_transform_id == data.get("aces_transform_id"):
                     return True
 
         return False
 
-    def multi_filters(array, filterers):
-        """Apply given filterers on given array."""
+    def filter_any(array, filterers):
+        """Filter array elements passing any of the filterers."""
 
         filtered = [a for a in array if any(filterer(a) for filterer in filterers)]
 
         return filtered
 
-    colorspace_filterers = [implicit_transform_filterer, transform_filterer]
-    data.colorspaces = multi_filters(data.colorspaces, colorspace_filterers)
-    logger.info(
+    def filter_all(array, filterers):
+        """Filter array elements passing all of the filterers."""
+
+        filtered = [a for a in array if all(filterer(a) for filterer in filterers)]
+
+        return filtered
+
+    # "Colorspaces" Filtering
+    # =======================
+    any_colorspace_filterers = [
+        implicit_transform_filterer,
+        transform_filterer,
+        *additional_filterers["any"].get("colorspace_filterers", []),
+    ]
+    data.colorspaces = filter_any(data.colorspaces, any_colorspace_filterers)
+    all_colorspace_filterers = [
+        *additional_filterers["all"].get("colorspace_filterers", [])
+    ]
+    data.colorspaces = filter_all(data.colorspaces, all_colorspace_filterers)
+    LOGGER.info(
         'Filtered "Colorspace" transforms: %s.',
         [a["name"] for a in data.colorspaces],
     )
 
-    look_filterers = [implicit_transform_filterer, transform_filterer]
-    data.looks = multi_filters(data.looks, look_filterers)
-    logger.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
-
-    view_transform_filterers = [
+    # "Looks" Filtering
+    # =================
+    any_look_filterers = [
         implicit_transform_filterer,
         transform_filterer,
+        *additional_filterers["any"].get("look_filterers", []),
     ]
-    data.view_transforms = multi_filters(data.view_transforms, view_transform_filterers)
-    logger.info(
+    data.looks = filter_any(data.looks, any_look_filterers)
+    all_look_filterers = [*additional_filterers["all"].get("look_filterers", [])]
+    data.looks = filter_all(data.looks, all_look_filterers)
+    LOGGER.info('Filtered "Look" transforms: %s ', [a["name"] for a in data.looks])
+
+    # "View Transform" Filtering
+    # ==========================
+    any_view_transform_filterers = [
+        implicit_transform_filterer,
+        transform_filterer,
+        *additional_filterers["any"].get("view_transform_filterers", []),
+    ]
+    data.view_transforms = filter_any(
+        data.view_transforms, any_view_transform_filterers
+    )
+    all_view_transform_filterers = [
+        *additional_filterers["all"].get("view_transform_filterers", [])
+    ]
+    data.view_transforms = filter_all(
+        data.view_transforms, all_view_transform_filterers
+    )
+    LOGGER.info(
         'Filtered "View" transforms: %s.',
         [a["name"] for a in data.view_transforms],
     )
 
-    # Views Filtering
+    # "Views & Shared Views" Filtering
+    # ================================
     display_names = [
         a["name"] for a in data.colorspaces if a.get("family") == "Display"
     ]
@@ -1039,27 +1102,72 @@ def generate_config_cg(
 
         return False
 
-    shared_view_filterers = [implicit_view_filterer, view_filterer]
-    data.shared_views = multi_filters(data.shared_views, shared_view_filterers)
-    logger.info(
+    # "Shared Views" Filtering
+    # ========================
+    any_shared_view_filterers = [
+        implicit_view_filterer,
+        view_filterer,
+        *additional_filterers["any"].get("shared_view_filterers", []),
+    ]
+    data.shared_views = filter_any(data.shared_views, any_shared_view_filterers)
+    all_shared_view_filterers = [
+        *additional_filterers["all"].get("shared_view_filterers", [])
+    ]
+    data.shared_views = filter_all(data.shared_views, all_shared_view_filterers)
+    LOGGER.info(
         'Filtered shared "View(s)": %s.',
         [a["view"] for a in data.shared_views],
     )
 
-    view_filterers = [implicit_view_filterer, view_filterer]
-    data.views = multi_filters(data.views, view_filterers)
-    logger.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
+    any_view_filterers = [
+        implicit_view_filterer,
+        view_filterer,
+        *additional_filterers["any"].get("view_filterers", []),
+    ]
+    data.views = filter_any(data.views, any_view_filterers)
+    all_view_filterers = [*additional_filterers["all"].get("view_filterers", [])]
+    data.views = filter_all(data.views, all_view_filterers)
+    LOGGER.info('Filtered "View(s)": %s.', [a["view"] for a in data.views])
 
-    # Active Displays Filtering
+    # "Active Displays" Filtering
+    # ===========================
     data.active_displays = [a for a in data.active_displays if a in display_names]
-    logger.info("Filtered active displays: %s.", data.active_displays)
+    LOGGER.info("Filtered active displays: %s.", data.active_displays)
 
-    # Active Views Filtering
+    # "Active Views" Filtering
+    # ========================
     views = [view["view"] for view in data.views]
     data.active_views = [view for view in data.active_views if view in views]
-    logger.info("Filtered active views: %s.", data.active_views)
+    LOGGER.info("Filtered active views: %s.", data.active_views)
 
     # CLF Transforms & BuiltinTransform Creation
+    # ==========================================
+    def remove_existing_colorspace(name):
+        """Remove given existing *ColorSpace* from the current config data."""
+
+        for i, colorspace in enumerate(data.colorspaces[:]):
+            if colorspace["name"] == name:
+                LOGGER.info(
+                    'Removing existing "%s" "ColorSpace" transform from '
+                    "current config data.",
+                    name,
+                )
+
+                data.colorspaces.pop(i)
+
+    def remove_existing_named_transform(name):
+        """Remove given existing *NamedTransform* from the current config data."""
+
+        for i, named_transform in enumerate(data.named_transforms[:]):
+            if named_transform["name"] == name:
+                LOGGER.info(
+                    'Removing existing "%s" "NamedTransform" transform from '
+                    "current config data.",
+                    name,
+                )
+
+                data.named_transforms.pop(i)
+
     for transform_data in yield_from_config_mapping():
         # Inherited from the "Reference" config.
         if (
@@ -1089,26 +1197,32 @@ def generate_config_cg(
             )
 
             if transform_data["interface"] == "ColorSpace":
-                logger.info(
+                LOGGER.info(
                     'Creating a "Colorspace" transform for "%s" style...',
                     style,
                 )
 
                 colorspace = style_to_colorspace(**kwargs)
                 colorspace["transforms_data"] = [transform_data]
+
+                remove_existing_colorspace(colorspace["name"])
+
                 data.colorspaces.append(colorspace)
             elif transform_data["interface"] == "NamedTransform":
-                logger.info(
+                LOGGER.info(
                     'Creating a "NamedTransform" transform for "%s" style...',
                     style,
                 )
 
-                colorspace = style_to_named_transform(**kwargs)
-                colorspace["transforms_data"] = [transform_data]
-                data.named_transforms.append(colorspace)
+                named_transform = style_to_named_transform(**kwargs)
+                named_transform["transforms_data"] = [transform_data]
+
+                remove_existing_named_transform(named_transform["name"])
+
+                data.named_transforms.append(named_transform)
 
             if style and clf_transform_id:
-                logger.warning(
+                LOGGER.warning(
                     '"%s" style was defined along side a "CTLtransformID", '
                     "hybrid transform generation was used!",
                     style,
@@ -1126,37 +1240,37 @@ def generate_config_cg(
             kwargs["clf_transform"] = clf_transform
 
             if transform_data["interface"] == "NamedTransform":
-                logger.info(
+                LOGGER.info(
                     'Adding "%s" "CLF" transform as a "Named" transform.',
                     clf_transform_id,
                 )
 
                 named_transform = clf_transform_to_named_transform(**kwargs)
                 named_transform["transforms_data"] = [transform_data]
+
+                remove_existing_named_transform(named_transform["name"])
+
                 data.named_transforms.append(named_transform)
             else:
-                logger.info(
+                LOGGER.info(
                     'Adding "%s" "CLF" transform as a "Colorspace" transform.',
                     clf_transform_id,
                 )
 
                 colorspace = clf_transform_to_colorspace(**kwargs)
                 colorspace["transforms_data"] = [transform_data]
+
+                remove_existing_colorspace(colorspace["name"])
+
                 data.colorspaces.append(colorspace)
 
-    # Reordering the "Raw" colorspace for aesthetics.
-    data.colorspaces.extend(
-        data.colorspaces.pop(i)
-        for i, a in enumerate(data.colorspaces[:])
-        if a["name"] == "Raw"
-    )
-
     # Inactive Colorspaces Filtering
+    # ==============================
     colorspace_named_transform_names = [a["name"] for a in data.colorspaces]
     inactive_colorspaces = []
     for colorspace in data.inactive_colorspaces:
         if colorspace not in colorspace_named_transform_names:
-            logger.info('Removing "%s" inactive colorspace.', colorspace)
+            LOGGER.info('Removing "%s" inactive colorspace.', colorspace)
             continue
 
         inactive_colorspaces.append(colorspace)
@@ -1170,11 +1284,12 @@ def generate_config_cg(
     ]
 
     # Roles Filtering & Update
+    # ========================
     for role in (
         # A config contains multiple possible "Rendering" color spaces.
         ocio.ROLE_RENDERING,
     ):
-        logger.info('Removing "%s" role.', role)
+        LOGGER.info('Removing "%s" role.', role)
 
         data.roles.pop(role)
 
@@ -1196,13 +1311,32 @@ def generate_config_cg(
         }
     )
 
-    data.profile_version = dependency_versions.ocio
+    # Ordering
+    # ========
+    def ordering(element):
+        """Return the ordering key for given element."""
+
+        return int(
+            next(iter(element.get("transforms_data", [{"ordering": 0}])))["ordering"]
+        )
+
+    data.colorspaces = sorted(data.colorspaces, key=ordering)
+    data.colorspaces.extend(
+        data.colorspaces.pop(i)
+        for i, a in enumerate(data.colorspaces[:])
+        if a["name"] == "Raw"
+    )
+    data.named_transforms = sorted(data.named_transforms, key=ordering)
+    data.view_transforms = sorted(data.view_transforms, key=ordering)
+    data.looks = sorted(data.looks, key=ordering)
+
+    data.profile_version = build_configuration.ocio
 
     config = generate_config(data, config_name, validate)
 
-    logger.info(
+    LOGGER.info(
         '"%s" config generation complete!',
-        config_name_cg(dependency_versions),
+        config_name_cg(build_configuration),
     )
 
     if additional_data:
@@ -1211,21 +1345,32 @@ def generate_config_cg(
         return config
 
 
-if __name__ == "__main__":
-    from opencolorio_config_aces import serialize_config_data
-    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+def main(build_directory):
+    """
+    Define the main entry point for the generation of all the *ACES* Computer
+    Graphics (CG) *OpenColorIO* config versions and variants.
 
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.INFO)
+    Parameters
+    ----------
+    build_directory : Path
+        Build directory.
 
-    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "cg").resolve()
+    Returns
+    -------
+    :class:`int`
+        Return code.
+    """
 
     logging.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
-    for dependency_versions in DEPENDENCY_VERSIONS:
-        config_basename = config_basename_cg(dependency_versions)
+    for build_configuration in BUILD_CONFIGURATIONS:
+        # Only building the D65 variant of the CG config.
+        if build_configuration.variant in ("D60 Views", "All Views"):
+            continue
+
+        config_basename = config_basename_cg(build_configuration)
         (
             config,
             data,
@@ -1234,11 +1379,11 @@ if __name__ == "__main__":
             amf_components,
         ) = generate_config_cg(
             config_name=build_directory / config_basename,
-            dependency_versions=dependency_versions,
+            build_configuration=build_configuration,
+            additional_filterers=BUILD_VARIANT_FILTERERS[build_configuration.variant],
             additional_data=True,
         )
-        # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
-        # versions.
+
         try:
             serialize_config_data(
                 data, build_directory / config_basename.replace("ocio", "json")
@@ -1246,15 +1391,16 @@ if __name__ == "__main__":
         except TypeError as error:
             logging.critical(error)
 
-        if dependency_versions.ocio.minor <= 3:
-            config = ocio.Config.CreateFromFile(  # pyright:ignore
-                str(build_directory / config_basename)
-            )
-            view_transforms = list(config.getViewTransforms())
-            view_transforms = [view_transforms[-1], *view_transforms[:-1]]
-            config.clearViewTransforms()
-            for view_transform in view_transforms:
-                config.addViewTransform(view_transform)
+    return 0
 
-            with open(build_directory / config_basename, "w") as file:
-                file.write(config.serialize())
+
+if __name__ == "__main__":
+    import sys
+
+    from opencolorio_config_aces import serialize_config_data
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
+    sys.exit(main((ROOT_BUILD_DEFAULT / "config" / "aces" / "cg").resolve()))

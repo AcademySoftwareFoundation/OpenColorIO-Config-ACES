@@ -17,8 +17,20 @@ Version Utilities
 
     PROFILE_VERSION_DEFAULT
     SUPPORTED_PROFILE_VERSIONS
-    DependencyVersions
-    DEPENDENCY_VERSIONS
+
+Build Configuration Utilities
+-----------------------------
+
+``opencolorio_config_aces``
+
+.. currentmodule:: opencolorio_config_aces
+
+.. autosummary::
+    :toctree: generated/
+
+    BuildConfiguration
+    BUILD_CONFIGURATIONS
+    BUILD_VARIANT_FILTERERS
 
 Config Generation Common Objects
 --------------------------------

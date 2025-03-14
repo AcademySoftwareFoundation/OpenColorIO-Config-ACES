@@ -106,7 +106,7 @@ VARICAM_V-Log_V-Gamut.pdf
     # Using the CSC ID here because there is a slight discrepancy between the matrix
     # coefficients of the CSC and IDT CTL and the CLF matches the CSC transform.
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:ACEScsc.Academy.VLog_VGamut_to_ACES.a1.1.0"
+        "urn:ampas:aces:transformId:v2.0:CSC.Panasonic.VLog_VGamut_to_ACES.a2.v1"
     )
 
     # Generate full transform.

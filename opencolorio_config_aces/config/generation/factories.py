@@ -26,7 +26,7 @@ import PyOpenColorIO as ocio
 from semver import Version
 
 from opencolorio_config_aces.config.generation import PROFILE_VERSION_DEFAULT
-from opencolorio_config_aces.utilities import DocstringDict, attest
+from opencolorio_config_aces.utilities import DocstringDict, attest, optional
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -50,6 +50,7 @@ __all__ = [
     "produce_transform",
 ]
 
+LOGGER = logging.getLogger(__name__)
 
 BUILTIN_TRANSFORMS = DocstringDict(
     {
@@ -74,6 +75,12 @@ BUILTIN_TRANSFORMS.update(
     }
 )
 
+for _builtin_transform, _profile in BUILTIN_TRANSFORMS.items():
+    if re.match("^ACES-OUTPUT - .*_2.0$", _builtin_transform):
+        BUILTIN_TRANSFORMS[_builtin_transform] = Version(2, 4)
+
+del _builtin_transform, _profile
+
 
 def group_transform_factory(transforms):
     """
@@ -90,7 +97,7 @@ def group_transform_factory(transforms):
         *OpenColorIO* `GroupTransform`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "GroupTransform" with the following transforms:\n%s',
         indent(pformat(locals()), "    "),
     )
@@ -167,14 +174,13 @@ def colorspace_factory(
         *OpenColorIO* colorspace.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "ColorSpace" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
     )
 
-    if bit_depth is None:
-        bit_depth = ocio.BIT_DEPTH_F32
+    bit_depth = optional(bit_depth, ocio.BIT_DEPTH_F32)
 
     if reference_space is None:
         reference_space = ocio.REFERENCE_SPACE_SCENE
@@ -297,7 +303,7 @@ def named_transform_factory(
         *OpenColorIO* `NamedTransform`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "NamedTransform" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
@@ -396,14 +402,13 @@ def view_transform_factory(
         *OpenColorIO* `ViewTransform`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "ViewTransform" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
     )
 
-    if categories is None:
-        categories = []
+    categories = optional(categories, [])
 
     if reference_space is None:
         reference_space = ocio.REFERENCE_SPACE_SCENE
@@ -483,14 +488,13 @@ def look_factory(
         *OpenColorIO* `Look`.
     """
 
-    logging.debug(
+    LOGGER.debug(
         'Producing "%s" "Look" with the following parameters:\n%s',
         name,
         indent(pformat(locals()), "    "),
     )
 
-    if process_space is None:
-        process_space = ocio.ROLE_SCENE_LINEAR
+    process_space = optional(process_space, ocio.ROLE_SCENE_LINEAR)
 
     if base_look is not None:
         if isinstance(base_look, Mapping):
@@ -541,7 +545,7 @@ def transform_factory_setter(**kwargs):
 
     kwargs.pop("transform_factory", None)
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "%s" transform with the following parameters:\n%s',
         transform.__class__.__name__,
         indent(pformat(kwargs), "    "),
@@ -581,7 +585,7 @@ def transform_factory_constructor(**kwargs):
 
     kwargs.pop("transform_factory", None)
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "%s" transform with the following parameters:\n%s',
         transform_type,
         indent(pformat(kwargs), "    "),
@@ -612,7 +616,7 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
     attest(kwargs["transform_type"] == "FileTransform")
     attest(Path(kwargs["src"]).exists())
 
-    logging.debug(
+    LOGGER.debug(
         'Producing a "FileTransform" transform with the following parameters:\n%s',
         indent(pformat(kwargs), "    "),
     )

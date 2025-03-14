@@ -89,6 +89,11 @@ PATTERNS_COLORSPACE_NAME = {
     "EI800": "(EI800)",
     "Linear Rec.709": "Linear Rec.709 (sRGB)",
     "sRGB Encoded Rec.709": "sRGB Encoded Rec.709 (sRGB)",
+    "^LogC3": "ARRI LogC3 (EI800)",
+    "^LogC4": "ARRI LogC4",
+    "AppleLog BT2020": "Apple Log",
+    "Log3G10 RWG": "Log3G10 REDWideGamutRGB",
+    "Venice S-Log3": "S-Log3 Venice",
 }
 """
 *OpenColorIO* colorspace name substitution patterns.
@@ -113,10 +118,7 @@ PATTERNS_COLORSPACE_NAME.update(
 )
 
 PATTERNS_LOOK_NAME = {
-    # TODO: Implement support for callable patterns.
-    # The following ones should be a dedicated definition/callable.
-    "BlueLightArtifactFix": "Blue Light Artifact Fix",
-    "ReferenceGamutCompress": "ACES 1.3 Reference Gamut Compression",
+    "Reference Gamut Compress": "ACES 1.3 Reference Gamut Compression",
 }
 """
 *OpenColorIO* look name substitution patterns.
@@ -177,6 +179,7 @@ PATTERNS_DISPLAY_NAME = {
     "REC.2100": "Rec.2100",
     "-Rec.": " Rec.",
     "-1000nit": "",
+    "P3-HDR": "P3 HDR",
     # Legacy Substitutions
     "dcdm": "DCDM",
     "p3": "P3",
@@ -286,8 +289,8 @@ def beautify_look_name(name):
 
     Examples
     --------
-    >>> beautify_look_name('BlueLightArtifactFix')
-    'Blue Light Artifact Fix'
+    >>> beautify_look_name('Reference Gamut Compress')
+    'ACES 1.3 Reference Gamut Compression'
     """
 
     return beautify_name(name, PATTERNS_LOOK_NAME)

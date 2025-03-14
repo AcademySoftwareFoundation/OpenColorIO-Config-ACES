@@ -14,13 +14,13 @@ import logging
 import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.config.generation import (
+    BUILD_CONFIGURATIONS,
     BUILTIN_TRANSFORMS,
-    DEPENDENCY_VERSIONS,
     PROFILE_VERSION_DEFAULT,
     SEPARATOR_BUILTIN_TRANSFORM_NAME,
     SEPARATOR_COLORSPACE_NAME,
+    BuildConfiguration,
     ConfigData,
-    DependencyVersions,
     beautify_display_name,
     beautify_name,
     colorspace_factory,
@@ -40,7 +40,6 @@ from opencolorio_config_aces.config.reference.discover.graph import (
     SEPARATOR_NODE_NAME_CTL,
 )
 from opencolorio_config_aces.config.reference.generate.config import (
-    COLORSPACE_OUTPUT_ENCODING_REFERENCE,
     COLORSPACE_SCENE_ENCODING_REFERENCE,
     ctl_transform_to_colorspace,
 )
@@ -63,9 +62,10 @@ __all__ = [
     "config_name_aces",
     "config_description_aces",
     "generate_config_aces",
+    "main",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 PATTERNS_VIEW_NAME_REFERENCE = {
     "\\(100 nits\\) dim": "",
@@ -132,13 +132,13 @@ def create_builtin_transform(style, profile_version=PROFILE_VERSION_DEFAULT):
         builtin_transform.setStyle(style)
     except (ValueError, ocio.Exception) as error:
         if isinstance(error, ValueError):
-            logger.warning(
+            LOGGER.warning(
                 '"%s" style is unavailable for "%s" profile version!',
                 style,
                 profile_version,
             )
         else:
-            logger.warning(
+            LOGGER.warning(
                 '"%s" style is either undefined using a placeholder '
                 '"FileTransform" instead!',
                 style,
@@ -190,7 +190,7 @@ def node_to_builtin_transform(
             return None
 
         verbose_path = " --> ".join(dict.fromkeys(itertools.chain.from_iterable(path)))
-        logger.debug('Creating "BuiltinTransform" with "%s" path.', verbose_path)
+        LOGGER.debug('Creating "BuiltinTransform" with "%s" path.', verbose_path)
 
         for edge in path:
             source, target = edge
@@ -216,7 +216,7 @@ def node_to_builtin_transform(
             return group_transform
 
     except NetworkXNoPath:
-        logger.debug(
+        LOGGER.debug(
             'No path to "%s" for "%s" node!',
             COLORSPACE_SCENE_ENCODING_REFERENCE,
             node,
@@ -267,15 +267,15 @@ def node_to_colorspace(
     return colorspace
 
 
-def config_basename_aces(dependency_versions):
+def config_basename_aces(build_configuration):
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method basename.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -285,19 +285,19 @@ def config_basename_aces(dependency_versions):
     """
 
     return ("reference-analytical-config_aces-{aces}_ocio-{ocio}.ocio").format(
-        **dependency_versions.to_regularised_versions()
+        **build_configuration.compact_fields()
     )
 
 
-def config_name_aces(dependency_versions):
+def config_name_aces(build_configuration):
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph*  name.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
 
     Returns
     -------
@@ -310,18 +310,18 @@ def config_name_aces(dependency_versions):
         "Academy Color Encoding System - Reference (Analytical) Config "
         "[ACES {aces}] "
         "[OCIO {ocio}]"
-    ).format(**dependency_versions.to_regularised_versions())
+    ).format(**build_configuration.compact_fields())
 
 
-def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT_UNION):
+def config_description_aces(build_configuration, describe=DescriptionStyle.SHORT_UNION):
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method description.
 
     Parameters
     ----------
-    dependency_versions: DependencyVersions
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration
+        Build configuration.
     describe : int, optional
         Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
@@ -333,7 +333,7 @@ def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT
         analytical *Graph* method description.
     """
 
-    name = config_name_aces(dependency_versions)
+    name = config_name_aces(build_configuration)
 
     underline = "-" * len(name)
 
@@ -354,7 +354,7 @@ def config_description_aces(dependency_versions, describe=DescriptionStyle.SHORT
 
 def generate_config_aces(
     config_name=None,
-    dependency_versions=DependencyVersions(),
+    build_configuration=BuildConfiguration(),
     validate=True,
     describe=DescriptionStyle.LONG_UNION,
     filterers=None,
@@ -367,16 +367,15 @@ def generate_config_aces(
     The config generation is driven entirely from the *aces-dev* conversion
     graph. The config generated, while not usable because of the missing
     *OpenColorIO* *BuiltinTransforms*, provides an exact mapping with the
-    *aces-dev* *CTL* transforms, and, for example, uses the
-    *Output Color Encoding Specification* (OCES) colourspace.
+    *aces-dev* *CTL* transforms.
 
     Parameters
     ----------
     config_name : unicode, optional
         *OpenColorIO* config file name, if given the config will be written to
         disk.
-    dependency_versions: DependencyVersions, optional
-        Dependency versions, e.g., *aces-dev*, *colorspaces*, and *OpenColorIO*.
+    build_configuration: BuildConfiguration, optional
+        Build configuration.
     validate : bool, optional
         Whether to validate the config.
     describe : int, optional
@@ -399,7 +398,7 @@ def generate_config_aces(
         instances.
     """
 
-    logger.info('Generating "%s" config...', config_name_aces(dependency_versions))
+    LOGGER.info('Generating "%s" config...', config_name_aces(build_configuration))
 
     ctl_transforms = discover_aces_ctl_transforms()
     classified_ctl_transforms = classify_aces_ctl_transforms(ctl_transforms)
@@ -420,15 +419,6 @@ def generate_config_aces(
         description='The "Academy Color Encoding System" reference colorspace.',
     )
 
-    display_reference_colorspace = colorspace_factory(
-        f"CSC - {COLORSPACE_OUTPUT_ENCODING_REFERENCE}",
-        "ACES",
-        description='The "Output Color Encoding Specification" colorspace.',
-        from_reference=node_to_builtin_transform(
-            graph, COLORSPACE_OUTPUT_ENCODING_REFERENCE, "Reverse"
-        ),
-    )
-
     raw_colorspace = colorspace_factory(
         "Utility - Raw",
         "Utility",
@@ -438,24 +428,20 @@ def generate_config_aces(
 
     colorspaces += [
         scene_reference_colorspace,
-        display_reference_colorspace,
         raw_colorspace,
     ]
 
-    logger.info('Implicit colorspaces: "%s"', [a.getName() for a in colorspaces])
+    LOGGER.info('Implicit colorspaces: "%s"', [a.getName() for a in colorspaces])
 
     for family in ("csc", "input_transform", "lmt", "output_transform"):
         family_colourspaces = []
         for node in filter_nodes(graph, [lambda x, family=family: x.family == family]):
-            if node in (
-                COLORSPACE_SCENE_ENCODING_REFERENCE,
-                COLORSPACE_OUTPUT_ENCODING_REFERENCE,
-            ):
+            if node == COLORSPACE_SCENE_ENCODING_REFERENCE:
                 continue
 
-            logger.info('Creating a colorspace for "%s" node...', node)
+            LOGGER.info('Creating a colorspace for "%s" node...', node)
             colorspace = node_to_colorspace(
-                graph, node, dependency_versions.ocio, describe
+                graph, node, build_configuration.ocio, describe
             )
 
             family_colourspaces.append(colorspace)
@@ -490,7 +476,7 @@ def generate_config_aces(
 
     for display_name in display_names:
         view = beautify_view_name(raw_colorspace.getName())
-        logger.info('Adding "%s" view to "%s" display.', view, display_name)
+        LOGGER.info('Adding "%s" view to "%s" display.', view, display_name)
         views.append(
             {
                 "display": display_name,
@@ -500,8 +486,8 @@ def generate_config_aces(
         )
 
     data = ConfigData(
-        name=config_basename_aces(dependency_versions),
-        description=config_description_aces(dependency_versions, describe),
+        name=config_basename_aces(build_configuration),
+        description=config_description_aces(build_configuration, describe),
         roles={
             ocio.ROLE_SCENE_LINEAR: "CSC - ACEScg",
         },
@@ -510,14 +496,14 @@ def generate_config_aces(
         active_displays=display_names,
         active_views=list(dict.fromkeys([view["view"] for view in views])),
         file_rules=[{"name": "Default", "colorspace": "CSC - ACEScg"}],
-        profile_version=dependency_versions.ocio,
+        profile_version=build_configuration.ocio,
     )
 
     config = generate_config(data, config_name, validate)
 
-    logger.info(
+    LOGGER.info(
         '"%s" config generation complete!',
-        config_name_aces(dependency_versions),
+        config_name_aces(build_configuration),
     )
 
     if additional_data:
@@ -526,29 +512,37 @@ def generate_config_aces(
         return config
 
 
-if __name__ == "__main__":
-    from opencolorio_config_aces import serialize_config_data
-    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+def main(build_directory):
+    """
+    Define the main entry point for the generation using the analytical *Graph*
+    method of all the *aces-dev* reference implementation *OpenColorIO* config
+    versions and variants.
 
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.INFO)
+    Parameters
+    ----------
+    build_directory : Path
+        Build directory.
 
-    build_directory = (ROOT_BUILD_DEFAULT / "config" / "aces" / "analytical").resolve()
+    Returns
+    -------
+    :class:`int`
+        Return code.
+    """
 
-    logger.info('Using "%s" build directory...', build_directory)
+    LOGGER.info('Using "%s" build directory...', build_directory)
 
     build_directory.mkdir(parents=True, exist_ok=True)
 
-    for dependency_versions in DEPENDENCY_VERSIONS:
-        config_basename = config_basename_aces(dependency_versions)
+    for build_configuration in BUILD_CONFIGURATIONS:
+        config_basename = config_basename_aces(build_configuration)
         config, data, colorspaces = generate_config_aces(
             config_name=build_directory / config_basename,
-            dependency_versions=dependency_versions,
+            build_configuration=build_configuration,
             additional_data=True,
         )
 
         for ctl_transform in colorspaces.values():
-            logger.info(ctl_transform.aces_transform_id)
+            LOGGER.info(ctl_transform.aces_transform_id)
 
         # TODO: Pickling "PyOpenColorIO.ColorSpace" fails on early "PyOpenColorIO"
         # versions.
@@ -557,4 +551,18 @@ if __name__ == "__main__":
                 data, build_directory / config_basename.replace("ocio", "json")
             )
         except TypeError as error:
-            logger.critical(error)
+            LOGGER.critical(error)
+
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+
+    from opencolorio_config_aces import serialize_config_data
+    from opencolorio_config_aces.utilities import ROOT_BUILD_DEFAULT
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+
+    sys.exit(main((ROOT_BUILD_DEFAULT / "config" / "aces" / "analytical").resolve()))

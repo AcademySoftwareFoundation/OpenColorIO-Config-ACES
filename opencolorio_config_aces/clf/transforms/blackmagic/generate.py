@@ -238,8 +238,8 @@ DaVinci_Resolve_17_Wide_Gamut_Intermediate.pdf?_v=1607414410000
     # This transform is not yet part of aces-dev, but an ID will be needed for AMF.
     # Proposing the following ID:
     aces_transform_id = (
-        "urn:ampas:aces:transformId:v1.5:"
-        "ACEScsc.Academy.DaVinci_Intermediate_WideGamut_to_ACES.a1.v1"
+        "urn:ampas:aces:transformId:v2.0:"
+        "CSC.Blackmagic.DaVinci_Intermediate_WideGamut_to_ACES.a2.v1"
     )
 
     # Generate full transform.

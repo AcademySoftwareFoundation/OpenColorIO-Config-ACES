@@ -30,6 +30,7 @@ from semver import Version
 from opencolorio_config_aces.utilities import (
     attest,
     message_box,
+    optional,
     paths_common_ancestor,
     vivified_to_dict,
 )
@@ -68,10 +69,9 @@ __all__ = [
     "generate_amf_components",
 ]
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
-
-URN_CTL = "urn:ampas:aces:transformId:v1.5"
+URN_CTL = "urn:ampas:aces:transformId:v2.0"
 """
 *ACES* Uniform Resource Name (*URN*).
 
@@ -91,8 +91,8 @@ SEPARATOR_ID_CTL = "."
 *ACEStransformID* separator used to tokenize the *ID* part of the
 *ACEStransformID*.
 
-urn:ampas:aces:transformId:v1.5:ODT.Academy.DCDM.a1.0.3
-|-------------URN-------------|:|----------ID---------|
+urn:ampas:aces:transformId:v2.0:CSC.Academy.ACES_to_ACEScc.a2.v1
+|-------------URN-------------|:|--------------ID--------------|
 
 SEPARATOR_ID_CTL : unicode
 """
@@ -112,18 +112,12 @@ NAMESPACE_CTL : unicode
 """
 
 TRANSFORM_TYPES_CTL = [
-    "ACEScsc",
-    "ACESlib",
-    "ACESutil",
-    "IDT",
-    "InvLMT",
-    "InvODT",
-    "InvRRT",
-    "InvRRTODT",
-    "LMT",
-    "ODT",
-    "RRT",
-    "RRTODT",
+    "CSC",
+    "Lib",
+    "Look",
+    "InvLook",
+    "Output",
+    "InvOutput",
 ]
 """
 *ACES* *CTL* transform types.
@@ -132,14 +126,10 @@ TRANSFORM_TYPES_CTL : list
 """
 
 TRANSFORM_FAMILIES_CTL = {
-    "csc": "csc",
-    "idt": "input_transform",
-    "lib": "lib",
-    "lmt": "lmt",
-    "odt": "output_transform",
-    "outputTransform": "output_transform",
-    "rrt": "rrt",
-    "utilities": "utility",
+    "aces-core": "lib",
+    "aces-input-and-colorspaces": "csc",
+    "aces-look": "look",
+    "aces-output": "output",
 }
 """
 *ACES* *CTL* transform families mapping the *CTL* transform directories to
@@ -229,52 +219,34 @@ def patch_invalid_aces_transform_id(aces_transform_id):
     -------
     unicode
         Patched *ACEStransformID*.
-
-    Notes
-    -----
-    -   Fixed by https://github.com/scottdyer/aces-dev/\
-commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
-        - https://github.com/ampas/aces-dev/issues/118
-        - https://github.com/ampas/aces-dev/pull/119
     """
 
-    # Addressed with https://github.com/scottdyer/aces-dev/
-    # commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
-    if False:
+    if True:
         invalid_id = aces_transform_id
-        if not aces_transform_id.startswith(URN_CTL):
-            logger.warning('"%s" is missing "ACES" URN!', invalid_id)
 
-            aces_transform_id = f"{URN_CTL}:{aces_transform_id}"
-
-        if "Academy.P3D65_108nits_7.2nits_ST2084" in aces_transform_id:
-            logger.warning('"%s" has an invalid separator in "7.2nits"!', invalid_id)
-
-            aces_transform_id = aces_transform_id.replace("7.2", "7")
-        elif "P3D65_709limit_48nits" in aces_transform_id:
-            logger.warning('"%s" is inconsistently named!', invalid_id)
-
-            aces_transform_id = aces_transform_id.replace(
-                "P3D65_709limit_48nits", "P3D65_Rec709limited_48nits"
+        if "transformID" in invalid_id:
+            LOGGER.critical(
+                '"%s" urn is incorrect, "transformID" should be "transformId"!',
+                invalid_id,
             )
-        elif "Rec2020_100nits.a1.1.0" in aces_transform_id:
-            logger.warning('"%s" is incorrectly named!', invalid_id)
 
-            aces_transform_id = aces_transform_id.replace(
-                "Rec2020_100nits", "Rec2020_P3D65limited_100nits_dim"
+            aces_transform_id = invalid_id.replace("transformID", "transformId")
+
+        if "LogCv3" in invalid_id:
+            LOGGER.critical(
+                '"%s" urn is incorrect, "LogCv3" should be "LogC3"!',
+                invalid_id,
             )
-        elif "ACEScsc" in aces_transform_id:
-            if "ACEScsc.Academy" not in aces_transform_id:
-                logger.warning('"%s" is missing "Academy" namespace!', invalid_id)
 
-                aces_transform_id = aces_transform_id.replace(
-                    "ACEScsc", "ACEScsc.Academy"
-                )
+            aces_transform_id = invalid_id.replace("LogCv3", "LogC3")
 
-            if aces_transform_id.endswith("a1.v1"):
-                logger.warning('"%s" version scheme is invalid!', invalid_id)
+        if "LogCv4" in invalid_id:
+            LOGGER.critical(
+                '"%s" urn is incorrect, "LogCv4" should be "LogC4"!',
+                invalid_id,
+            )
 
-                aces_transform_id = aces_transform_id.replace("a1.v1", "a1.1.0")
+            aces_transform_id = invalid_id.replace("LogCv4", "LogC4")
 
     return aces_transform_id
 
@@ -282,7 +254,7 @@ commit/4b88ef35afc41e58ea52d9acde68af24e75b58c5
 ROOT_TRANSFORMS_CTL = os.path.normpath(
     os.environ.get(
         "OPENCOLORIO_CONFIG_CTL__CTL_TRANSFORMS_ROOT",
-        os.path.join(os.path.dirname(__file__), "../", "aces-dev", "transforms", "ctl"),
+        os.path.join(os.path.dirname(__file__), "../", "aces-system"),
     )
 )
 """
@@ -604,6 +576,7 @@ class ACESTransformID:
         aces_transform_id = patch_invalid_aces_transform_id(self._aces_transform_id)
 
         self._urn, components = aces_transform_id.rsplit(SEPARATOR_URN_CTL, 1)
+
         components = components.split(SEPARATOR_ID_CTL)
         self._type, components = components[0], components[1:]
 
@@ -613,39 +586,16 @@ class ACESTransformID:
         )
 
         attest(
-            len(components) in (3, 4, 5),
+            len(components) == 4,
             f'{self._aces_transform_id} is an invalid "ACEStransformID"!',
         )
 
-        if len(components) == 3:
-            (
-                self._major_version,
-                self._minor_version,
-                self._patch_version,
-            ) = components
-        elif len(components) == 4:
-            if self._type in ("ACESlib", "ACESutil"):
-                (
-                    self._name,
-                    self._major_version,
-                    self._minor_version,
-                    self._patch_version,
-                ) = components
-            elif self._type == "IDT":
-                (
-                    self._namespace,
-                    self._name,
-                    self._major_version,
-                    self._minor_version,
-                ) = components
-        else:
-            (
-                self._namespace,
-                self._name,
-                self._major_version,
-                self._minor_version,
-                self._patch_version,
-            ) = components
+        (
+            self._namespace,
+            self._name,
+            self._major_version,
+            self._minor_version,
+        ) = components
 
         attest(
             self._type in TRANSFORM_TYPES_CTL,
@@ -653,8 +603,11 @@ class ACESTransformID:
         )
 
         if self._name is not None:
-            if self._type == "ACEScsc":
-                source, target = self._name.split("_to_")
+            if self._type == "CSC":
+                if "Unity" in self._name:
+                    source, target = "ACES", "ACES"
+                else:
+                    source, target = self._name.split("_to_")
 
                 if source == "ACES":
                     source = "ACES2065-1"
@@ -663,23 +616,12 @@ class ACESTransformID:
                     target = "ACES2065-1"
 
                 self._source, self._target = source, target
-            elif self._type in ("IDT", "LMT"):
-                self._source, self._target = self._name, "ACES2065-1"
-            elif self._type == "InvLMT":
+            elif self._type in ("Look", "InvLook"):
+                self._source, self._target = "ACES2065-1", "ACES2065-1"
+            elif self._type == "Output":
                 self._source, self._target = "ACES2065-1", self._name
-            elif self._type == "ODT":
-                self._source, self._target = "OCES", self._name
-            elif self._type == "InvODT":
-                self._source, self._target = self._name, "OCES"
-            elif self._type == "RRTODT":
-                self._source, self._target = "ACES2065-1", self._name
-            elif self._type == "InvRRTODT":
+            elif self._type == "InvOutput":
                 self._source, self._target = self._name, "ACES2065-1"
-        else:  # noqa: PLR5501
-            if self._type == "RRT":
-                self._source, self._target = "ACES2065-1", "OCES"
-            elif self._type == "InvRRT":
-                self._source, self._target = "OCES", "ACES2065-1"
 
 
 class CTLTransform:
@@ -719,8 +661,7 @@ class CTLTransform:
     """
 
     def __init__(self, path, family=None, genus=None, siblings=None):
-        if siblings is None:
-            siblings = []
+        siblings = optional(siblings, [])
 
         self._path = os.path.abspath(os.path.normpath(path))
 
@@ -973,6 +914,8 @@ CTLTransform` class are tried on the underlying
     def _parse(self):
         """Parse the *ACES* *CTL* transform."""
 
+        LOGGER.info('Parsing "%s" CTL transform...', self._path)
+
         with open(self._path) as ctl_file:
             self._code = ctl_file.read()
 
@@ -1182,6 +1125,10 @@ def find_ctl_transform_pairs(ctl_transforms):
 
         basename = basename.replace("ACES_to_", "")
 
+        LOGGER.debug(
+            'Is "%s" CTL transform is forward? "%s"', ctl_transform, is_forward
+        )
+
         if is_forward:
             ctl_transform_pairs[basename]["forward_transform"] = ctl_transform
         else:
@@ -1216,10 +1163,11 @@ def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
     >>> ctl_transforms = discover_aces_ctl_transforms()
     >>> key = sorted(ctl_transforms.keys())[0]
     >>> os.path.basename(key)
-    'ACEScc'
+    'lib'
     >>> sorted([os.path.basename(path) for path in ctl_transforms[key]])
-    ['ACEScsc.Academy.ACES_to_ACEScc.ctl', \
-'ACEScsc.Academy.ACEScc_to_ACES.ctl']
+    ['Lib.Academy.ColorSpaces.ctl', 'Lib.Academy.DisplayEncoding.ctl', \
+'Lib.Academy.OutputTransform.ctl', 'Lib.Academy.Tonescale.ctl', \
+'Lib.Academy.Utilities.ctl']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1235,7 +1183,7 @@ def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
 
             ctl_transform = os.path.join(directory, filename)
 
-            logger.debug(
+            LOGGER.debug(
                 '"%s" CTL transform was found!',
                 ctl_transform_relative_path(ctl_transform),
             )
@@ -1282,13 +1230,13 @@ def classify_aces_ctl_transforms(unclassified_ctl_transforms):
     'csc'
     >>> genera = sorted(ctl_transforms[family])
     >>> print(genera)
-    ['ACEScc', 'ACEScct', 'ACEScg', 'ACESproxy', 'ADX', 'arri', \
-'blackmagic_design', 'canon', 'panasonic', 'red', 'sony']
+    ['ACEScc', 'ACEScct', 'ACEScg', 'ACESproxy', 'ADX', 'apple', 'arri', \
+'blackmagic_design', 'canon', 'dji', 'panasonic', 'red', 'sony', 'unity']
     >>> genus = genera[0]
     >>> sorted(ctl_transforms[family][genus].items())  # doctest: +ELLIPSIS
-    [('ACEScsc.Academy.ACEScc', CTLTransformPair(\
-CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')', \
-CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
+    [('CSC.Academy.ACEScc', CTLTransformPair(CTLTransform(\
+'aces-input-and-colorspaces...ACEScc...CSC.Academy.ACES_to_ACEScc.ctl')', \
+CTLTransform('aces-input-and-colorspaces...ACEScc...CSC.Academy.ACEScc_to_ACES.ctl')'))]
     """
 
     classified_ctl_transforms = defaultdict(lambda: defaultdict(dict))
@@ -1309,7 +1257,7 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
             if len(pairs) == 1:
                 ctl_transform = CTLTransform(next(iter(pairs.values())), family, genus)
 
-                logger.debug('Classifying "%s" under "%s".', ctl_transform, genus)
+                LOGGER.debug('Classifying "%s" under "%s".', ctl_transform, genus)
 
                 classified_ctl_transforms[family][genus][basename] = ctl_transform
 
@@ -1328,7 +1276,7 @@ CTLTransform('csc...ACEScc...ACEScsc.Academy.ACEScc_to_ACES.ctl')'))]
                     forward_ctl_transform, inverse_ctl_transform
                 )
 
-                logger.debug('Classifying "%s" under "%s".', ctl_transform, genus)
+                LOGGER.debug('Classifying "%s" under "%s".', ctl_transform, genus)
 
                 classified_ctl_transforms[family][genus][basename] = ctl_transform
 
@@ -1359,7 +1307,7 @@ def unclassify_ctl_transforms(classified_ctl_transforms):
     ...     discover_aces_ctl_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
     ...     unclassify_ctl_transforms(ctl_transforms), key=lambda x: x.path)[0]
-    CTLTransform('csc...ACEScc...ACEScsc.Academy.ACES_to_ACEScc.ctl')
+    CTLTransform('aces-core...lib...Lib.Academy.ColorSpaces.ctl')
     """
 
     unclassified_ctl_transforms = []
@@ -1408,13 +1356,13 @@ def filter_ctl_transforms(ctl_transforms, filterers=None):
     >>> ctl_transforms = classify_aces_ctl_transforms(
     ...     discover_aces_ctl_transforms())
     >>> sorted(  # doctest: +ELLIPSIS
-    ...     filter_ctl_transforms(ctl_transforms, [lambda x: x.genus == 'p3']),
+    ...     filter_ctl_transforms(ctl_transforms, [lambda x: x.genus == "d65/p3"]),
     ...     key=lambda x: x.path)[0]
-    CTLTransform('odt...p3...InvODT.Academy.P3D60_48nits.ctl')
+    CTLTransform('aces-output...d65...p3...InvOutput.Academy.\
+P3-D65_1000nit_in_P3-D65_ST2084.ctl')
     """
 
-    if filterers is None:
-        filterers = TRANSFORM_FILTERERS_DEFAULT_CTL
+    filterers = optional(filterers, TRANSFORM_FILTERERS_DEFAULT_CTL)
 
     if isinstance(ctl_transforms, Mapping):
         ctl_transforms = unclassify_ctl_transforms(ctl_transforms)
@@ -1452,34 +1400,39 @@ reference.ROOT_TRANSFORMS_CTL` attribute using the
     )
 
     for family, genera in classified_ctl_transforms.items():
-        message_box(family, print_callable=logger.info)
+        message_box(family, print_callable=LOGGER.info)
         for genus, ctl_transforms in genera.items():
-            logger.info("[ %s ]", genus)
+            LOGGER.info("[ %s ]", genus)
             for name, ctl_transform in ctl_transforms.items():
-                logger.info("\t( %s )", name)
+                LOGGER.info("\t( %s )", name)
                 if isinstance(ctl_transform, CTLTransform):
-                    logger.info(
-                        '\t\t"%s" --> "%s"',
-                        ctl_transform.source,
-                        ctl_transform.target,
-                    )
-                    logger.info(
+                    LOGGER.info(
                         '\t\tACEStransformID : "%s"',
                         ctl_transform.aces_transform_id.aces_transform_id,
                     )
-                elif isinstance(ctl_transform, CTLTransformPair):
-                    logger.info(
-                        '\t\t"%s" <--> "%s"',
-                        ctl_transform.forward_transform.source,
-                        ctl_transform.inverse_transform.target,
+                    LOGGER.info(
+                        '\t\t\t"%s" --> "%s"',
+                        ctl_transform.source,
+                        ctl_transform.target,
                     )
-                    logger.info(
+                elif isinstance(ctl_transform, CTLTransformPair):
+                    LOGGER.info(
                         '\t\tACEStransformID : "%s"',
                         ctl_transform.forward_transform.aces_transform_id.aces_transform_id,
                     )
-                    logger.info(
+                    LOGGER.info(
+                        '\t\t\t"%s" --> "%s"',
+                        ctl_transform.forward_transform.source,
+                        ctl_transform.forward_transform.target,
+                    )
+                    LOGGER.info(
                         '\t\tACEStransformID : "%s"',
                         ctl_transform.inverse_transform.aces_transform_id.aces_transform_id,
+                    )
+                    LOGGER.info(
+                        '\t\t\t"%s" --> "%s"',
+                        ctl_transform.inverse_transform.source,
+                        ctl_transform.inverse_transform.target,
                     )
 
 
@@ -1545,7 +1498,7 @@ def generate_amf_components(ctl_transforms, raise_exception=False):
                 if raise_exception:
                     attest(False, exception_message)
                 else:
-                    logger.critical(exception_message)
+                    LOGGER.critical(exception_message)
 
     for ctl_transform in ctl_transforms:
         aces_transform_id = ctl_transform.aces_transform_id.aces_transform_id

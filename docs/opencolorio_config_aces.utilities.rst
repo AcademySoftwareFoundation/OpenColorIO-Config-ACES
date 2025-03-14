@@ -39,3 +39,5 @@ Common
     slugify
     attest
     timestamp
+    as_bool
+    optional

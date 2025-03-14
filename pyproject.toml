@@ -38,13 +38,13 @@ dependencies = [
     "semver>=3,<4",
 ]
 
-[tool.uv.sources]
-opencolorio = { index = "test-pypi" }
+# [tool.uv.sources]
+# opencolorio = { index = "test-pypi" }
 
-[[tool.uv.index]]
-name = "test-pypi"
-url = "https://test.pypi.org/simple/"
-explicit = true
+# [[tool.uv.index]]
+# name = "test-pypi"
+# url = "https://test.pypi.org/simple/"
+# explicit = true
 
 [project.optional-dependencies]
 optional = [
