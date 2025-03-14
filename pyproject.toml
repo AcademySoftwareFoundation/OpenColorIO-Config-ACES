@@ -48,7 +48,7 @@ dependencies = [
 
 [project.optional-dependencies]
 optional = [
-    "colour-science>=0.4.3",
+    "colour-science>=0.4.6",
     "jsonpickle",
     "networkx",
     "pydot",
