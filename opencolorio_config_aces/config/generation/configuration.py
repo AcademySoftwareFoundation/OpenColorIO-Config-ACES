@@ -87,19 +87,19 @@ class BuildConfiguration:
 BUILD_CONFIGURATIONS = [
     BuildConfiguration(
         aces=Version(2, 0),
-        colorspaces=Version(2, 3, 0),
+        colorspaces=Version(3, 0, 0),
         ocio=Version(2, 4),
         variant="",
     ),
     BuildConfiguration(
         aces=Version(2, 0),
-        colorspaces=Version(2, 3, 0),
+        colorspaces=Version(3, 0, 0),
         ocio=Version(2, 4),
         variant="D60 Views",
     ),
     BuildConfiguration(
         aces=Version(2, 0),
-        colorspaces=Version(2, 3, 0),
+        colorspaces=Version(3, 0, 0),
         ocio=Version(2, 4),
         variant="All Views",
     ),

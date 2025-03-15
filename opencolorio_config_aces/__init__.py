@@ -133,6 +133,7 @@ __all__ += ["generate_clf_transform"]
 
 __application_name__ = "OpenColorIO Configuration for ACES"
 
-__major_version__ = "2"
-__minor_version__ = "4"
-__version__ = f"{__major_version__}.{__minor_version__}"
+__major_version__ = "3"
+__minor_version__ = "0"
+__patch_version__ = "0"
+__version__ = f"{__major_version__}.{__minor_version__}.{__patch_version__}"
