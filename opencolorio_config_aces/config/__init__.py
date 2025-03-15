@@ -14,6 +14,7 @@ from .generation import (
 from .generation import (
     BUILTIN_TRANSFORMS,
     BUILD_CONFIGURATIONS,
+    BUILD_VARIANT_FILTERERS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
     PROFILE_VERSIONS,
@@ -58,6 +59,7 @@ __all__ = [
 __all__ += [
     "BUILTIN_TRANSFORMS",
     "BUILD_CONFIGURATIONS",
+    "BUILD_VARIANT_FILTERERS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
     "PROFILE_VERSIONS",

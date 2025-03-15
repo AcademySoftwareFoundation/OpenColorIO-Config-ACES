@@ -38,7 +38,7 @@ The *aces-dev* *CTL* reference graph can be plotted but it requires `Graphviz <h
 to be installed on the system.
 
 Docker
-------
+~~~~~~
 
 Installing the dependencies for the `previous config generator <https://github.com/imageworks/OpenColorIO-Configs>`__
 was not a trivial task. For ease of use an `aswf-docker <https://github.com/AcademySoftwareFoundation/aswf-docker>`__
@@ -59,43 +59,43 @@ Then, to run *bash* in the container::
     docker run -it -v ${PWD}:/home/aswf/OpenColorIO-Config-ACES aswf/opencolorio-config-aces:latest /bin/bash
 
 Pypi
-----
+~~~~
 
 The **OpenColorIO Configuration for ACES** package requires various
 dependencies in order to run and be able to generate the *OCIO* configurations:
 
 Primary Dependencies
-********************
+~~~~~~~~~~~~~~~~~~~~
 
--   `python >= 3.10, < 3.14 <https://www.python.org/download/releases>`__
--   `opencolorio <https://pypi.org/project/opencolorio>`__
--   `requests <https://pypi.org/project/requests>`__
--   `semver <https://pypi.org/project/semver>`__
+- `python >= 3.10, < 3.14 <https://www.python.org/download/releases>`__
+- `opencolorio <https://pypi.org/project/opencolorio>`__
+- `requests <https://pypi.org/project/requests>`__
+- `semver <https://pypi.org/project/semver>`__
 
 Optional Dependencies
-*********************
+~~~~~~~~~~~~~~~~~~~~~
 
--   `colour-science <https://pypi.org/project/colour-science>`__
--   `graphviz <https://www.graphviz.org>`__
--   `jsonpickle <https://jsonpickle.github.io>`__
--   `networkx <https://pypi.org/project/networkx>`__
--   `pydot <https://pypi.org/project/pydot>`__
+- `colour-science <https://pypi.org/project/colour-science>`__
+- `graphviz <https://www.graphviz.org>`__
+- `jsonpickle <https://jsonpickle.github.io>`__
+- `networkx <https://pypi.org/project/networkx>`__
+- `pydot <https://pypi.org/project/pydot>`__
 
 Docs Dependencies
-*****************
+~~~~~~~~~~~~~~~~~
 
--   `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
--   `sphinx <https://pypi.org/project/sphinx>`__
+- `pydata-sphinx-theme <https://pypi.org/project/pydata-sphinx-theme>`__
+- `sphinx <https://pypi.org/project/sphinx>`__
 
 Development Dependencies
-************************
+~~~~~~~~~~~~~~~~~~~~~~~~
 
--   `coverage <https://pypi.org/project/coverage>`__
--   `coveralls <https://pypi.org/project/coveralls>`__
--   `hatch <https://pypi.org/project/hatch>`__
--   `invoke <https://pypi.org/project/invoke>`__
--   `pre-commit <https://pypi.org/project/pre-commit>`__
--   `pyright <https://pypi.org/project/pyright>`__
--   `pytest <https://pypi.org/project/pytest>`__
--   `pytest-cov <https://pypi.org/project/pytest-cov>`__
--   `pytest-xdist <https://pypi.org/project/pytest-xdist>`__
+- `coverage <https://pypi.org/project/coverage>`__
+- `coveralls <https://pypi.org/project/coveralls>`__
+- `hatch <https://pypi.org/project/hatch>`__
+- `invoke <https://pypi.org/project/invoke>`__
+- `pre-commit <https://pypi.org/project/pre-commit>`__
+- `pyright <https://pypi.org/project/pyright>`__
+- `pytest <https://pypi.org/project/pytest>`__
+- `pytest-cov <https://pypi.org/project/pytest-cov>`__
+- `pytest-xdist <https://pypi.org/project/pytest-xdist>`__

@@ -32,9 +32,12 @@ from .config import (
 )
 from .config import (
     BUILTIN_TRANSFORMS,
+    BUILD_CONFIGURATIONS,
+    BUILD_VARIANT_FILTERERS,
     ConfigData,
     PROFILE_VERSION_DEFAULT,
     PROFILE_VERSIONS,
+    BuildConfiguration,
     deserialize_config_data,
     generate_config,
     serialize_config_data,
@@ -48,6 +51,7 @@ from .config import (
     discover_aces_ctl_transforms,
     filter_ctl_transforms,
     filter_nodes,
+    generate_amf_components,
     node_to_ctl_transform,
     plot_aces_conversion_graph,
     print_aces_taxonomy,
@@ -87,9 +91,12 @@ __all__ = [
 ]
 __all__ += [
     "BUILTIN_TRANSFORMS",
+    "BUILD_CONFIGURATIONS",
+    "BUILD_VARIANT_FILTERERS",
     "ConfigData",
     "PROFILE_VERSION_DEFAULT",
     "PROFILE_VERSIONS",
+    "BuildConfiguration",
     "deserialize_config_data",
     "generate_config",
     "serialize_config_data",
@@ -103,6 +110,7 @@ __all__ += [
     "discover_aces_ctl_transforms",
     "filter_ctl_transforms",
     "filter_nodes",
+    "generate_amf_components",
     "node_to_ctl_transform",
     "plot_aces_conversion_graph",
     "print_aces_taxonomy",
@@ -126,6 +134,5 @@ __all__ += ["generate_clf_transform"]
 __application_name__ = "OpenColorIO Configuration for ACES"
 
 __major_version__ = "2"
-__minor_version__ = "0"
-__change_version__ = "0"
-__version__ = ".".join((__major_version__, __minor_version__, __change_version__))
+__minor_version__ = "4"
+__version__ = f"{__major_version__}.{__minor_version__}"
