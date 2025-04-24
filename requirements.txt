@@ -22,7 +22,7 @@ docutils==0.21.2
 exceptiongroup==1.2.2 ; python_full_version < '3.11'
 execnet==2.1.1
 filelock==3.18.0
-h11==0.14.0
+h11==0.16.0
 hatch==1.14.0
 hatchling==1.27.0
 httpcore==1.0.7
