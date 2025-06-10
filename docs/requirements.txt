@@ -24,7 +24,7 @@ pydata-sphinx-theme==0.16.1
 pydot==3.0.4
 pygments==2.19.1
 pyparsing==3.2.1
-requests==2.32.3
+requests==2.32.4
 scipy==1.15.2
 semver==3.0.4
 snowballstemmer==2.2.0
