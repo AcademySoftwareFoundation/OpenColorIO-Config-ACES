@@ -7,6 +7,8 @@ Common Utilities
 Defines common utilities objects that don't fall in any specific category.
 """
 
+from __future__ import annotations
+
 import datetime
 import functools
 import logging
@@ -15,12 +17,13 @@ import re
 import subprocess
 import unicodedata
 from collections import defaultdict
+from collections.abc import Callable, Iterable
 from html.parser import HTMLParser
 from itertools import chain
 from pathlib import Path
 from pprint import PrettyPrinter
 from textwrap import TextWrapper
-from typing import TypeVar
+from typing import Any, TypeVar
 
 import requests
 
@@ -64,8 +67,8 @@ LOGGER = logging.getLogger(__name__)
 
 # Monkey-patching the "PrettyPrinter" mapping to handle the "TypeError"
 # exception raised with "instancemethod": https://bugs.python.org/issue33395
-class _dispatch(dict):
-    def get(self, key, default=None):
+class _dispatch(dict[Any, Any]):
+    def get(self, key: Any, default: Any = None) -> Any:
         try:
             return self.__get__(key, default)
         except Exception as error:  # noqa: F841, S110
@@ -74,7 +77,7 @@ class _dispatch(dict):
 
 PrettyPrinter._dispatch = _dispatch()  # pyright: ignore
 
-ROOT_BUILD_DEFAULT = (Path(__file__) / ".." / ".." / ".." / "build").resolve()
+ROOT_BUILD_DEFAULT: Path = (Path(__file__) / ".." / ".." / ".." / "build").resolve()
 """
 Default build root directory.
 
@@ -82,14 +85,14 @@ ROOT_BUILD_DEFAULT : str
 """
 
 
-class DocstringDict(dict):
+class DocstringDict(dict[str, Any]):
     """
     A :class:`dict` sub-class that allows settings a docstring to :class:`dict`
     instances.
     """
 
 
-def first_item(iterable, default=None):
+def first_item(iterable: Iterable[Any], default: Any = None) -> Any:
     """
     Return the first item of given iterable.
 
@@ -115,7 +118,7 @@ def first_item(iterable, default=None):
     return None
 
 
-def common_ancestor(*args):
+def common_ancestor(*args: Any) -> Any:
     """
     Return the common ancestor of given iterables.
 
@@ -148,7 +151,7 @@ def common_ancestor(*args):
     return ancestor
 
 
-def paths_common_ancestor(*args):
+def paths_common_ancestor(*args: str) -> str:
     """
     Return the common ancestor path from given paths.
 
@@ -174,7 +177,7 @@ def paths_common_ancestor(*args):
     return path_ancestor
 
 
-def vivification():
+def vivification() -> defaultdict[Any, Any]:
     """
     Implement supports for vivification of the underlying dict like
     data-structure, magical!
@@ -196,7 +199,9 @@ def vivification():
     return defaultdict(vivification)
 
 
-def vivified_to_dict(vivified):
+def vivified_to_dict(
+    vivified: defaultdict[Any, Any] | dict[Any, Any],
+) -> dict[Any, Any]:
     """
     Convert given vivified data-structure to dictionary.
 
@@ -222,7 +227,12 @@ def vivified_to_dict(vivified):
     return vivified
 
 
-def message_box(message, width=79, padding=3, print_callable=print):
+def message_box(
+    message: str,
+    width: int = 79,
+    padding: int = 3,
+    print_callable: Callable[[str], None] = print,
+) -> bool:
     """
     Print a message inside a box.
 
@@ -278,7 +288,7 @@ def message_box(message, width=79, padding=3, print_callable=print):
 
     ideal_width = width - padding * 2 - 2
 
-    def inner(text):
+    def inner(text: str) -> str:
         """Format and pads inner text for the message box."""
 
         return "*{0}{1}{2}{0}*".format(
@@ -303,7 +313,7 @@ def message_box(message, width=79, padding=3, print_callable=print):
     return True
 
 
-def is_colour_installed(raise_exception=False):
+def is_colour_installed(raise_exception: bool = False) -> bool:
     """
     Return if *Colour* is installed and available.
 
@@ -335,7 +345,7 @@ def is_colour_installed(raise_exception=False):
         return False
 
 
-def is_jsonpickle_installed(raise_exception=False):
+def is_jsonpickle_installed(raise_exception: bool = False) -> bool:
     """
     Return if *jsonpickle* is installed and available.
 
@@ -368,7 +378,7 @@ def is_jsonpickle_installed(raise_exception=False):
         return False
 
 
-def is_networkx_installed(raise_exception=False):
+def is_networkx_installed(raise_exception: bool = False) -> bool:
     """
     Return if *NetworkX* is installed and available.
 
@@ -400,7 +410,7 @@ def is_networkx_installed(raise_exception=False):
         return False
 
 
-REQUIREMENTS_TO_CALLABLE = DocstringDict(
+REQUIREMENTS_TO_CALLABLE: DocstringDict = DocstringDict(
     {
         "Colour": is_colour_installed,
         "jsonpickle": is_jsonpickle_installed,
@@ -415,7 +425,7 @@ _REQUIREMENTS_TO_CALLABLE : CaseInsensitiveMapping
 """
 
 
-def required(*requirements):
+def required(*requirements: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorate a function to check whether various ancillary package requirements
     are satisfied.
@@ -430,11 +440,11 @@ def required(*requirements):
     object
     """
 
-    def wrapper(function):
+    def wrapper(function: Callable[..., Any]) -> Callable[..., Any]:
         """Wrap given function wrapper."""
 
         @functools.wraps(function)
-        def wrapped(*args, **kwargs):
+        def wrapped(*args: Any, **kwargs: Any) -> Any:
             """Wrap given function."""
 
             for requirement in requirements:
@@ -447,7 +457,7 @@ def required(*requirements):
     return wrapper
 
 
-def is_string(a):
+def is_string(a: Any) -> bool:
     """
     Return if given :math:`a` variable is a *string* like variable.
 
@@ -472,7 +482,7 @@ def is_string(a):
     return isinstance(a, str)
 
 
-def is_iterable(a):
+def is_iterable(a: Any) -> bool:
     """
     Return if given :math:`a` variable is iterable.
 
@@ -497,7 +507,7 @@ def is_iterable(a):
     return is_string(a) or (bool(getattr(a, "__iter__", False)))
 
 
-def git_describe():
+def git_describe() -> str:
     """
     Describe the current *OpenColorIO Configuration for ACES* *git* version.
 
@@ -512,7 +522,7 @@ def git_describe():
     try:  # pragma: no cover
         version = subprocess.check_output(
             ["git", "describe"],  # noqa: S603, S607
-            cwd=opencolorio_config_aces.__path__[0],
+            cwd=opencolorio_config_aces.__path__[0],  # pyright: ignore
             stderr=subprocess.STDOUT,
         ).strip()
         version = version.decode("utf-8")
@@ -525,7 +535,7 @@ def git_describe():
 # TODO: Numpy currently comes via "Colour", we might want that to be an
 # explicit dependency in the future.
 @required("Colour")
-def matrix_3x3_to_4x4(M):
+def matrix_3x3_to_4x4(M: Any) -> list[float]:
     """
     Convert given 3x3 matrix :math:`M` to a raveled 4x4 matrix.
 
@@ -548,7 +558,7 @@ def matrix_3x3_to_4x4(M):
     return np.ravel(M_I).tolist()
 
 
-def multi_replace(name, patterns):
+def multi_replace(name: str, patterns: dict[str, str]) -> str:
     """
     Update given name by applying in succession the given patterns and
     substitutions.
@@ -581,10 +591,10 @@ def multi_replace(name, patterns):
 
 
 def validate_method(
-    method,
-    valid_methods,
-    message='"{0}" method is invalid, it must be one of {1}!',
-):
+    method: str,
+    valid_methods: list[str],
+    message: str = '"{0}" method is invalid, it must be one of {1}!',
+) -> str:
     """
     Validate whether given method exists in the given valid methods and
     returns the method lower cased.
@@ -623,7 +633,7 @@ def validate_method(
     return method_lower
 
 
-def google_sheet_title(url):
+def google_sheet_title(url: str) -> str:
     """
     Return the title from given *Google Sheet* url.
 
@@ -649,20 +659,24 @@ def google_sheet_title(url):
     """
 
     class Parser(HTMLParser):
-        def __init__(self):
+        def __init__(self) -> None:
             HTMLParser.__init__(self)
-            self.in_title = []
-            self.title = None
+            self.in_title: list[str] = []
+            self.title: str | None = None
 
-        def handle_starttag(self, tag, attrs):  # noqa: ARG002
+        def handle_starttag(
+            self,
+            tag: str,
+            attrs: list[tuple[str, str | None]],  # noqa: ARG002
+        ) -> None:
             if tag == "title":
                 self.in_title.append(tag)
 
-        def handle_endtag(self, tag):
+        def handle_endtag(self, tag: str) -> None:
             if tag == "title":
                 self.in_title.pop()
 
-        def handle_data(self, data):
+        def handle_data(self, data: str) -> None:
             if self.in_title:
                 self.title = data
 
@@ -672,10 +686,13 @@ def google_sheet_title(url):
     parser = Parser()
     parser.feed(requests.get(url, timeout=60).text)
 
+    if parser.title is None:
+        raise ValueError(f"Could not extract title from URL: {url}")
+
     return parser.title.rsplit("-", 1)[0].strip()
 
 
-def slugify(object_, allow_unicode=False):
+def slugify(object_: Any, allow_unicode: bool = False) -> str:
     """
     Generate a *SEO* friendly and human-readable slug from given object.
 
@@ -725,7 +742,7 @@ def slugify(object_, allow_unicode=False):
     return re.sub(r"[-\s]+", "-", value).strip("-_")
 
 
-def attest(condition, message=""):
+def attest(condition: bool, message: str = "") -> None:
     """
     Provide the `assert` statement functionality without being disabled by
     optimised Python execution.
@@ -742,7 +759,7 @@ def attest(condition, message=""):
         raise AssertionError(message)
 
 
-def timestamp():
+def timestamp() -> str:
     """
     Return a timestamp description.
 
