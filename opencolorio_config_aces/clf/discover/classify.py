@@ -54,6 +54,7 @@ __all__ = [
     "TRANSFORM_FILTERERS_DEFAULT_CLF",
     "PATTERNS_DESCRIPTION_CLF",
     "ROOT_TRANSFORMS_CLF",
+    "VALUE_DEFAULT_UNDEFINED",
     "clf_transform_relative_path",
     "CLFTransformID",
     "CLFTransform",
@@ -140,6 +141,11 @@ sub-module repository. It can be defined by setting the
 the local 'transforms/clf' directory.
 """
 
+VALUE_DEFAULT_UNDEFINED: str = "undefined"
+"""
+Default undefined value, i.e., *undefined*.
+"""
+
 
 def clf_transform_relative_path(
     path: str, root_directory: str = ROOT_TRANSFORMS_CLF
@@ -194,23 +200,23 @@ class CLFTransformID:
     __repr__
     """
 
-    def __init__(self, clf_transform_id: str) -> None:
+    def __init__(self, clf_transform_id: str = VALUE_DEFAULT_UNDEFINED) -> None:
         self._clf_transform_id: str = clf_transform_id
 
-        self._urn: str | None = None
-        self._type: str | None = None
-        self._namespace: str | None = None
-        self._name: str | None = None
-        self._major_version: str | None = None
-        self._minor_version: str | None = None
-        self._patch_version: str | None = None
-        self._source: str | None = None
-        self._target: str | None = None
+        self._urn: str = VALUE_DEFAULT_UNDEFINED
+        self._type: str = VALUE_DEFAULT_UNDEFINED
+        self._namespace: str = VALUE_DEFAULT_UNDEFINED
+        self._name: str = VALUE_DEFAULT_UNDEFINED
+        self._major_version: str = VALUE_DEFAULT_UNDEFINED
+        self._minor_version: str = VALUE_DEFAULT_UNDEFINED
+        self._patch_version: str = VALUE_DEFAULT_UNDEFINED
+        self._source: str = VALUE_DEFAULT_UNDEFINED
+        self._target: str = VALUE_DEFAULT_UNDEFINED
 
         self._parse()
 
     @property
-    def clf_transform_id(self) -> str | None:
+    def clf_transform_id(self) -> str:
         """
         Getter property for the *CLFtransformID*, e.g.,
         *urn:aswf:ocio:transformId:v1.0:ACES.OCIO.AP0_to_AP1-Gamma2pnt2.c1.v1*.
@@ -228,7 +234,7 @@ class CLFTransformID:
         return self._clf_transform_id
 
     @property
-    def urn(self) -> str | None:
+    def urn(self) -> str:
         """
         Getter property for the *CLFtransformID* Uniform Resource Name (*URN*),
         e.g., *urn:aswf:ocio:transformId:v1.0*.
@@ -246,7 +252,7 @@ class CLFTransformID:
         return self._urn
 
     @property
-    def type(self) -> str | None:
+    def type(self) -> str:
         """
         Getter property for the *CLFtransformID* type, e.g., *ACES*.
 
@@ -263,7 +269,7 @@ class CLFTransformID:
         return self._type
 
     @property
-    def namespace(self) -> str | None:
+    def namespace(self) -> str:
         """
         Getter property for the *CLFtransformID* namespace, e.g., *OCIO*.
 
@@ -280,7 +286,7 @@ class CLFTransformID:
         return self._namespace
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> str:
         """
         Getter property for the *CLFtransformID* name, e.g.,
         *AP0_to_AP1-Gamma2pnt2*.
@@ -298,7 +304,7 @@ class CLFTransformID:
         return self._name
 
     @property
-    def major_version(self) -> str | None:
+    def major_version(self) -> str:
         """
         Getter property for the *CLFtransformID* major version number, e.g., *c1*.
 
@@ -315,7 +321,7 @@ class CLFTransformID:
         return self._major_version
 
     @property
-    def minor_version(self) -> str | None:
+    def minor_version(self) -> str:
         """
         Getter property for the *CLFtransformID* minor version number, e.g., *v1*.
 
@@ -332,7 +338,7 @@ class CLFTransformID:
         return self._minor_version
 
     @property
-    def patch_version(self) -> str | None:
+    def patch_version(self) -> str:
         """
         Getter property for the *CLFtransformID* patch version number.
 
@@ -349,7 +355,7 @@ class CLFTransformID:
         return self._patch_version
 
     @property
-    def source(self) -> str | None:
+    def source(self) -> str:
         """
         Getter property for the *CLFtransformID* source colourspace.
 
@@ -366,7 +372,7 @@ class CLFTransformID:
         return self._source
 
     @property
-    def target(self) -> str | None:
+    def target(self) -> str:
         """
         Getter property for the *CLFtransformID* target colourspace.
 
@@ -409,7 +415,7 @@ class CLFTransformID:
     def _parse(self) -> None:
         """Parse the *CLFtransformID*."""
 
-        if self._clf_transform_id is None:
+        if self._clf_transform_id == VALUE_DEFAULT_UNDEFINED:
             return
 
         clf_transform_id = self._clf_transform_id
@@ -489,30 +495,30 @@ class CLFTransform:
     def __init__(
         self,
         path: str,
-        family: str | None = None,
-        genus: str | None = None,
+        family: str = VALUE_DEFAULT_UNDEFINED,
+        genus: str = VALUE_DEFAULT_UNDEFINED,
         siblings: Sequence | None = None,
     ) -> None:
         siblings = optional(siblings, [])
 
         self._path: str = os.path.abspath(os.path.normpath(path))
 
-        self._code: str | None = None
-        self._clf_transform_id: CLFTransformID | None = None
-        self._user_name: str | None = None
-        self._description: str | None = ""
-        self._input_descriptor: str | None = ""
-        self._output_descriptor: str | None = ""
+        self._code: str = VALUE_DEFAULT_UNDEFINED
+        self._clf_transform_id: CLFTransformID = CLFTransformID()
+        self._user_name: str = VALUE_DEFAULT_UNDEFINED
+        self._description: str = VALUE_DEFAULT_UNDEFINED
+        self._input_descriptor: str = VALUE_DEFAULT_UNDEFINED
+        self._output_descriptor: str = VALUE_DEFAULT_UNDEFINED
         self._information: dict = {}
 
-        self._family: str | None = family
-        self._genus: str | None = genus
+        self._family: str = family
+        self._genus: str = genus
         self._siblings: Sequence | None = siblings
 
         self._parse()
 
     @property
-    def path(self) -> str | None:
+    def path(self) -> str:
         """
         Getter property for the *CLF* transform path.
 
@@ -529,7 +535,7 @@ class CLFTransform:
         return self._path
 
     @property
-    def code(self) -> str | None:
+    def code(self) -> str:
         """
         Getter property for the *CLF* transform code, i.e., the *CLF* transform
         file content.
@@ -549,7 +555,7 @@ class CLFTransform:
         return self._code
 
     @property
-    def clf_transform_id(self) -> CLFTransformID | None:
+    def clf_transform_id(self) -> CLFTransformID:
         """
         Getter property for the *CLF* transform *CLFtransformID*.
 
@@ -566,7 +572,7 @@ class CLFTransform:
         return self._clf_transform_id
 
     @property
-    def user_name(self) -> str | None:
+    def user_name(self) -> str:
         """
         Getter property for the *CLF* transform user name.
 
@@ -583,7 +589,7 @@ class CLFTransform:
         return self._user_name
 
     @property
-    def description(self) -> str | None:
+    def description(self) -> str:
         """
         Getter property for the *CLF* transform description extracted from
         parsing the file content header.
@@ -601,7 +607,7 @@ class CLFTransform:
         return self._description
 
     @property
-    def input_descriptor(self) -> str | None:
+    def input_descriptor(self) -> str:
         """
         Getter property for the *CLF* transform input descriptor extracted from
         parsing the file content header.
@@ -619,7 +625,7 @@ class CLFTransform:
         return self._input_descriptor
 
     @property
-    def output_descriptor(self) -> str | None:
+    def output_descriptor(self) -> str:
         """
         Getter property for the *CLF* transform output descriptor extracted
         from parsing the file content header.
@@ -655,7 +661,7 @@ class CLFTransform:
         return self._information
 
     @property
-    def family(self) -> str | None:
+    def family(self) -> str:
         """
         Getter property for the *CLF* transform family, e.g., *aces*, a value in
         :attr:`opencolorio_config_aces.clf.reference.\
@@ -674,7 +680,7 @@ TRANSFORM_FAMILIES_CLF` attribute dictionary.
         return self._family
 
     @property
-    def genus(self) -> str | None:
+    def genus(self) -> str:
         """
         Getter property for the *CLF* transform genus, e.g., *undefined*.
 
@@ -824,7 +830,7 @@ CLFTransform` class are tried on the underlying
             )
             if aces_transform_id is not None:
                 self._information["ACEStransformID"] = ACESTransformID(
-                    aces_transform_id.text
+                    aces_transform_id.text  # pyright: ignore
                 )
 
             builtin_transform = next(

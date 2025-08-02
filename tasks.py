@@ -28,7 +28,7 @@ from opencolorio_config_aces.config.studio.generate.config import (
 from opencolorio_config_aces.utilities import google_sheet_title, message_box
 
 if not hasattr(inspect, "getargspec"):
-    inspect.getargspec = inspect.getfullargspec  # pyright: ignore
+    inspect.getargspec = inspect.getfullargspec
 
 from invoke.context import Context
 from invoke.tasks import task
@@ -80,19 +80,19 @@ __all__ = [
     "docker_run_build_config_studio",
 ]
 
-APPLICATION_NAME = opencolorio_config_aces.__application_name__
+APPLICATION_NAME: str = opencolorio_config_aces.__application_name__
 
-APPLICATION_VERSION = opencolorio_config_aces.__version__
+APPLICATION_VERSION: str = opencolorio_config_aces.__version__
 
-PYTHON_PACKAGE_NAME = opencolorio_config_aces.__name__
+PYTHON_PACKAGE_NAME: str = opencolorio_config_aces.__name__
 
-GITHUB_REPOSITORY_NAME = "OpenColorIO-Config-ACES"
+GITHUB_REPOSITORY_NAME: str = "OpenColorIO-Config-ACES"
 
-PYPI_PACKAGE_NAME = "opencolorio-config-aces"
+PYPI_PACKAGE_NAME: str = "opencolorio-config-aces"
 
-ORG = "aswf"
+ORG: str = "aswf"
 
-CONTAINER = PYPI_PACKAGE_NAME
+CONTAINER: str = PYPI_PACKAGE_NAME
 
 
 @task
@@ -102,7 +102,7 @@ def clean(
     bytecode: bool = False,
     mypy: bool = True,
     pytest: bool = True,
-):
+) -> None:
     """
     Clean the project.
 
@@ -146,7 +146,7 @@ def clean(
 def quality(
     ctx: Context,
     pyright: bool = True,
-):
+) -> None:
     """
     Check the codebase with *Pyright* and lints various *restructuredText*
     files with *rst-lint*.
@@ -161,11 +161,11 @@ def quality(
 
     if pyright:
         message_box('Checking codebase with "Pyright"...')
-        ctx.run("pyright --skipunannotated --level warning")
+        ctx.run("pyright --threads --skipunannotated --level warning")
 
 
 @task
-def precommit(ctx: Context):
+def precommit(ctx: Context) -> None:
     """
     Run the "pre-commit" hooks on the codebase.
 
@@ -180,7 +180,7 @@ def precommit(ctx: Context):
 
 
 @task
-def tests(ctx: Context):
+def tests(ctx: Context) -> None:
     """
     Run the unit tests with *Pytest*.
 
@@ -201,7 +201,7 @@ def tests(ctx: Context):
 
 
 @task(quality, precommit, tests)
-def preflight(ctx: Context):  # noqa: ARG001
+def preflight(ctx: Context) -> None:  # noqa: ARG001
     """
     Perform the preflight tasks, i.e., *formatting* and *quality*.
 
@@ -215,7 +215,7 @@ def preflight(ctx: Context):  # noqa: ARG001
 
 
 @task
-def docs(ctx: Context, html: bool = True, pdf: bool = True):
+def docs(ctx: Context, html: bool = True, pdf: bool = True) -> None:
     """
     Build the documentation.
 
@@ -240,7 +240,7 @@ def docs(ctx: Context, html: bool = True, pdf: bool = True):
 
 
 @task
-def build_clf_transforms(ctx: Context):
+def build_clf_transforms(ctx: Context) -> None:
     """
     Build the *CLF* transforms.
 
@@ -267,7 +267,7 @@ def build_clf_transforms(ctx: Context):
 
 
 @task
-def build_aces_conversion_graph(ctx: Context):
+def build_aces_conversion_graph(ctx: Context) -> None:
     """
     Build the *aces-dev* conversion graph.
 
@@ -283,7 +283,7 @@ def build_aces_conversion_graph(ctx: Context):
 
 
 @task
-def build_config_common_tests(ctx: Context):
+def build_config_common_tests(ctx: Context) -> None:
     """
     Build the common tests *OpenColorIO* config(s).
 
@@ -299,7 +299,7 @@ def build_config_common_tests(ctx: Context):
 
 
 @task
-def build_config_reference_analytical(ctx: Context):
+def build_config_reference_analytical(ctx: Context) -> None:
     """
     Build the *aces-dev* reference analytical *OpenColorIO* config.
 
@@ -315,7 +315,7 @@ def build_config_reference_analytical(ctx: Context):
 
 
 @task
-def update_mapping_file_reference(ctx: Context):  # noqa: ARG001
+def update_mapping_file_reference(ctx: Context) -> None:  # noqa: ARG001
     """
     Update the *aces-dev* reference *OpenColorIO* config mapping file.
 
@@ -349,7 +349,7 @@ def update_mapping_file_reference(ctx: Context):  # noqa: ARG001
 
 
 @task
-def build_config_reference(ctx: Context):
+def build_config_reference(ctx: Context) -> None:
     """
     Build the *aces-dev* reference *OpenColorIO* config.
 
@@ -365,7 +365,7 @@ def build_config_reference(ctx: Context):
 
 
 @task
-def update_mapping_file_cg(ctx: Context):  # noqa: ARG001
+def update_mapping_file_cg(ctx: Context) -> None:  # noqa: ARG001
     """
     Update the *ACES* Computer Graphics (CG) *OpenColorIO* mapping file.
 
@@ -396,7 +396,7 @@ def update_mapping_file_cg(ctx: Context):  # noqa: ARG001
 
 
 @task
-def build_config_cg(ctx: Context):
+def build_config_cg(ctx: Context) -> None:
     """
     Build the *ACES* Computer Graphics (CG) *OpenColorIO* config.
 
@@ -412,7 +412,7 @@ def build_config_cg(ctx: Context):
 
 
 @task
-def update_mapping_file_studio(ctx: Context):  # noqa: ARG001
+def update_mapping_file_studio(ctx: Context) -> None:  # noqa: ARG001
     """
     Update the *ACES* Studio *OpenColorIO* mapping file.
 
@@ -444,7 +444,7 @@ def update_mapping_file_studio(ctx: Context):  # noqa: ARG001
 
 
 @task
-def build_config_studio(ctx: Context):
+def build_config_studio(ctx: Context) -> None:
     """
     Build the *ACES* Studio *OpenColorIO* config.
 
@@ -460,7 +460,7 @@ def build_config_studio(ctx: Context):
 
 
 @task
-def requirements(ctx: Context):
+def requirements(ctx: Context) -> None:
     """
     Export the *requirements.txt* file.
 
@@ -481,7 +481,7 @@ def requirements(ctx: Context):
 
 
 @task(requirements)
-def docker_build(ctx: Context):
+def docker_build(ctx: Context) -> None:
     """
     Build the *docker* image.
 
@@ -499,7 +499,7 @@ def docker_build(ctx: Context):
 
 
 @task
-def docker_remove(ctx: Context):
+def docker_remove(ctx: Context) -> None:
     """
     Stop and remove the *docker* container.
 
@@ -518,7 +518,7 @@ def docker_remove(ctx: Context):
         ctx.run(f"docker rm {CONTAINER}")
 
 
-def run_in_container(ctx: Context, command: str):
+def run_in_container(ctx: Context, command: str) -> None:
     """
     Run given command in *docker* container.
 
@@ -538,7 +538,7 @@ def run_in_container(ctx: Context, command: str):
 
 
 @task
-def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
+def docker_run_docs(ctx: Context, html: bool = True, pdf: bool = True) -> None:
     """
     Build the documentation in the *docker* container.
 
@@ -564,7 +564,7 @@ def docker_run_docs(ctx, html: bool = True, pdf: bool = True):
 
 
 @task
-def docker_run_build_clf_transforms(ctx: Context):
+def docker_run_build_clf_transforms(ctx: Context) -> None:
     """
     Build the *CLF* transforms in the *docker* container.
 
@@ -578,7 +578,7 @@ def docker_run_build_clf_transforms(ctx: Context):
 
 
 @task
-def docker_run_build_aces_conversion_graph(ctx: Context):
+def docker_run_build_aces_conversion_graph(ctx: Context) -> None:
     """
     Build the *aces-dev* conversion graph in the *docker* container.
 
@@ -592,7 +592,7 @@ def docker_run_build_aces_conversion_graph(ctx: Context):
 
 
 @task
-def docker_run_build_config_common_tests(ctx: Context):
+def docker_run_build_config_common_tests(ctx: Context) -> None:
     """
     Build the common tests *OpenColorIO* config(s) in the *docker* container.
 
@@ -606,7 +606,7 @@ def docker_run_build_config_common_tests(ctx: Context):
 
 
 @task
-def docker_run_build_config_reference_analytical(ctx: Context):
+def docker_run_build_config_reference_analytical(ctx: Context) -> None:
     """
     Build the *aces-dev* reference analytical *OpenColorIO* config in the
     *docker* container.
@@ -620,7 +620,7 @@ def docker_run_build_config_reference_analytical(ctx: Context):
     run_in_container(ctx, "invoke build-config-reference-analytical")
 
 
-def docker_run_update_mapping_file_reference(ctx: Context):
+def docker_run_update_mapping_file_reference(ctx: Context) -> None:
     """
     Update the *aces-dev* reference *OpenColorIO* config mapping file in the
     *docker* container.
@@ -635,7 +635,7 @@ def docker_run_update_mapping_file_reference(ctx: Context):
 
 
 @task
-def docker_run_build_config_reference(ctx: Context):
+def docker_run_build_config_reference(ctx: Context) -> None:
     """
     Build the *aces-dev* reference *OpenColorIO* config in the *docker*
     container.
@@ -649,7 +649,7 @@ def docker_run_build_config_reference(ctx: Context):
     run_in_container(ctx, "invoke build-config-reference")
 
 
-def docker_run_update_mapping_file_cg(ctx: Context):
+def docker_run_update_mapping_file_cg(ctx: Context) -> None:
     """
     Update the *ACES* Computer Graphics (CG) *OpenColorIO* config mapping file
     in the *docker* container.
@@ -664,7 +664,7 @@ def docker_run_update_mapping_file_cg(ctx: Context):
 
 
 @task
-def docker_run_build_config_cg(ctx: Context):
+def docker_run_build_config_cg(ctx: Context) -> None:
     """
     Build the *ACES* Computer Graphics (CG) *OpenColorIO* config in the
     *docker* container.
@@ -678,7 +678,7 @@ def docker_run_build_config_cg(ctx: Context):
     run_in_container(ctx, "invoke build-config-cg")
 
 
-def docker_run_update_mapping_file_studio(ctx: Context):
+def docker_run_update_mapping_file_studio(ctx: Context) -> None:
     """
     Update the *ACES* Studio *OpenColorIO* config mapping file in the *docker*
     container.
@@ -693,7 +693,7 @@ def docker_run_update_mapping_file_studio(ctx: Context):
 
 
 @task
-def docker_run_build_config_studio(ctx: Context):
+def docker_run_build_config_studio(ctx: Context) -> None:
     """
     Build the *ACES* Studio *OpenColorIO* config in the *docker* container.
 

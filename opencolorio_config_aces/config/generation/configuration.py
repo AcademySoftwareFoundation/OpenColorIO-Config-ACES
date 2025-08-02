@@ -11,7 +11,10 @@ Defines various objects related to *OpenColorIO* config build configuration:
 -   :attr:`opencolorio_config_aces.BUILD_VARIANT_FILTERERS`
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
+from typing import Any
 
 from semver import Version
 
@@ -51,7 +54,7 @@ class BuildConfiguration:
     ocio: Version = field(default_factory=lambda: PROFILE_VERSION_DEFAULT)
     variant: str = field(default_factory=lambda: "")
 
-    def compact_fields(self):
+    def compact_fields(self) -> dict[str, str]:
         """
         Return the compact fields.
 
@@ -68,7 +71,7 @@ class BuildConfiguration:
             "variant": f"{slugify(self.variant)}" if self.variant else "",
         }
 
-    def extended_fields(self):
+    def extended_fields(self) -> dict[str, str]:
         """
         Return the extended fields.
 
@@ -84,7 +87,7 @@ class BuildConfiguration:
         }
 
 
-BUILD_CONFIGURATIONS = [
+BUILD_CONFIGURATIONS: list[BuildConfiguration] = [
     BuildConfiguration(
         aces=Version(2, 0),
         colorspaces=Version(3, 0, 0),
@@ -110,7 +113,7 @@ Build configurations.
 BUILD_CONFIGURATIONS : list
 """
 
-BUILD_VARIANT_FILTERERS = {
+BUILD_VARIANT_FILTERERS: dict[str, dict[str, dict[str, Any]]] = {
     "": {
         "any": {},
         "all": {

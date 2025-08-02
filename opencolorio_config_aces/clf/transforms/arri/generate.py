@@ -10,8 +10,11 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_arri`
 """
 
+from __future__ import annotations
+
 import logging
 import sys
+from collections.abc import Sequence
 from math import log, log10
 from pathlib import Path
 
@@ -41,56 +44,55 @@ __all__ = [
 
 LOGGER = logging.getLogger(__name__)
 
-
-FAMILY = "ARRI"
+FAMILY: str = "ARRI"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Input"
+GENUS: str = "Input"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
-def _build_awg3_mtx():
+def _build_awg3_mtx() -> ocio.MatrixTransform:
     """
-    Build the `MatrixTransform` for ARRI Wide Gamut 3 primaries.
+    Build the `MatrixTransform` for *ARRI* *Wide Gamut 3* primaries.
 
-    Matrix precision is insufficient for Float64 comparison in the LogC
+    Matrix precision is insufficient for Float64 comparison in the *LogC*
     White Paper, values are derived from the primaries here.
 
     Returns
     -------
-    ocio.MatrixTransform
+    :class:`ocio.MatrixTransform`
          *OpenColorIO* `MatrixTransform`.
     """
 
-    mtx = matrix_RGB_to_RGB_transform("ALEXA Wide Gamut", "ACES2065-1", "CAT02")
+    mtx = matrix_RGB_to_RGB_transform("ARRI Wide Gamut 3", "ACES2065-1", "CAT02")
     return mtx
 
 
-def _build_logc3_curve(ei=800, info=False):
+def _build_logc3_curve(ei: int = 800, info: bool = False) -> ocio.LogCameraTransform:
     """
-    Build the `LogCameraTransform` for ARRI LogC3 Curve.
+    Build the `LogCameraTransform` for *ARRI* *LogC3* Curve.
 
     Parameter values are derived from the published aces-dev IDT formula.
 
     Parameters
     ----------
-    ei : int, optional
-        *Exposure Index* of the LogC3 Curve to generate.
-    info : bool, optional
+    ei
+        *Exposure Index* of the *LogC3* Curve to generate.
+    info
         Whether to print additional informative text.
 
     Returns
     -------
-    ocio.LogCameraTransform
+    :class:`ocio.LogCameraTransform`
          *OpenColorIO* `LogCameraTransform`.
 
     Raises
@@ -168,15 +170,15 @@ def _build_logc3_curve(ei=800, info=False):
     )
 
 
-def _build_awg4_mtx():
+def _build_awg4_mtx() -> ocio.MatrixTransform:
     """
-    Build the `MatrixTransform` for ARRI Wide Gamut 4 primaries.
+    Build the `MatrixTransform` for *ARRI* *Wide Gamut 4* primaries.
 
-    Values are copied directly from the LogC4 Specification.
+    Values are copied directly from the *LogC4* Specification.
 
     Returns
     -------
-    ocio.MatrixTransform
+    :class:`ocio.MatrixTransform`
          *OpenColorIO* `MatrixTransform`.
     """
 
@@ -204,15 +206,15 @@ def _build_awg4_mtx():
     return transform_factory(transform_type="MatrixTransform", matrix=mtx)
 
 
-def _build_logc4_curve():
+def _build_logc4_curve() -> ocio.LogCameraTransform:
     """
-    Build the `LogCameraTransform` for ARRI LogC4 Curve.
+    Build the `LogCameraTransform` for *ARRI* *LogC4* Curve.
 
-    Parameter values are derived from the published LogC4 Specification.
+    Parameter values are derived from the published *LogC4* Specification.
 
     Returns
     -------
-    ocio.LogCameraTransform
+    :class:`ocio.LogCameraTransform`
          *OpenColorIO* `LogCameraTransform`.
     """
 
@@ -245,21 +247,24 @@ def _build_logc4_curve():
     )
 
 
-def _generate_logc3_transforms(output_directory, ei_list=(800,)):
+def _generate_logc3_transforms(
+    output_directory: Path, ei_list: Sequence[int] = (800,)
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Generate the collection of LogC3 transforms.
+    Generate the collection of *LogC3* transforms.
 
     Parameters
     ----------
-    output_directory : PosixPath or WindowsPath
-        Directory where generated CLF files should be saved.
-    ei_list : array_like of int, optional
-        List of EI values to generate LogC3 and LogC3 Curve transforms for.
+    output_directory
+        Directory to write the *CLF* transform(s) to.
+    ei_list
+        List of EI values to generate *LogC3* and *LogC3* Curve transforms for.
 
     Returns
     -------
-    dict
-        Dictionary of *OpenColorIO* `Transform` instances.
+    :class:`dict`
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
     """
 
     transforms = {}
@@ -315,19 +320,22 @@ def _generate_logc3_transforms(output_directory, ei_list=(800,)):
     return transforms
 
 
-def _generate_logc4_transforms(output_directory):
+def _generate_logc4_transforms(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Generate the collection of LogC4 transforms.
+    Generate the collection of *LogC4* transforms.
 
     Parameters
     ----------
-    output_directory : PosixPath or WindowsPath
-        Directory where generated CLF files should be saved.
+    output_directory
+        Directory to write the *CLF* transform(s) to.
 
     Returns
     -------
-    dict
-        Dictionary of *OpenColorIO* `Transform` instances.
+    :class:`dict`
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
     """
 
     transforms = {}
@@ -382,24 +390,22 @@ def _generate_logc4_transforms(output_directory):
     return transforms
 
 
-def generate_clf_transforms_arri(output_directory):
+def generate_clf_transforms_arri(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Generate CLF files for ARRI color encodings and save to disk.
+    Generate the *CLF* transforms for *ARRI* color encodings and save to disk.
 
     Parameters
     ----------
-    output_directory : PosixPath or WindowsPath
-        Directory where generated CLF files should be saved.
+    output_directory
+        Directory to write the *CLF* transform(s) to.
 
     Returns
     -------
-    dict
-        Dictionary of *OpenColorIO* `Transform` instances.
-
-    References
-    ----------
-    -
-
+    :class:`dict`
+        Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
+        instances.
     """
 
     output_directory.mkdir(parents=True, exist_ok=True)
@@ -412,15 +418,16 @@ def generate_clf_transforms_arri(output_directory):
     return clf_transforms
 
 
-def _main():
+def _main() -> int:
     """
     Generate files, initiate logging, and provide exit code.
 
     Returns
     -------
-    int
+    :class:`int`
         Software exit code for successful termination.
     """
+
     import logging
 
     logging.basicConfig()

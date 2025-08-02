@@ -11,6 +11,8 @@ transforms:
 -   :func:`opencolorio_config_aces.clf.generate_clf_transforms_davinci`
 """
 
+from __future__ import annotations
+
 import math
 from pathlib import Path
 
@@ -39,29 +41,36 @@ __all__ = [
     "generate_clf_transforms_davinci",
 ]
 
-FAMILY = "BlackmagicDesign"
+FAMILY: str = "BlackmagicDesign"
 """
 *CLF* transforms family.
 """
 
-GENUS = "Input"
+GENUS: str = "Input"
 """
 *CLF* transforms genus.
 """
 
-VERSION = "1.0"
+VERSION: str = "1.0"
 """
 *CLF* transforms version.
 """
 
 
-def generate_clf_transforms_bmdfilm(output_directory):
+def generate_clf_transforms_bmdfilm(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Make the CLF file for BMDFilm_WideGamut_Gen5 plus matrix/curve CLFs.
+    Generate the *CLF* transforms for *BMDFilm_WideGamut_Gen5* plus matrix/curve.
+
+    Parameters
+    ----------
+    output_directory
+        Directory to write the *CLF* transform(s) to.
 
     Returns
     -------
-    dict
+    :class:`dict`
         Dictionary of *CLF* transforms and *OpenColorIO* `GroupTransform`
         instances.
 
@@ -176,9 +185,12 @@ def generate_clf_transforms_bmdfilm(output_directory):
     return clf_transforms
 
 
-def generate_clf_transforms_davinci(output_directory):
+def generate_clf_transforms_davinci(
+    output_directory: Path,
+) -> dict[Path, ocio.GroupTransform]:
     """
-    Make the CLF file for DaVinci Intermediate Wide Gamut plus matrix/curve CLFs.
+    Generate the *CLF* transforms for DaVinci Intermediate Wide Gamut plus
+    matrix/curve.
 
     Returns
     -------
