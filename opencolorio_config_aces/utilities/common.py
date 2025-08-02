@@ -641,10 +641,10 @@ def google_sheet_title(url):
     --------
     >>> url = (
     ...     "https://docs.google.com/spreadsheets/d/"
-    ...     "1SXPt-USy3HlV2G2qAvh9zit6ZCINDOlfKT07yXJdWLg/"
+    ...     "1z3xsy3sF0I-8AN_tkMOEjHlAs13ba7VAVhrE8v4WIyo/"
     ...     "export?format=csv&gid=273921464"
     ... )
-    >>> google_sheet_title(url)  # doctest: +ELLIPSIS
+    >>> google_sheet_title(url)  # doctest: +SKIP
     'OpenColorIO-Config-ACES "Reference" Transforms - v...'
     """
 
