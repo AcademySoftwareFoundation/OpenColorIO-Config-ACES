@@ -15,6 +15,8 @@ transforms discovery and classification:
 -   :func:`opencolorio_config_aces.generate_amf_components`
 """
 
+from __future__ import annotations
+
 import itertools
 import json
 import logging
@@ -22,8 +24,9 @@ import os  # TODO: Use "pathlib".
 import re
 import subprocess
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from pathlib import Path
+from typing import Any
 
 from semver import Version
 
@@ -50,7 +53,7 @@ __all__ = [
     "NAMESPACE_CTL",
     "TRANSFORM_TYPES_CTL",
     "TRANSFORM_FAMILIES_CTL",
-    "TRANSFORM_GENUS_DEFAULT_CTL",
+    "VALUE_DEFAULT_UNDEFINED",
     "TRANSFORM_FILTERERS_DEFAULT_CTL",
     "PATTERNS_DESCRIPTION_CTL",
     "patch_invalid_aces_transform_id",
@@ -69,16 +72,16 @@ __all__ = [
     "generate_amf_components",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-URN_CTL = "urn:ampas:aces:transformId:v2.0"
+URN_CTL: str = "urn:ampas:aces:transformId:v2.0"
 """
 *ACES* Uniform Resource Name (*URN*).
 
 URN_CTL : unicode
 """
 
-SEPARATOR_URN_CTL = ":"
+SEPARATOR_URN_CTL: str = ":"
 """
 *ACEStransformID* separator used to separate the *URN* and *ID* part of the
 *ACEStransformID*.
@@ -86,7 +89,7 @@ SEPARATOR_URN_CTL = ":"
 SEPARATOR_URN_CTL : unicode
 """
 
-SEPARATOR_ID_CTL = "."
+SEPARATOR_ID_CTL: str = "."
 """
 *ACEStransformID* separator used to tokenize the *ID* part of the
 *ACEStransformID*.
@@ -97,21 +100,21 @@ urn:ampas:aces:transformId:v2.0:CSC.Academy.ACES_to_ACEScc.a2.v1
 SEPARATOR_ID_CTL : unicode
 """
 
-EXTENSION_CTL = ".ctl"
+EXTENSION_CTL: str = ".ctl"
 """
 *CTL* transform extension.
 
 EXTENSION_CTL : unicode
 """
 
-NAMESPACE_CTL = "Academy"
+NAMESPACE_CTL: str = "Academy"
 """
 *ACES* namespace for *A.M.P.A.S* official *CTL* transforms.
 
 NAMESPACE_CTL : unicode
 """
 
-TRANSFORM_TYPES_CTL = [
+TRANSFORM_TYPES_CTL: list[str] = [
     "CSC",
     "Lib",
     "Look",
@@ -125,7 +128,7 @@ TRANSFORM_TYPES_CTL = [
 TRANSFORM_TYPES_CTL : list
 """
 
-TRANSFORM_FAMILIES_CTL = {
+TRANSFORM_FAMILIES_CTL: dict[str, str] = {
     "aces-core": "lib",
     "aces-input-and-colorspaces": "csc",
     "aces-look": "look",
@@ -138,15 +141,13 @@ family names.
 TRANSFORM_FAMILIES_CTL : dict
 """
 
-TRANSFORM_GENUS_DEFAULT_CTL = "undefined"
+VALUE_DEFAULT_UNDEFINED: str = "undefined"
 """
-*ACES* *CTL* transform default genus, i.e., *undefined*.
-
-TRANSFORM_GENUS_DEFAULT_CTL : unicode
+Default undefined value, i.e., *undefined*.
 """
 
 
-def _exclusion_filterer_ARRIIDT(ctl_transform):
+def _exclusion_filterer_ARRIIDT(ctl_transform: CTLTransform) -> bool:
     """
     Filter out the *Alexa* *ACES* *CTL* transform whose name does not contain:
 
@@ -175,7 +176,7 @@ def _exclusion_filterer_ARRIIDT(ctl_transform):
     return False
 
 
-TRANSFORM_FILTERERS_DEFAULT_CTL = [
+TRANSFORM_FILTERERS_DEFAULT_CTL: list[Callable[[CTLTransform], bool]] = [
     _exclusion_filterer_ARRIIDT,
 ]
 """
@@ -184,7 +185,7 @@ Default list of *ACES* *CTL* transform filterers.
 TRANSFORM_FILTERERS_DEFAULT_CTL : list
 """
 
-PATTERNS_DESCRIPTION_CTL = {
+PATTERNS_DESCRIPTION_CTL: dict[str, str] = {
     "============ CONSTANTS ============ //": "",
     "Written by .*_IDT_maker\\.py v.* on .*": "",
 }
@@ -194,7 +195,7 @@ PATTERNS_DESCRIPTION_CTL = {
 PATTERNS_DESCRIPTION_CTL : dict
 """
 
-PATH_AMF_COMPONENTS_FILE = (
+PATH_AMF_COMPONENTS_FILE: Path = (
     Path(__file__).parents[0] / "resources" / "ACES_AMF_Components.json"
 )
 
@@ -205,7 +206,7 @@ PATH_AMF_COMPONENTS_FILE : unicode
 """
 
 
-def patch_invalid_aces_transform_id(aces_transform_id):
+def patch_invalid_aces_transform_id(aces_transform_id: str) -> str:
     """
     Patchan invalid *ACEStransformID*, see the *Notes* section for relevant
     issues supported by this definition.
@@ -251,7 +252,7 @@ def patch_invalid_aces_transform_id(aces_transform_id):
     return aces_transform_id
 
 
-ROOT_TRANSFORMS_CTL = os.path.normpath(
+ROOT_TRANSFORMS_CTL: str = os.path.normpath(
     os.environ.get(
         "OPENCOLORIO_CONFIG_CTL__CTL_TRANSFORMS_ROOT",
         os.path.join(os.path.dirname(__file__), "../", "aces-system"),
@@ -267,7 +268,7 @@ ROOT_TRANSFORMS_CTL : unicode
 """
 
 
-def version_aces_dev():
+def version_aces_dev() -> Version:
     """
     Return the current *aces-dev* version, trying first with *git*, then by
     parsing the *CHANGELOG.md* file.
@@ -285,12 +286,11 @@ def version_aces_dev():
             stderr=subprocess.STDOUT,
         ).strip()
 
-        version = version.decode("utf-8")
-
-        return Version.parse(
-            re.search(r"v(\d\.\d(\.\d)?)", version).group(1),
-            optional_minor_and_patch=True,
-        )
+        if search := re.search(r"v(\d\.\d(\.\d)?)", version.decode("utf-8")):
+            return Version.parse(
+                search.group(1),
+                optional_minor_and_patch=True,
+            )
     except Exception:  # pragma: no cover
         changelog_path = os.path.join(ROOT_TRANSFORMS_CTL, "..", "..", "CHANGELOG.md")
         if os.path.exists(changelog_path):
@@ -300,10 +300,12 @@ def version_aces_dev():
                     if search:
                         return Version.parse(search.group(1))
 
-        return Version(0)
+    return Version(0)
 
 
-def ctl_transform_relative_path(path, root_directory=ROOT_TRANSFORMS_CTL):
+def ctl_transform_relative_path(
+    path: str, root_directory: str = ROOT_TRANSFORMS_CTL
+) -> str:
     """
     Return the relative path from given *ACES* *CTL* transform to the
     *aces-dev* *CTL* transforms root directory.
@@ -354,23 +356,23 @@ class ACESTransformID:
     __repr__
     """
 
-    def __init__(self, aces_transform_id):
-        self._aces_transform_id = aces_transform_id
+    def __init__(self, aces_transform_id: str = VALUE_DEFAULT_UNDEFINED) -> None:
+        self._aces_transform_id: str = aces_transform_id
 
-        self._urn = None
-        self._type = None
-        self._namespace = None
-        self._name = None
-        self._major_version = None
-        self._minor_version = None
-        self._patch_version = None
-        self._source = None
-        self._target = None
+        self._urn: str = VALUE_DEFAULT_UNDEFINED
+        self._type: str = VALUE_DEFAULT_UNDEFINED
+        self._namespace: str = VALUE_DEFAULT_UNDEFINED
+        self._name: str = VALUE_DEFAULT_UNDEFINED
+        self._major_version: str = VALUE_DEFAULT_UNDEFINED
+        self._minor_version: str = VALUE_DEFAULT_UNDEFINED
+        self._patch_version: str = VALUE_DEFAULT_UNDEFINED
+        self._source: str = VALUE_DEFAULT_UNDEFINED
+        self._target: str = VALUE_DEFAULT_UNDEFINED
 
         self._parse()
 
     @property
-    def aces_transform_id(self):
+    def aces_transform_id(self) -> str:
         """
         Getter property for the *ACEStransformID*, e.g.,
         *urn:ampas:aces:transformId:v1.5:ODT.Academy.DCDM.a1.0.3*.
@@ -388,7 +390,7 @@ class ACESTransformID:
         return self._aces_transform_id
 
     @property
-    def urn(self):
+    def urn(self) -> str:
         """
         Getter property for the *ACEStransformID* Uniform Resource Name (*URN*),
         e.g., *urn:ampas:aces:transformId:v1.5*.
@@ -406,7 +408,7 @@ class ACESTransformID:
         return self._urn
 
     @property
-    def type(self):
+    def type(self) -> str:
         """
         Getter property for the *ACEStransformID* type, e.g., *ODT*.
 
@@ -423,7 +425,7 @@ class ACESTransformID:
         return self._type
 
     @property
-    def namespace(self):
+    def namespace(self) -> str:
         """
         Getter property for the *ACEStransformID* namespace, e.g., *Academy*.
 
@@ -440,7 +442,7 @@ class ACESTransformID:
         return self._namespace
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Getter property for the *ACEStransformID* name, e.g., *DCDM*.
 
@@ -457,7 +459,7 @@ class ACESTransformID:
         return self._name
 
     @property
-    def major_version(self):
+    def major_version(self) -> str:
         """
         Getter property for the *ACEStransformID* major version number, e.g.,
         *a1*.
@@ -475,7 +477,7 @@ class ACESTransformID:
         return self._major_version
 
     @property
-    def minor_version(self):
+    def minor_version(self) -> str:
         """
         Getter property for the *ACEStransformID* minor version number, e.g.,
         *0*.
@@ -493,7 +495,7 @@ class ACESTransformID:
         return self._minor_version
 
     @property
-    def patch_version(self):
+    def patch_version(self) -> str:
         """
         Getterproperty for the *ACEStransformID* patch version number, e.g., *3*.
 
@@ -510,7 +512,7 @@ class ACESTransformID:
         return self._patch_version
 
     @property
-    def source(self):
+    def source(self) -> str:
         """
         Getter property for the *ACEStransformID* source colourspace.
 
@@ -527,7 +529,7 @@ class ACESTransformID:
         return self._source
 
     @property
-    def target(self):
+    def target(self) -> str:
         """
         Getter property for the *ACEStransformID* target colourspace.
 
@@ -543,7 +545,7 @@ class ACESTransformID:
 
         return self._target
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a formatted string representation of the *ACEStransformID*.
 
@@ -555,7 +557,7 @@ class ACESTransformID:
 
         return f"{self.__class__.__name__}('{self._aces_transform_id}')"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return an evaluable string representation of the *ACEStransformID*.
 
@@ -567,10 +569,10 @@ class ACESTransformID:
 
         return str(self)
 
-    def _parse(self):
+    def _parse(self) -> None:
         """Parse the *ACEStransformID*."""
 
-        if self._aces_transform_id is None:
+        if self._aces_transform_id == VALUE_DEFAULT_UNDEFINED:
             return
 
         aces_transform_id = patch_invalid_aces_transform_id(self._aces_transform_id)
@@ -660,24 +662,30 @@ class CTLTransform:
     __ne__
     """
 
-    def __init__(self, path, family=None, genus=None, siblings=None):
+    def __init__(
+        self,
+        path: str,
+        family: str = VALUE_DEFAULT_UNDEFINED,
+        genus: str = VALUE_DEFAULT_UNDEFINED,
+        siblings: list[CTLTransform] | None = None,
+    ) -> None:
         siblings = optional(siblings, [])
 
-        self._path = os.path.abspath(os.path.normpath(path))
+        self._path: str = os.path.abspath(os.path.normpath(path))
 
-        self._code = None
-        self._aces_transform_id = None
-        self._user_name = None
-        self._description = ""
+        self._code: str = VALUE_DEFAULT_UNDEFINED
+        self._aces_transform_id: ACESTransformID = ACESTransformID()
+        self._user_name: str = VALUE_DEFAULT_UNDEFINED
+        self._description: str = VALUE_DEFAULT_UNDEFINED
 
-        self._family = family
-        self._genus = genus
-        self._siblings = siblings
+        self._family: str = family
+        self._genus: str = genus
+        self._siblings: list[CTLTransform] = siblings
 
         self._parse()
 
     @property
-    def path(self):
+    def path(self) -> str:
         """
         Getter  property for the *ACES* *CTL* transform path.
 
@@ -694,7 +702,7 @@ class CTLTransform:
         return self._path
 
     @property
-    def code(self):
+    def code(self) -> str:
         """
         Getter  property for the *ACES* *CTL* transform code, i.e., the *ACES*
         *CTL* transform file content.
@@ -714,7 +722,7 @@ class CTLTransform:
         return self._code
 
     @property
-    def aces_transform_id(self):
+    def aces_transform_id(self) -> ACESTransformID:
         """
         Getter property for the *ACES* *CTL* transform *ACEStransformID*.
 
@@ -731,7 +739,7 @@ class CTLTransform:
         return self._aces_transform_id
 
     @property
-    def user_name(self):
+    def user_name(self) -> str:
         """
         Getter property for the *ACES* *CTL* transform *ACESuserName*.
 
@@ -748,7 +756,7 @@ class CTLTransform:
         return self._user_name
 
     @property
-    def description(self):
+    def description(self) -> str:
         """
         Getter property for the *ACES* *CTL* transform description extracted
         from parsing the file content header.
@@ -766,7 +774,7 @@ class CTLTransform:
         return self._description
 
     @property
-    def family(self):
+    def family(self) -> str:
         """
         Getter property for the *ACES* *CTL* transform family, e.g.,
         *output_transform*, a value in
@@ -786,7 +794,7 @@ TRANSFORM_FAMILIES_CTL` attribute dictionary.
         return self._family
 
     @property
-    def genus(self):
+    def genus(self) -> str:
         """
         Getter property for the *ACES* *CTL* transform genus, e.g., *dcdm*.
 
@@ -803,7 +811,7 @@ TRANSFORM_FAMILIES_CTL` attribute dictionary.
         return self._genus
 
     @property
-    def siblings(self):
+    def siblings(self) -> list[CTLTransform]:
         """
         Getter property for the *ACES* *CTL* transform siblings, e.g., inverse
         transform.
@@ -820,7 +828,7 @@ TRANSFORM_FAMILIES_CTL` attribute dictionary.
 
         return self._siblings
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Any:
         """
         Reimplement the :meth:`object.__getattr__` so that unsuccessful
         attribute lookup on :class:`opencolorio_config_aces.config.reference.\
@@ -843,7 +851,7 @@ CTLTransform` class are tried on the underlying
 
         return getattr(aces_transform_id, item)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a formatted string representation of the *ACES* *CTL*
         transform.
@@ -859,7 +867,7 @@ CTLTransform` class are tried on the underlying
             f"'{ctl_transform_relative_path(self._path)}')"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return an evaluable representation of the *ACES* *CTL* transform.
 
@@ -871,7 +879,7 @@ CTLTransform` class are tried on the underlying
 
         return str(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         Return whether the *ACES* *CTL* transform is equal to given other
         object.
@@ -892,7 +900,7 @@ CTLTransform` class are tried on the underlying
         else:
             return self._path == other.path
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """
         Return whether the *ACES* *CTL* transform is not equal to given other
         object.
@@ -911,7 +919,7 @@ CTLTransform` class are tried on the underlying
 
         return not (self == other)
 
-    def _parse(self):
+    def _parse(self) -> None:
         """Parse the *ACES* *CTL* transform."""
 
         LOGGER.info('Parsing "%s" CTL transform...', self._path)
@@ -976,12 +984,14 @@ class CTLTransformPair:
     __ne__
     """
 
-    def __init__(self, forward_transform, inverse_transform):
-        self._forward_transform = forward_transform
-        self._inverse_transform = inverse_transform
+    def __init__(
+        self, forward_transform: CTLTransform, inverse_transform: CTLTransform
+    ) -> None:
+        self._forward_transform: CTLTransform = forward_transform
+        self._inverse_transform: CTLTransform = inverse_transform
 
     @property
-    def forward_transform(self):
+    def forward_transform(self) -> CTLTransform:
         """
         Getter property for the *ACES* *CTL* transform pair forward transform.
 
@@ -998,7 +1008,7 @@ class CTLTransformPair:
         return self._forward_transform
 
     @property
-    def inverse_transform(self):
+    def inverse_transform(self) -> CTLTransform:
         """
         Getter property for the *ACES* *CTL* transform pair inverse transform.
 
@@ -1014,7 +1024,7 @@ class CTLTransformPair:
 
         return self._inverse_transform
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a formatted string representation of the *ACES* *CTL*
         transform pair.
@@ -1031,7 +1041,7 @@ class CTLTransformPair:
             f"{self._inverse_transform!s}')"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return an evaluable string representation of the *ACES* *CTL*
         transform pair.
@@ -1044,7 +1054,7 @@ class CTLTransformPair:
 
         return str(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         Return whether the *ACES* *CTL* transform pair is equal to given
         other object.
@@ -1068,7 +1078,7 @@ class CTLTransformPair:
                 self._inverse_transform == other._inverse_transform
             )
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """
         Return whether the *ACES* *CTL* transform pair is not equal to given
         other object.
@@ -1088,7 +1098,7 @@ class CTLTransformPair:
         return not (self == other)
 
 
-def find_ctl_transform_pairs(ctl_transforms):
+def find_ctl_transform_pairs(ctl_transforms: list[str]) -> dict[str, dict[str, str]]:
     """
     Find the pairs in given list of *ACES* *CTL* transform paths.
 
@@ -1137,7 +1147,9 @@ def find_ctl_transform_pairs(ctl_transforms):
     return ctl_transform_pairs
 
 
-def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
+def discover_aces_ctl_transforms(
+    root_directory: str = ROOT_TRANSFORMS_CTL,
+) -> dict[str, list[str]]:
     """
     Discover the *ACES* *CTL* transform paths in given root directory: The
     given directory is traversed and the `*.ctl` files are collected.
@@ -1193,7 +1205,9 @@ def discover_aces_ctl_transforms(root_directory=ROOT_TRANSFORMS_CTL):
     return ctl_transforms
 
 
-def classify_aces_ctl_transforms(unclassified_ctl_transforms):
+def classify_aces_ctl_transforms(
+    unclassified_ctl_transforms: dict[str, list[str]],
+) -> dict[str, dict[str, dict[str, CTLTransform | CTLTransformPair]]]:
     """
     Classifie given *ACES* *CTL* transforms.
 
@@ -1251,7 +1265,7 @@ CTLTransform('aces-input-and-colorspaces...ACEScc...CSC.Academy.ACEScc_to_ACES.c
             for part in sub_directory.split(os.sep)
         )
 
-        genus = TRANSFORM_GENUS_DEFAULT_CTL if not genus else "/".join(genus)
+        genus = VALUE_DEFAULT_UNDEFINED if not genus else "/".join(genus)
 
         for basename, pairs in find_ctl_transform_pairs(ctl_transforms).items():
             if len(pairs) == 1:
@@ -1283,7 +1297,11 @@ CTLTransform('aces-input-and-colorspaces...ACEScc...CSC.Academy.ACEScc_to_ACES.c
     return vivified_to_dict(classified_ctl_transforms)
 
 
-def unclassify_ctl_transforms(classified_ctl_transforms):
+def unclassify_ctl_transforms(
+    classified_ctl_transforms: dict[
+        str, dict[str, dict[str, CTLTransform | CTLTransformPair]]
+    ],
+) -> list[CTLTransform]:
     """
     Unclassify given *ACES* *CTL* transforms.
 
@@ -1323,7 +1341,11 @@ def unclassify_ctl_transforms(classified_ctl_transforms):
     return unclassified_ctl_transforms
 
 
-def filter_ctl_transforms(ctl_transforms, filterers=None):
+def filter_ctl_transforms(
+    ctl_transforms: dict[str, dict[str, dict[str, CTLTransform | CTLTransformPair]]]
+    | list[CTLTransform],
+    filterers: list[Callable[[CTLTransform], bool]] | None = None,
+) -> list[CTLTransform]:
     """
     Filter given *ACES* *CTL* transforms with given filterers.
 
@@ -1379,7 +1401,7 @@ P3-D65_1000nit_in_P3-D65_ST2084.ctl')
     return filtered_ctl_transforms
 
 
-def print_aces_taxonomy():
+def print_aces_taxonomy() -> None:
     """
     Print *aces-dev* taxonomy:
 
@@ -1436,7 +1458,11 @@ reference.ROOT_TRANSFORMS_CTL` attribute using the
                     )
 
 
-def generate_amf_components(ctl_transforms, raise_exception=False):
+def generate_amf_components(
+    ctl_transforms: dict[str, dict[str, dict[str, CTLTransform | CTLTransformPair]]]
+    | list[CTLTransform],
+    raise_exception: bool = False,
+) -> dict[str, list[str]]:
     """
     Generate the *ACES* *AMF* components from given *ACES* *CTL* transforms.
 

@@ -8,8 +8,11 @@ Defines various objects related to the generation of the analytical *aces-dev*
 reference *OpenColorIO* config.
 """
 
+from __future__ import annotations
+
 import itertools
 import logging
+from typing import Any
 
 import PyOpenColorIO as ocio
 
@@ -65,9 +68,9 @@ __all__ = [
     "main",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-PATTERNS_VIEW_NAME_REFERENCE = {
+PATTERNS_VIEW_NAME_REFERENCE: dict[str, str] = {
     "\\(100 nits\\) dim": "",
     "\\(100 nits\\)": "",
     "\\(48 nits\\)": "",
@@ -80,7 +83,7 @@ PATTERNS_VIEW_NAME_REFERENCE : dict
 """
 
 
-def beautify_view_name(name):
+def beautify_view_name(name: str) -> str:
     """
     Beautifie given *OpenColorIO* view name by applying in succession the
     relevant patterns.
@@ -104,7 +107,9 @@ def beautify_view_name(name):
     return beautify_name(name, PATTERNS_VIEW_NAME_REFERENCE)
 
 
-def create_builtin_transform(style, profile_version=PROFILE_VERSION_DEFAULT):
+def create_builtin_transform(
+    style: str, profile_version: Any = PROFILE_VERSION_DEFAULT
+) -> Any:
     """
     Create an *OpenColorIO* builtin transform for given style.
 
@@ -151,11 +156,11 @@ def create_builtin_transform(style, profile_version=PROFILE_VERSION_DEFAULT):
 
 @required("NetworkX")
 def node_to_builtin_transform(
-    graph,
-    node,
-    profile_version=PROFILE_VERSION_DEFAULT,
-    direction="Forward",
-):
+    graph: Any,
+    node: str,
+    profile_version: Any = PROFILE_VERSION_DEFAULT,
+    direction: str = "Forward",
+) -> Any | None:
     """
     Generate the *OpenColorIO* builtin transform for given *aces-dev*
     conversion graph node.
@@ -224,11 +229,11 @@ def node_to_builtin_transform(
 
 
 def node_to_colorspace(
-    graph,
-    node,
-    profile_version=PROFILE_VERSION_DEFAULT,
-    describe=DescriptionStyle.LONG_UNION,
-):
+    graph: Any,
+    node: str,
+    profile_version: Any = PROFILE_VERSION_DEFAULT,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+) -> Any:
     """
     Generate the *OpenColorIO* `Colorspace` for given *aces-dev* conversion
     graph node.
@@ -267,7 +272,7 @@ def node_to_colorspace(
     return colorspace
 
 
-def config_basename_aces(build_configuration):
+def config_basename_aces(build_configuration: BuildConfiguration) -> str:
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method basename.
@@ -289,7 +294,7 @@ def config_basename_aces(build_configuration):
     )
 
 
-def config_name_aces(build_configuration):
+def config_name_aces(build_configuration: BuildConfiguration) -> str:
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph*  name.
@@ -313,7 +318,10 @@ def config_name_aces(build_configuration):
     ).format(**build_configuration.compact_fields())
 
 
-def config_description_aces(build_configuration, describe=DescriptionStyle.SHORT_UNION):
+def config_description_aces(
+    build_configuration: BuildConfiguration,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+) -> str:
     """
     Generate *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method description.
@@ -353,13 +361,13 @@ def config_description_aces(build_configuration, describe=DescriptionStyle.SHORT
 
 
 def generate_config_aces(
-    config_name=None,
-    build_configuration=BuildConfiguration(),
-    validate=True,
-    describe=DescriptionStyle.LONG_UNION,
-    filterers=None,
-    additional_data=False,
-):
+    config_name: str | None = None,
+    build_configuration: BuildConfiguration = BuildConfiguration(),
+    validate: bool = True,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    filterers: Any = None,
+    additional_data: bool = False,
+) -> Any:
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     using the analytical *Graph* method.
@@ -512,7 +520,7 @@ def generate_config_aces(
         return config
 
 
-def main(build_directory):
+def main(build_directory: Any) -> int:
     """
     Define the main entry point for the generation using the analytical *Graph*
     method of all the *aces-dev* reference implementation *OpenColorIO* config

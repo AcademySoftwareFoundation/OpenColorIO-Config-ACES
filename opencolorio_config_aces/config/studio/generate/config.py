@@ -13,6 +13,9 @@ Defines various objects related to the generation of the *ACES* Studio
 import logging
 import re
 from pathlib import Path
+from typing import Any
+
+import PyOpenColorIO as ocio
 
 from opencolorio_config_aces.config.cg import (
     generate_config_cg,
@@ -23,6 +26,7 @@ from opencolorio_config_aces.config.generation import (
     BuildConfiguration,
     generate_config,
 )
+from opencolorio_config_aces.config.generation.common import ConfigData
 from opencolorio_config_aces.config.reference import (
     DescriptionStyle,
 )
@@ -48,9 +52,9 @@ __all__ = [
     "main",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO = (
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO: str = (
     "https://docs.google.com/spreadsheets/d/"
     "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
     "export?format=csv&gid=1155125238"
@@ -61,7 +65,7 @@ URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO : unicode
 """
 
-PATH_TRANSFORMS_MAPPING_FILE_STUDIO = next(
+PATH_TRANSFORMS_MAPPING_FILE_STUDIO: Path = next(
     (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
 )
 """
@@ -71,7 +75,7 @@ PATH_TRANSFORMS_MAPPING_FILE_STUDIO : unicode
 """
 
 
-def config_basename_studio(build_configuration):
+def config_basename_studio(build_configuration: BuildConfiguration) -> str:
     """
     Generate the ACES* Studio *OpenColorIO* config basename, i.e., the filename
     devoid of directory affixe.
@@ -99,7 +103,7 @@ def config_basename_studio(build_configuration):
     )
 
 
-def config_name_studio(build_configuration):
+def config_name_studio(build_configuration: BuildConfiguration) -> str:
     """
     Generate the ACES* Studio *OpenColorIO* config name.
 
@@ -133,9 +137,9 @@ def config_name_studio(build_configuration):
 
 
 def config_description_studio(
-    build_configuration,
-    describe=DescriptionStyle.SHORT_UNION,
-):
+    build_configuration: BuildConfiguration,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+) -> str:
     """
     Generate the ACES* Studio *OpenColorIO* config description.
 
@@ -172,16 +176,16 @@ def config_description_studio(
 
 
 def generate_config_studio(
-    data=None,
-    config_name=None,
-    build_configuration=BuildConfiguration(),
-    validate=True,
-    describe=DescriptionStyle.SHORT_UNION,
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
-    scheme="Modern 1",
-    additional_filterers=None,
-    additional_data=False,
-):
+    data: ConfigData | None = None,
+    config_name: str | Path | None = None,
+    build_configuration: BuildConfiguration = BuildConfiguration(),
+    validate: bool = True,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+    config_mapping_file_path: Path = PATH_TRANSFORMS_MAPPING_FILE_STUDIO,
+    scheme: str = "Modern 1",
+    additional_filterers: dict[str, dict[str, list[Any]]] | None = None,
+    additional_data: bool = False,
+) -> ocio.Config | tuple[ocio.Config, ConfigData, Any, Any, Any]:
     """
     Generate the *ACES* Studio *OpenColorIO* config.
 
@@ -268,13 +272,15 @@ def generate_config_studio(
             additional_data=True,
         )
 
-    data.name = re.sub(
+    data.name = re.sub(  # pyright: ignore
         r"\.ocio$",
         "",
         config_basename_studio(build_configuration),
     )
-    data.description = config_description_studio(build_configuration, describe)
-    config = generate_config(data, config_name, validate)
+    data.description = config_description_studio(  # pyright: ignore
+        build_configuration, describe
+    )
+    config = generate_config(data, config_name, validate)  # pyright: ignore
 
     LOGGER.info(
         '"%s" config generation complete!',
@@ -287,7 +293,7 @@ def generate_config_studio(
         return config
 
 
-def main(build_directory):
+def main(build_directory: Path) -> int:
     """
     Define the main entry point for the generation of all the *ACES* Studio
     *OpenColorIO* config versions and variants.

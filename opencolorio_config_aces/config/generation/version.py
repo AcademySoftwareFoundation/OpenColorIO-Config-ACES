@@ -10,6 +10,8 @@ Defines various objects related to *OpenColorIO* config version handling:
 -   :attr:`opencolorio_config_aces.PROFILE_VERSIONS`
 """
 
+from __future__ import annotations
+
 from semver import Version
 
 __author__ = "OpenColorIO Contributors"
@@ -25,14 +27,16 @@ __all__ = [
 ]
 
 
-PROFILE_VERSION_DEFAULT = Version(2, 0)
+PROFILE_VERSION_DEFAULT: Version = Version(2, 0)
 """
 Default *OpenColorIO* profile version.
 
 PROFILE_VERSION_DEFAULT : Version
 """
 
-PROFILE_VERSIONS = [Version(i, j) for i in range(2, 3) for j in range(1, 5)]
+PROFILE_VERSIONS: list[Version] = [
+    Version(i, j) for i in range(2, 3) for j in range(1, 5)
+]
 
 """
 *OpenColorIO* profile versions.

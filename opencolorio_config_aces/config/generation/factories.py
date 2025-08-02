@@ -15,12 +15,15 @@ Defines various *OpenColorIO* transform factories:
 -   :func:`opencolorio_config_aces.produce_transform`
 """
 
+from __future__ import annotations
+
 import logging
 import re
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from pprint import pformat
 from textwrap import indent
+from typing import Any
 
 import PyOpenColorIO as ocio
 from semver import Version
@@ -50,10 +53,10 @@ __all__ = [
     "produce_transform",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-BUILTIN_TRANSFORMS = DocstringDict(
-    {builtin: PROFILE_VERSION_DEFAULT for builtin in ocio.BuiltinTransformRegistry()}
+BUILTIN_TRANSFORMS: DocstringDict = DocstringDict(
+    dict.fromkeys(ocio.BuiltinTransformRegistry(), PROFILE_VERSION_DEFAULT)
 )
 BUILTIN_TRANSFORMS.__doc__ = """
 Mapping of *OpenColorIO* builtintransforms to their profile version.
@@ -79,7 +82,7 @@ for _builtin_transform, _profile in BUILTIN_TRANSFORMS.items():
 del _builtin_transform, _profile
 
 
-def group_transform_factory(transforms):
+def group_transform_factory(transforms: Sequence[Any]) -> ocio.GroupTransform:
     """
     *OpenColorIO* `GroupTransform` factory.
 
@@ -107,23 +110,23 @@ def group_transform_factory(transforms):
 
 
 def colorspace_factory(
-    name,
-    family=None,
-    encoding=None,
-    aliases=None,
-    categories=None,
-    description=None,
-    equality_group=None,
-    bit_depth=None,
-    allocation=None,
-    allocation_vars=None,
-    to_reference=None,
-    from_reference=None,
-    is_data=None,
-    reference_space=None,
-    base_colorspace=None,
-    **kwargs,
-):
+    name: str,
+    family: str | None = None,
+    encoding: str | None = None,
+    aliases: str | Sequence[str] | None = None,
+    categories: str | Sequence[str] | None = None,
+    description: str | None = None,
+    equality_group: str | None = None,
+    bit_depth: int | None = None,
+    allocation: int | None = None,
+    allocation_vars: tuple[float, ...] | None = None,
+    to_reference: Mapping[str, Any] | ocio.Transform | None = None,
+    from_reference: Mapping[str, Any] | ocio.Transform | None = None,
+    is_data: bool | None = None,
+    reference_space: str | int | None = None,
+    base_colorspace: Mapping[str, Any] | ocio.ColorSpace | None = None,
+    **kwargs: Any,
+) -> ocio.ColorSpace:
     """
     *OpenColorIO* `Colorspace` factory.
 
@@ -212,13 +215,13 @@ def colorspace_factory(
                 ocio.COLORSPACE_DIR_FROM_REFERENCE,
             )
 
-    colorspace.setName(name)
+    colorspace.setName(name)  # pyright: ignore
 
     if family is not None:
-        colorspace.setFamily(family)
+        colorspace.setFamily(family)  # pyright: ignore
 
     if encoding is not None:
-        colorspace.setEncoding(encoding)
+        colorspace.setEncoding(encoding)  # pyright: ignore
 
     if aliases is not None:
         if isinstance(aliases, str):
@@ -228,7 +231,7 @@ def colorspace_factory(
             if not alias:
                 continue
 
-            colorspace.addAlias(alias)
+            colorspace.addAlias(alias)  # pyright: ignore
 
     if categories is not None:
         if isinstance(categories, str):
@@ -238,32 +241,32 @@ def colorspace_factory(
             if not category:
                 continue
 
-            colorspace.addCategory(category)
+            colorspace.addCategory(category)  # pyright: ignore
 
     if description is not None:
-        colorspace.setDescription(description)
+        colorspace.setDescription(description)  # pyright: ignore
 
     if equality_group is not None:
-        colorspace.setEqualityGroup(equality_group)
+        colorspace.setEqualityGroup(equality_group)  # pyright: ignore
 
     if is_data is not None:
-        colorspace.setIsData(is_data)
+        colorspace.setIsData(is_data)  # pyright: ignore
 
     return colorspace
 
 
 def named_transform_factory(
-    name,
-    family=None,
-    encoding=None,
-    aliases=None,
-    categories=None,
-    description=None,
-    forward_transform=None,
-    inverse_transform=None,
-    base_named_transform=None,
-    **kwargs,
-):
+    name: str,
+    family: str | None = None,
+    encoding: str | None = None,
+    aliases: str | Sequence[str] | None = None,
+    categories: str | Sequence[str] | None = None,
+    description: str | None = None,
+    forward_transform: Mapping[str, Any] | ocio.Transform | None = None,
+    inverse_transform: Mapping[str, Any] | ocio.Transform | None = None,
+    base_named_transform: Mapping[str, Any] | ocio.NamedTransform | None = None,
+    **kwargs: Any,
+) -> ocio.NamedTransform:
     """
     *OpenColorIO* `NamedTransform` factory.
 
@@ -326,45 +329,45 @@ def named_transform_factory(
                 ocio.TRANSFORM_DIR_INVERSE,
             )
 
-    named_transform.setName(name)
+    named_transform.setName(name)  # pyright: ignore
 
     if family is not None:
-        named_transform.setFamily(family)
+        named_transform.setFamily(family)  # pyright: ignore
 
     if encoding is not None:
-        named_transform.setEncoding(encoding)
+        named_transform.setEncoding(encoding)  # pyright: ignore
 
     if aliases is not None:
         if isinstance(aliases, str):
             aliases = [aliases]
 
         for alias in aliases:
-            named_transform.addAlias(alias)
+            named_transform.addAlias(alias)  # pyright: ignore
 
     if categories is not None:
         if isinstance(categories, str):
             categories = re.split("[,;]+", categories)
 
         for category in categories:
-            named_transform.addCategory(category)
+            named_transform.addCategory(category)  # pyright: ignore
 
     if description is not None:
-        named_transform.setDescription(description)
+        named_transform.setDescription(description)  # pyright: ignore
 
     return named_transform
 
 
 def view_transform_factory(
-    name,
-    family=None,
-    categories=None,
-    description=None,
-    to_reference=None,
-    from_reference=None,
-    reference_space=None,
-    base_view_transform=None,
-    **kwargs,
-):
+    name: str,
+    family: str | None = None,
+    categories: Sequence[str] | None = None,
+    description: str | None = None,
+    to_reference: Mapping[str, Any] | ocio.Transform | None = None,
+    from_reference: Mapping[str, Any] | ocio.Transform | None = None,
+    reference_space: str | int | None = None,
+    base_view_transform: Mapping[str, Any] | ocio.ViewTransform | None = None,
+    **kwargs: Any,
+) -> ocio.ViewTransform:
     """
     *OpenColorIO* `ViewTransform` factory.
 
@@ -432,29 +435,29 @@ def view_transform_factory(
                 ocio.VIEWTRANSFORM_DIR_FROM_REFERENCE,
             )
 
-    view_transform.setName(name)
+    view_transform.setName(name)  # pyright: ignore
 
     if family is not None:
-        view_transform.setFamily(family)
+        view_transform.setFamily(family)  # pyright: ignore
 
     for category in categories:
-        view_transform.addCategory(category)
+        view_transform.addCategory(category)  # pyright: ignore
 
     if description is not None:
-        view_transform.setDescription(description)
+        view_transform.setDescription(description)  # pyright: ignore
 
     return view_transform
 
 
 def look_factory(
-    name,
-    process_space=None,
-    description=None,
-    forward_transform=None,
-    inverse_transform=None,
-    base_look=None,
-    **kwargs,
-):
+    name: str,
+    process_space: str | None = None,
+    description: str | None = None,
+    forward_transform: Mapping[str, Any] | ocio.Transform | None = None,
+    inverse_transform: Mapping[str, Any] | ocio.Transform | None = None,
+    base_look: Mapping[str, Any] | ocio.Look | None = None,
+    **kwargs: Any,
+) -> ocio.Look:
     """
     *OpenColorIO* `Look` factory.
 
@@ -509,15 +512,15 @@ def look_factory(
         if inverse_transform is not None:
             look.setInverseTransform(produce_transform(inverse_transform))
 
-    look.setName(name)
+    look.setName(name)  # pyright: ignore
 
     if description is not None:
-        look.setDescription(description)
+        look.setDescription(description)  # pyright: ignore
 
     return look
 
 
-def transform_factory_setter(**kwargs):
+def transform_factory_setter(**kwargs: Any) -> ocio.Transform:
     """
     *OpenColorIO* default transform factory that produces an *OpenColorIO*
     transform according to given ``name`` keyword argument. The ``kwargs`` are
@@ -557,7 +560,7 @@ def transform_factory_setter(**kwargs):
     return transform
 
 
-def transform_factory_constructor(**kwargs):
+def transform_factory_constructor(**kwargs: Any) -> ocio.Transform:
     """
     *OpenColorIO* default transform factory that produces an *OpenColorIO*
     transform according to given ``name`` keyword argument. The ``kwargs`` are
@@ -591,7 +594,9 @@ def transform_factory_constructor(**kwargs):
     return transform(**kwargs)
 
 
-def transform_factory_clf_transform_to_group_transform(**kwargs):
+def transform_factory_clf_transform_to_group_transform(
+    **kwargs: Any,
+) -> ocio.GroupTransform:
     """
     *OpenColorIO* transform factory that produces an *OpenColorIO*
     `GroupTransform` if given ``name`` keyword argument is ``FileTransform`` and
@@ -625,7 +630,7 @@ def transform_factory_clf_transform_to_group_transform(**kwargs):
     return processor.createGroupTransform()
 
 
-TRANSFORM_FACTORIES = DocstringDict(
+TRANSFORM_FACTORIES: DocstringDict = DocstringDict(
     {
         "Setter": transform_factory_setter,
         "Constructor": transform_factory_constructor,
@@ -641,7 +646,7 @@ TRANSFORM_FACTORIES : dict
 """
 
 
-def transform_factory(**kwargs):
+def transform_factory(**kwargs: Any) -> ocio.Transform:
     """
     *OpenColorIO* transform factory.
 
@@ -664,7 +669,9 @@ def transform_factory(**kwargs):
     return factory(**kwargs)
 
 
-def produce_transform(transform):
+def produce_transform(
+    transform: Mapping[str, Any] | Sequence[Any] | ocio.Transform,
+) -> ocio.Transform:
     """
     Produce given transform.
 

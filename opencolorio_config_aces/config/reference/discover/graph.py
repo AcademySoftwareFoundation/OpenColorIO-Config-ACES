@@ -15,14 +15,19 @@ conversion graph:
 -   :func:`opencolorio_config_aces.plot_aces_conversion_graph`
 """
 
+from __future__ import annotations
+
 import codecs
 import itertools
 import logging
 import os
 import pickle
 import re
+from collections.abc import Callable
+from typing import Any
 
 from opencolorio_config_aces.config.reference.discover.classify import (
+    CTLTransform,
     classify_aces_ctl_transforms,
     discover_aces_ctl_transforms,
     filter_ctl_transforms,
@@ -47,9 +52,9 @@ __all__ = [
     "plot_aces_conversion_graph",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-SEPARATOR_NODE_NAME_CTL = "/"
+SEPARATOR_NODE_NAME_CTL: str = "/"
 """
 *aces-dev* conversion graph node name separator.
 
@@ -58,7 +63,9 @@ SEPARATOR_NODE_NAME_CTL : unicode
 
 
 @required("NetworkX")
-def build_aces_conversion_graph(ctl_transforms):
+def build_aces_conversion_graph(
+    ctl_transforms: dict[str, dict[str, dict[str, Any]]] | list[CTLTransform],
+) -> Any:
     """
     Build the *aces-dev* conversion graph from given *ACES* *CTL* transforms.
 
@@ -145,7 +152,7 @@ def build_aces_conversion_graph(ctl_transforms):
     return graph
 
 
-def node_to_ctl_transform(graph, node):
+def node_to_ctl_transform(graph: Any, node: str) -> CTLTransform:
     """
     Return the *ACES* *CTL* transform from given node name.
 
@@ -175,7 +182,7 @@ InvOutput.Academy.P3-D65_1000nit_in_P3-D65_ST2084.ctl')
     return graph.nodes[node]["data"]
 
 
-def ctl_transform_to_node(graph, ctl_transform):
+def ctl_transform_to_node(graph: Any, ctl_transform: CTLTransform) -> str | None:
     """
     Return the node name from given *ACES* *CTL* transform.
 
@@ -210,7 +217,9 @@ def ctl_transform_to_node(graph, ctl_transform):
     return None
 
 
-def filter_nodes(graph, filterers=None):
+def filter_nodes(
+    graph: Any, filterers: list[Callable[[CTLTransform], bool]] | None = None
+) -> list[str]:
     """
     Filter given *aces-dev* conversion graph nodes with given filterers.
 
@@ -252,7 +261,7 @@ def filter_nodes(graph, filterers=None):
 
 
 @required("NetworkX")
-def conversion_path(graph, source, target):
+def conversion_path(graph: Any, source: str, target: str) -> list[tuple[str, str]]:
     """
     Return the conversion path from the source node to the target node in the
     *aces-dev* conversion graph.
@@ -290,7 +299,7 @@ def conversion_path(graph, source, target):
 
 
 @required("NetworkX")
-def plot_aces_conversion_graph(graph, filename, prog="dot"):
+def plot_aces_conversion_graph(graph: Any, filename: str, prog: str = "dot") -> Any:
     """
     Plot given *aces-dev* conversion graph using
     `Graphviz <https://www.graphviz.org/>`__ and

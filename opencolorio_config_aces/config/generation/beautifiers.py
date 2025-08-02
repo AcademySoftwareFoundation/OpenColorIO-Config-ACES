@@ -7,6 +7,8 @@ Beautifiers
 Defines various objects related to pattern beautification.
 """
 
+from __future__ import annotations
+
 from opencolorio_config_aces.utilities import (
     multi_replace,
     slugify,
@@ -38,28 +40,28 @@ __all__ = [
     "beautify_alias",
 ]
 
-SEPARATOR_COLORSPACE_NAME = " - "
+SEPARATOR_COLORSPACE_NAME: str = " - "
 """
 *OpenColorIO* config colorspace name separator.
 
 SEPARATOR_COLORSPACE_NAME : unicode
 """
 
-SEPARATOR_COLORSPACE_FAMILY = "/"
+SEPARATOR_COLORSPACE_FAMILY: str = "/"
 """
 *OpenColorIO* config colorspace family separator.
 
 SEPARATOR_COLORSPACE_FAMILY : unicode
 """
 
-SEPARATOR_BUILTIN_TRANSFORM_NAME = "_to_"
+SEPARATOR_BUILTIN_TRANSFORM_NAME: str = "_to_"
 """
 *OpenColorIO* config *BuiltinTransform* name separator.
 
 SEPARATOR_BUILTIN_TRANSFORM_NAME : unicode
 """
 
-PATTERNS_COLORSPACE_NAME = {
+PATTERNS_COLORSPACE_NAME: dict[str, str] = {
     "ACES_0_1_1": "ACES 0.1.1",
     "ACES_0_2_2": "ACES 0.2.2",
     "ACES_0_7_1": "ACES 0.7.1",
@@ -117,7 +119,7 @@ PATTERNS_COLORSPACE_NAME.update(
     }
 )
 
-PATTERNS_LOOK_NAME = {
+PATTERNS_LOOK_NAME: dict[str, str] = {
     "Reference Gamut Compress": "ACES 1.3 Reference Gamut Compression",
 }
 """
@@ -130,7 +132,7 @@ Notes
 PATTERNS_LOOK_NAME : dict
 """
 
-PATTERNS_TRANSFORM_FAMILY = {
+PATTERNS_TRANSFORM_FAMILY: dict[str, str] = {
     "\\\\": SEPARATOR_COLORSPACE_FAMILY,
     "vendorSupplied[/\\\\]": "",
     "arri": "ARRI",
@@ -150,7 +152,7 @@ Notes
 PATTERNS_TRANSFORM_FAMILY : dict
 """
 
-PATTERNS_VIEW_TRANSFORM_NAME = {
+PATTERNS_VIEW_TRANSFORM_NAME: dict[str, str] = {
     "7.2nit": "&",
     "15nit": "&",
     "lim": " lim",
@@ -169,7 +171,7 @@ PATTERNS_VIEW_TRANSFORM_NAME = {
 PATTERNS_VIEW_TRANSFORM_NAME : dict
 """
 
-PATTERNS_DISPLAY_NAME = {
+PATTERNS_DISPLAY_NAME: dict[str, str] = {
     "G2.6-": "",
     "-BFD": "",
     "DisplayP3": "Display P3",
@@ -198,7 +200,7 @@ Notes
 PATTERNS_DISPLAY_NAME : dict
 """
 
-PATTERNS_ALIAS = {
+PATTERNS_ALIAS: dict[str, str] = {
     "Curve": "crv",
     "Display P3": "DisplayP3",
     "Gamma ": "g",
@@ -220,7 +222,7 @@ PATTERNS_ALIAS : dict
 """
 
 
-def beautify_name(name, patterns):
+def beautify_name(name: str, patterns: dict[str, str]) -> str:
     """
     Beautify given name by applying in succession the given patterns.
 
@@ -248,7 +250,7 @@ def beautify_name(name, patterns):
     return multi_replace(name, patterns).strip()
 
 
-def beautify_colorspace_name(name):
+def beautify_colorspace_name(name: str) -> str:
     """
     Beautify given *OpenColorIO* `Colorspace` name by applying in succession
     the relevant patterns.
@@ -272,7 +274,7 @@ def beautify_colorspace_name(name):
     return beautify_name(name, PATTERNS_COLORSPACE_NAME)
 
 
-def beautify_look_name(name):
+def beautify_look_name(name: str) -> str:
     """
     Beautify given *OpenColorIO* `Look` name by applying in succession the
     relevant patterns.
@@ -296,7 +298,7 @@ def beautify_look_name(name):
     return beautify_name(name, PATTERNS_LOOK_NAME)
 
 
-def beautify_transform_family(name):
+def beautify_transform_family(name: str) -> str:
     """
     Beautify given *OpenColorIO* `Colorspace` family by applying in succession
     the relevant patterns.
@@ -320,7 +322,7 @@ def beautify_transform_family(name):
     return beautify_name(name, PATTERNS_TRANSFORM_FAMILY)
 
 
-def beautify_view_transform_name(name):
+def beautify_view_transform_name(name: str) -> str:
     """
     Beautify given *OpenColorIO* `ViewTransform` name by applying in
     succession the relevant patterns.
@@ -362,7 +364,7 @@ def beautify_view_transform_name(name):
     return f"{family} ({genus})" if genus is not None else family
 
 
-def beautify_display_name(name):
+def beautify_display_name(name: str) -> str:
     """
     Beautify given *OpenColorIO* display name by applying in succession the
     relevant patterns.
@@ -392,7 +394,7 @@ def beautify_display_name(name):
     return name
 
 
-def beautify_alias(name):
+def beautify_alias(name: str) -> str:
     """
     Beautify given *OpenColorIO* alias by applying in succession the relevant
     patterns.

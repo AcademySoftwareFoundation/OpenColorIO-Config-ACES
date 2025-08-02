@@ -5,6 +5,7 @@ Defines the unit tests for the
 :mod:`opencolorio_config_aces.config.reference.generate` module resources.
 """
 
+from __future__ import annotations
 
 import unittest
 
@@ -33,7 +34,7 @@ class TestConfigResources(unittest.TestCase):
     methods.
     """
 
-    def test_csv_mapping_file(self):
+    def test_csv_mapping_file(self) -> None:
         """Test the *CSV* mapping file."""
 
         csv_local_path = PATH_TRANSFORMS_MAPPING_FILE_REFERENCE

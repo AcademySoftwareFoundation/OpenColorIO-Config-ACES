@@ -14,7 +14,9 @@ import csv
 import logging
 import re
 from collections import defaultdict
+from collections.abc import Callable, Mapping
 from pathlib import Path
+from typing import Any
 
 import PyOpenColorIO as ocio
 
@@ -23,6 +25,7 @@ from opencolorio_config_aces.clf import (
     discover_clf_transforms,
     unclassify_clf_transforms,
 )
+from opencolorio_config_aces.clf.discover.classify import CLFTransform
 from opencolorio_config_aces.config.generation import (
     BUILD_CONFIGURATIONS,
     BUILD_VARIANT_FILTERERS,
@@ -82,9 +85,9 @@ __all__ = [
     "main",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG = (
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG: str = (
     "https://docs.google.com/spreadsheets/d/"
     "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
     "export?format=csv&gid=365242296"
@@ -95,7 +98,7 @@ URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG : unicode
 """
 
-PATH_TRANSFORMS_MAPPING_FILE_CG = next(
+PATH_TRANSFORMS_MAPPING_FILE_CG: Path = next(
     (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
 )
 """
@@ -104,14 +107,14 @@ Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 PATH_TRANSFORMS_MAPPING_FILE_CG : unicode
 """
 
-FILTERED_NAMESPACES = ("OCIO",)
+FILTERED_NAMESPACES: tuple[str, ...] = ("OCIO",)
 """
 Filtered namespaces.
 
 FILTERED_NAMESPACES : tuple
 """
 
-TEMPLATE_CLF_TRANSFORM_ID = "CLFtransformID: {}"
+TEMPLATE_CLF_TRANSFORM_ID: str = "CLFtransformID: {}"
 """
 Template for the description of an *CLFtransformID*.
 
@@ -119,7 +122,7 @@ TEMPLATE_CLF_TRANSFORM_ID : unicode
 """
 
 
-def is_reference(name):
+def is_reference(name: str) -> bool:
     """
     Return whether given name represent a reference linear-like space.
 
@@ -141,7 +144,7 @@ def is_reference(name):
     )
 
 
-def clf_transform_to_colorspace_name(clf_transform):
+def clf_transform_to_colorspace_name(clf_transform: CLFTransform) -> str:
     """
     Generate the *OpenColorIO* `Colorspace` name for given *CLF* transform.
 
@@ -165,11 +168,11 @@ def clf_transform_to_colorspace_name(clf_transform):
 
 
 def clf_transform_to_description(
-    clf_transform,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    direction="Forward",
-):
+    clf_transform: CLFTransform,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: Mapping[str, Any] | None = None,
+    direction: str = "Forward",
+) -> str | None:
     """
     Generate the *OpenColorIO* `Colorspace` or `NamedTransform` description for
     given *CLF* transform.
@@ -260,7 +263,10 @@ def clf_transform_to_description(
     return description
 
 
-def clf_transform_to_family(clf_transform, filtered_namespaces=FILTERED_NAMESPACES):
+def clf_transform_to_family(
+    clf_transform: CLFTransform,
+    filtered_namespaces: tuple[str, ...] = FILTERED_NAMESPACES,
+) -> str:
     """
     Generate the *OpenColorIO* `Colorspace` or `NamedTransform` family for
     given *CLF* transform.
@@ -292,12 +298,12 @@ def clf_transform_to_family(clf_transform, filtered_namespaces=FILTERED_NAMESPAC
 
 
 def clf_transform_to_colorspace(
-    clf_transform,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    **kwargs,
-):
+    clf_transform: CLFTransform,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: Mapping[str, Any] | None = None,
+    signature_only: bool = False,
+    **kwargs: Any,
+) -> dict[str, Any] | ocio.ColorSpace:
     """
     Generate the *OpenColorIO* `Colorspace` for given *CLF* transform.
 
@@ -359,12 +365,12 @@ def clf_transform_to_colorspace(
 
 
 def clf_transform_to_named_transform(
-    clf_transform,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    **kwargs,
-):
+    clf_transform: CLFTransform,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: Mapping[str, Any] | None = None,
+    signature_only: bool = False,
+    **kwargs: Any,
+) -> dict[str, Any] | ocio.NamedTransform:
     """
     Generate the *OpenColorIO* `NamedTransform` for given *CLF* transform.
 
@@ -404,20 +410,20 @@ def clf_transform_to_named_transform(
         "src": clf_transform.path,
     }
     if is_reference(clf_transform.source):
-        signature["inverse_transform"] = file_transform
-        signature["description"] = clf_transform_to_description(
+        signature["inverse_transform"] = file_transform  # pyright: ignore
+        signature["description"] = clf_transform_to_description(  # pyright: ignore
             clf_transform, describe, amf_components, direction="Reverse"
         )
     else:
-        signature["forward_transform"] = file_transform
-        signature["description"] = clf_transform_to_description(
+        signature["forward_transform"] = file_transform  # pyright: ignore
+        signature["description"] = clf_transform_to_description(  # pyright: ignore
             clf_transform, describe, amf_components, direction="Forward"
         )
 
     signature.update(kwargs)
 
-    signature["aliases"] = list(
-        dict.fromkeys([beautify_alias(signature["name"])] + signature["aliases"])
+    signature["aliases"] = list(  # pyright: ignore
+        dict.fromkeys([beautify_alias(signature["name"])] + signature["aliases"])  # pyright: ignore
     )
 
     if signature_only:
@@ -429,13 +435,13 @@ def clf_transform_to_named_transform(
 
 
 def style_to_colorspace(
-    style,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    scheme="Modern 1",  # noqa: ARG001
-    **kwargs,
-):
+    style: str,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: Mapping[str, Any] | None = None,
+    signature_only: bool = False,
+    scheme: str = "Modern 1",  # noqa: ARG001
+    **kwargs: Any,
+) -> dict[str, Any] | ocio.ColorSpace:
     """
     Create an *OpenColorIO* `Colorspace` or its signature for given style.
 
@@ -539,13 +545,13 @@ def style_to_colorspace(
 
 
 def style_to_named_transform(
-    style,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    scheme="Modern 1",  # noqa: ARG001
-    **kwargs,
-):
+    style: str,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: Mapping[str, Any] | None = None,
+    signature_only: bool = False,
+    scheme: str = "Modern 1",  # noqa: ARG001
+    **kwargs: Any,
+) -> dict[str, Any] | ocio.NamedTransform:
     """
     Create an *OpenColorIO* `NamedTransform` or its signature for given style.
 
@@ -654,7 +660,7 @@ def style_to_named_transform(
         return colorspace
 
 
-def config_basename_cg(build_configuration):
+def config_basename_cg(build_configuration: BuildConfiguration) -> str:
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
     basename, i.e., the filename devoid of directory affix.
@@ -682,7 +688,7 @@ def config_basename_cg(build_configuration):
     )
 
 
-def config_name_cg(build_configuration):
+def config_name_cg(build_configuration: BuildConfiguration) -> str:
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config name.
 
@@ -716,9 +722,9 @@ def config_name_cg(build_configuration):
 
 
 def config_description_cg(
-    build_configuration,
-    describe=DescriptionStyle.SHORT_UNION,
-):
+    build_configuration: BuildConfiguration,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+) -> str:
     """
     Generate the ACES* Computer Graphics (CG) *OpenColorIO* config
     description.
@@ -756,16 +762,17 @@ def config_description_cg(
 
 
 def generate_config_cg(
-    data=None,
-    config_name=None,
-    build_configuration=BuildConfiguration(),
-    validate=True,
-    describe=DescriptionStyle.SHORT_UNION,
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_CG,
-    scheme="Modern 1",
-    additional_filterers=None,
-    additional_data=False,
-):
+    data: Any = None,
+    config_name: str | Path | None = None,
+    build_configuration: BuildConfiguration = BuildConfiguration(),
+    validate: bool = True,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+    config_mapping_file_path: Path = PATH_TRANSFORMS_MAPPING_FILE_CG,
+    scheme: str = "Modern 1",
+    additional_filterers: dict[str, dict[str, list[Callable[[Any], bool]]]]
+    | None = None,
+    additional_data: bool = False,
+) -> ocio.Config | tuple[ocio.Config, Any, Any, list[CLFTransform], Any]:
     """
     Generate the *ACES* Computer Graphics (CG) *OpenColorIO* config.
 
@@ -861,7 +868,7 @@ def generate_config_cg(
             additional_data=True,
         )
 
-    def clf_transform_from_id(clf_transform_id):
+    def clf_transform_from_id(clf_transform_id: str) -> CLFTransform | None:
         """
         Filter the "CLFTransform" instances matching given "CLFtransformID".
         """
@@ -882,7 +889,7 @@ def generate_config_cg(
 
         return clf_transform
 
-    def clf_transform_from_style(style):
+    def clf_transform_from_style(style: str) -> CLFTransform | None:
         """Filter the "CLFTransform" instances matching given style."""
 
         filtered_clf_transforms = [
@@ -970,7 +977,7 @@ def generate_config_cg(
 
             config_mapping[transform_data["colorspace"]].append(transform_data)
 
-    def yield_from_config_mapping():
+    def yield_from_config_mapping() -> Any:
         """Yield the transform data stored in the *CSV* mapping file."""
         for transforms_data in config_mapping.values():
             yield from transforms_data
@@ -991,12 +998,12 @@ def generate_config_cg(
 
     LOGGER.info("Implicit transforms: %s.", implicit_transforms)
 
-    def implicit_transform_filterer(transform):
+    def implicit_transform_filterer(transform: dict[str, Any]) -> bool:
         """Return whether given transform is an implicit transform."""
 
         return transform.get("name") in implicit_transforms
 
-    def transform_filterer(transform):
+    def transform_filterer(transform: dict[str, Any]) -> bool:
         """Return whether given transform must be included."""
 
         for transform_data in yield_from_config_mapping():
@@ -1010,14 +1017,18 @@ def generate_config_cg(
 
         return False
 
-    def filter_any(array, filterers):
+    def filter_any(
+        array: list[dict[str, Any]], filterers: list[Callable[[dict[str, Any]], bool]]
+    ) -> list[dict[str, Any]]:
         """Filter array elements passing any of the filterers."""
 
         filtered = [a for a in array if any(filterer(a) for filterer in filterers)]
 
         return filtered
 
-    def filter_all(array, filterers):
+    def filter_all(
+        array: list[dict[str, Any]], filterers: list[Callable[[dict[str, Any]], bool]]
+    ) -> list[dict[str, Any]]:
         """Filter array elements passing all of the filterers."""
 
         filtered = [a for a in array if all(filterer(a) for filterer in filterers)]
@@ -1080,7 +1091,7 @@ def generate_config_cg(
         a["name"] for a in data.colorspaces if a.get("family") == "Display"
     ]
 
-    def implicit_view_filterer(transform):
+    def implicit_view_filterer(transform: dict[str, Any]) -> bool:
         """Return whether given transform is an implicit view."""
 
         return all(
@@ -1090,7 +1101,7 @@ def generate_config_cg(
             ]
         )
 
-    def view_filterer(transform):
+    def view_filterer(transform: dict[str, Any]) -> bool:
         """Return whether given view transform must be included."""
 
         if transform["display"] not in display_names:
@@ -1142,7 +1153,7 @@ def generate_config_cg(
 
     # CLF Transforms & BuiltinTransform Creation
     # ==========================================
-    def remove_existing_colorspace(name):
+    def remove_existing_colorspace(name: str) -> None:
         """Remove given existing *ColorSpace* from the current config data."""
 
         for i, colorspace in enumerate(data.colorspaces[:]):
@@ -1155,7 +1166,7 @@ def generate_config_cg(
 
                 data.colorspaces.pop(i)
 
-    def remove_existing_named_transform(name):
+    def remove_existing_named_transform(name: str) -> None:
         """Remove given existing *NamedTransform* from the current config data."""
 
         for i, named_transform in enumerate(data.named_transforms[:]):
@@ -1233,7 +1244,7 @@ def generate_config_cg(
             clf_transform = clf_transform_from_id(clf_transform_id)
 
             attest(
-                clf_transform,
+                clf_transform is not None,
                 f'"{clf_transform_id}" "CLF" transform does not exist!',
             )
 
@@ -1313,7 +1324,7 @@ def generate_config_cg(
 
     # Ordering
     # ========
-    def ordering(element):
+    def ordering(element: dict[str, Any]) -> int:
         """Return the ordering key for given element."""
 
         return int(
@@ -1345,7 +1356,7 @@ def generate_config_cg(
         return config
 
 
-def main(build_directory):
+def main(build_directory: Path) -> int:
     """
     Define the main entry point for the generation of all the *ACES* Computer
     Graphics (CG) *OpenColorIO* config versions and variants.

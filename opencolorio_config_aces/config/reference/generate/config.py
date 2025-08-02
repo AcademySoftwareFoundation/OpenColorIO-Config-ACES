@@ -10,11 +10,15 @@ Defines various objects related to the generation of the *aces-dev* reference
 -   :func:`opencolorio_config_aces.generate_config_aces`
 """
 
+from __future__ import annotations
+
 import csv
 import logging
 import re
+from collections.abc import Callable
 from enum import Flag, auto
 from pathlib import Path
+from typing import Any
 
 import PyOpenColorIO as ocio
 
@@ -43,6 +47,9 @@ from opencolorio_config_aces.config.reference import (
     filter_ctl_transforms,
     generate_amf_components,
     unclassify_ctl_transforms,
+)
+from opencolorio_config_aces.config.reference.discover.classify import (
+    CTLTransform,
 )
 from opencolorio_config_aces.utilities import (
     as_bool,
@@ -84,9 +91,9 @@ __all__ = [
     "main",
 ]
 
-LOGGER = logging.getLogger(__name__)
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
-URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE = (
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE: str = (
     "https://docs.google.com/spreadsheets/d/"
     "1z3xsy3sF0I-8AN_tkMOEjHlAs13ba7VAVhrE8v4WIyo/"
     "export?format=csv&gid=273921464"
@@ -97,7 +104,7 @@ URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE : unicode
 """
 
-PATH_TRANSFORMS_MAPPING_FILE_REFERENCE = next(
+PATH_TRANSFORMS_MAPPING_FILE_REFERENCE: Path = next(
     (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
 )
 """
@@ -106,28 +113,28 @@ Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 PATH_TRANSFORMS_MAPPING_FILE_REFERENCE : unicode
 """
 
-COLORSPACE_SCENE_ENCODING_REFERENCE = "ACES2065-1"
+COLORSPACE_SCENE_ENCODING_REFERENCE: str = "ACES2065-1"
 """
 *OpenColorIO* config reference colorspace.
 
 COLORSPACE_SCENE_ENCODING_REFERENCE : unicode
 """
 
-FAMILY_DISPLAY_REFERENCE = "Display"
+FAMILY_DISPLAY_REFERENCE: str = "Display"
 """
 *OpenColorIO* config display family.
 
 FAMILY_DISPLAY_REFERENCE : unicode
 """
 
-TEMPLATE_ACES_TRANSFORM_ID = "ACEStransformID: {}"
+TEMPLATE_ACES_TRANSFORM_ID: str = "ACEStransformID: {}"
 """
 Template for the description of an *ACEStransformID*.
 
 TEMPLATE_ACES_TRANSFORM_ID : unicode
 """
 
-HEADER_AMF_COMPONENTS = "AMF Components\n--------------"
+HEADER_AMF_COMPONENTS: str = "AMF Components\n--------------"
 """
 Header for the description of the *ACES* *AMF* components.
 
@@ -150,7 +157,7 @@ class DescriptionStyle(Flag):
     LONG_UNION = ACES | OPENCOLORIO | LONG | AMF
 
 
-def format_optional_prefix(name, prefix, scheme="Modern 1"):
+def format_optional_prefix(name: str, prefix: str, scheme: str = "Modern 1") -> str:
     """
     Format given name according to given prefix and naming convention scheme.
 
@@ -182,7 +189,7 @@ def format_optional_prefix(name, prefix, scheme="Modern 1"):
     return f"{prefix}{SEPARATOR_COLORSPACE_NAME}{name}" if scheme == "legacy" else name
 
 
-def format_swapped_affix(name, affix, scheme="Modern 1"):
+def format_swapped_affix(name: str, affix: str, scheme: str = "Modern 1") -> str:
     """
     Format given name according to given prefix and naming convention scheme.
 
@@ -218,7 +225,7 @@ def format_swapped_affix(name, affix, scheme="Modern 1"):
     )
 
 
-def ctl_transform_to_colorspace_name(ctl_transform):
+def ctl_transform_to_colorspace_name(ctl_transform: CTLTransform) -> str:
     """
     Generate the *OpenColorIO* `Colorspace` name for given *ACES* *CTL*
     transform.
@@ -243,7 +250,7 @@ def ctl_transform_to_colorspace_name(ctl_transform):
     return beautify_colorspace_name(name)
 
 
-def ctl_transform_to_look_name(ctl_transform):
+def ctl_transform_to_look_name(ctl_transform: CTLTransform) -> str:
     """
     Generate the *OpenColorIO* `Look` name for given *ACES* *CTL*
     transform.
@@ -262,7 +269,9 @@ def ctl_transform_to_look_name(ctl_transform):
     return beautify_look_name(ctl_transform.user_name)
 
 
-def ctl_transform_to_transform_family(ctl_transform, analytical=True):
+def ctl_transform_to_transform_family(
+    ctl_transform: CTLTransform, analytical: bool = True
+) -> str:
     """
     Generate the *OpenColorIO* transform family for given *ACES* *CTL*
     transform.
@@ -305,12 +314,12 @@ def ctl_transform_to_transform_family(ctl_transform, analytical=True):
 
 
 def ctl_transform_to_description(
-    ctl_transform,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    factory=colorspace_factory,
-    **kwargs,
-):
+    ctl_transform: CTLTransform,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: dict[str, list[str]] | None = None,
+    factory: Callable[..., Any] = colorspace_factory,
+    **kwargs: Any,
+) -> str | None:
     """
     Generate the *OpenColorIO* `Colorspace` or `Look` description for given
     *ACES* *CTL* transform.
@@ -417,14 +426,14 @@ def ctl_transform_to_description(
 
 
 def ctl_transform_to_colorspace(
-    ctl_transform,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    scheme="Modern 1",
-    analytical=True,
-    **kwargs,
-):
+    ctl_transform: CTLTransform,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: dict[str, list[str]] | None = None,
+    signature_only: bool = False,
+    scheme: str = "Modern 1",
+    analytical: bool = True,
+    **kwargs: Any,
+) -> Any:
     """
     Generate the *OpenColorIO* `Colorspace` or its signature for given *ACES*
     *CTL* transform.
@@ -488,14 +497,14 @@ def ctl_transform_to_colorspace(
 
 
 def ctl_transform_to_look(
-    ctl_transform,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    scheme="Modern 1",
-    analytical=True,
-    **kwargs,
-):
+    ctl_transform: CTLTransform,
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: dict[str, list[str]] | None = None,
+    signature_only: bool = False,
+    scheme: str = "Modern 1",
+    analytical: bool = True,
+    **kwargs: Any,
+) -> Any:
     """
     Generate the *OpenColorIO* `Look` or its signature for given *ACES* *CTL*
     transform.
@@ -554,14 +563,14 @@ def ctl_transform_to_look(
 
 
 def style_to_view_transform(
-    style,
-    ctl_transforms,
-    describe=DescriptionStyle.LONG_UNION,
-    amf_components=None,
-    signature_only=False,
-    scheme="Modern 1",
-    **kwargs,
-):
+    style: str,
+    ctl_transforms: list[CTLTransform],
+    describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
+    amf_components: dict[str, list[str]] | None = None,
+    signature_only: bool = False,
+    scheme: str = "Modern 1",
+    **kwargs: Any,
+) -> Any:
     """
     Create an *OpenColorIO* `ViewTransform` or its signature for given style.
 
@@ -596,6 +605,9 @@ def style_to_view_transform(
     ocio.ViewTransform or dict
         *OpenColorIO* `ViewTransform` or its signature for given style.
     """
+
+    if amf_components is None:
+        amf_components = {}
 
     name = beautify_view_transform_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
@@ -705,13 +717,13 @@ def style_to_view_transform(
 
 
 def style_to_display_colorspace(
-    style,
-    describe=DescriptionStyle.OPENCOLORIO,
-    amf_components=None,
-    signature_only=False,
-    scheme="Modern 1",
-    **kwargs,
-):
+    style: str,
+    describe: DescriptionStyle = DescriptionStyle.OPENCOLORIO,
+    amf_components: dict[str, list[str]] | None = None,
+    signature_only: bool = False,
+    scheme: str = "Modern 1",
+    **kwargs: Any,
+) -> Any:
     """
     Create an *OpenColorIO* display `Colorspace` or its signature for given
     style.
@@ -744,6 +756,9 @@ def style_to_display_colorspace(
     ocio.ColorSpace or dict
         *OpenColorIO* display `Colorspace` or its signature for given style.
     """
+
+    if amf_components is None:
+        amf_components = {}
 
     kwargs.setdefault("family", FAMILY_DISPLAY_REFERENCE)
 
@@ -805,7 +820,7 @@ def style_to_display_colorspace(
         return colorspace
 
 
-def transform_data_aliases(transform_data):
+def transform_data_aliases(transform_data: dict[str, Any]) -> list[str]:
     """
     Return the aliases from given transform data.
 
@@ -831,7 +846,7 @@ def transform_data_aliases(transform_data):
         return aliases
 
 
-def config_basename_aces(build_configuration):
+def config_basename_aces(build_configuration: BuildConfiguration) -> str:
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     basename, i.e., the filename devoid of directory affixe.
@@ -857,7 +872,7 @@ def config_basename_aces(build_configuration):
     )
 
 
-def config_name_aces(build_configuration):
+def config_name_aces(build_configuration: BuildConfiguration) -> str:
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config name.
 
@@ -886,7 +901,10 @@ def config_name_aces(build_configuration):
     ).format(**build_configuration.compact_fields())
 
 
-def config_description_aces(build_configuration, describe=DescriptionStyle.SHORT_UNION):
+def config_description_aces(
+    build_configuration: BuildConfiguration,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+) -> str:
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     description.
@@ -926,15 +944,15 @@ def config_description_aces(build_configuration, describe=DescriptionStyle.SHORT
 
 
 def generate_config_aces(
-    config_name=None,
-    build_configuration=BuildConfiguration(),
-    validate=True,
-    describe=DescriptionStyle.SHORT_UNION,
-    config_mapping_file_path=PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
-    scheme="Modern 1",
-    analytical=True,
-    additional_data=False,
-):
+    config_name: str | None = None,
+    build_configuration: BuildConfiguration = BuildConfiguration(),
+    validate: bool = True,
+    describe: DescriptionStyle = DescriptionStyle.SHORT_UNION,
+    config_mapping_file_path: Any = PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
+    scheme: str = "Modern 1",
+    analytical: bool = True,
+    additional_data: bool = False,
+) -> Any:
     """
     Generate the *aces-dev* reference implementation *OpenColorIO* config
     using the *Mapping* method.
@@ -1087,10 +1105,10 @@ def generate_config_aces(
                 amf_components[style] = []
 
             amf_components[style].extend(
-                [ctl_transform.aces_transform_id.aces_transform_id]
+                [ctl_transform.aces_transform_id.aces_transform_id]  # pyright: ignore
                 + [
                     sibling.aces_transform_id.aces_transform_id
-                    for sibling in ctl_transform.siblings
+                    for sibling in ctl_transform.siblings  # pyright: ignore
                 ]
             )
 
@@ -1126,7 +1144,7 @@ def generate_config_aces(
         "reference_space": "REFERENCE_SPACE_DISPLAY",
         "encoding": "display-linear",
     }
-    display_reference_colorspace["aliases"] = [
+    display_reference_colorspace["aliases"] = [  # pyright: ignore
         "cie_xyz_d65_display",
         "lin_ciexyzd65_display",
     ]
@@ -1261,7 +1279,7 @@ def generate_config_aces(
             display_names.insert(0, display_names.pop(i))
 
     # Ordering active views by luminance, whitepoint, and, dynamic range.
-    def ordering(element):
+    def ordering(element: str) -> int:
         """Return the ordering key for given element."""
 
         score = 0
@@ -1392,7 +1410,7 @@ def generate_config_aces(
         return config
 
 
-def main(build_directory):
+def main(build_directory: Any) -> int:
     """
     Define the main entry point for the generation of all the *aces-dev*
     reference implementation *OpenColorIO* config versions and variants.
