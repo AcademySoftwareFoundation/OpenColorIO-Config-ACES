@@ -92,7 +92,7 @@ trove-classifiers==2025.3.13.13
 typing-extensions==4.12.2
 urllib3==2.3.0
 userpath==1.9.2
-uv==0.6.6
+uv==0.8.6
 virtualenv==20.29.3
 zipp==3.21.0 ; python_full_version < '3.12'
 zstandard==0.23.0
