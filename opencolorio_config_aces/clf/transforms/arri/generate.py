@@ -273,6 +273,10 @@ def _generate_logc3_transforms(
         # Generate ARRI LogC3 to ACES 2065-1 Transform
         name = f"ARRI_LogC3_EI{ei}_to_ACES2065-1"
         aces_id = f"urn:ampas:aces:transformId:v1.5:IDT.ARRI.Alexa-v3-logC-EI{ei}.a1.v2"
+
+        if ei == 800:
+            aces_id = "urn:ampas:aces:transformId:v2.0:CSC.Arri.LogC3_to_ACES.a2.v1"
+
         input_descriptor = f"ARRI LogC3 (EI{ei})"
         output_descriptor = "ACES2065-1"
         clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)
@@ -342,7 +346,7 @@ def _generate_logc4_transforms(
 
     # Generate ARRI LogC4 to ACES 2065-1 Transform
     name = "ARRI_LogC4_to_ACES2065-1"
-    aces_id = "urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv4_to_ACES.a2.v1"
+    aces_id = "urn:ampas:aces:transformId:v2.0:CSC.Arri.LogC4_to_ACES.a2.v1"
     input_descriptor = "ARRI LogC4"
     output_descriptor = "ACES2065-1"
     clf_transform_id = format_clf_transform_id(FAMILY, GENUS, name, VERSION)

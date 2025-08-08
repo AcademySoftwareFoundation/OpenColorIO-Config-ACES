@@ -255,7 +255,7 @@ def patch_invalid_aces_transform_id(aces_transform_id: str) -> str:
 ROOT_TRANSFORMS_CTL: str = os.path.normpath(
     os.environ.get(
         "OPENCOLORIO_CONFIG_CTL__CTL_TRANSFORMS_ROOT",
-        os.path.join(os.path.dirname(__file__), "../", "aces-system"),
+        os.path.join(os.path.dirname(__file__), "../", "aces"),
     )
 )
 """

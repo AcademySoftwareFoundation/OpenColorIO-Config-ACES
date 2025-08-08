@@ -1,3 +1,3 @@
-[submodule "opencolorio_config_aces/config/reference/aces-system"]
-	path = opencolorio_config_aces/config/reference/aces-system
-	url = https://github.com/colour-science/aces-system
+[submodule "opencolorio_config_aces/config/reference/aces"]
+	path = opencolorio_config_aces/config/reference/aces
+	url = https://github.com/ampas/aces

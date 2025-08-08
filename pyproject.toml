@@ -108,7 +108,7 @@ reportUnnecessaryTypeIgnoreComment = true
 reportUnsupportedDunderAll = false
 reportUnusedExpression = false
 reportAttributeAccessIssue = false  # OpenColorIO does not have typing stubs.
-exclude = ["**/aces-system", "**/.venv"]
+exclude = ["**/aces", "**/.venv"]
 
 [tool.ruff]
 target-version = "py310"

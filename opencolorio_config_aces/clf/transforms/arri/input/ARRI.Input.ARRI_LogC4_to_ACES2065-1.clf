@@ -3,7 +3,7 @@
     <InputDescriptor>ARRI LogC4</InputDescriptor>
     <OutputDescriptor>ACES2065-1</OutputDescriptor>
     <Info>
-        <ACEStransformID>urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv4_to_ACES.a2.v1</ACEStransformID>
+        <ACEStransformID>urn:ampas:aces:transformId:v2.0:CSC.Arri.LogC4_to_ACES.a2.v1</ACEStransformID>
     </Info>
     <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
         <LogParams base="2" linSideSlope="2231.82630906769" linSideOffset="64" logSideSlope="0.0647954196341293" logSideOffset="-0.295908392682586" linSideBreak="-0.0180569961199113" />

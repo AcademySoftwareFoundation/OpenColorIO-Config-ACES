@@ -5,8 +5,8 @@ Ordering,ACEStransformID,Colorspace,Legacy,BuiltinTransform Style,Linked Display
 100,urn:ampas:aces:transformId:v2.0:CSC.Academy.ADX10_to_ACES.a2.v1,Input - ADX - ADX10,TRUE,ADX10_to_ACES2065-1,,ColorSpace,log,file-io,adx10
 100,urn:ampas:aces:transformId:v2.0:CSC.Academy.ADX16_to_ACES.a2.v1,Input - ADX - ADX16,TRUE,ADX16_to_ACES2065-1,,ColorSpace,log,file-io,adx16
 105,urn:ampas:aces:transformId:v2.0:CSC.Apple.AppleLog_BT2020_to_ACES.a2.v1,,FALSE,APPLE_LOG_to_ACES2065-1,,ColorSpace,log,file-io,
-110,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv3_to_ACES.a2.v1,,FALSE,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace,log,file-io,logc3ei800_alexawide
-110,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogCv4_to_ACES.a2.v1,,FALSE,ARRI_LOGC4_to_ACES2065-1,,ColorSpace,log,file-io,
+110,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogC3_to_ACES.a2.v1,,FALSE,ARRI_ALEXA-LOGC-EI800-AWG_to_ACES2065-1,,ColorSpace,log,file-io,logc3ei800_alexawide
+110,urn:ampas:aces:transformId:v2.0:CSC.Arri.LogC4_to_ACES.a2.v1,,FALSE,ARRI_LOGC4_to_ACES2065-1,,ColorSpace,log,file-io,
 130,urn:ampas:aces:transformId:v2.0:CSC.Panasonic.VLog_VGamut_to_ACES.a2.v1,,FALSE,PANASONIC_VLOG-VGAMUT_to_ACES2065-1,,ColorSpace,log,file-io,vlog_vgamut
 135,urn:ampas:aces:transformId:v2.0:CSC.Red.Log3G10_RWG_to_ACES.a2.v1,,FALSE,RED_LOG3G10-RWG_to_ACES2065-1,,ColorSpace,log,file-io,log3g10_rwg
 140,urn:ampas:aces:transformId:v2.0:CSC.Sony.SLog3_SGamut3_to_ACES.a2.v1,,FALSE,SONY_SLOG3-SGAMUT3_to_ACES2065-1,,ColorSpace,log,file-io,slog3_sgamut3
