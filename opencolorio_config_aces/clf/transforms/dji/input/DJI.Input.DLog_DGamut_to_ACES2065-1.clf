@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:DJI:Input:DLog_DGamut_to_ACES2065-1:1.0" name="DJI D-Log - D-Gamut to ACES2065-1">
+    <InputDescriptor>DJI D-Log - D-Gamut</InputDescriptor>
+    <OutputDescriptor>ACES2065-1</OutputDescriptor>
+    <Info>
+        <ACEStransformID>urn:ampas:aces:transformId:v2.0:CSC.DJI.DLog_DGamut_to_ACES.a1.v1</ACEStransformID>
+    </Info>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="0.9892" linSideOffset="0.0108" logSideSlope="0.256662970719888" logSideOffset="0.58455504907396" linSideBreak="0.00758078675" />
+    </Log>
+    <Matrix inBitDepth="32f" outBitDepth="32f">
+        <Array dim="3 3">
+  0.691279245585754   0.214382527745956  0.0943382266682902
+ 0.0662224037667752     1.0116160801876 -0.0778384839543733
+-0.0172985410341745 -0.0773788501012682    1.09467739113544
+        </Array>
+    </Matrix>
+</ProcessList>

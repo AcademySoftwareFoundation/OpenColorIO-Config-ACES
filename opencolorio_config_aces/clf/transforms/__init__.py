@@ -19,6 +19,9 @@ from .blackmagic import (
 from .canon import (
     generate_clf_transforms_canon,
 )
+from .dji import (
+    generate_clf_transforms_dji,
+)
 from .itu import (
     generate_clf_transforms_itu,
 )
@@ -52,6 +55,9 @@ __all__ += [
 ]
 __all__ += [
     "generate_clf_transforms_canon",
+]
+__all__ += [
+    "generate_clf_transforms_dji",
 ]
 __all__ += [
     "generate_clf_transforms_itu",

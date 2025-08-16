@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessList compCLFversion="3" id="urn:aswf:ocio:transformId:1.0:DJI:Input:DLog-Curve_to_Linear:1.0" name="DJI D-Log Log to Linear Curve">
+    <InputDescriptor>DJI D-Log Log (arbitrary primaries)</InputDescriptor>
+    <OutputDescriptor>DJI D-Log Linear (arbitrary primaries)</OutputDescriptor>
+    <Log inBitDepth="32f" outBitDepth="32f" style="cameraLogToLin">
+        <LogParams base="10" linSideSlope="0.9892" linSideOffset="0.0108" logSideSlope="0.256662970719888" logSideOffset="0.58455504907396" linSideBreak="0.00758078675" />
+    </Log>
+</ProcessList>
