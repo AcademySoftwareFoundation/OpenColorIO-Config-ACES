@@ -195,14 +195,12 @@ PATTERNS_DESCRIPTION_CTL: dict[str, str] = {
 PATTERNS_DESCRIPTION_CTL : dict
 """
 
-PATH_AMF_COMPONENTS_FILE: Path = (
-    Path(__file__).parents[0] / "resources" / "ACES_AMF_Components.json"
-)
+PATH_TRANSFORMS_FILE: Path = Path(__file__).parents[1] / "aces" / "transforms.json"
 
 """
-Path to the *ACES* *AMF* components file.
+Path to the *ACES* transforms file containing comprehensive metadata.
 
-PATH_AMF_COMPONENTS_FILE : unicode
+PATH_TRANSFORMS_FILE : unicode
 """
 
 
@@ -1461,10 +1459,10 @@ reference.ROOT_TRANSFORMS_CTL` attribute using the
 def generate_amf_components(
     ctl_transforms: dict[str, dict[str, dict[str, CTLTransform | CTLTransformPair]]]
     | list[CTLTransform],
-    raise_exception: bool = False,
+    include_previous_transform_ids: bool = False,
 ) -> dict[str, list[str]]:
     """
-    Generate the *ACES* *AMF* components from given *ACES* *CTL* transforms.
+    Generate the *ACES* *AMF* components from the `transforms.json` file.
 
     Parameters
     ----------
@@ -1473,9 +1471,9 @@ def generate_amf_components(
         :func:`opencolorio_config_aces.classify_aces_ctl_transforms` or
         :func:`opencolorio_config_aces.unclassify_aces_ctl_transforms`
         definitions.
-    raise_exception : bool, optional
-        Whether to raise an exception if an *ACES* *ACEStransformID* is
-        missing.
+    include_previous_transform_ids : bool
+        Whether to include the previous *ACEStransformID* in the *ACES* *AMF*
+        components.
 
     Returns
     -------
@@ -1485,46 +1483,48 @@ def generate_amf_components(
 
     amf_components = defaultdict(list)
 
-    with open(PATH_AMF_COMPONENTS_FILE) as json_file:
-        content = json_file.readlines()
-        content = json.loads(
-            "\n".join([line for line in content if not line.strip().startswith("//")])
-        )
+    with open(PATH_TRANSFORMS_FILE) as json_file:
+        json_data = json.load(json_file)
 
-        attest(content["header"]["schema_version"].split(".")[0] == "1")
+    all_transforms = [
+        transform
+        for version_data in json_data["transformsData"].values()
+        for transform in version_data["transforms"]
+    ]
 
-        amf_components_implicit = content["amf_components"]
+    for transform in all_transforms:
+        transform_id = transform["transformId"]
+
+        if (
+            include_previous_transform_ids
+            and "previousEquivalentTransformIds" in transform
+        ):
+            for previous_transform_id in transform["previousEquivalentTransformIds"]:
+                if (
+                    previous_transform_id
+                    and transform_id
+                    and transform_id not in amf_components[previous_transform_id]
+                ):
+                    amf_components[previous_transform_id].append(transform_id)
+
+        inverse_transform_id = transform.get("inverseTransformId", "")
+
+        if (
+            inverse_transform_id
+            and transform_id
+            and inverse_transform_id not in amf_components[transform_id]
+        ):
+            amf_components[transform_id].append(inverse_transform_id)
+
+        if (
+            inverse_transform_id
+            and transform_id
+            and transform_id not in amf_components[inverse_transform_id]
+        ):
+            amf_components[inverse_transform_id].append(transform_id)
 
     if isinstance(ctl_transforms, Mapping):
         ctl_transforms = unclassify_ctl_transforms(ctl_transforms)
-
-    # Checking that the explicit "ACEStransformID" do exist.
-    for aces_transform_id, relations in amf_components_implicit.items():
-        explicit_aces_transform_ids = [aces_transform_id]
-        explicit_aces_transform_ids.extend(relations)
-
-        for explicit_aces_transform_id in explicit_aces_transform_ids:
-            filtered_ctl_transforms = filter_ctl_transforms(
-                ctl_transforms,
-                [
-                    lambda x, y=explicit_aces_transform_id: (
-                        x.aces_transform_id.aces_transform_id == y
-                    )
-                ],
-            )
-
-            ctl_transform = next(iter(filtered_ctl_transforms), None)
-
-            if ctl_transform is None:
-                exception_message = (
-                    f'"aces-dev" has no transform with '
-                    f'"{explicit_aces_transform_id}" "ACEStransformID!'
-                )
-
-                if raise_exception:
-                    attest(False, exception_message)
-                else:
-                    LOGGER.critical(exception_message)
 
     for ctl_transform in ctl_transforms:
         aces_transform_id = ctl_transform.aces_transform_id.aces_transform_id
@@ -1541,22 +1541,21 @@ def generate_amf_components(
             )
         ]:
             for sibling in siblings:
-                amf_components[aces_transform_id].append(
-                    sibling.aces_transform_id.aces_transform_id
+                sibling_id = sibling.aces_transform_id.aces_transform_id
+                if sibling_id not in amf_components[aces_transform_id]:
+                    amf_components[aces_transform_id].append(sibling_id)
+
+    for aces_transform_id, relations in list(amf_components.items()):
+        for relation in relations:
+            if relation in amf_components:
+                amf_components[relation] = sorted(
+                    set(amf_components[relation] + relations + [aces_transform_id])
+                    - {relation}
                 )
 
-    # Extending with explicit relations.
-    for aces_transform_id, relations in amf_components_implicit.items():
-        amf_components[aces_transform_id].extend(relations)
+    result = {key: sorted(set(value)) for key, value in amf_components.items() if value}
 
-    # Generating the permutations.
-    for aces_transform_id, relations in amf_components.copy().items():
-        for relation in relations:
-            amf_components[relation] = sorted(
-                {*relations, *amf_components[relation], aces_transform_id} - {relation}
-            )
-
-    return dict(amf_components)
+    return result
 
 
 if __name__ == "__main__":
