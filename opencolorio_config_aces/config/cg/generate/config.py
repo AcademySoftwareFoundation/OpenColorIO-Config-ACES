@@ -1341,6 +1341,34 @@ def generate_config_cg(
     data.view_transforms = sorted(data.view_transforms, key=ordering)
     data.looks = sorted(data.looks, key=ordering)
 
+    # Virtual Display Shared Views
+    # ============================
+    data.virtual_display_shared_views = list(
+        {
+            shared_view["view"]
+            for shared_view in data.shared_views
+            if shared_view["display"]
+            in [
+                a["name"]
+                for a in data.colorspaces
+                if a.get("family") == "Display" and a.get("encoding") == "sdr-video"
+            ]
+        }
+    )
+
+    # Virtual Display Views
+    # =====================
+    data.virtual_display_views = [
+        {
+            "view": "Raw",
+            "view_transform": "",
+            "colorspace": "Raw",
+            "looks": "",
+            "rule": "",
+            "description": "",
+        }
+    ]
+
     data.profile_version = build_configuration.ocio
 
     config = generate_config(data, config_name, validate)

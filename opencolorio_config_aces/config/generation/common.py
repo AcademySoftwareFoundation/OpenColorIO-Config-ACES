@@ -93,6 +93,11 @@ class ConfigData:
     views : array_like, optional
         Config views, an iterable of dicts of display, view
         and `Colorspace` names.
+    virtual_display_shared_views : array_like, optional
+        Config virtual display shared views, an iterable of shared view names.
+    virtual_display_views : array_like, optional
+        Config virtual display views, an iterable of dicts of view, `ViewTransform`,
+        `Colorspace` names, looks, rule name and description.
     active_displays : array_like, optional
         Config active displays, an iterable of display names.
     active_views : array_like, optional
@@ -144,6 +149,8 @@ class ConfigData:
     looks: list[dict[str, Any] | ocio.Look] = field(default_factory=list)
     shared_views: list[dict[str, Any]] = field(default_factory=list)
     views: list[dict[str, Any]] = field(default_factory=list)
+    virtual_display_shared_views: list[str] = field(default_factory=list)
+    virtual_display_views: list[dict[str, Any]] = field(default_factory=list)
     active_displays: list[str] = field(default_factory=list)
     active_views: list[str] = field(default_factory=list)
     file_rules: list[dict[str, Any]] = field(default_factory=list)
@@ -364,6 +371,33 @@ def generate_config(
         else:
             LOGGER.debug('Adding "%s" view to "%s" display.', view, display)
             config.addDisplaySharedView(display, view)
+
+    for virtual_display_shared_view in data.virtual_display_shared_views:
+        LOGGER.debug(
+            'Adding "%s" virtual display shared view.', virtual_display_shared_view
+        )
+        config.addVirtualDisplaySharedView(virtual_display_shared_view)
+
+    for virtual_display_view in data.virtual_display_views:
+        view_name = virtual_display_view["view"]
+        view_transform = virtual_display_view["view_transform"]
+        colorspace = virtual_display_view["colorspace"]
+        looks = virtual_display_view.get("looks", "")
+        rule = virtual_display_view.get("rule", "")
+        description = virtual_display_view.get("description", "")
+        LOGGER.debug(
+            'Adding "%s" virtual display view using "%s" view transform, "%s" '
+            'colorspace, "%s" looks, "%s" rule and "%s" description.',
+            view_name,
+            view_transform,
+            colorspace,
+            looks,
+            rule,
+            description,
+        )
+        config.addVirtualDisplayView(
+            view_name, view_transform, colorspace, looks, rule, description
+        )
 
     if data.active_displays:
         LOGGER.debug('Activating "%s" displays.', data.active_displays)
