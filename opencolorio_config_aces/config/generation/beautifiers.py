@@ -182,6 +182,7 @@ PATTERNS_DISPLAY_NAME: dict[str, str] = {
     "-Rec.": " Rec.",
     "-1000nit": "",
     "P3-HDR": "P3 HDR",
+    "- MIRROR NEGS": "",
     # Legacy Substitutions
     "dcdm": "DCDM",
     "p3": "P3",

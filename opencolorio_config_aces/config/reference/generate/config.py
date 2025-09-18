@@ -1031,6 +1031,7 @@ def generate_config_aces(
                 "encoding",
                 "categories",
                 "aliases",
+                "interop_id",
             ],
         )
 
@@ -1129,6 +1130,7 @@ def generate_config_aces(
         "description": 'The "Academy Color Encoding System" reference colorspace.',
         "encoding": "scene-linear",
         "categories": ["file-io", "texture"],
+        "interop_id": "lin_ap0_scene",
     }
     scene_reference_colorspace["aliases"] = [
         beautify_alias(scene_reference_colorspace["name"]),
@@ -1143,10 +1145,12 @@ def generate_config_aces(
         "description": 'The "CIE XYZ (D65)" display connection colorspace.',
         "reference_space": "REFERENCE_SPACE_DISPLAY",
         "encoding": "display-linear",
+        "interop_id": "ocio:lin_ciexyzd65_display",
     }
     display_reference_colorspace["aliases"] = [  # pyright: ignore
         "cie_xyz_d65_display",
         "lin_ciexyzd65_display",
+        "ocio:lin_ciexyzd65_display",
     ]
 
     raw_colorspace = {
@@ -1156,6 +1160,7 @@ def generate_config_aces(
         "is_data": True,
         "categories": ["file-io", "texture"],
         "encoding": "data",
+        "interop_id": "data",
     }
     raw_colorspace["aliases"] = [
         beautify_alias(raw_colorspace["name"]),
@@ -1204,6 +1209,7 @@ def generate_config_aces(
                 encoding=transform_data.get("encoding"),
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
+                interop_id=transform_data.get("interop_id"),
             )
             display["transforms_data"] = [transform_data]
             display_name = display["name"]
@@ -1267,6 +1273,7 @@ def generate_config_aces(
                 encoding=transform_data.get("encoding"),
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
+                interop_id=transform_data.get("interop_id"),
             )
             colorspace["transforms_data"] = [transform_data]
             if colorspace not in colorspaces:

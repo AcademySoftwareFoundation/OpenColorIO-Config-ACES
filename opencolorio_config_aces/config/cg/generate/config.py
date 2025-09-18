@@ -926,6 +926,7 @@ def generate_config_cg(
                 "aliases",
                 "encoding",
                 "categories",
+                "interop_id",
             ],
         )
 
@@ -1194,6 +1195,7 @@ def generate_config_cg(
             "aliases": transform_data_aliases(transform_data),
             "encoding": transform_data.get("encoding"),
             "categories": transform_data.get("categories"),
+            "interop_id": transform_data.get("interop_id"),
         }
 
         style = transform_data["builtin_transform_style"]
