@@ -70,6 +70,7 @@ __all__ = [
     "filter_ctl_transforms",
     "print_aces_taxonomy",
     "generate_amf_components",
+    "filter_amf_components",
 ]
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
@@ -1457,8 +1458,6 @@ reference.ROOT_TRANSFORMS_CTL` attribute using the
 
 
 def generate_amf_components(
-    ctl_transforms: dict[str, dict[str, dict[str, CTLTransform | CTLTransformPair]]]
-    | list[CTLTransform],
     include_previous_transform_ids: bool = False,
 ) -> dict[str, list[str]]:
     """
@@ -1466,11 +1465,6 @@ def generate_amf_components(
 
     Parameters
     ----------
-    ctl_transforms : dict or list
-        *ACES* *CTL* transforms as returned by
-        :func:`opencolorio_config_aces.classify_aces_ctl_transforms` or
-        :func:`opencolorio_config_aces.unclassify_aces_ctl_transforms`
-        definitions.
     include_previous_transform_ids : bool
         Whether to include the previous *ACEStransformID* in the *ACES* *AMF*
         components.
@@ -1495,67 +1489,49 @@ def generate_amf_components(
     for transform in all_transforms:
         transform_id = transform["transformId"]
 
-        if (
-            include_previous_transform_ids
-            and "previousEquivalentTransformIds" in transform
-        ):
-            for previous_transform_id in transform["previousEquivalentTransformIds"]:
-                if (
-                    previous_transform_id
-                    and transform_id
-                    and transform_id not in amf_components[previous_transform_id]
-                ):
-                    amf_components[previous_transform_id].append(transform_id)
+        amf_components[transform_id].append(transform_id)
 
-        inverse_transform_id = transform.get("inverseTransformId", "")
+        if include_previous_transform_ids:
+            amf_components[transform_id].extend(
+                transform["previousEquivalentTransformIds"]
+            )
 
-        if (
-            inverse_transform_id
-            and transform_id
-            and inverse_transform_id not in amf_components[transform_id]
-        ):
-            amf_components[transform_id].append(inverse_transform_id)
-
-        if (
-            inverse_transform_id
-            and transform_id
-            and transform_id not in amf_components[inverse_transform_id]
-        ):
+        if (inverse_transform_id := transform.get("inverseTransformId")) is not None:
+            amf_components[inverse_transform_id].append(inverse_transform_id)
             amf_components[inverse_transform_id].append(transform_id)
 
-    if isinstance(ctl_transforms, Mapping):
-        ctl_transforms = unclassify_ctl_transforms(ctl_transforms)
+            amf_components[transform_id].append(inverse_transform_id)
 
-    for ctl_transform in ctl_transforms:
-        aces_transform_id = ctl_transform.aces_transform_id.aces_transform_id
-
-        for siblings in [
-            ctl_transform.siblings
-            for ctl_transform in filter_ctl_transforms(
-                ctl_transforms,
-                [
-                    lambda x, y=aces_transform_id: (
-                        x.aces_transform_id.aces_transform_id == y
-                    )
-                ],
-            )
-        ]:
-            for sibling in siblings:
-                sibling_id = sibling.aces_transform_id.aces_transform_id
-                if sibling_id not in amf_components[aces_transform_id]:
-                    amf_components[aces_transform_id].append(sibling_id)
-
-    for aces_transform_id, relations in list(amf_components.items()):
-        for relation in relations:
-            if relation in amf_components:
-                amf_components[relation] = sorted(
-                    set(amf_components[relation] + relations + [aces_transform_id])
-                    - {relation}
+            if include_previous_transform_ids:
+                amf_components[inverse_transform_id].extend(
+                    transform["previousEquivalentTransformIds"]
                 )
 
-    result = {key: sorted(set(value)) for key, value in amf_components.items() if value}
+    return {key: sorted(set(value)) for key, value in amf_components.items() if value}
 
-    return result
+
+def filter_amf_components(
+    amf_components: dict[str, list[str]], aces_transform_id: str
+) -> list[str] | None:
+    """
+    Filter the *ACES* *AMF* components for specified *ACEStransformID*.
+
+    Parameters
+    ----------
+    amf_components : dict
+        *ACES* *AMF* components to filter.
+    aces_transform_id : str
+        *ACEStransformID* to filter the *ACES* *AMF* components with.
+
+    Returns
+    -------
+    :class:`list`
+        Filtered *ACES* *AMF* components.
+    """
+
+    filtered_amf_components = list(amf_components.get(aces_transform_id, []))
+
+    return filtered_amf_components if len(filtered_amf_components) else None
 
 
 if __name__ == "__main__":

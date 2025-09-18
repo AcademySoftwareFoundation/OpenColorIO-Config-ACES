@@ -44,6 +44,7 @@ from opencolorio_config_aces.config.generation import (
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms,
     discover_aces_ctl_transforms,
+    filter_amf_components,
     filter_ctl_transforms,
     generate_amf_components,
     unclassify_ctl_transforms,
@@ -54,7 +55,6 @@ from opencolorio_config_aces.config.reference.discover.classify import (
 from opencolorio_config_aces.utilities import (
     as_bool,
     attest,
-    optional,
     timestamp,
     validate_method,
 )
@@ -72,7 +72,6 @@ __all__ = [
     "COLORSPACE_SCENE_ENCODING_REFERENCE",
     "FAMILY_DISPLAY_REFERENCE",
     "TEMPLATE_ACES_TRANSFORM_ID",
-    "HEADER_AMF_COMPONENTS",
     "DescriptionStyle",
     "format_optional_prefix",
     "format_swapped_affix",
@@ -134,13 +133,6 @@ Template for the description of an *ACEStransformID*.
 TEMPLATE_ACES_TRANSFORM_ID : unicode
 """
 
-HEADER_AMF_COMPONENTS: str = "AMF Components\n--------------"
-"""
-Header for the description of the *ACES* *AMF* components.
-
-HEADER_AMF_COMPONENTS : unicode
-"""
-
 
 class DescriptionStyle(Flag):
     """
@@ -152,9 +144,8 @@ class DescriptionStyle(Flag):
     OPENCOLORIO = auto()
     SHORT = auto()
     LONG = auto()
-    AMF = auto()
-    SHORT_UNION = ACES | OPENCOLORIO | SHORT | AMF
-    LONG_UNION = ACES | OPENCOLORIO | LONG | AMF
+    SHORT_UNION = ACES | OPENCOLORIO | SHORT
+    LONG_UNION = ACES | OPENCOLORIO | LONG
 
 
 def format_optional_prefix(name: str, prefix: str, scheme: str = "Modern 1") -> str:
@@ -316,7 +307,6 @@ def ctl_transform_to_transform_family(
 def ctl_transform_to_description(
     ctl_transform: CTLTransform,
     describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
-    amf_components: dict[str, list[str]] | None = None,
     factory: Callable[..., Any] = colorspace_factory,
     **kwargs: Any,
 ) -> str | None:
@@ -331,9 +321,6 @@ def ctl_transform_to_description(
     describe : bool, optional
         *ACES* *CTL* transform description style. Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
-    amf_components : mapping, optional
-        *ACES* *AMF* components used to extend the *ACES* *CTL* transform
-        description.
     factory : callable, optional
         Factory used to adjust the code paths because of slight difference
         of signature between the *OpenColorIO* `Colorspace` and `Look`.
@@ -349,8 +336,6 @@ def ctl_transform_to_description(
     unicode
         *OpenColorIO* `Colorspace` or `Look` description.
     """
-
-    amf_components = optional(amf_components, {})
 
     description = None
     if describe != DescriptionStyle.NONE:
@@ -404,22 +389,6 @@ def ctl_transform_to_description(
                 description.append(f"{ctl_transform.description}\n")
                 description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
 
-            if describe in (
-                DescriptionStyle.AMF,
-                DescriptionStyle.SHORT_UNION,
-                DescriptionStyle.LONG_UNION,
-            ):
-                amf_components_description = [
-                    TEMPLATE_ACES_TRANSFORM_ID.format(amf_aces_transform_id)
-                    for amf_aces_transform_id in amf_components.get(
-                        aces_transform_id, []
-                    )
-                ]
-                if amf_components_description:
-                    description.append("")
-                    description.append(HEADER_AMF_COMPONENTS)
-                    description.extend(amf_components_description)
-
         description = "\n".join(description)
 
     return description
@@ -428,7 +397,6 @@ def ctl_transform_to_description(
 def ctl_transform_to_colorspace(
     ctl_transform: CTLTransform,
     describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
-    amf_components: dict[str, list[str]] | None = None,
     signature_only: bool = False,
     scheme: str = "Modern 1",
     analytical: bool = True,
@@ -445,9 +413,6 @@ def ctl_transform_to_colorspace(
     describe : bool, optional
         *ACES* *CTL* transform description style. Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
-    amf_components : mapping, optional
-       *ACES* *AMF* components used to extend the *OpenColorIO* `Colorspace`
-        description.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* `Colorspace` signature only, i.e.,
         the arguments for its instantiation.
@@ -474,7 +439,7 @@ def ctl_transform_to_colorspace(
     name = ctl_transform_to_colorspace_name(ctl_transform)
     family = ctl_transform_to_transform_family(ctl_transform, analytical)
     description = ctl_transform_to_description(
-        ctl_transform, describe, amf_components, colorspace_factory, **kwargs
+        ctl_transform, describe, colorspace_factory, **kwargs
     )
 
     signature = {
@@ -499,7 +464,6 @@ def ctl_transform_to_colorspace(
 def ctl_transform_to_look(
     ctl_transform: CTLTransform,
     describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
-    amf_components: dict[str, list[str]] | None = None,
     signature_only: bool = False,
     scheme: str = "Modern 1",
     analytical: bool = True,
@@ -516,9 +480,6 @@ def ctl_transform_to_look(
     describe : bool, optional
         *ACES* *CTL* transform description style. Any value from the
         :class:`opencolorio_config_aces.DescriptionStyle` enum.
-    amf_components : mapping, optional
-        *ACES* *AMF* components used to extend the *OpenColorIO* `Look`
-        description.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* `Look` signature only, i.e., the
         arguments for its instantiation.
@@ -545,7 +506,7 @@ def ctl_transform_to_look(
     name = ctl_transform_to_look_name(ctl_transform)
     family = ctl_transform_to_transform_family(ctl_transform, analytical)
     description = ctl_transform_to_description(
-        ctl_transform, describe, amf_components, look_factory, **kwargs
+        ctl_transform, describe, look_factory, **kwargs
     )
 
     signature = {
@@ -566,7 +527,6 @@ def style_to_view_transform(
     style: str,
     ctl_transforms: list[CTLTransform],
     describe: DescriptionStyle = DescriptionStyle.LONG_UNION,
-    amf_components: dict[str, list[str]] | None = None,
     signature_only: bool = False,
     scheme: str = "Modern 1",
     **kwargs: Any,
@@ -584,9 +544,6 @@ def style_to_view_transform(
     describe : int, optional
         Any value from the :class:`opencolorio_config_aces.DescriptionStyle`
         enum.
-    amf_components : mapping, optional
-        *ACES* *AMF* components used to extend the *OpenColorIO* `ViewTransform`
-        description.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* `ViewTransform` signature only,
         i.e., the arguments for its instantiation.
@@ -605,9 +562,6 @@ def style_to_view_transform(
     ocio.ViewTransform or dict
         *OpenColorIO* `ViewTransform` or its signature for given style.
     """
-
-    if amf_components is None:
-        amf_components = {}
 
     name = beautify_view_transform_name(style)
     builtin_transform = ocio.BuiltinTransform(style)
@@ -670,26 +624,6 @@ def style_to_view_transform(
                     )
                 )
 
-            if describe in (
-                DescriptionStyle.AMF,
-                DescriptionStyle.SHORT_UNION,
-                DescriptionStyle.LONG_UNION,
-            ):
-                amf_components_description = []
-                for aces_transform_id in aces_transform_ids:
-                    amf_components_description.extend(
-                        [
-                            TEMPLATE_ACES_TRANSFORM_ID.format(amf_aces_transform_id)
-                            for amf_aces_transform_id in amf_components.get(
-                                aces_transform_id, []
-                            )
-                        ]
-                    )
-                if amf_components_description:
-                    description.append("")
-                    description.append(HEADER_AMF_COMPONENTS)
-                    description.extend(amf_components_description)
-
         description = "\n".join(description)
 
     version = style.split(SEPARATOR_COLORSPACE_NAME)[-1].split("_")[-1]
@@ -719,7 +653,6 @@ def style_to_view_transform(
 def style_to_display_colorspace(
     style: str,
     describe: DescriptionStyle = DescriptionStyle.OPENCOLORIO,
-    amf_components: dict[str, list[str]] | None = None,
     signature_only: bool = False,
     scheme: str = "Modern 1",
     **kwargs: Any,
@@ -735,9 +668,6 @@ def style_to_display_colorspace(
     describe : int, optional
         Any value from the :class:`opencolorio_config_aces.DescriptionStyle`
         enum.
-    amf_components : mapping, optional
-        *ACES* *AMF* components used to extend the *OpenColorIO* display
-        `Colorspace` description.
     signature_only : bool, optional
         Whether to return the *OpenColorIO* display `Colorspace` signature only,
         i.e., the arguments for its instantiation.
@@ -757,9 +687,6 @@ def style_to_display_colorspace(
         *OpenColorIO* display `Colorspace` or its signature for given style.
     """
 
-    if amf_components is None:
-        amf_components = {}
-
     kwargs.setdefault("family", FAMILY_DISPLAY_REFERENCE)
 
     name = beautify_display_name(style)
@@ -778,19 +705,6 @@ def style_to_display_colorspace(
 
         if len(description) > 0:
             description.append("")
-
-        if describe in (
-            DescriptionStyle.AMF,
-            DescriptionStyle.SHORT_UNION,
-            DescriptionStyle.LONG_UNION,
-        ):
-            amf_components_description = [
-                TEMPLATE_ACES_TRANSFORM_ID.format(amf_aces_transform_id)
-                for amf_aces_transform_id in amf_components.get(style, [])
-            ]
-            if amf_components_description:
-                description.append(HEADER_AMF_COMPONENTS)
-                description.extend(amf_components_description)
 
         description = "\n".join(description)
 
@@ -1009,7 +923,7 @@ def generate_config_aces(
     ctl_transforms = unclassify_ctl_transforms(
         classify_aces_ctl_transforms(discover_aces_ctl_transforms())
     )
-    amf_components = generate_amf_components(ctl_transforms)
+    amf_components = generate_amf_components()
 
     LOGGER.debug('Using %s "CTL" transforms...', ctl_transforms)
 
@@ -1187,7 +1101,6 @@ def generate_config_aces(
                 style,
                 [transform_data["ctl_transform"]],
                 describe,
-                amf_components,
                 signature_only=True,
                 scheme=scheme,
             )
@@ -1200,16 +1113,24 @@ def generate_config_aces(
 
             display_style = transform_data["linked_display_colorspace_style"]
 
+            filtered_amf_components = filter_amf_components(
+                amf_components, display_style
+            )
+
             display = style_to_display_colorspace(
                 display_style,
                 describe,
-                amf_components,
                 signature_only=True,
                 scheme=scheme,
                 encoding=transform_data.get("encoding"),
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
                 interop_id=transform_data.get("interop_id"),
+                interchange_mapping=(
+                    None
+                    if filtered_amf_components is None
+                    else {"amf_transform_ids": "\n".join(filtered_amf_components)}
+                ),
             )
             display["transforms_data"] = [transform_data]
             display_name = display["name"]
@@ -1240,7 +1161,6 @@ def generate_config_aces(
             look = ctl_transform_to_look(
                 ctl_transform,
                 describe,
-                amf_components,
                 signature_only=True,
                 scheme=scheme,
                 analytical=analytical,
@@ -1259,10 +1179,13 @@ def generate_config_aces(
                 style,
             )
 
+            filtered_amf_components = filter_amf_components(
+                amf_components, ctl_transform.aces_transform_id.aces_transform_id
+            )
+
             colorspace = ctl_transform_to_colorspace(
                 ctl_transform,
                 describe,
-                amf_components,
                 signature_only=True,
                 scheme=scheme,
                 analytical=analytical,
@@ -1274,6 +1197,11 @@ def generate_config_aces(
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
                 interop_id=transform_data.get("interop_id"),
+                interchange_mapping=(
+                    None
+                    if filtered_amf_components is None
+                    else {"amf_transform_ids": "\n".join(filtered_amf_components)}
+                ),
             )
             colorspace["transforms_data"] = [transform_data]
             if colorspace not in colorspaces:

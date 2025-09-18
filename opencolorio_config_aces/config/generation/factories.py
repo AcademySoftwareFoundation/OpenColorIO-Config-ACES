@@ -125,6 +125,7 @@ def colorspace_factory(
     is_data: bool | None = None,
     reference_space: str | int | None = None,
     interop_id: str | None = None,
+    interchange_mapping: dict[str, str] | None = None,
     base_colorspace: Mapping[str, Any] | ocio.ColorSpace | None = None,
     **kwargs: Any,
 ) -> ocio.ColorSpace:
@@ -166,6 +167,9 @@ def colorspace_factory(
         See https://github.com/AcademySoftwareFoundation/ColorInterop/blob/\
 5aebc3f37ac192c86694a47bb92fa65cc95e4e67/Recommendations/\
 01_TextureAssetColorSpaces/TextureAssetColorSpaces.md
+    interchange_mapping : dict, optional
+        Mapping of key and value pairs for interchange, e.g.,
+        `amf_transform_ids` or `icc_profile_name`.
     base_colorspace : dict or ColorSpace, optional
         *OpenColorIO* base `Colorspace` inherited for initial attribute values.
 
@@ -260,6 +264,10 @@ def colorspace_factory(
 
     if interop_id is not None:
         colorspace.setInteropID(interop_id)  # pyright: ignore
+
+    if interchange_mapping is not None:
+        for key, value in interchange_mapping.items():
+            colorspace.setInterchangeAttribute(key, value)  # pyright: ignore
 
     return colorspace
 

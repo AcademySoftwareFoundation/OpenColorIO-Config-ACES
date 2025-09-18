@@ -82,6 +82,7 @@ Reference Configuration
     version_aces_dev
     classify_aces_ctl_transforms
     discover_aces_ctl_transforms
+    filter_amf_components
     filter_ctl_transforms
     generate_amf_components
     print_aces_taxonomy
