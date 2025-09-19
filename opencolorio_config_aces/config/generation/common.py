@@ -409,8 +409,7 @@ def generate_config(
 
     if data.file_rules:
         file_rules = ocio.FileRules()
-        rule_index = 0
-        for file_rule in reversed(data.file_rules):
+        for i, file_rule in enumerate(data.file_rules):
             name = file_rule["name"]
             colorspace = file_rule["colorspace"]
             regex = file_rule.get("regex")
@@ -431,8 +430,7 @@ def generate_config(
                     regex,
                     colorspace,
                 )
-                file_rules.insertRule(rule_index, name, colorspace, regex)
-                rule_index += 1
+                file_rules.insertRule(i, name, colorspace, regex)
             else:
                 LOGGER.debug(
                     'Adding "%s" file rule with "%s" pattern and "%s" '
@@ -442,15 +440,20 @@ def generate_config(
                     extension,
                     colorspace,
                 )
-                file_rules.insertRule(rule_index, name, colorspace, pattern, extension)
-                rule_index += 1
+                file_rules.insertRule(i, name, colorspace, pattern, extension)
         config.setFileRules(file_rules)
 
     if data.viewing_rules:
         viewing_rules = ocio.ViewingRules()
-        for _i, _viewing_rule in enumerate(reversed(data.viewing_rules)):
-            LOGGER.warning("Inserting a viewing rule is not supported yet!")
-            # viewing_rules.insertRule()
+        for i, viewing_rule in enumerate(data.viewing_rules):
+            name = viewing_rule["name"]
+            encodings = viewing_rule["encodings"]
+            LOGGER.debug(
+                'Adding "%s" viewing rule with "%s" encodings.', name, encodings
+            )
+            viewing_rules.insertRule(i, name)
+            for encoding in encodings:
+                viewing_rules.addEncoding(i, encoding)
         config.setViewingRules(viewing_rules)
 
     if data.default_view_transform is not None:

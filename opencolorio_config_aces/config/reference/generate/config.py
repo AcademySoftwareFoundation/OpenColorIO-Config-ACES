@@ -916,6 +916,7 @@ def generate_config_aces(
                 "builtin_transform_style",
                 "linked_display_colorspace_style",
                 "interface",
+                "viewing_rule",
                 "encoding",
                 "categories",
                 "aliases",
@@ -1121,6 +1122,7 @@ def generate_config_aces(
                 "display": display_name,
                 "view": view_transform_name,
                 "view_transform": view_transform_name,
+                "rule": transform_data["viewing_rule"],
             }
             if shared_view not in shared_views:
                 LOGGER.info(
@@ -1239,12 +1241,42 @@ def generate_config_aces(
             "transform_type": "BuiltinTransform",
             "style": "UTILITY - ACES-AP0_to_CIE-XYZ-D65_BFD",
         },
+        "rule": "Any Scene-linear or Log",
     }
+
+    video_view_transform = {
+        "name": "Video (colorimetric)",
+        "from_reference": {
+            "transform_type": "MatrixTransform",
+            "matrix": [
+                1.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                0.0000000000,
+                1.0000000000,
+            ],
+        },
+        "reference_space": ocio.REFERENCE_SPACE_DISPLAY,
+        "rule": "Any Video",
+    }
+
     for display_name in display_names:
         untonemapped_shared_view = {
             "display": display_name,
             "view": untonemapped_view_transform["name"],
             "view_transform": untonemapped_view_transform["name"],
+            "rule": untonemapped_view_transform["rule"],
         }
         LOGGER.info(
             'Adding "%s" shared view to "%s" display.',
@@ -1254,6 +1286,21 @@ def generate_config_aces(
 
         if untonemapped_shared_view not in shared_views:
             shared_views.append(untonemapped_shared_view)
+
+        video_shared_view = {
+            "display": display_name,
+            "view": video_view_transform["name"],
+            "view_transform": video_view_transform["name"],
+            "rule": video_view_transform["rule"],
+        }
+        LOGGER.info(
+            'Adding "%s" shared view to "%s" display.',
+            video_shared_view["view"],
+            display_name,
+        )
+
+        if video_shared_view not in shared_views:
+            shared_views.append(video_shared_view)
 
         raw_view = {
             "display": display_name,
@@ -1291,16 +1338,24 @@ def generate_config_aces(
         },
         colorspaces=colorspaces + displays,
         looks=looks,
-        view_transforms=[*view_transforms, untonemapped_view_transform],
+        view_transforms=[
+            *view_transforms,
+            untonemapped_view_transform,
+            video_view_transform,
+        ],
         shared_views=shared_views,
         views=shared_views + views,
         active_displays=display_names,
-        active_views=[*active_views, "Un-tone-mapped", "Raw"],
+        active_views=[*active_views, "Un-tone-mapped", "Video (colorimetric)", "Raw"],
         file_rules=[
             {
                 "name": "Default",
                 "colorspace": scene_reference_colorspace["name"],
             }
+        ],
+        viewing_rules=[
+            {"name": "Any Scene-linear or Log", "encodings": ["log", "scene-linear"]},
+            {"name": "Any Video", "encodings": ["sdr-video", "hdr-video"]},
         ],
         default_view_transform=untonemapped_view_transform["name"],
         profile_version=build_configuration.ocio,
