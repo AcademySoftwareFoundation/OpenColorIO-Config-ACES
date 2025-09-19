@@ -1349,9 +1349,20 @@ def generate_config_aces(
         active_views=[*active_views, "Un-tone-mapped", "Video (colorimetric)", "Raw"],
         file_rules=[
             {
-                "name": "Default",
+                "name": "EXR",
                 "colorspace": scene_reference_colorspace["name"],
-            }
+                "pattern": "*",
+                "extension": "exr",
+            },
+            {
+                "name": "Movies",
+                "colorspace": "Rec.1886 Rec.709 - Display",
+                "regex": ".*\\.([mM][pP]4|[mM][oO][vV]|[mM][xX][fF])$",
+            },
+            {
+                "name": "Default",
+                "colorspace": "sRGB - Display",
+            },
         ],
         viewing_rules=[
             {"name": "Any Scene-linear or Log", "encodings": ["log", "scene-linear"]},
