@@ -198,11 +198,7 @@ def clf_transform_to_description(
     if describe != DescriptionStyle.NONE:
         description = []
 
-        if describe in (
-            DescriptionStyle.OPENCOLORIO,
-            DescriptionStyle.SHORT,
-            DescriptionStyle.SHORT_UNION,
-        ):
+        if describe in (DescriptionStyle.SHORT_UNION, DescriptionStyle.LONG_UNION):
             if clf_transform.description is not None:
                 if direction.lower() == "forward":
                     description.append(
@@ -214,27 +210,23 @@ def clf_transform_to_description(
                         f"Convert {clf_transform.output_descriptor} "
                         f"to {clf_transform.input_descriptor}"
                     )
-        elif describe in (  # noqa: SIM102
-            DescriptionStyle.OPENCOLORIO,
-            DescriptionStyle.LONG,
-            DescriptionStyle.LONG_UNION,
-        ):
+        elif describe in (DescriptionStyle.LONG_UNION,):
             if clf_transform.description is not None:
                 description.append("\n" + clf_transform.description)
 
-        if len(description) > 0:
-            description.append("")
+            if len(description) > 0:
+                description.append("")
 
-        description.append(
-            TEMPLATE_CLF_TRANSFORM_ID.format(
-                clf_transform.clf_transform_id.clf_transform_id
-            ),
-        )
+            description.append(
+                TEMPLATE_CLF_TRANSFORM_ID.format(
+                    clf_transform.clf_transform_id.clf_transform_id
+                ),
+            )
 
-        aces_transform_id = clf_transform.information.get("ACEStransformID")
-        if aces_transform_id:
-            aces_transform_id = aces_transform_id.aces_transform_id
-            description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
+            aces_transform_id = clf_transform.information.get("ACEStransformID")
+            if aces_transform_id:
+                aces_transform_id = aces_transform_id.aces_transform_id
+                description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
 
         description = "\n".join(description).strip()
 

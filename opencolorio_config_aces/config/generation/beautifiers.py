@@ -173,6 +173,7 @@ PATTERNS_VIEW_TRANSFORM_NAME : dict
 
 PATTERNS_DISPLAY_NAME: dict[str, str] = {
     "G2.6-": "",
+    "G2.2": "Gamma 2.2",
     "-BFD": "",
     "DisplayP3": "Display P3",
     "REC.1886": "Rec.1886",

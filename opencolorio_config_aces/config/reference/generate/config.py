@@ -340,9 +340,7 @@ def ctl_transform_to_description(
     description = None
     if describe != DescriptionStyle.NONE:
         description = []
-
         if describe in (
-            DescriptionStyle.OPENCOLORIO,
             DescriptionStyle.SHORT_UNION,
             DescriptionStyle.LONG_UNION,
         ):
@@ -357,37 +355,28 @@ def ctl_transform_to_description(
                     "inverse_transform",
                 ]
             )
+
             transforms = [
                 transform
                 for transform in (kwargs.get(forward), kwargs.get(inverse))
                 if transform is not None
             ]
+
             transform = produce_transform(next(iter(transforms), None))
+
             if isinstance(transform, ocio.BuiltinTransform):
                 description.append(transform.getDescription())
 
-        if describe in (
-            DescriptionStyle.ACES,
-            DescriptionStyle.ACES | DescriptionStyle.SHORT,
-            DescriptionStyle.SHORT_UNION,
-            DescriptionStyle.LONG_UNION,
-        ):
+        if describe in (DescriptionStyle.LONG_UNION,):
             if len(description) > 0:
                 description.append("")
 
             aces_transform_id = ctl_transform.aces_transform_id.aces_transform_id
 
-            if describe in (
-                DescriptionStyle.ACES,
-                DescriptionStyle.ACES | DescriptionStyle.SHORT,
-                DescriptionStyle.SHORT_UNION,
-            ):
-                description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
-            else:
-                description.append("CTL Transform")
-                description.append(f'{"=" * len(description[-1])}\n')
-                description.append(f"{ctl_transform.description}\n")
-                description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
+            description.append("CTL Transform")
+            description.append(f'{"=" * len(description[-1])}\n')
+            description.append(f"{ctl_transform.description}\n")
+            description.append(TEMPLATE_ACES_TRANSFORM_ID.format(aces_transform_id))
 
         description = "\n".join(description)
 
@@ -571,18 +560,12 @@ def style_to_view_transform(
         description = []
 
         if describe in (
-            DescriptionStyle.OPENCOLORIO,
             DescriptionStyle.SHORT_UNION,
             DescriptionStyle.LONG_UNION,
         ):
             description.append(builtin_transform.getDescription())
 
-        if describe in (
-            DescriptionStyle.ACES,
-            DescriptionStyle.ACES | DescriptionStyle.SHORT,
-            DescriptionStyle.SHORT_UNION,
-            DescriptionStyle.LONG_UNION,
-        ):
+        if describe in (DescriptionStyle.LONG_UNION,):
             aces_transform_ids, aces_descriptions = zip(
                 *[
                     (
@@ -596,33 +579,22 @@ def style_to_view_transform(
             if len(description) > 0:
                 description.append("")
 
-            if describe in (
-                DescriptionStyle.ACES | DescriptionStyle.SHORT,
-                DescriptionStyle.SHORT_UNION,
-            ):
-                description.extend(
+            description.append(
+                f'CTL Transform{"s" if len(aces_transform_ids) >= 2 else ""}'
+            )
+            description.append(f'{"=" * len(description[-1])}\n')
+
+            description.append(
+                f'\n{"-" * 80}\n\n'.join(
                     [
-                        f"ACEStransformID: {aces_transform_id}"
-                        for aces_transform_id in aces_transform_ids
+                        (
+                            f"{aces_descriptions[i]}\n\n"
+                            f"ACEStransformID: {aces_transform_id}\n"
+                        )
+                        for i, aces_transform_id in enumerate(aces_transform_ids)
                     ]
                 )
-            else:
-                description.append(
-                    f'CTL Transform{"s" if len(aces_transform_ids) >= 2 else ""}'
-                )
-                description.append(f'{"=" * len(description[-1])}\n')
-
-                description.append(
-                    f'\n{"-" * 80}\n\n'.join(
-                        [
-                            (
-                                f"{aces_descriptions[i]}\n\n"
-                                f"ACEStransformID: {aces_transform_id}\n"
-                            )
-                            for i, aces_transform_id in enumerate(aces_transform_ids)
-                        ]
-                    )
-                )
+            )
 
         description = "\n".join(description)
 
@@ -697,7 +669,6 @@ def style_to_display_colorspace(
         description = []
 
         if describe in (
-            DescriptionStyle.OPENCOLORIO,
             DescriptionStyle.SHORT_UNION,
             DescriptionStyle.LONG_UNION,
         ):
@@ -753,6 +724,9 @@ def transform_data_aliases(transform_data: dict[str, Any]) -> list[str]:
 
     if not aliases:
         aliases = []
+
+    if (interop_id := transform_data.get("interop_id")) is not None:
+        aliases.append(interop_id)
 
     if as_bool(transform_data["legacy"]):
         return [transform_data["colorspace"], *aliases]
