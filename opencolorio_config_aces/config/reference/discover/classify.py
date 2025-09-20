@@ -32,6 +32,8 @@ from semver import Version
 
 from opencolorio_config_aces.utilities import (
     attest,
+    filter_all,
+    filter_any,
     message_box,
     optional,
     paths_common_ancestor,
@@ -1511,8 +1513,11 @@ def generate_amf_components(
 
 
 def filter_amf_components(
-    amf_components: dict[str, list[str]], aces_transform_id: str
-) -> list[str] | None:
+    amf_components: dict[str, list[str]],
+    aces_transform_id: str,
+    filter_any_filterers: list[Callable[[dict[str, Any]], bool]] | None = None,
+    filter_all_filterers: list[Callable[[dict[str, Any]], bool]] | None = None,
+) -> list[str]:
     """
     Filter the *ACES* *AMF* components for specified *ACEStransformID*.
 
@@ -1522,16 +1527,79 @@ def filter_amf_components(
         *ACES* *AMF* components to filter.
     aces_transform_id : str
         *ACEStransformID* to filter the *ACES* *AMF* components with.
+    filter_any_filterers : list[Callable[[dict[str, Any]], bool]] | None, optional
+        List of filter functions for OR logic filtering. Each function should
+        accept a dictionary with *transform_id* key and return True if the
+        element passes the filter condition.
+    filter_all_filterers : list[Callable[[dict[str, Any]], bool]] | None, optional
+        List of filter functions for AND logic filtering. Each function should
+        accept a dictionary with *transform_id* key and return True if the
+        element passes the filter condition.
 
     Returns
     -------
-    :class:`list`
+    list
         Filtered *ACES* *AMF* components.
+
+    Examples
+    --------
+    >>> amf_components = {
+    ...     "DISPLAY - CIE-XYZ-D65_to_sRGB - MIRROR NEGS": [
+    ...         'urn:ampas:aces:transformId:v2.0:Output.Academy.\
+Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1',
+    ...         'urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
+Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1',
+    ...         'urn:ampas:aces:transformId:v2.0:Output.Academy.\
+Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1',
+    ...         'urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
+Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1'
+    ...     ]
+    ... }
+    >>> filterers_all = [lambda x: "-D60_" not in x['transform_id']]
+    >>> filter_amf_components(
+    ...     amf_components,
+    ...     "DISPLAY - CIE-XYZ-D65_to_sRGB - MIRROR NEGS",
+    ...     filterers_all
+    ... )  # doctest: +ELLIPSIS
+    ['urn:ampas:aces:transformId:v2.0:Output.Academy.\
+Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1', \
+'urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
+Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1']
+    >>> filterers_all = [lambda x: "-D60_" in x['transform_id']]
+    >>> filter_amf_components(
+    ...     amf_components,
+    ...     "DISPLAY - CIE-XYZ-D65_to_sRGB - MIRROR NEGS",
+    ...     filterers_all
+    ... )  # doctest: +ELLIPSIS
+    ['urn:ampas:aces:transformId:v2.0:Output.Academy.\
+Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1', \
+'urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
+Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1']
     """
 
-    filtered_amf_components = list(amf_components.get(aces_transform_id, []))
+    filtered_amf_components = amf_components.get(aces_transform_id, [])
 
-    return filtered_amf_components if len(filtered_amf_components) else None
+    if filter_any_filterers or filter_all_filterers:
+        filtered_amf_components_dicts = [
+            {"transform_id": transform_id} for transform_id in filtered_amf_components
+        ]
+
+        if filter_any_filterers:
+            filtered_amf_components_dicts = filter_any(
+                filtered_amf_components_dicts, filter_any_filterers
+            )
+
+        if filter_all_filterers:
+            filtered_amf_components_dicts = filter_all(
+                filtered_amf_components_dicts, filter_all_filterers
+            )
+
+        filtered_amf_components = [
+            filtered_amf_components_dict["transform_id"]
+            for filtered_amf_components_dict in filtered_amf_components_dicts
+        ]
+
+    return filtered_amf_components
 
 
 if __name__ == "__main__":

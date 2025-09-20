@@ -53,6 +53,8 @@ from opencolorio_config_aces.config.reference.generate.config import (
 )
 from opencolorio_config_aces.utilities import (
     attest,
+    filter_all,
+    filter_any,
     optional,
     timestamp,
     validate_method,
@@ -816,6 +818,7 @@ def generate_config_cg(
             describe=describe,
             scheme=scheme,
             analytical=False,
+            additional_filterers=additional_filterers,
             additional_data=True,
         )
 
@@ -968,24 +971,6 @@ def generate_config_cg(
                     return True
 
         return False
-
-    def filter_any(
-        array: list[dict[str, Any]], filterers: list[Callable[[dict[str, Any]], bool]]
-    ) -> list[dict[str, Any]]:
-        """Filter array elements passing any of the filterers."""
-
-        filtered = [a for a in array if any(filterer(a) for filterer in filterers)]
-
-        return filtered
-
-    def filter_all(
-        array: list[dict[str, Any]], filterers: list[Callable[[dict[str, Any]], bool]]
-    ) -> list[dict[str, Any]]:
-        """Filter array elements passing all of the filterers."""
-
-        filtered = [a for a in array if all(filterer(a) for filterer in filterers)]
-
-        return filtered
 
     # "Colorspaces" Filtering
     # =======================
@@ -1161,7 +1146,8 @@ def generate_config_cg(
                 )
             ) is not None:
                 filtered_amf_components = filter_amf_components(
-                    amf_components, aces_transform_id.aces_transform_id
+                    amf_components,
+                    aces_transform_id.aces_transform_id,
                 )
 
             kwargs.update(

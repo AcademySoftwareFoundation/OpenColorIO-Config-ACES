@@ -55,6 +55,7 @@ from opencolorio_config_aces.config.reference.discover.classify import (
 from opencolorio_config_aces.utilities import (
     as_bool,
     attest,
+    optional,
     timestamp,
     validate_method,
 )
@@ -839,6 +840,8 @@ def generate_config_aces(
     config_mapping_file_path: Any = PATH_TRANSFORMS_MAPPING_FILE_REFERENCE,
     scheme: str = "Modern 1",
     analytical: bool = True,
+    additional_filterers: dict[str, dict[str, list[Callable[[Any], bool]]]]
+    | None = None,
     additional_data: bool = False,
 ) -> Any:
     """
@@ -876,6 +879,21 @@ def generate_config_aces(
         Whether to generate *OpenColorIO* transform families that analytically
         match the given *ACES* *CTL* transform, i.e., true to the *aces-dev*
         reference but not necessarily user-friendly.
+    additional_filterers : dict, optional
+        Additional filterers to further include or exclude components from the
+        generated config.
+
+        .. code-block:: python
+
+            filterer = [lambda x: "-D60_" not in x["transform_id"]]
+
+            {
+                "any": {},
+                "all": {
+                    "amf_component_display_filterers": filterer,
+                },
+            },
+
     additional_data : bool, optional
         Whether to return additional data.
 
@@ -891,6 +909,10 @@ def generate_config_aces(
         'Generating "%s" config...',
         config_name_aces(build_configuration),
     )
+
+    # TODO: Implement full filtering for all the transforms that is defined
+    # in the *CG* config.
+    additional_filterers = optional(additional_filterers, {"any": {}, "all": {}})
 
     LOGGER.debug('Using %s "Builtin" transforms...', list(BUILTIN_TRANSFORMS.keys()))
 
@@ -1089,7 +1111,10 @@ def generate_config_aces(
             display_style = transform_data["linked_display_colorspace_style"]
 
             filtered_amf_components = filter_amf_components(
-                amf_components, display_style
+                amf_components,
+                display_style,
+                additional_filterers["any"].get("amf_component_display_filterers"),
+                additional_filterers["all"].get("amf_component_display_filterers"),
             )
 
             display = style_to_display_colorspace(

@@ -60,6 +60,8 @@ __all__ = [
     "timestamp",
     "as_bool",
     "optional",
+    "filter_any",
+    "filter_all",
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -842,3 +844,90 @@ def optional(value: T | None, default: T) -> T:
         return default
     else:
         return value
+
+
+def filter_any(
+    array: list[dict[str, Any]], filterers: list[Callable[[dict[str, Any]], bool]]
+) -> list[dict[str, Any]]:
+    """
+    Filter array elements that pass any of the provided filter functions.
+
+    This function applies multiple filter functions to each element in the array
+    and returns elements that satisfy at least one filter condition (OR logic).
+
+    Parameters
+    ----------
+    array : list[dict[str, Any]]
+        The list of dictionaries to filter.
+    filterers : list[Callable[[dict[str, Any]], bool]]
+        A list of callable filter functions. Each function should accept a
+        dictionary and return True if the element passes the filter condition,
+        False otherwise.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        A new list containing only the elements that pass at least one of the
+        filter conditions.
+
+    Examples
+    --------
+    >>> transforms = [
+    ...     {'name': 'ACEScc', 'type': 'CSC', 'family': 'aces'},
+    ...     {'name': 'ACEScg', 'type': 'CSC', 'family': 'aces'},
+    ...     {'name': 'sRGB', 'type': 'Output', 'family': 'display'},
+    ... ]
+    >>> is_csc = lambda x: x['type'] == 'CSC'
+    >>> is_output = lambda x: x['type'] == 'Output'
+    >>> filter_any(transforms, [is_csc, is_output])
+    [{'name': 'ACEScc', 'type': 'CSC', 'family': 'aces'}, \
+{'name': 'ACEScg', 'type': 'CSC', 'family': 'aces'}, \
+{'name': 'sRGB', 'type': 'Output', 'family': 'display'}]
+    """
+
+    filtered = [a for a in array if any(filterer(a) for filterer in filterers)]
+
+    return filtered
+
+
+def filter_all(
+    array: list[dict[str, Any]], filterers: list[Callable[[dict[str, Any]], bool]]
+) -> list[dict[str, Any]]:
+    """
+    Filter array elements that pass all of the provided filter functions.
+
+    This function applies multiple filter functions to each element in the array
+    and returns only elements that satisfy every filter condition (AND logic).
+
+    Parameters
+    ----------
+    array : list[dict[str, Any]]
+        The list of dictionaries to filter.
+    filterers : list[Callable[[dict[str, Any]], bool]]
+        A list of callable filter functions. Each function should accept a
+        dictionary and return True if the element passes the filter condition,
+        False otherwise.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        A new list containing only the elements that pass all of the filter
+        conditions.
+
+    Examples
+    --------
+    >>> transforms = [
+    ...     {'name': 'ACEScc', 'type': 'CSC', 'family': 'aces'},
+    ...     {'name': 'Rec709', 'type': 'Output', 'family': 'display'},
+    ...     {'name': 'sRGB', 'type': 'Output', 'family': 'display'},
+    ... ]
+    >>> is_output = lambda x: x['type'] == 'Output'
+    >>> is_display = lambda x: x['family'] == 'display'
+    >>> filter_all(transforms, [is_output, is_display])
+    [{'name': 'Rec709', 'type': 'Output', 'family': 'display'}, \
+{'name': 'sRGB', 'type': 'Output', 'family': 'display'}]
+    """
+
+    filtered = [a for a in array if all(filterer(a) for filterer in filterers)]
+
+    return filtered

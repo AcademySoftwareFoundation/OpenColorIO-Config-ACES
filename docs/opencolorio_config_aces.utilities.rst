@@ -40,3 +40,5 @@ Common
     timestamp
     as_bool
     optional
+    filter_any
+    filter_all

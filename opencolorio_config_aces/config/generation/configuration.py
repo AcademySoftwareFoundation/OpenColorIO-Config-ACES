@@ -120,6 +120,9 @@ BUILD_VARIANT_FILTERERS: dict[str, dict[str, dict[str, Any]]] = {
             "view_transform_filterers": [lambda x: "D60 in" not in x["name"]],
             "shared_view_filterers": [lambda x: "D60 in" not in x["view_transform"]],
             "view_filterers": [lambda x: "D60 in" not in x["view"]],
+            "amf_component_display_filterers": [
+                lambda x: "-D60_" not in x["transform_id"]
+            ],
         },
     },
     "D60 Views": {
@@ -140,6 +143,7 @@ BUILD_VARIANT_FILTERERS: dict[str, dict[str, dict[str, Any]]] = {
                 or x["view"] == "Un-tone-mapped"
                 or x["view"] == "Raw"
             ],
+            "amf_component_display_filterers": [lambda x: "-D60_" in x["transform_id"]],
         },
     },
     "All Views": {"any": {}, "all": {}},
