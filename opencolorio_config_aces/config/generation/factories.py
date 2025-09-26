@@ -383,6 +383,7 @@ def view_transform_factory(
     from_reference: Mapping[str, Any] | ocio.Transform | None = None,
     reference_space: str | int | None = None,
     base_view_transform: Mapping[str, Any] | ocio.ViewTransform | None = None,
+    interchange_mapping: dict[str, str] | None = None,
     **kwargs: Any,
 ) -> ocio.ViewTransform:
     """
@@ -463,6 +464,10 @@ def view_transform_factory(
     if description is not None:
         view_transform.setDescription(description)  # pyright: ignore
 
+    if interchange_mapping is not None:
+        for key, value in interchange_mapping.items():
+            view_transform.setInterchangeAttribute(key, value)  # pyright: ignore
+
     return view_transform
 
 
@@ -473,6 +478,7 @@ def look_factory(
     forward_transform: Mapping[str, Any] | ocio.Transform | None = None,
     inverse_transform: Mapping[str, Any] | ocio.Transform | None = None,
     base_look: Mapping[str, Any] | ocio.Look | None = None,
+    interchange_mapping: dict[str, str] | None = None,
     **kwargs: Any,
 ) -> ocio.Look:
     """
@@ -533,6 +539,10 @@ def look_factory(
 
     if description is not None:
         look.setDescription(description)  # pyright: ignore
+
+    if interchange_mapping is not None:
+        for key, value in interchange_mapping.items():
+            look.setInterchangeAttribute(key, value)  # pyright: ignore
 
     return look
 

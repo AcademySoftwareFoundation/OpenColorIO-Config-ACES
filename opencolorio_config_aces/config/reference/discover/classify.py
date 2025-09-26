@@ -1561,9 +1561,9 @@ Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1'
     ...     "DISPLAY - CIE-XYZ-D65_to_sRGB - MIRROR NEGS",
     ...     filterers_all
     ... )  # doctest: +ELLIPSIS
-    ['urn:ampas:aces:transformId:v2.0:Output.Academy.\
+    ['urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
 Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1', \
-'urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
+'urn:ampas:aces:transformId:v2.0:Output.Academy.\
 Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1']
     >>> filterers_all = [lambda x: "-D60_" in x['transform_id']]
     >>> filter_amf_components(
@@ -1571,9 +1571,9 @@ Rec709-D65_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1']
     ...     "DISPLAY - CIE-XYZ-D65_to_sRGB - MIRROR NEGS",
     ...     filterers_all
     ... )  # doctest: +ELLIPSIS
-    ['urn:ampas:aces:transformId:v2.0:Output.Academy.\
+    ['urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
 Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1', \
-'urn:ampas:aces:transformId:v2.0:InvOutput.Academy.\
+'urn:ampas:aces:transformId:v2.0:Output.Academy.\
 Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1']
     """
 
@@ -1599,7 +1599,7 @@ Rec709-D60_100nit_in_Rec709-D65_sRGB-Piecewise.a2.v1']
             for filtered_amf_components_dict in filtered_amf_components_dicts
         ]
 
-    return filtered_amf_components
+    return sorted(filtered_amf_components)
 
 
 if __name__ == "__main__":

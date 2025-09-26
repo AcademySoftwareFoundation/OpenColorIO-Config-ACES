@@ -967,6 +967,20 @@ def generate_config_aces(
                     )
                     continue
 
+                # Extending the "AMF" relations.
+                if not amf_components.get(style):
+                    amf_components[style] = []
+
+                if (
+                    aces_transform_id := transform_data.get("aces_transform_id")
+                ) is not None:
+                    amf_components[style].extend(
+                        {
+                            aces_transform_id,
+                            *amf_components.get(aces_transform_id, []),
+                        }
+                    )
+
             # Checking whether the linked "DisplayColorspace"
             # "BuiltinTransform" style exists.
             style = transform_data["linked_display_colorspace_style"]
@@ -1100,6 +1114,11 @@ def generate_config_aces(
                 describe,
                 signature_only=True,
                 scheme=scheme,
+                interchange_mapping={
+                    "amf_transform_ids": "\n".join(
+                        filter_amf_components(amf_components, style)
+                    )
+                },
             )
             view_transform["transforms_data"] = [transform_data]
             view_transforms.append(view_transform)
@@ -1110,13 +1129,6 @@ def generate_config_aces(
 
             display_style = transform_data["linked_display_colorspace_style"]
 
-            filtered_amf_components = filter_amf_components(
-                amf_components,
-                display_style,
-                additional_filterers["any"].get("amf_component_display_filterers"),
-                additional_filterers["all"].get("amf_component_display_filterers"),
-            )
-
             display = style_to_display_colorspace(
                 display_style,
                 describe,
@@ -1126,11 +1138,20 @@ def generate_config_aces(
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
                 interop_id=transform_data.get("interop_id"),
-                interchange_mapping=(
-                    None
-                    if filtered_amf_components is None
-                    else {"amf_transform_ids": "\n".join(filtered_amf_components)}
-                ),
+                interchange_mapping={
+                    "amf_transform_ids": "\n".join(
+                        filter_amf_components(
+                            amf_components,
+                            display_style,
+                            additional_filterers["any"].get(
+                                "amf_component_display_filterers"
+                            ),
+                            additional_filterers["all"].get(
+                                "amf_component_display_filterers"
+                            ),
+                        )
+                    )
+                },
             )
             display["transforms_data"] = [transform_data]
             display_name = display["name"]
@@ -1170,6 +1191,11 @@ def generate_config_aces(
                     "style": style,
                 },
                 process_space=scene_reference_colorspace["name"],
+                interchange_mapping={
+                    "amf_transform_ids": "\n".join(
+                        filter_amf_components(amf_components, style)
+                    )
+                },
             )
             look["transforms_data"] = [transform_data]
             if look not in looks:
@@ -1178,10 +1204,6 @@ def generate_config_aces(
             LOGGER.info(
                 'Creating a "Colorspace" transform for "%s" style...',
                 style,
-            )
-
-            filtered_amf_components = filter_amf_components(
-                amf_components, ctl_transform.aces_transform_id.aces_transform_id
             )
 
             colorspace = ctl_transform_to_colorspace(
@@ -1198,11 +1220,14 @@ def generate_config_aces(
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
                 interop_id=transform_data.get("interop_id"),
-                interchange_mapping=(
-                    None
-                    if filtered_amf_components is None
-                    else {"amf_transform_ids": "\n".join(filtered_amf_components)}
-                ),
+                interchange_mapping={
+                    "amf_transform_ids": "\n".join(
+                        filter_amf_components(
+                            amf_components,
+                            ctl_transform.aces_transform_id.aces_transform_id,
+                        )
+                    )
+                },
             )
             colorspace["transforms_data"] = [transform_data]
             if colorspace not in colorspaces:
