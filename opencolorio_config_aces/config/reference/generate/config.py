@@ -1416,7 +1416,10 @@ def generate_config_aces(
         ],
         viewing_rules=[
             {"name": "Any Scene-linear or Log", "encodings": ["log", "scene-linear"]},
-            {"name": "Any Video", "encodings": ["sdr-video", "hdr-video"]},
+            {
+                "name": "Any Video",
+                "encodings": ["sdr-video", "hdr-video", "edr-video", "display-linear"],
+            },
         ],
         default_view_transform=untonemapped_view_transform["name"],
         profile_version=build_configuration.ocio,
