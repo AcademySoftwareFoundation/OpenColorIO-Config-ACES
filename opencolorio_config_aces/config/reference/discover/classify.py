@@ -1509,7 +1509,11 @@ def generate_amf_components(
                     transform["previousEquivalentTransformIds"]
                 )
 
-    return {key: sorted(set(value)) for key, value in amf_components.items() if value}
+    return {
+        key: sorted({transform_id for transform_id in transform_ids if transform_id})
+        for key, transform_ids in amf_components.items()
+        if transform_ids
+    }
 
 
 def filter_amf_components(
