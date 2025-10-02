@@ -524,7 +524,7 @@ def git_describe() -> str:
     try:  # pragma: no cover
         version = subprocess.check_output(
             ["git", "describe"],  # noqa: S603, S607
-            cwd=opencolorio_config_aces.__path__[0],  # pyright: ignore
+            cwd=opencolorio_config_aces.__path__[0],
             stderr=subprocess.STDOUT,
         ).strip()
         version = version.decode("utf-8")
