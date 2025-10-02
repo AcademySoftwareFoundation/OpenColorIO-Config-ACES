@@ -471,12 +471,15 @@ def requirements(ctx: Context) -> None:
     """
 
     message_box('Exporting "requirements.txt" file...')
-    ctx.run('uv export --no-hashes --all-extras | grep -v "-e \\." > requirements.txt')
+    ctx.run(
+        "uv export --no-annotate --no-hashes --all-extras | "
+        'grep -v "-e \\." > requirements.txt'
+    )
 
     message_box('Exporting "docs/requirements.txt" file...')
     ctx.run(
-        'uv export --no-hashes --all-extras --no-dev | grep -v "-e \\." > '
-        "docs/requirements.txt"
+        "uv export --no-annotate --no-hashes --all-extras --no-dev | "
+        'grep -v "-e \\." > docs/requirements.txt'
     )
 
 
