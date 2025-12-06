@@ -95,7 +95,7 @@ tomli-w==1.2.0
 tomlkit==0.13.3
 trove-classifiers==2025.9.11.17
 typing-extensions==4.15.0
-urllib3==2.5.0
+urllib3==2.6.0
 userpath==1.9.2
 uv==0.8.22
 virtualenv==20.34.0
