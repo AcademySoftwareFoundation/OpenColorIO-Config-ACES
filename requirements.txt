@@ -98,6 +98,6 @@ typing-extensions==4.15.0
 urllib3==2.5.0
 userpath==1.9.2
 uv==0.8.22
-virtualenv==20.34.0
+virtualenv==20.36.1
 zipp==3.23.0 ; python_full_version < '3.12'
 zstandard==0.25.0
