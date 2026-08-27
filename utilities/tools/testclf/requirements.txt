@@ -1,3 +1,4 @@
-imageio
+colour-science>=0.4.6
 numpy
 opencolorio
+OpenImageIO>=3,<4
