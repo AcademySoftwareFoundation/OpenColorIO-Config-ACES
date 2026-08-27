@@ -41,6 +41,9 @@ from opencolorio_config_aces.config.generation import (
     produce_transform,
     view_transform_factory,
 )
+from opencolorio_config_aces.config.generation.spreadsheet import (
+    url_export_transforms_mapping_file,
+)
 from opencolorio_config_aces.config.reference import (
     classify_aces_ctl_transforms,
     discover_aces_ctl_transforms,
@@ -93,10 +96,8 @@ __all__ = [
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 
-URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE: str = (
-    "https://docs.google.com/spreadsheets/d/"
-    "1z3xsy3sF0I-8AN_tkMOEjHlAs13ba7VAVhrE8v4WIyo/"
-    "export?format=csv&gid=273921464"
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE: str = url_export_transforms_mapping_file(
+    273921464
 )
 """
 URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
