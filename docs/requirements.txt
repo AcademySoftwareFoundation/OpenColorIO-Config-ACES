@@ -20,6 +20,7 @@ networkx==3.5 ; python_full_version >= '3.11'
 numpy==2.2.6 ; python_full_version < '3.11'
 numpy==2.3.3 ; python_full_version >= '3.11'
 opencolorio==2.5.0
+openimageio==3.1.16.0
 packaging==25.0
 pillow==11.3.0
 pydata-sphinx-theme==0.16.1

@@ -19,9 +19,9 @@ import logging
 import sys
 import traceback
 
-import imageio
 import numpy as np
 import PyOpenColorIO as ocio
+from colour import read_image, write_image
 
 __author__ = "OpenColorIO Contributors"
 __copyright__ = "Copyright Contributors to the OpenColorIO Project."
@@ -75,7 +75,7 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
             )
     else:
         # Interpret as RGB image path
-        src_rgb = imageio.imread(input_data[0])
+        src_rgb = read_image(input_data[0])
         num_channels = src_rgb.shape[2]
 
         output_image = True
@@ -113,7 +113,8 @@ def test_clf(clf_path, input_data, output_path, inverse=False):
 
     if output_image:
         # Write array to output image
-        imageio.imwrite(output_path, dst_rgb)
+        if not write_image(dst_rgb, output_path):
+            raise RuntimeError(f'Unable to write output image "{output_path}".')
     else:
         # Print pixel transformations
         for src_pixel, dst_pixel in zip(src_rgb, dst_rgb):

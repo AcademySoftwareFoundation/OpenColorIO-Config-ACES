@@ -51,6 +51,7 @@ optional = [
     "colour-science>=0.4.6",
     "jsonpickle",
     "networkx",
+    "OpenImageIO>=3,<4",
     "pydot",
 ]
 docs = [

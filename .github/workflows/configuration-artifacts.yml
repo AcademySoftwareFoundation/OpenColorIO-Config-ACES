@@ -35,7 +35,6 @@ jobs:
       - name: Install Package Dependencies
         run: |
           uv sync --all-extras --no-dev
-          uv run python -c "import imageio;imageio.plugins.freeimage.download()"
         shell: bash
       - name: ACES - Conversion Graph
         run: |
