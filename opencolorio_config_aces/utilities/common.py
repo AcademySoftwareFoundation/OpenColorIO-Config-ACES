@@ -653,11 +653,11 @@ def google_sheet_title(url: str) -> str:
     --------
     >>> url = (
     ...     "https://docs.google.com/spreadsheets/d/"
-    ...     "1z3xsy3sF0I-8AN_tkMOEjHlAs13ba7VAVhrE8v4WIyo/"
+    ...     "1V6tbYwPOK8fssOpO91LTUMV_5Lj1ULjadz65r4zxBHw/"
     ...     "export?format=csv&gid=273921464"
     ... )
     >>> google_sheet_title(url)  # doctest: +SKIP
-    'OpenColorIO-Config-ACES "Reference" Transforms - v...'
+    'OpenColorIO-Config-ACES - Transforms - v4'
     """
 
     class Parser(HTMLParser):

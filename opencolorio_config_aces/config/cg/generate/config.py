@@ -40,6 +40,9 @@ from opencolorio_config_aces.config.generation import (
     generate_config,
     named_transform_factory,
 )
+from opencolorio_config_aces.config.generation.spreadsheet import (
+    url_export_transforms_mapping_file,
+)
 from opencolorio_config_aces.config.reference import (
     DescriptionStyle,
     filter_amf_components,
@@ -89,10 +92,8 @@ __all__ = [
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 
-URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG: str = (
-    "https://docs.google.com/spreadsheets/d/"
-    "1PXjTzBVYonVFIceGkLDaqcEJvKR6OI63DwZX0aajl3A/"
-    "export?format=csv&gid=365242296"
+URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG: str = url_export_transforms_mapping_file(
+    863695708
 )
 """
 URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
@@ -1136,8 +1137,27 @@ def generate_config_cg(
         style = transform_data["builtin_transform_style"]
         clf_transform_id = transform_data["clf_transform_id"]
 
-        if style:
-            clf_transform = clf_transform_from_style(style)
+        clf_transform = None
+        if clf_transform_id:
+            clf_transform = clf_transform_from_id(clf_transform_id)
+
+            attest(
+                clf_transform is not None,
+                f'"{clf_transform_id}" "CLF" transform does not exist!',
+            )
+
+        linked_builtin_transform = (
+            clf_transform.information.get("BuiltinTransform")
+            if clf_transform is not None
+            else None
+        )
+        use_builtin_transform = bool(
+            style and (not clf_transform_id or linked_builtin_transform == style)
+        )
+
+        if use_builtin_transform:
+            if clf_transform is None:
+                clf_transform = clf_transform_from_style(style)
 
             filtered_amf_components = None
             if (
@@ -1187,20 +1207,20 @@ def generate_config_cg(
 
             if style and clf_transform_id:
                 LOGGER.warning(
-                    '"%s" style was defined along side a "CTLtransformID", '
+                    '"%s" style was defined along side a "CLFtransformID", '
                     "hybrid transform generation was used!",
                     style,
                 )
                 continue
-
-        if clf_transform_id:
-            clf_transform = clf_transform_from_id(clf_transform_id)
-
-            attest(
-                clf_transform is not None,
-                f'"{clf_transform_id}" "CLF" transform does not exist!',
+        elif style and clf_transform_id:
+            LOGGER.info(
+                'Using explicit "%s" "CLFtransformID" because it does not '
+                'declare "%s" as an equivalent "BuiltinTransform".',
+                clf_transform_id,
+                style,
             )
 
+        if clf_transform_id:
             filtered_amf_components = None
             if (
                 aces_transform_id := clf_transform.information.get(  # pyright: ignore
@@ -1314,7 +1334,7 @@ def generate_config_cg(
     # Virtual Display Shared Views
     # ============================
     data.virtual_display_shared_views = list(
-        {
+        dict.fromkeys(
             shared_view["view"]
             for shared_view in data.shared_views
             if shared_view["display"]
@@ -1323,7 +1343,7 @@ def generate_config_cg(
                 for a in data.colorspaces
                 if a.get("family") == "Display" and a.get("encoding") == "sdr-video"
             ]
-        }
+        )
     )
 
     # Virtual Display Views

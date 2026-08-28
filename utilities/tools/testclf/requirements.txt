@@ -1,3 +1,6 @@
-imageio
+colour-science>=0.4.6,<0.4.7; python_version < "3.11"
+colour-science>=0.4.7; python_version >= "3.11"
 numpy
 opencolorio
+OpenImageIO>=3,<4
+scipy>=1.13,<2

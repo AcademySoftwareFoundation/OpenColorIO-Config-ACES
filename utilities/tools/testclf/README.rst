@@ -36,6 +36,5 @@ Dependencies
 * ``pip install requirements.txt``
   * Installs [numpy](https://pypi.org/project/numpy/)
   * Installs [opencolorio](https://pypi.org/project/opencolorio/)
-  * Installs [imageio](https://pypi.org/project/imageio/)
-* ``imageio_download_bin freeimage``
-  * Installs [imageio FreeImage plugin](https://imageio.readthedocs.io/en/stable/_autosummary/imageio.plugins.freeimage.html) to enable OpenEXR support
+  * Installs [colour-science](https://pypi.org/project/colour-science/)
+  * Installs [OpenImageIO](https://pypi.org/project/OpenImageIO/)
