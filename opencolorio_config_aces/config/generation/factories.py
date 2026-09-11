@@ -72,6 +72,7 @@ BUILTIN_TRANSFORMS.update(
         "DISPLAY - CIE-XYZ-D65_to_DisplayP3": Version(2, 3),
         "APPLE_LOG_to_ACES2065-1": Version(2, 4),
         "CURVE - APPLE_LOG_to_LINEAR": Version(2, 4),
+        "APPLE_LOG-APPLEWG_to_ACES2065-1": Version(2, 6),
     }
 )
 
