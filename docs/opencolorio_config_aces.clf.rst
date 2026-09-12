@@ -39,6 +39,7 @@ Common LUT Format Generation
 .. autosummary::
     :toctree: generated/
 
+    generate_clf_transforms_apple
     generate_clf_transforms_arri
     generate_clf_transforms_bmdfilm
     generate_clf_transforms_canon

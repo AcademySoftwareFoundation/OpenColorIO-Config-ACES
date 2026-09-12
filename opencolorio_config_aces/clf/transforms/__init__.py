@@ -9,6 +9,9 @@ from .utilities import (
     format_clf_transform_id,
     clf_basename,
 )
+from .apple import (
+    generate_clf_transforms_apple,
+)
 from .arri import (
     generate_clf_transforms_arri,
 )
@@ -45,6 +48,9 @@ __all__ = [
     "generate_clf_transform",
     "format_clf_transform_id",
     "clf_basename",
+]
+__all__ += [
+    "generate_clf_transforms_apple",
 ]
 __all__ += [
     "generate_clf_transforms_arri",
