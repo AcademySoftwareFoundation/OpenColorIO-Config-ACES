@@ -1051,7 +1051,7 @@ def discover_clf_transforms(
     'input'
     >>> sorted([os.path.basename(path) for path in clf_transforms[key]])[:2]
     ['Apple.Input.Apple_Log-Curve.clf', \
-'Apple.Input.Apple_Log_to_ACES2065-1.clf']
+'Apple.Input.Apple_Log_2_to_ACES2065-1.clf']
     """
 
     root_directory = os.path.normpath(os.path.expandvars(root_directory))
@@ -1114,9 +1114,9 @@ def classify_clf_transforms(
     [('Apple.Input.Apple_Log-Curve', \
 CLFTransform(\
 'apple...input...Apple.Input.Apple_Log-Curve.clf')), \
-('Apple.Input.Apple_Log_to_ACES2065-1', \
+('Apple.Input.Apple_Log_2_to_ACES2065-1', \
 CLFTransform(\
-'apple...input...Apple.Input.Apple_Log_to_ACES2065-1.clf'))]
+'apple...input...Apple.Input.Apple_Log_2_to_ACES2065-1.clf'))]
     """
 
     classified_clf_transforms = defaultdict(lambda: defaultdict(dict))

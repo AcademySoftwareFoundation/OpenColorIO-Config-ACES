@@ -10,6 +10,7 @@ from .discover import (
 )
 from .transforms import (
     generate_clf_transform,
+    generate_clf_transforms_apple,
     generate_clf_transforms_arri,
     generate_clf_transforms_bmdfilm,
     generate_clf_transforms_canon,
@@ -32,6 +33,7 @@ __all__ = [
 __all__ += [
     "generate_clf_transform",
     "generate_clf_transform",
+    "generate_clf_transforms_apple",
     "generate_clf_transforms_arri",
     "generate_clf_transforms_bmdfilm",
     "generate_clf_transforms_canon",
