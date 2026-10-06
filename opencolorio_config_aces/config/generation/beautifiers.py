@@ -172,6 +172,7 @@ PATTERNS_VIEW_TRANSFORM_NAME : dict
 """
 
 PATTERNS_DISPLAY_NAME: dict[str, str] = {
+    "G2.6-P3-D65 - MIRROR NEGS": "Gamma 2.6 P3-D65",
     "G2.6-": "",
     "G2.2": "Gamma 2.2",
     "-BFD": "",

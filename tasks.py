@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import contextlib
 import inspect
-import os
 from pathlib import Path
 
 import requests
@@ -25,7 +24,7 @@ from opencolorio_config_aces.config.reference.generate.config import (
 from opencolorio_config_aces.config.studio.generate.config import (
     URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO,
 )
-from opencolorio_config_aces.utilities import google_sheet_title, message_box
+from opencolorio_config_aces.utilities import message_box
 
 if not hasattr(inspect, "getargspec"):
     inspect.getargspec = inspect.getfullargspec
@@ -329,17 +328,11 @@ def update_mapping_file_reference(ctx: Context) -> None:  # noqa: ARG001
         'Updating the "aces-dev" reference "OpenColorIO" config mapping file...'
     )
 
-    title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE)
-
-    directory = Path(
-        "opencolorio_config_aces/config/reference/generate/resources/"
-    ).absolute()
-
-    for csv_file in directory.glob("*Mapping.csv"):
-        os.remove(csv_file)
-
-    filename = str(directory / f"{title} - Reference Config - Mapping.csv").replace(
-        '"', ""
+    filename = str(
+        Path(
+            "opencolorio_config_aces/config/reference/generate/resources/"
+            "reference_config_mapping.csv"
+        ).absolute()
     )
 
     with open(filename, "w") as csv_file:
@@ -380,14 +373,12 @@ def update_mapping_file_cg(ctx: Context) -> None:  # noqa: ARG001
         "mapping file..."
     )
 
-    title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG)
-
-    directory = Path("opencolorio_config_aces/config/cg/generate/resources/").absolute()
-
-    for csv_file in directory.glob("*Mapping.csv"):
-        os.remove(csv_file)
-
-    filename = str(directory / f"{title} - CG Config - Mapping.csv").replace('"', "")
+    filename = str(
+        Path(
+            "opencolorio_config_aces/config/cg/generate/resources/"
+            "cg_config_mapping.csv"
+        ).absolute()
+    )
 
     with open(filename, "w") as csv_file:
         csv_file.write(
@@ -424,17 +415,11 @@ def update_mapping_file_studio(ctx: Context) -> None:  # noqa: ARG001
 
     message_box('Updating the "ACES" Studio "OpenColorIO" config mapping file...')
 
-    title = google_sheet_title(URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO)
-
-    directory = Path(
-        "opencolorio_config_aces/config/studio/generate/resources/"
-    ).absolute()
-
-    for csv_file in directory.glob("*Mapping.csv"):
-        os.remove(csv_file)
-
-    filename = str(directory / f"{title} - Studio Config - Mapping.csv").replace(
-        '"', ""
+    filename = str(
+        Path(
+            "opencolorio_config_aces/config/studio/generate/resources/"
+            "studio_config_mapping.csv"
+        ).absolute()
     )
 
     with open(filename, "w") as csv_file:

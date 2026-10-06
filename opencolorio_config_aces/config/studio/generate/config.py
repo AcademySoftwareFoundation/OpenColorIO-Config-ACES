@@ -66,8 +66,8 @@ URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_STUDIO : unicode
 """
 
-PATH_TRANSFORMS_MAPPING_FILE_STUDIO: Path = next(
-    (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
+PATH_TRANSFORMS_MAPPING_FILE_STUDIO: Path = (
+    Path(__file__).parents[0] / "resources" / "studio_config_mapping.csv"
 )
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.

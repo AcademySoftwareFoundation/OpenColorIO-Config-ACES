@@ -101,8 +101,8 @@ URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_CG : unicode
 """
 
-PATH_TRANSFORMS_MAPPING_FILE_CG: Path = next(
-    (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
+PATH_TRANSFORMS_MAPPING_FILE_CG: Path = (
+    Path(__file__).parents[0] / "resources" / "cg_config_mapping.csv"
 )
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
@@ -882,6 +882,7 @@ def generate_config_cg(
                 "encoding",
                 "categories",
                 "interop_id",
+                "family",
             ],
         )
 
@@ -1133,6 +1134,13 @@ def generate_config_cg(
             "categories": transform_data.get("categories"),
             "interop_id": transform_data.get("interop_id"),
         }
+
+        # Overriding the computed "family" with the "Family" mapping file
+        # column value when specified, otherwise leaving it untouched so it
+        # falls back to the value computed from the transform id.
+        family = transform_data.get("family")
+        if family:
+            kwargs["family"] = family
 
         style = transform_data["builtin_transform_style"]
         clf_transform_id = transform_data["clf_transform_id"]

@@ -105,8 +105,8 @@ URL to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
 URL_EXPORT_TRANSFORMS_MAPPING_FILE_REFERENCE : unicode
 """
 
-PATH_TRANSFORMS_MAPPING_FILE_REFERENCE: Path = next(
-    (Path(__file__).parents[0] / "resources").glob("*Mapping.csv")
+PATH_TRANSFORMS_MAPPING_FILE_REFERENCE: Path = (
+    Path(__file__).parents[0] / "resources" / "reference_config_mapping.csv"
 )
 """
 Path to the *ACES* *CTL* transforms to *OpenColorIO* colorspaces mapping file.
@@ -944,6 +944,7 @@ def generate_config_aces(
                 "categories",
                 "aliases",
                 "interop_id",
+                "family",
             ],
         )
 
@@ -1207,6 +1208,15 @@ def generate_config_aces(
                 style,
             )
 
+            # Overriding the computed "family" with the "Family" mapping
+            # file column value when specified, otherwise leaving it
+            # untouched so it falls back to the value computed from the
+            # transform id.
+            family_kwargs: dict[str, Any] = {}
+            family = transform_data.get("family")
+            if family:
+                family_kwargs["family"] = family
+
             colorspace = ctl_transform_to_colorspace(
                 ctl_transform,
                 describe,
@@ -1221,6 +1231,7 @@ def generate_config_aces(
                 categories=transform_data.get("categories"),
                 aliases=transform_data_aliases(transform_data),
                 interop_id=transform_data.get("interop_id"),
+                **family_kwargs,
                 interchange_mapping={
                     "amf_transform_ids": "\n".join(
                         filter_amf_components(
