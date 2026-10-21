@@ -4,7 +4,7 @@ accessible-pygments==0.0.5
 alabaster==1.0.0
 babel==2.17.0
 beautifulsoup4==4.13.5
-certifi==2025.8.3
+certifi==2026.10.19
 charset-normalizer==3.4.3
 colorama==0.4.6 ; sys_platform == 'win32'
 colour-science==0.4.6 ; python_full_version < '3.11'
